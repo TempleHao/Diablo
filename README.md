@@ -2,9 +2,13 @@
 
 **版本 0.2.0** · 原创暗黑风格的 3D 网页单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。
 
-[打开游戏](https://templehao.github.io/Diablo/) · [部署工作流](https://github.com/TempleHao/Diablo/actions/workflows/pages.yml) · [玩法设计](docs/GAME-DESIGN.md)
+[打开游戏](https://templehao.github.io/Diablo/) · [完整游戏策划](docs/bible/README.md) · [在线策划阅读版](https://templehao.github.io/Diablo/design/) · [部署工作流](https://github.com/TempleHao/Diablo/actions/workflows/pages.yml)
 
 游戏地址需要 GitHub Pages 工作流成功部署后才可访问；以工作流结果为准。
+
+## 完整故事与策划纲领
+
+《余烬纪事》策划基线1.0已整理成[分章文档](docs/bible/README.md)、[完整Markdown](docs/GAME-BIBLE-1.0.md)与[PDF](dist/design/GAME-BIBLE-1.0.pdf)。源章节约11.0万汉字，覆盖五幕故事、法师三系、装备与词条、关卡与怪物、掉落打造、终局和未来在线扩展，并给出美术技术规范及验证方法。它是完整设计提案，与当前Demo实际能力分别标注。
 
 ![地窟实机画面](docs/screenshots/gameplay.png)
 
@@ -59,7 +63,7 @@ blender -b --python scripts/build-mage.py -- /你的绝对路径/Diablo
 
 ## 仍待实现
 
-完整房间关卡、分工怪物 AI、六槽装备、火焰/冰霜构筑、真实词条组合、定向掉落与重铸仍属于[设计计划](docs/GAME-DESIGN.md)，目前不是现有能力。当前地图是固定场景，怪物位置和法杖数值随机；法杖还只有伤害加成。
+完整房间关卡、分工怪物 AI、三系构筑、真实词条组合、定向掉落与重铸仍属于[设计计划](docs/bible/README.md)，目前不是现有能力。完整计划为十装备位，D1先做六槽过渡。当前地图是固定场景，怪物位置和法杖数值随机；法杖还只有伤害加成。
 
 暂不提供账号、云存档、多人联机或交易。本机存档不跨域名/设备共享；清除网站数据会丢失存档。真实手机性能与完整 Boss 通关平衡仍需持续测试。
 

@@ -1,0 +1,103 @@
+{
+  "designVersion": "1.0",
+  "designDate": "2026-10-11",
+  "gameVersion": "0.2.0",
+  "scope": "Unique source chapters 00–08 only; excludes index and generated copies",
+  "totals": {
+    "hanCharacters": 110438,
+    "totalCharacters": 160738,
+    "bytes": 408564
+  },
+  "contentTableCounts": {
+    "mainQuests": 35,
+    "sideQuests": 24,
+    "roomTemplates": 35,
+    "monsters": 36,
+    "eliteModifiers": 12,
+    "bosses": 10,
+    "itemBases": 28,
+    "affixes": 48,
+    "uniqueItems": 18,
+    "contractModifiers": 22
+  },
+  "chapters": [
+    {
+      "file": "00-CONTRACTS.md",
+      "title": "共同约定与版本边界",
+      "hanCharacters": 1509,
+      "totalCharacters": 2000,
+      "bytes": 5452,
+      "sha256": "e605733885b0ef6680752f0d400c69e0c8682469c02965abe481d5562f7e37c7"
+    },
+    {
+      "file": "01-VISION-AND-COVERAGE.md",
+      "title": "第一卷：产品纲领、玩法覆盖与系统关系",
+      "hanCharacters": 5102,
+      "totalCharacters": 8100,
+      "bytes": 19278,
+      "sha256": "5e6e3ccf6e4d9ffae97bf437f2424b66d26decb5a9066fea5f85f505c1ad7c59"
+    },
+    {
+      "file": "02-STORY-WORLD-AND-QUESTS.md",
+      "title": "第二卷：故事框架、世界圣经与任务策划",
+      "hanCharacters": 14131,
+      "totalCharacters": 18087,
+      "bytes": 48941,
+      "sha256": "7679c3cb842b13e21522e62df588c8a2551295a6b946230a0a0e4bda21ef390b"
+    },
+    {
+      "file": "03-COMBAT-AND-MAGE.md",
+      "title": "03｜战斗规则与法师构筑",
+      "hanCharacters": 18015,
+      "totalCharacters": 26345,
+      "bytes": 67100,
+      "sha256": "3d3789de7d1f7e4f83a6dd074c0a341acfaf02c5aa465b07475d0b01e25019fa"
+    },
+    {
+      "file": "04-WORLD-LEVELS-AND-BESTIARY.md",
+      "title": "04 世界、关卡与怪物图鉴",
+      "hanCharacters": 16121,
+      "totalCharacters": 25863,
+      "bytes": 62528,
+      "sha256": "c5e006fd5644dfefa30b702c34d106ca78046ea404b4d77f4c9b8fb4626d6d94"
+    },
+    {
+      "file": "05-ITEMS-LOOT-AND-CRAFTING.md",
+      "title": "05 装备、掉落与打造",
+      "hanCharacters": 18357,
+      "totalCharacters": 30078,
+      "bytes": 72329,
+      "sha256": "68cac1a527c44972b880554ddc290cca75eff0a7d63e3794908a7e2280978e5b"
+    },
+    {
+      "file": "06-ENDGAME-ECONOMY-AND-ONLINE.md",
+      "title": "06 长期玩法、经济闭环与在线扩展",
+      "hanCharacters": 14047,
+      "totalCharacters": 18101,
+      "bytes": 49265,
+      "sha256": "50b15be039899032f072d2aadeb4018cefe242e4dad66d52672feabddbbb175d"
+    },
+    {
+      "file": "07-EXPERIENCE-ART-TECH-AND-PRODUCTION.md",
+      "title": "07｜体验、美术、技术与制作执行规范",
+      "hanCharacters": 13919,
+      "totalCharacters": 18635,
+      "bytes": 50093,
+      "sha256": "f350f113b4f8567e9a23b05a8d417b75aa2439f79500a77e28ba58697ca35409"
+    },
+    {
+      "file": "08-VALIDATION-AND-DECISIONS.md",
+      "title": "08｜验证方案、决策登记与策划维护",
+      "hanCharacters": 9237,
+      "totalCharacters": 13529,
+      "bytes": 33578,
+      "sha256": "3ac613515056ea99b07ae2841d3e01bf654cbfdfa1b5e4b646dfcd10cd74ee5d"
+    }
+  ],
+  "validation": {
+    "relativeChapterLinks": "passed",
+    "codeFences": "passed",
+    "tableIdUniqueness": "passed",
+    "gameBalanceAndRealDevicePerformance": "not measured; proposed methods only"
+  }
+}
