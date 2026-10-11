@@ -6,6 +6,8 @@
 
 游戏地址需要 GitHub Pages 工作流成功部署后才可访问；以工作流结果为准。
 
+项目续做从[断点记录](docs/PROJECT-STATE.md)、[工作队列](docs/WORK-QUEUE.md)和[机器可读状态](docs/project-state.json)恢复。定时任务每5小时尝试继续；实际执行取决于额度、工具与连接可用，不代表能够查询或保证额度恢复时间。
+
 ## 完整故事与策划纲领
 
 《余烬纪事》策划基线1.0已整理成[分章文档](docs/bible/README.md)、[完整Markdown](docs/GAME-BIBLE-1.0.md)与[PDF](dist/design/GAME-BIBLE-1.0.pdf)。源章节约11.0万汉字，覆盖五幕故事、法师三系、装备与词条、关卡与怪物、掉落打造、终局和未来在线扩展，并给出美术技术规范及验证方法。它是完整设计提案，与当前Demo实际能力分别标注。
