@@ -7,7 +7,10 @@
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "D1-01",
-  "completedTaskIds": ["D0-PLAYABLE", "DOC-BIBLE-1"],
+  "completedTaskIds": [
+    "D0-PLAYABLE",
+    "DOC-BIBLE-1"
+  ],
   "lastCompletedWorkCommit": "f6b427b495d2531c06f6490de71805ad085fb996",
   "lastKnownSuccessfulDeployment": {
     "commit": "f6b427b495d2531c06f6490de71805ad085fb996",
@@ -29,10 +32,17 @@
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-11T16:05:05Z",
+  "lastUpdatedAt": "2026-10-11T21:19:10.848248+00:00",
   "validationLimitations": [
     "Full planned systems are not implemented in Demo 0.2.0",
     "Browser mobile viewport checks are not real-device performance tests",
     "Scheduler success does not guarantee future Codex quota or coding tools"
-  ]
+  ],
+  "automation": {
+    "title": "余烬纪事断点续做",
+    "isEnabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART:20261012T021910Z\nRRULE:FREQ=HOURLY;INTERVAL=5\nEND:VEVENT",
+    "timezone": "Asia/Shanghai",
+    "configuredAt": "2026-10-11T21:19:10.848248+00:00"
+  }
 }
