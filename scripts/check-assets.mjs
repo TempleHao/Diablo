@@ -1,0 +1,13 @@
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const bytes=readFileSync(new URL('../dist/models/ember-mage.glb',import.meta.url));
+assert.equal(bytes.readUInt32LE(0),0x46546c67,'Invalid GLB magic');
+assert.equal(bytes.readUInt32LE(4),2,'Unsupported GLB version');
+assert.equal(bytes.readUInt32LE(8),bytes.length,'Truncated model');
+assert.equal(bytes.readUInt32LE(16),0x4e4f534a,'Model JSON chunk missing');
+const model=JSON.parse(bytes.subarray(20,20+bytes.readUInt32LE(12)).toString());
+assert.ok(model.meshes?.length&&model.skins?.length,'Character mesh/skin missing');
+for(const name of ['Idle','Walk','Cast'])assert.ok(model.animations?.some(a=>a.name===name&&a.channels.length),'Animation missing: '+name);
+assert.equal(model.buffers[0].uri,undefined,'Model requires an external buffer');
+assert.ok(model.nodes.some(n=>n.skin!==undefined),'Skin not connected to mesh');
+console.log('Model payload, skin and animation clips verified.');

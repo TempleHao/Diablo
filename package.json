@@ -1,0 +1,10 @@
+{
+  "name": "ember-mage",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 5173 --directory dist",
+    "check": "node --check dist/game.js && node --check dist/hero.js && node --check dist/environment.js && node scripts/check-assets.mjs"
+  }
+}

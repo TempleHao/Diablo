@@ -1,0 +1,7 @@
+node_modules/
+*.zip
+*.blend1
+assets-source/*.blend
+preview.png
+gameplay.png
+mobile.png

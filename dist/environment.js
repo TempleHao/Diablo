@@ -1,0 +1,503 @@
+import * as T from './vendor/three.module.js';
+
+// An open-roof, cutaway crypt. All coordinates and collisions stay deterministic.
+export function createEnvironment(scene) {
+  const group = new T.Group();
+  group.name = 'The Cinder Archive';
+  scene.add(group);
+  const obstacles = [];
+  const batches = new Map();
+  const animatedFlames = [];
+  const animatedLights = [];
+  const portalSparks = [];
+  const roomBands = [
+    { min: -21, max: -7, door: -14 },
+    { min: -5, max: 7, door: 1 },
+    { min: 9, max: 21, door: 15 }
+  ];
+  const transform = new T.Object3D();
+  let seed = 17391;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const standard = (color, extra = {}) => new T.MeshStandardMaterial({
+    color, roughness: .91, metalness: .04, ...extra
+  });
+  const materials = {
+    foundation: standard(0x18232b),
+    stone: standard(0x56636b),
+    stoneLight: standard(0x74828a),
+    stoneDark: standard(0x36434c),
+    mortar: standard(0x28343c),
+    carved: standard(0x67747b),
+    bronze: standard(0x9f8052, { roughness: .6, metalness: .66 }),
+    iron: standard(0x242b30, { roughness: .65, metalness: .65 }),
+    wood: standard(0x473b35),
+    woodEdge: standard(0x675246),
+    bone: standard(0xa8a398),
+    ash: standard(0x292d32),
+    runeGold: standard(0xa8834f, { emissive: 0x4f270e, emissiveIntensity: .32 }),
+    runeBlue: standard(0x7cbdcc, { emissive: 0x2c9abc, emissiveIntensity: 1.35, roughness: .55 }),
+    ember: new T.MeshBasicMaterial({ color: 0xffaf53 }),
+    flameCore: new T.MeshBasicMaterial({ color: 0xffe9ac }),
+    flameEdge: new T.MeshBasicMaterial({ color: 0xf36b27, transparent: true, opacity: .85 }),
+    blueGlow: new T.MeshBasicMaterial({ color: 0x7ed7e6, transparent: true, opacity: .7 }),
+    redGlow: new T.MeshBasicMaterial({ color: 0xd98d55, transparent: true, opacity: .48 })
+  };
+  const floorMaterials = [0x45545e, 0x4c5b63, 0x53616a, 0x3e4d57, 0x5c6970].map(c => standard(c));
+  const wallMaterials = [0x46535c, 0x4f5b63, 0x59656c, 0x3d4b54].map(c => standard(c));
+  const books = [0x526d75, 0x806452, 0x654d59, 0x69735b, 0x8b7352, 0x3d5362].map(c => standard(c));
+  const geometries = {
+    tile: new T.BoxGeometry(1.94, .2, 1.94),
+    brick: new T.BoxGeometry(1.42, .57, .54),
+    block: new T.BoxGeometry(1, 1, 1),
+    column: new T.CylinderGeometry(.49, .58, 3.95, 12),
+    columnBase: new T.CylinderGeometry(.83, .94, .32, 8),
+    collar: new T.CylinderGeometry(.66, .66, .16, 12),
+    flute: new T.CylinderGeometry(.035, .035, 3.58, 5),
+    archStone: new T.BoxGeometry(.66, .61, 1.08),
+    tomb: new T.BoxGeometry(1.15, .73, 2.16),
+    tombLid: new T.BoxGeometry(1.32, .17, 2.34),
+    tombTrim: new T.BoxGeometry(1.38, .12, 2.4),
+    book: new T.BoxGeometry(.48, .63, .18),
+    candle: new T.CylinderGeometry(.065, .071, .34, 6),
+    candleFlame: new T.ConeGeometry(.053, .19, 5),
+    rubble: new T.DodecahedronGeometry(.31, 0),
+    rune: new T.BoxGeometry(.065, .025, .38),
+    smallBone: new T.CylinderGeometry(.034, .043, .38, 5)
+  };
+
+  function mesh(geometry, material, x, y, z, rotation = null, parent = group) {
+    const object = new T.Mesh(geometry, material);
+    object.position.set(x, y, z);
+    if (rotation) object.rotation.set(...rotation);
+    object.castShadow = true;
+    object.receiveShadow = true;
+    parent.add(object);
+    return object;
+  }
+  function box(x, y, z, w, h, d, material = materials.stone, parent = group) {
+    const object = mesh(geometries.block, material, x, y, z, null, parent);
+    object.scale.set(w, h, d);
+    return object;
+  }
+  function instance(name, geometry, material, x, y, z, sx = 1, sy = 1, sz = 1, rx = 0, ry = 0, rz = 0) {
+    if (!batches.has(name)) batches.set(name, { geometry, material, matrices: [] });
+    transform.position.set(x, y, z);
+    transform.rotation.set(rx, ry, rz);
+    transform.scale.set(sx, sy, sz);
+    transform.updateMatrix();
+    batches.get(name).matrices.push(transform.matrix.clone());
+  }
+  function collision(x, z, r) { obstacles.push({ x, z, r }); }
+  function ring(radius, tube, material, x, y, z, segments = 80) {
+    return mesh(new T.TorusGeometry(radius, tube, 6, segments), material, x, y, z, [-Math.PI / 2, 0, 0]);
+  }
+  function beam(x1, y1, z1, x2, y2, z2, radius, material = materials.iron) {
+    const start = new T.Vector3(x1, y1, z1), end = new T.Vector3(x2, y2, z2);
+    const delta = end.clone().sub(start);
+    const object = mesh(new T.CylinderGeometry(radius, radius, delta.length(), 6), material,
+      (x1 + x2) / 2, (y1 + y2) / 2, (z1 + z2) / 2);
+    object.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), delta.normalize());
+    return object;
+  }
+
+  // Broad slabs hide the tile seams from below, while the five tile batches supply variation.
+  box(0, -.34, 0, 20, .4, 46, materials.foundation);
+  for (const side of [-1, 1]) for (const room of roomBands)
+    box(side * 16.5, -.34, (room.min + room.max) / 2, 13, .4, room.max - room.min, materials.foundation);
+  function tile(x, z, index) {
+    instance(`floor-${index}`, geometries.tile, floorMaterials[index], x, -.08, z, 1, 1, 1, 0, random() > .5 ? Math.PI / 2 : 0);
+  }
+  for (let x = -9; x <= 9; x += 2) for (let z = -22; z <= 22; z += 2) {
+    const index = Math.abs(x) < 3 ? (z / 2 & 1 ? 1 : 2) : Math.floor(random() * floorMaterials.length);
+    tile(x, z, index);
+  }
+  for (const side of [-1, 1]) for (const room of roomBands)
+    for (let x = 11; x <= 21; x += 2) for (let z = room.min + 1; z < room.max; z += 2)
+      tile(side * x, z, Math.floor(random() * floorMaterials.length));
+
+  // Narrow stone borders and brass joints make the nave read as a built place, not a grid.
+  for (const side of [-1, 1]) {
+    box(side * 9.65, .045, 0, .23, .11, 45.4, materials.stoneLight);
+    box(side * 3.15, .034, 0, .13, .035, 44.8, materials.bronze);
+    for (let z = -21; z < 22; z += 2) {
+      instance('nave-inlay', geometries.block, materials.runeGold, side * 3.15, .059, z, .27, .012, .12);
+      instance('edge-inlay', geometries.block, materials.stoneDark, side * 8.85, .035, z, .5, .018, .5, 0, Math.PI / 4);
+    }
+  }
+  const crackPoints = [];
+  for (let i = 0; i < 78; i++) {
+    const x = (random() - .5) * 17.8, z = (random() - .5) * 43.4;
+    const length = .25 + random() * .65, turn = random() * Math.PI * 2;
+    const cx = x + Math.cos(turn) * length * .45, cz = z + Math.sin(turn) * length * .45;
+    crackPoints.push(x, .026, z, cx, .026, cz, cx, .026, cz,
+      x + Math.cos(turn + .42) * length, .026, z + Math.sin(turn + .42) * length);
+  }
+  const crackGeometry = new T.BufferGeometry();
+  crackGeometry.setAttribute('position', new T.Float32BufferAttribute(crackPoints, 3));
+  group.add(new T.LineSegments(crackGeometry, new T.LineBasicMaterial({ color: 0x25343e, transparent: true, opacity: .7 })));
+
+  // Masonry cores plus staggered face stones. Front edges are low cutaway walls.
+  function wall(x1, z1, x2, z2, height) {
+    const length = Math.hypot(x2 - x1, z2 - z1), angle = Math.atan2(z2 - z1, x2 - x1);
+    const core = box((x1 + x2) / 2, height / 2 - .08, (z1 + z2) / 2, length, height, .53, materials.mortar);
+    core.rotation.y = -angle;
+    const rows = Math.max(1, Math.floor(height / .62));
+    for (let row = 0; row < rows; row++) {
+      const unit = 1.46, offset = row % 2 ? .73 : 0;
+      for (let p = .05; p < length; p += unit) {
+        const begin = Math.max(0, p - offset), end = Math.min(length, p - offset + 1.42);
+        if (end - begin < .12) continue;
+        const t = (begin + end) / 2 / length;
+        const color = Math.floor(random() * wallMaterials.length);
+        instance(`wall-${color}`, geometries.brick, wallMaterials[color],
+          x1 + (x2 - x1) * t, .25 + row * .62, z1 + (z2 - z1) * t,
+          (end - begin) / 1.42, 1, 1, 0, -angle);
+      }
+    }
+    const footing = box((x1 + x2) / 2, .19, (z1 + z2) / 2, length, .34, .83, materials.stoneDark);
+    footing.rotation.y = -angle;
+    const cap = box((x1 + x2) / 2, height - .01, (z1 + z2) / 2, length + .08, .19, .76, materials.carved);
+    cap.rotation.y = -angle;
+  }
+  wall(-10, -23, 10, -23, 5.1);
+  wall(-10, 23, 10, 23, .88);
+  const naveSegments = [[-23, -16.5], [-11.5, -1.5], [3.5, 12.5], [17.5, 23]];
+  for (const side of [-1, 1]) {
+    for (const [a, b] of naveSegments) wall(side * 10, a, side * 10, b, a >= 17 ? 2.05 : 3.85);
+    for (const room of roomBands) {
+      wall(side * 10.2, room.min, side * 23, room.min, 3.8);
+      wall(side * 10.2, room.max, side * 23, room.max, 1.0);
+      wall(side * 23, room.min, side * 23, room.max, 4.15);
+      const door = room.door;
+      for (const dz of [-2.52, 2.52]) {
+        box(side * 10, 2.14, door + dz, .94, 4.34, .62, materials.carved);
+        box(side * 10, .3, door + dz, 1.15, .3, .85, materials.stoneLight);
+        box(side * 10, 3.82, door + dz, 1.05, .22, .82, materials.stoneLight);
+      }
+      // A flat lintel and carved keystone leave a generous five-metre door below.
+      box(side * 10, 4.27, door, .81, .47, 5.65, materials.stone);
+      box(side * 10, 4.25, door, .94, .78, .46, materials.carved);
+      for (const dz of [-1.7, -1.05, -.4, .4, 1.05, 1.7])
+        instance('door-frieze', geometries.block, materials.bronze, side * 10, 4.52, door + dz, .85, .055, .23);
+    }
+  }
+
+  // Fluted nave piers and stone voussoirs are instanced across both arcades.
+  for (const side of [-1, 1]) for (const z of [-20, -10, 0, 10, 20]) {
+    const x = side * 8.25;
+    collision(x, z, .88);
+    instance('column-plinth', geometries.block, materials.stoneDark, x, .24, z, 1.68, .38, 1.68);
+    instance('column-base', geometries.columnBase, materials.stoneLight, x, .57, z);
+    instance('column-shaft', geometries.column, materials.carved, x, 2.7, z);
+    instance('column-neck', geometries.collar, materials.stoneLight, x, 4.72, z);
+    instance('column-neck', geometries.collar, materials.stoneLight, x, 1.04, z);
+    instance('column-capital', geometries.block, materials.stoneLight, x, 5.02, z, 1.37, .37, 1.37);
+    instance('column-capital-top', geometries.block, materials.carved, x, 5.29, z, 1.64, .17, 1.64);
+    for (let i = 0; i < 12; i++) {
+      const angle = i / 12 * Math.PI * 2;
+      instance('column-flutes', geometries.flute, materials.stoneDark,
+        x + Math.cos(angle) * .504, 2.77, z + Math.sin(angle) * .504);
+    }
+    for (const dx of [-.48, .48]) for (const dz of [-.48, .48])
+      instance('capital-carving', geometries.block, materials.bronze, x + dx, 4.99, z + dz, .15, .18, .15, 0, Math.PI / 4);
+  }
+  for (const side of [-1, 1]) for (const center of [-15, -5, 5, 15]) {
+    for (let i = 0; i < 15; i++) {
+      const a = (i + .5) / 15 * Math.PI;
+      instance('arcade-voussoirs', geometries.archStone, materials.stone,
+        side * 8.25, 5.37 + Math.sin(a) * 4.91, center + Math.cos(a) * 4.91,
+        1, 1, 1, Math.PI / 2 - a);
+    }
+    instance('arcade-keystone', geometries.block, materials.carved, side * 8.25, 10.27, center, .82, .88, .76);
+  }
+
+  // A recessed northern apse: stone relief, bronze sun, and extinguished braziers.
+  box(0, 2.65, -22.61, 8.2, 4.85, .17, materials.stoneDark);
+  for (const x of [-4.35, 4.35]) {
+    box(x, 2.52, -22.15, .47, 4.91, .75, materials.stoneLight);
+    box(x, 4.93, -22.15, .8, .21, 1.01, materials.carved);
+  }
+  const apseSun = mesh(new T.TorusGeometry(1.15, .095, 8, 48), materials.bronze, 0, 3.34, -22.35);
+  mesh(new T.OctahedronGeometry(.52), materials.bronze, 0, 3.34, -22.36);
+  for (let i = 0; i < 12; i++) {
+    const angle = i * Math.PI / 6;
+    const ray = box(Math.cos(angle) * 1.55, 3.34 + Math.sin(angle) * 1.55, -22.33, .11, .46, .1, materials.bronze);
+    ray.rotation.z = angle - Math.PI / 2;
+  }
+  for (const x of [-5.85, 5.85]) {
+    mesh(new T.CylinderGeometry(.72, .5, .45, 8), materials.iron, x, .55, -20.9);
+    instance('apse-brazier-feet', geometries.block, materials.stoneDark, x, .19, -20.9, 1.3, .32, 1.3);
+    collision(x, -20.9, .72);
+  }
+
+  // Six rooms retain broad clear approaches from their doors.
+  function tomb(x, z, rotation = 0) {
+    const tombGroup = new T.Group();
+    tombGroup.position.set(x, 0, z);
+    tombGroup.rotation.y = rotation;
+    group.add(tombGroup);
+    mesh(geometries.tomb, materials.stoneDark, 0, .43, 0, null, tombGroup);
+    mesh(geometries.tombTrim, materials.carved, 0, .1, 0, null, tombGroup);
+    mesh(geometries.tombLid, materials.stoneLight, 0, .91, 0, null, tombGroup);
+    box(0, 1.016, 0, .095, .017, 1.4, materials.bronze, tombGroup);
+    box(0, 1.018, -.15, .63, .019, .085, materials.bronze, tombGroup);
+    const head = mesh(new T.CylinderGeometry(.46, .46, .19, 12), materials.carved, 0, 1.25, -.88, [Math.PI / 2, 0, 0], tombGroup);
+    box(0, 1.02, -.88, .92, .61, .2, materials.carved, tombGroup);
+    box(0, 1.32, -1.001, .052, .31, .018, materials.bronze, tombGroup);
+    box(0, 1.34, -1.002, .25, .05, .019, materials.bronze, tombGroup);
+    for (const s of [-1, 1]) box(s * .586, .51, 0, .025, .07, 1.68, materials.bronze, tombGroup);
+    collision(x, z, 1.15);
+    return head;
+  }
+  tomb(-15.2, -18.25); tomb(-20.1, -17.6); tomb(-18.2, -9.3, Math.PI / 2);
+  tomb(-15.5, 18); tomb(-20.1, 13.2, Math.PI / 2); tomb(19.5, 18.4);
+
+  function altar(x, z, cold = false) {
+    box(x, .22, z, 3.8, .43, 2.3, materials.stoneDark);
+    box(x, .75, z, 3.13, .7, 1.7, materials.stone);
+    box(x, 1.17, z, 3.65, .2, 2.11, materials.carved);
+    for (const sign of [-1, 1]) {
+      box(x + sign * 1.4, .78, z + .87, .12, .58, .045, materials.bronze);
+      for (const dz of [-.65, .65]) {
+        instance('altar-candles', geometries.candle, materials.bone, x + sign * 1.34, 1.47, z + dz);
+        instance('altar-candle-flames', geometries.candleFlame, materials.flameCore, x + sign * 1.34, 1.71, z + dz);
+      }
+    }
+    mesh(new T.OctahedronGeometry(.38), cold ? materials.runeBlue : materials.runeGold, x, 1.62, z);
+    ring(.53, .035, materials.bronze, x, 1.28, z, 40);
+    collision(x, z, 1.93);
+  }
+  altar(18.5, -18.2, false);
+  // Hooded, faceless funerary idol behind the eastern altar.
+  box(18.5, .43, -20.16, 1.88, .75, 1.31, materials.stoneDark);
+  mesh(new T.ConeGeometry(.81, 2.17, 7), materials.carved, 18.5, 1.74, -20.16);
+  mesh(new T.SphereGeometry(.34, 9, 7), materials.stoneDark, 18.5, 3.02, -20.11);
+  mesh(new T.ConeGeometry(.49, .98, 7), materials.stoneLight, 18.5, 3.39, -20.18);
+  for (const sign of [-1, 1]) {
+    const arm = box(18.5 + sign * .65, 2.24, -20.14, .31, 1.26, .4, materials.carved);
+    arm.rotation.z = sign * .65;
+  }
+
+  // Archive shelves: six book-material batches, with bands and uneven spines.
+  function bookshelf(x, z, length) {
+    box(x - .15, 1.91, z, .76, 3.68, length, materials.wood);
+    box(x + .27, 1.91, z, .045, 3.38, length - .21, materials.stoneDark);
+    for (let row = 0; row < 5; row++) {
+      const y = .28 + row * .73;
+      box(x + .23, y, z, 1.07, .115, length + .1, materials.woodEdge);
+      if (row === 4) continue;
+      for (let p = -length / 2 + .22; p < length / 2 - .17; p += .22) {
+        const c = Math.floor(random() * books.length), h = .74 + random() * .28;
+        instance(`books-${c}`, geometries.book, books[c], x + .43, y + .38 * h, z + p, 1, h, .8 + random() * .2);
+        instance('book-spine-bands', geometries.block, materials.bronze, x + .674, y + .17, z + p, .012, .029, .145);
+        instance('book-spine-bands', geometries.block, materials.bronze, x + .674, y + .49 * h, z + p, .012, .029, .145);
+      }
+    }
+    for (const end of [-length / 2, length / 2]) {
+      box(x + .2, 1.9, z + end, 1.03, 3.84, .15, materials.woodEdge);
+      box(x + .73, 1.94, z + end, .03, 2.62, .065, materials.bronze);
+    }
+    for (let p = -length / 2 + .45; p < length / 2; p += 1.1) collision(x + .28, z + p, .72);
+  }
+  bookshelf(-21.8, 1, 9.5);
+  // Reading lectern and an open, ivory-paged grimoire.
+  box(-17.7, .19, 4.7, 1.36, .3, 1.2, materials.stoneDark);
+  box(-17.7, .82, 4.7, .58, 1.06, .63, materials.wood);
+  const desk = box(-17.7, 1.4, 4.7, 1.65, .15, 1.28, materials.woodEdge);
+  desk.rotation.x = -.2;
+  for (const side of [-1, 1]) {
+    const page = box(-17.7 + side * .34, 1.52, 4.7, .65, .06, .88, materials.bone);
+    page.rotation.z = side * -.1;
+    page.rotation.x = -.2;
+    for (let row = 0; row < 5; row++)
+      instance('grimoire-ink', geometries.block, materials.stoneDark, -17.7 + side * .35, 1.57 - row * .031, 4.45 + row * .13, .41, .009, .014);
+  }
+  collision(-17.7, 4.7, 1.0);
+
+  altar(18.65, 4.65, true);
+  for (const z of [-3.5, -1.7, .1]) {
+    box(21.62, .44, z, 1.28, .84, 1.25, materials.wood);
+    for (const dz of [-.51, .51]) box(21.62, .47, z + dz, 1.33, .92, .045, materials.iron);
+    for (const x of [21.12, 22.12]) box(x, .47, z, .045, .92, 1.31, materials.iron);
+    collision(21.62, z, .83);
+  }
+  // Southern memorial chamber: a carved obelisk and low votive plinth.
+  box(16.1, .19, 11.5, 2.05, .36, 1.88, materials.stoneDark);
+  mesh(new T.CylinderGeometry(.48, .66, 2.28, 4), materials.carved, 16.1, 1.48, 11.5, [0, Math.PI / 4, 0]);
+  mesh(new T.ConeGeometry(.68, .62, 4), materials.stoneLight, 16.1, 2.95, 11.5, [0, Math.PI / 4, 0]);
+  box(16.1, 1.42, 12.08, .09, .74, .02, materials.bronze);
+  box(16.1, 1.54, 12.09, .42, .07, .02, materials.bronze);
+  collision(16.1, 11.5, 1.01);
+  box(-18.4, .17, 20.07, 3.6, .27, 1.15, materials.stone);
+  for (let i = 0; i < 9; i++) {
+    const x = -19.83 + i * .36;
+    instance('votive-candles', geometries.candle, materials.bone, x, .47, 20.05, 1, .7 + random() * .8, 1);
+    instance('votive-flames', geometries.candleFlame, materials.flameCore, x, .73, 20.05);
+  }
+  collision(-18.4, 20.07, 1.7);
+
+  // Four real lights; the remaining fire and candle details use emissive geometry.
+  function torch(x, z, direction, lit) {
+    const towardX = Math.cos(direction), towardZ = Math.sin(direction);
+    box(x, 2.16, z, .26, .7, .23, materials.iron);
+    beam(x, 2.05, z, x + towardX * .4, 2.41, z + towardZ * .4, .071);
+    const fx = x + towardX * .43, fz = z + towardZ * .43;
+    mesh(new T.CylinderGeometry(.17, .13, .35, 7), materials.iron, fx, 2.53, fz);
+    const flame = new T.Group();
+    flame.position.set(fx, 2.91, fz);
+    group.add(flame);
+    mesh(new T.ConeGeometry(.15, .57, 7), materials.flameEdge, 0, .02, 0, null, flame);
+    const core = mesh(new T.ConeGeometry(.09, .4, 6), materials.flameCore, 0, -.025, 0, null, flame);
+    core.castShadow = false;
+    animatedFlames.push({ object: flame, phase: random() * 6.28 });
+    if (lit) {
+      const light = new T.PointLight(0xffb66b, 13, 17, 2);
+      light.position.set(fx, 3.05, fz);
+      group.add(light);
+      animatedLights.push({ object: light, phase: random() * 6.28 });
+    }
+  }
+  for (const side of [-1, 1]) {
+    torch(side * 9.58, -9.8, side === -1 ? 0 : Math.PI, true);
+    torch(side * 9.58, 9.9, side === -1 ? 0 : Math.PI, true);
+    torch(side * 22.57, -13.7, side === -1 ? 0 : Math.PI, false);
+    torch(side * 22.57, 1, side === -1 ? 0 : Math.PI, false);
+    torch(side * 22.57, 15.2, side === -1 ? 0 : Math.PI, false);
+  }
+
+  // Low ritual rings keep the playable nave clear and make both landmarks legible.
+  const bossSigil = new T.Group();
+  bossSigil.position.set(0, 0, -15);
+  group.add(bossSigil);
+  mesh(new T.CylinderGeometry(3.4, 3.4, .07, 64), materials.ash, 0, .027, 0, null, bossSigil);
+  function localRing(radius, material, thickness, parent, y = .081) {
+    return mesh(new T.TorusGeometry(radius, thickness, 6, 80), material, 0, y, 0, [-Math.PI / 2, 0, 0], parent);
+  }
+  localRing(3.31, materials.bronze, .034, bossSigil);
+  localRing(2.86, materials.redGlow, .021, bossSigil);
+  localRing(2.64, materials.bronze, .02, bossSigil);
+  const bossInner = localRing(1.48, materials.redGlow, .016, bossSigil, .088);
+  for (let i = 0; i < 12; i++) {
+    const angle = i / 12 * Math.PI * 2;
+    const glyph = box(Math.sin(angle) * 3.07, .083, -15 + Math.cos(angle) * 3.07, .13, .018, .23, materials.runeGold);
+    glyph.rotation.y = angle;
+    const cross = box(Math.sin(angle) * 3.07, .084, -15 + Math.cos(angle) * 3.07, .23, .018, .055, materials.runeGold);
+    cross.rotation.y = angle;
+  }
+  for (let i = 0; i < 5; i++) {
+    const a = i / 5 * Math.PI * 2, b = ((i + 2) % 5) / 5 * Math.PI * 2;
+    beam(Math.sin(a) * 2.35, .085, -15 + Math.cos(a) * 2.35,
+      Math.sin(b) * 2.35, .085, -15 + Math.cos(b) * 2.35, .018, materials.runeGold);
+  }
+  for (const side of [-1, 1]) for (const dz of [-1.8, 1.8]) {
+    instance('ritual-candles', geometries.candle, materials.bone, side * 3.75, .25, -15 + dz);
+    instance('ritual-flames', geometries.candleFlame, materials.flameCore, side * 3.75, .51, -15 + dz);
+  }
+
+  const portal = new T.Group();
+  portal.position.set(0, 0, 7);
+  group.add(portal);
+  mesh(new T.CylinderGeometry(1.95, 2.03, .08, 64), materials.stoneDark, 0, .032, 0, null, portal);
+  localRing(1.92, materials.bronze, .052, portal);
+  localRing(1.72, materials.runeBlue, .026, portal, .091);
+  const portalInner = localRing(1.27, materials.blueGlow, .026, portal, .101);
+  localRing(.43, materials.bronze, .025, portal, .092);
+  const mistMaterial = new T.MeshBasicMaterial({ color: 0x579eac, transparent: true, opacity: .13, depthWrite: false, side: T.DoubleSide });
+  const mist = mesh(new T.CircleGeometry(1.6, 64), mistMaterial, 0, .09, 0, [-Math.PI / 2, 0, 0], portal);
+  mist.castShadow = false;
+  for (let i = 0; i < 10; i++) {
+    const a = i / 10 * Math.PI * 2;
+    const glyph = mesh(geometries.rune, materials.runeBlue, Math.sin(a) * 1.51, .098, Math.cos(a) * 1.51, [0, a + .35, 0], portal);
+    const cross = mesh(geometries.rune, materials.runeBlue, Math.sin(a) * 1.51, .099, Math.cos(a) * 1.51, [0, a + 1.4, 0], portal);
+    cross.scale.z = .48;
+    const spark = mesh(new T.OctahedronGeometry(.035), materials.blueGlow, Math.sin(a) * 1.69, .2 + i * .06, Math.cos(a) * 1.69, null, portal);
+    spark.castShadow = false;
+    portalSparks.push({ object: spark, angle: a, phase: i / 10 });
+  }
+
+  // Debris remains against walls and outside the principal combat route.
+  for (let i = 0; i < 72; i++) {
+    const side = i % 2 ? -1 : 1;
+    const x = side * (6.7 + random() * 2.35), z = -22 + random() * 44;
+    if (obstacles.some(o => Math.hypot(x - o.x, z - o.z) < o.r + .35)) continue;
+    instance('nave-rubble', geometries.rubble, materials.stoneDark, x, .105, z,
+      .35 + random() * .6, .25 + random() * .35, .4 + random() * .6,
+      random() * .8, random() * 6.28, random() * .7);
+  }
+  for (const side of [-1, 1]) for (const room of roomBands) for (let i = 0; i < 7; i++) {
+    const x = side * (13.1 + random() * 8.9), z = room.min + .65 + random() * 1.0;
+    instance('room-rubble', geometries.rubble, materials.stone, x, .12, z,
+      .5 + random(), .34 + random() * .3, .5 + random(), random(), random() * 6.28, random());
+    if (i % 2 === 0)
+      instance('scattered-bones', geometries.smallBone, materials.bone, x + .35, .045, z + .3, 1, 1, 1, Math.PI / 2, random() * 6.28);
+  }
+
+  // Small architectural details share the same unit geometries as well. Bake
+  // their parent transforms into instances instead of issuing a draw per cornice.
+  group.updateMatrixWorld(true);
+  const inverseRoot = group.matrixWorld.clone().invert();
+  const sharedGeometries = new Set(Object.values(geometries));
+  const bake = [];
+  group.traverse(object => {
+    if (object.isMesh && sharedGeometries.has(object.geometry)) bake.push(object);
+  });
+  for (const object of bake) {
+    const name = `detail-${object.geometry.uuid}-${object.material.uuid}`;
+    if (!batches.has(name)) batches.set(name, { geometry: object.geometry, material: object.material, matrices: [] });
+    batches.get(name).matrices.push(object.matrixWorld.clone().premultiply(inverseRoot));
+    object.removeFromParent();
+  }
+  for (const [name, batch] of batches) {
+    const object = new T.InstancedMesh(batch.geometry, batch.material, batch.matrices.length);
+    object.name = name;
+    batch.matrices.forEach((matrix, i) => object.setMatrixAt(i, matrix));
+    object.castShadow = !name.includes('floor') && !name.includes('inlay') && !name.includes('flame');
+    object.receiveShadow = true;
+    object.instanceMatrix.needsUpdate = true;
+    object.computeBoundingSphere();
+    group.add(object);
+  }
+
+  // This includes a 0.4 player-radius margin around the masonry, but leaves
+  // object collisions to the returned obstacle circles used by the game.
+  function walkable(x, z) {
+    if (!Number.isFinite(x) || !Number.isFinite(z) || Math.abs(x) >= 22.3 || Math.abs(z) >= 22.3) return false;
+    const ax = Math.abs(x);
+    if (ax < 9.25) return true;
+    for (const room of roomBands) {
+      if (ax < 11.15 && Math.abs(z - room.door) < 1.97) return true;
+      if (ax > 10.75 && z > room.min + .72 && z < room.max - .72) return true;
+    }
+    return false;
+  }
+  function update(dt, time, playerPosition) {
+    const t = Number.isFinite(time) ? time : 0;
+    for (const item of animatedFlames) {
+      const flicker = Math.sin(t * 13 + item.phase) * .055 + Math.sin(t * 21 + item.phase * 2) * .035;
+      item.object.scale.set(1 + flicker, 1 + flicker * 1.8, 1 - flicker);
+      item.object.rotation.z = Math.sin(t * 7 + item.phase) * .055;
+    }
+    for (const item of animatedLights)
+      item.object.intensity = 12.7 + Math.sin(t * 9 + item.phase) * .7 + Math.sin(t * 17 + item.phase) * .3;
+    portalInner.rotation.z = t * .1;
+    bossInner.rotation.z = -t * .025;
+    materials.blueGlow.opacity = .58 + Math.sin(t * 1.8) * .1;
+    materials.redGlow.opacity = .39 + Math.sin(t * 1.4) * .08;
+    mistMaterial.opacity = .115 + Math.sin(t * 1.9) * .025;
+    for (const spark of portalSparks) {
+      const a = spark.angle + t * .14;
+      spark.object.position.set(Math.sin(a) * 1.69, .16 + ((t * .17 + spark.phase) % 1) * .78, Math.cos(a) * 1.69);
+      spark.object.rotation.y = t * .7 + spark.angle;
+    }
+    // The open roof and low southern wall are fixed cutaways, so camera movement
+    // never changes collisions or hides the player with a solid foreground wall.
+    void dt;
+    void playerPosition;
+  }
+
+  update(0, 0, null);
+  return { group, obstacles, walkable, update };
+}
