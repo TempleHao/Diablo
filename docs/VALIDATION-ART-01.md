@@ -1,6 +1,6 @@
 # ART-01 美术预览：实际验证与未达目标
 
-候选版本0.3.0-preview.1，日期2026-10-12；策划仍为1.0。此记录是人物与代表地窟切片，不代表整个游戏美术已达到D2R/D4质量。当前main已发布版仍为0.2.1，候选发布与Pages结果待核验后补记。
+候选版本0.3.0-preview.1，日期2026-10-12；策划仍为1.0。此记录是人物与代表地窟切片，不代表整个游戏美术已达到D2R/D4质量。首次美术切片技术验证已完成；发布提交和Pages结果另记于PROJECT-STATE及JSON，不能把本页验证通过等同线上部署成功。
 
 ## 产物与检查
 
@@ -15,8 +15,8 @@
 Headless Chromium与SwiftShader，本地HTTP服务使用待发布文件；不是实体手机。
 
 - 桌面：模型加载200、Idle脊椎/头骨实际变化、键盘移动并Idle→Walk→Idle、冰霜扣蓝30及Cast肩臂变化、火球/闪现；人物暂停、拖转/滚轮、面部取景与非负预览时钟、resize适配；存档叠层/装备暂停与正确恢复已通过。
-- 390×844：摇杆与冰霜双触点移动/施法初查通过；持续火球部分释放与人物中释放触点仍在完成最终回归。一次部分释放失败已定位为QA的CDP touchEnd协议使用错误，保留错误记录，不将其称为生产缺陷或调低验收标准。
-- 原生人脸/全身/背面与游戏截图已产生，无pageerror/资源404/Shader警告。新填光的当前场景截图及完整最终回归结果待补。
+- 390×844：摇杆与冰霜双触点、松摇杆后保留火球触点并实际产生新投射物、松冰霜后继续移动、人物中释放摇杆后恢复Idle且不残留位移、拖转/捏合、人物/存档布局均通过。23项最终检查全部成功。两次早期失败来自QA结束触点/剩余触点混用；按当前Chromium实际DOM pointerup target与ID核对结束点，不调低断言。
+- 原生人脸/全身/背面与游戏截图已产生，无pageerror/资源404/Shader警告。当前新填光截图、23项JSON证据已保存：[浏览器证据](qa/art-01-browser.json)、[桌面面部](screenshots/art-face-desktop.png)、[手机游戏](screenshots/art-gameplay-mobile.png)、[手机面部](screenshots/art-face-mobile.png)、[手机存档](screenshots/art-save-mobile.png)。两端game/hero/模型SHA一致，页面错误、console error、404及失败请求均为0。
 - 本环境不能直接浏览github.io，线上URL浏览器回归未执行。Pages发布结果仅根据Actions的检查/上传/部署步骤确认。
 
 ## 资源成本与目标缺口
@@ -41,3 +41,5 @@ npm run dev
 ```
 
 存档schema仍为2，旧0.2.0与0.2.1角色继续使用；导入先预览/确认，失败不替换。完整策划不重建。下一工作是明确的ART-02角色精修与战斗LOD/rig、随后ART-03环境和怪物美术；用户美术目标未验收前不回到D1-02。
+
+可选浏览器复现：安装 `playwright-core@1.64.0`（`npm install --no-save --package-lock=false playwright-core@1.64.0`），启动本地服务后另终端运行 `npm run check:art-browser`。`tests/art-browser-smoke.cjs`默认URL为5173、Chromium为/usr/bin/chromium，ART_QA_URL/ART_CHROMIUM_PATH/ART_QA_OUTPUT可覆盖。测试使用临时上下文，HTTP响应内注入只读快照，不向生产源码添加调试入口。本轮23项实际脚本通过；归入仓库时仅路径/loader/辅助代码收为单文件，已核对测试函数相同并做语法检查，未另重复完整回归。
