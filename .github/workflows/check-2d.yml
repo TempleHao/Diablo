@@ -23,4 +23,4 @@ jobs:
       - name: Browser runtime smoke tests
         run: |
           npm install --no-save --package-lock=false playwright-core@1.56.1
-          node tests/2d-browser.test.mjs
+          SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs
