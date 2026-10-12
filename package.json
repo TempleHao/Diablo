@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 5173 --directory dist",
-    "check": "node --check dist/game.js && node --check dist/hero.js && node --check dist/mage-preview.js && node --check dist/environment.js && node --check dist/save.js && node --check dist/save-panel.js && node --check dist/lighting.js && node --check dist/world-renderer.js && node scripts/check-assets.mjs && node scripts/check-art-assets.mjs && node --test tests/save.test.mjs",
+    "check": "node --check dist/game.js && node --check dist/hero.js && node --check dist/mage-preview.js && node --check dist/environment.js && node --check dist/save.js && node --check dist/save-panel.js && node --check dist/lighting.js && node --check dist/world-renderer.js && node scripts/check-assets.mjs && node scripts/check-art-assets.mjs && node --test tests/save.test.mjs && node --check dist/2d/core.js && node --check dist/2d/game.js && node --test tests/2d-core.test.mjs",
     "check:browser": "node tests/browser-smoke.cjs final",
     "check:art-browser": "node tests/art-browser-smoke.cjs",
     "check:art-lifecycle": "node tests/art/lifecycle.cjs",
