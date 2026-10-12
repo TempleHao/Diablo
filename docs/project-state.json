@@ -3,7 +3,7 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.3.0-preview.1",
   "designVersion": "1.0",
-  "status": "ready",
+  "status": "running",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "ART-02",
@@ -20,7 +20,14 @@
     "jobId": 114822611976,
     "conclusion": "success"
   },
-  "activeRun": null,
+  "activeRun": {
+    "runId": "auto-ART-02-20261012172128-73c3b1d8",
+    "taskId": "ART-02",
+    "trigger": "continuation",
+    "startedAt": "2026-10-12T17:21:28Z",
+    "heartbeatAt": "2026-10-12T17:21:28Z",
+    "leaseExpiresAt": "2026-10-12T19:21:28.000Z"
+  },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
@@ -28,8 +35,46 @@
   },
   "resumeBranch": null,
   "resumeCommit": null,
-  "nextAction": "ART-02: retain tested 0.3.0 preview as baseline; refine hair/cloth seams-folds-wear and hand/staff casting in native close-up, create combat LOD and reduce unused rig/material/texture cost with measured render budgets. Preserve source licenses, save compatibility and touch checks. After character pass, ART-03 environment/monster assets; do not resume D1-02 early.",
+  "nextAction": "ART-02 A: refine visible hair/cloth/hand details; B: simplify nonessential rig, atlas materials and create verified combat LOD; C: lazy-load close-up model and validate geometry, pose parity, touch/save/viewer regressions. Persist checkpoints per substep; no AAA or real-device performance claim.",
   "lastAttempt": {
+    "runId": "auto-ART-02-20261012172128-73c3b1d8",
+    "taskId": "ART-02",
+    "startedAt": "2026-10-12T17:21:28Z",
+    "status": "running",
+    "phase": "inspect-published-character-and-bounded-substeps"
+  },
+  "blocked": null,
+  "automationTitle": "余烬纪事断点续做",
+  "requestedRetryIntervalHours": 5,
+  "quotaState": "unknown-no-query-tool",
+  "lastUpdatedAt": "2026-10-12T17:21:28Z",
+  "validationLimitations": [
+    "Commercial D2R/D4 art quality not met; preview remains first slice, monsters remain prototype",
+    "Real Android/iOS performance, GPU memory, thermals/battery and user research not tested",
+    "Character 40966 triangles/163 bones/9 materials exceeds first budget; combat LOD/rig simplification/atlas not done",
+    "Live github.io URL browser regression not run due network policy; Actions check/upload/deploy successful",
+    "Viewport touch emulation is not physical-device testing; quota recovery cannot be queried"
+  ],
+  "automation": {
+    "title": "余烬纪事断点续做",
+    "isEnabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART:20261012T021910Z\nRRULE:FREQ=HOURLY;INTERVAL=5\nEND:VEVENT",
+    "timezone": "Asia/Shanghai",
+    "configuredAt": "2026-10-11T21:19:10.848248+00:00"
+  },
+  "lastWorkBranch": {
+    "name": "checkpoint/art-01",
+    "commit": "099dc20d47e02546c74e16813dde15f2a3c61243",
+    "status": "validated-integrated"
+  },
+  "userFeedback": {
+    "recordedAt": "2026-10-12T05:14:55Z",
+    "priority": "art-before-D1-02",
+    "currentArt": "0.3.0 preview delivered; quality not user-accepted",
+    "request": "Rebuild character and full scene environment toward realistic dark fantasy quality comparable to Diablo II Resurrected / Diablo IV. Existing rigid small-game primitive modeling is unacceptable.",
+    "targetAcceptance": "D2R/D4-level art quality not met; continue concrete character/environment refinement before D1-02"
+  },
+  "previousAttempt": {
     "runId": "resume-ART-01-20261012123442-6fcb5de2",
     "taskId": "ART-01",
     "startedAt": "2026-10-12T12:34:42Z",
@@ -63,61 +108,6 @@
       "jobId": 114822611976,
       "conclusion": "success"
     }
-  },
-  "blocked": null,
-  "automationTitle": "余烬纪事断点续做",
-  "requestedRetryIntervalHours": 5,
-  "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T13:06:03Z",
-  "validationLimitations": [
-    "Commercial D2R/D4 art quality not met; preview remains first slice, monsters remain prototype",
-    "Real Android/iOS performance, GPU memory, thermals/battery and user research not tested",
-    "Character 40966 triangles/163 bones/9 materials exceeds first budget; combat LOD/rig simplification/atlas not done",
-    "Live github.io URL browser regression not run due network policy; Actions check/upload/deploy successful",
-    "Viewport touch emulation is not physical-device testing; quota recovery cannot be queried"
-  ],
-  "automation": {
-    "title": "余烬纪事断点续做",
-    "isEnabled": true,
-    "schedule": "BEGIN:VEVENT\nDTSTART:20261012T021910Z\nRRULE:FREQ=HOURLY;INTERVAL=5\nEND:VEVENT",
-    "timezone": "Asia/Shanghai",
-    "configuredAt": "2026-10-11T21:19:10.848248+00:00"
-  },
-  "lastWorkBranch": {
-    "name": "checkpoint/art-01",
-    "commit": "099dc20d47e02546c74e16813dde15f2a3c61243",
-    "status": "validated-integrated"
-  },
-  "userFeedback": {
-    "recordedAt": "2026-10-12T05:14:55Z",
-    "priority": "art-before-D1-02",
-    "currentArt": "0.3.0 preview delivered; quality not user-accepted",
-    "request": "Rebuild character and full scene environment toward realistic dark fantasy quality comparable to Diablo II Resurrected / Diablo IV. Existing rigid small-game primitive modeling is unacceptable.",
-    "targetAcceptance": "D2R/D4-level art quality not met; continue concrete character/environment refinement before D1-02"
-  },
-  "previousAttempt": {
-    "runId": "manual-ART-01-20261012051455-3dbf40df",
-    "taskId": "ART-01",
-    "startedAt": "2026-10-12T05:14:55Z",
-    "status": "running",
-    "phase": "character-environment-candidate-checkpointed",
-    "checkpointCommit": "2d173faa58fbd39e48f86163e06b4df512098db7",
-    "validation": {
-      "sources": "13 anatomy and 12 PBR source hashes verified",
-      "GLB": "39508 triangles / 163 joints / embedded textures / normalized skin / Idle Walk Cast face_focus verified",
-      "browser": "New model loading and native face framing inspected; full regressions pending",
-      "visual": "Black eyes, hair/grip/cloth defects under correction; target not met",
-      "trueMobile": "not tested"
-    },
-    "resumedAt": "2026-10-12T07:24:26Z",
-    "observedInterruptions": [
-      {
-        "scope": "art_asset_sources and art_qa agents",
-        "error": "You've hit your usage limit",
-        "notedAt": "2026-10-12T07:24:26Z",
-        "quotaRecovery": "not queried; current GitHub read and local command availability independently observed"
-      }
-    ]
   },
   "completedWorkPackages": {
     "ART-01": "First playable realistic-direction art slice delivered; D2R/D4 commercial art target is not accepted or complete"
