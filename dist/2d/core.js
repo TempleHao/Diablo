@@ -21,8 +21,12 @@ export function makeDungeon(seed = 2026) {
       if (Math.abs(x - COLS / 2) < 4 || Math.hypot(x - COLS / 2, y - ROWS * .76) < 6) continue;
       if (Math.hypot(x - COLS / 2, y - 7) < 5) continue;
       if (rng() < .44) {
-        const w = rng() < .24 ? 57 : 38, h = rng() < .27 ? 56 : 38;
-        blocks.push({ x: x * TILE - w / 2, y: y * TILE - h / 2, w, h, variant: Math.floor(rng() * 3) });
+        // 将少量散点石柱组织成断裂墙面，形成有方向感的地牢空间。
+        const brokenWall = rng() < .27;
+        const w = brokenWall ? (rng() < .5 ? 111 : 146) : rng() < .24 ? 57 : 38;
+        const h = brokenWall ? 33 : rng() < .27 ? 56 : 38;
+        blocks.push({ x: x * TILE - w / 2, y: y * TILE - h / 2, w, h,
+          kind: brokenWall ? 'wall' : 'pillar', variant: Math.floor(rng() * 3) });
         if (rng() < .24) torches.push({ x: x * TILE + 24, y: y * TILE - 24 });
       }
     }
