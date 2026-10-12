@@ -83,15 +83,33 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick){
 }
 export function pillar(ctx,b){
   const center=b.x+b.w/2, foot=b.y+b.h;
-  ctx.fillStyle='#03060b8a';ctx.beginPath();ctx.ellipse(center+12,foot+8,38,15,-.25,0,Math.PI*2);ctx.fill();
-  const w=b.w>45?66:51,h=b.w>45?154:119;
+  ctx.fillStyle='#03060b9a';ctx.beginPath();ctx.ellipse(center+9,foot+7,Math.max(31,b.w*.56),14,-.12,0,Math.PI*2);ctx.fill();
+  if(b.kind==='wall'){
+    // Proper tileable ruined masonry instead of a stretched 16px-wide pillar.
+    const segment=36, elevation=64;
+    for(let x=b.x;x<b.x+b.w;x+=segment){
+      const width=Math.min(segment,b.x+b.w-x);
+      const n=Math.floor((x-b.x)/segment),variant=(n+b.variant)%3;
+      if(ready){
+        sprite(ctx,[FRAME.wall[variant][0],FRAME.wall[variant][1],16,16],x,b.y-elevation,width,elevation);
+        sprite(ctx,[FRAME.wallFace[variant][0],FRAME.wallFace[variant][1],16,16],x,b.y,width,50);
+      }else{
+        ctx.fillStyle='#49505a';ctx.fillRect(x,b.y-elevation,width,elevation+50);
+      }
+      ctx.strokeStyle='#17171bb0';ctx.lineWidth=1;ctx.beginPath();
+      ctx.moveTo(x,b.y-elevation+1);ctx.lineTo(x,b.y+49);ctx.stroke();
+    }
+    ctx.fillStyle='#0c0e12a6';ctx.fillRect(b.x,foot+13,b.w,5);
+    if(b.variant===1){sprite(ctx,FRAME.skull,center-12,b.y+3,23,23);}
+    return;
+  }
+  const w=b.w>45?65:49,h=b.w>45?143:112;
   if(ready){
-    sprite(ctx,FRAME.column,center-w/2,foot-h+15,w,h);
-    // Masonry blocks connect the sprite visually to its collision footprint.
-    sprite(ctx,[32,16,16,16],b.x,foot-12,b.w,18);
+    sprite(ctx,FRAME.column,center-w/2,foot-h+13,w,h);
+    sprite(ctx,[32,16,16,16],b.x,foot-11,b.w,16);
   }else{ctx.fillStyle='#3e4648';ctx.fillRect(b.x,b.y,b.w,b.h);}
   if(hash(Math.floor(center),Math.floor(foot))%5===0){
-    ctx.fillStyle='#4c2c222c';ctx.fillRect(center-w/4,foot-h*.53,w/2,9);
+    ctx.fillStyle='#211e1b5c';ctx.fillRect(center-w/4,foot-h*.53,w/2,9);
   }
 }
 export function torch(ctx,t){fixture(ctx,t.x,t.y);}
@@ -139,13 +157,13 @@ export function enemy(ctx,e,tick){
     :e.kind==='brute'?{type:'brute',width:113,height:127,off:-100}
     :e.kind==='archer'?{type:'archer',width:64,height:93,off:-76}
     :{type:'wretch',width:59,height:59,off:-47};
-  const animated=(Math.floor(tick*3+e.phase)%3)!==0;
   ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
   if(e.kind==='boss')gradientSpot(ctx,0,-45,117,'#a64d8950','#983b8600');
   shadow(ctx,0,6,cfg.width*.36,12,.73);
   if(ready){
-    const dx=e.x-prevEnemyPos.get(e.id)?.x,dy=e.y-prevEnemyPos.get(e.id)?.y;
-    const walking=Number.isFinite(dx)&&Math.hypot(dx,dy)>1;
+    const previous=prevEnemyPos.get(e.id);
+    const dx=e.x-(previous?.x ?? e.x),dy=e.y-(previous?.y ?? e.y);
+    const walking=Math.hypot(dx,dy)>.5;
     const frame=frameFor(cfg.type,walking,tick+e.phase*.1);
     // Boss eye line and oversized arms remain part of the source animation.
     sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);
