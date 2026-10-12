@@ -31,6 +31,20 @@ function randomPoint(minDist=260) {
   }
   return {x:WIDTH/2,y:HEIGHT*.2};
 }
+function encounterPoint(i) {
+  // Near the starting chamber so the first screen includes an actual encounter.
+  const angles=[-0.45,-2.75,-1.35,-2.15];
+  const distanceFromHero=[330,320,370,415];
+  const a=angles[i%angles.length],radius=distanceFromHero[i%distanceFromHero.length];
+  const candidate={x:hero.x+Math.cos(a)*radius,y:hero.y+Math.sin(a)*radius};
+  if(walkable(candidate.x,candidate.y,28,dungeon))return candidate;
+  for(let n=0;n<96;n++) {
+    const angle=rng()*Math.PI*2,dist=255+rng()*250;
+    const p={x:hero.x+Math.cos(angle)*dist,y:hero.y+Math.sin(angle)*dist};
+    if(walkable(p.x,p.y,28,dungeon))return p;
+  }
+  return randomPoint();
+}
 function build() {
   const seed = 20261013 + profile.clears*19;
   rng=mulberry32(seed); dungeon=makeDungeon(seed);
@@ -39,7 +53,7 @@ function build() {
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   const kinds=['wretch','wretch','archer','wretch','brute','archer','wretch','wretch','brute','archer','wretch','brute'];
-  for(const kind of kinds)spawn(kind);
+  kinds.forEach((kind,i)=>spawn(kind,i<4?encounterPoint(i):null));
   ui.boss.hidden=true;
   ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
@@ -174,7 +188,7 @@ function dealDamage(e,damage){
     boss=null;ui.boss.hidden=true;profile.clears++;persist();
     announce('炉心重燃，地窟净化完成！',true);showModal('victory');
   }else{
-    kills++;if(kills>=total&&!boss)spawn('boss',{x:WIDTH/2,y:TILE*5.7});
+    kills++;if(kills>=total&&!boss)spawn('boss',{x:hero.x,y:clamp(hero.y-310,TILE*4,HEIGHT-TILE*3)});
     persist();
   }
 }
