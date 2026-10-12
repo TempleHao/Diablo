@@ -56,6 +56,7 @@ function spawn(kind,location=null) {
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); }
 function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
+  const previousState=state;
   clearInput();state=kind==='victory'?'victory':kind==='death'?'death':'paused';
   const title=$('modal').querySelector('h1'), lead=$('modal').querySelector('.lead'), paragraphs=$('modal').querySelectorAll('p');
   const main=$('modal-primary'), secondary=$('modal-secondary');
@@ -71,7 +72,7 @@ function showModal(kind) {
   } else if(kind==='help') {
     title.innerHTML='操作<span>指南</span>';lead.textContent='移动、瞄准、拾取，开始你的远征。';
     paragraphs[1].textContent='电脑 WASD / 方向键移动，鼠标瞄准，长按左键或数字 1 连发；2 霜环，空格闪现，3 药水，B 打开行囊。手机用左侧摇杆与右侧技能键。靠近光柱自动拾取装备。';
-    main.textContent='返回游戏 →';main.onclick=()=>{hideModal();if(hero)state='playing';else state='intro';}; 
+    main.textContent='返回游戏 →';main.onclick=()=>{if(previousState==='intro'){location.reload();return;}if(['victory','death'].includes(previousState)){showModal(previousState);return;}if(previousState==='paused'){showModal('pause');return;}hideModal();state='playing';}; 
   } else {
     title.innerHTML='旅程<span>暂停</span>';lead.textContent='火种不灭，旅途未完。';
     paragraphs[1].textContent='当前角色将自动保存。装备与经验在失败后保留，你可以在行囊中导出备份。';
@@ -270,7 +271,6 @@ function update(dt){
   for(const h of [...hazards]){h.life-=dt;h.r+=(h.max-h.r)*dt*13;if(h.life<=0)hazards.splice(hazards.indexOf(h),1);}
   updateHud();
 }
-const norm = (x,y)=>{const n=Math.hypot(x,y)||1;return {x:x/n,y:y/n};};
 function floorDraw(){
   ctx.fillStyle='#171d22';ctx.fillRect(0,0,WIDTH,HEIGHT);
   const x0=Math.max(0,Math.floor(cam.x/TILE)-1),x1=Math.min(WIDTH/TILE,Math.ceil((cam.x+vw)/TILE)+1);
