@@ -1,6 +1,8 @@
 import * as T from './vendor/three.module.js';
 
-// An open-roof, cutaway crypt. All coordinates and collisions stay deterministic.
+// The Cinder Archive: an original, open-roof limestone crypt. Surface textures
+// are baked by scripts/build-environment-textures.py; no third-party art assets.
+// The route/collision contract is the same as the first playable crypt.
 export function createEnvironment(scene) {
   const group = new T.Group();
   group.name = 'The Cinder Archive';
@@ -21,45 +23,124 @@ export function createEnvironment(scene) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 4294967296;
   };
-  const standard = (color, extra = {}) => new T.MeshStandardMaterial({
-    color, roughness: .91, metalness: .04, ...extra
+  const textureLoader = new T.TextureLoader();
+  const surfaceMaps = new Map();
+  function texture(file, color = false) {
+    const result = textureLoader.load(new URL(`./textures/environment-${file}`, import.meta.url).href);
+    result.wrapS = result.wrapT = T.RepeatWrapping;
+    result.anisotropy = 4;
+    if (color) result.colorSpace = T.SRGBColorSpace;
+    return result;
+  }
+  for (const name of ['stone', 'floor']) surfaceMaps.set(name, {
+    map: texture(`${name}-basecolor.jpg`, true), normalMap: texture(`${name}-normal.jpg`),
+    roughnessMap: texture(`${name}-roughness.jpg`)
   });
+  const stone = (color = 0xbcb5a5, extra = {}) => new T.MeshStandardMaterial({
+    color, roughness: 1, metalness: 0, ...surfaceMaps.get('stone'),
+    normalScale: new T.Vector2(.42, .42), ...extra
+  });
+  const standard = (color, extra = {}) => new T.MeshStandardMaterial({ color, roughness: .89, metalness: 0, ...extra });
   const materials = {
-    foundation: standard(0x18232b),
-    stone: standard(0x56636b),
-    stoneLight: standard(0x74828a),
-    stoneDark: standard(0x36434c),
-    mortar: standard(0x28343c),
-    carved: standard(0x67747b),
-    bronze: standard(0x9f8052, { roughness: .6, metalness: .66 }),
-    iron: standard(0x242b30, { roughness: .65, metalness: .65 }),
+    foundation: stone(0x544e40, { ...surfaceMaps.get('floor'), normalScale: new T.Vector2(.35, .35) }),
+    stone: stone(),
+    stoneLight: stone(0xc7c0ad),
+    stoneDark: stone(0x8e8778),
+    mortar: standard(0x302d27),
+    carved: stone(0xb4b1a4),
+    bronze: standard(0x685035, { roughness: .63, metalness: .74 }),
+    iron: standard(0x272723, { roughness: .67, metalness: .69 }),
     wood: standard(0x473b35),
     woodEdge: standard(0x675246),
-    bone: standard(0xa8a398),
-    ash: standard(0x292d32),
-    runeGold: standard(0xa8834f, { emissive: 0x4f270e, emissiveIntensity: .32 }),
-    runeBlue: standard(0x7cbdcc, { emissive: 0x2c9abc, emissiveIntensity: 1.35, roughness: .55 }),
+    bone: standard(0x8e8875),
+    ash: stone(0x61584a, { ...surfaceMaps.get('floor') }),
+    runeGold: standard(0x826845, { roughness: .56, metalness: .65, emissive: 0x251306, emissiveIntensity: .15 }),
+    runeBlue: standard(0x668b91, { emissive: 0x28626f, emissiveIntensity: .72, roughness: .55 }),
     ember: new T.MeshBasicMaterial({ color: 0xffaf53 }),
     flameCore: new T.MeshBasicMaterial({ color: 0xffe9ac }),
     flameEdge: new T.MeshBasicMaterial({ color: 0xf36b27, transparent: true, opacity: .85 }),
-    blueGlow: new T.MeshBasicMaterial({ color: 0x7ed7e6, transparent: true, opacity: .7 }),
-    redGlow: new T.MeshBasicMaterial({ color: 0xd98d55, transparent: true, opacity: .48 })
+    blueGlow: new T.MeshBasicMaterial({ color: 0x72a2a4, transparent: true, opacity: .45 }),
+    redGlow: new T.MeshBasicMaterial({ color: 0xa66139, transparent: true, opacity: .25 })
   };
-  const floorMaterials = [0x45545e, 0x4c5b63, 0x53616a, 0x3e4d57, 0x5c6970].map(c => standard(c));
-  const wallMaterials = [0x46535c, 0x4f5b63, 0x59656c, 0x3d4b54].map(c => standard(c));
+  const floorMaterials = [0xb7b09e, 0xaaa58f, 0xc0b8a5, 0xa6a18f].map(c => stone(c, {
+    ...surfaceMaps.get('floor'), normalScale: new T.Vector2(.50, .50)
+  }));
+  // CC0 ambientCG Bricks076A maps, distributed through the pinned PlayCanvas
+  // test asset mirror. The UV crop samples one actual stone, not an entire wall
+  // repeated on each brick. Exact provenance is in docs/ART-ENVIRONMENT.md.
+  const masonryMaps = {
+    map:texture('masonry-color.webp',true), normalMap:texture('masonry-normal.webp'),
+    roughnessMap:texture('masonry-roughness.webp'), aoMap:texture('masonry-ao.webp')
+  };
+  const wallMaterials = [0xbcb7aa, 0xc8c0ad, 0xb1b0a4, 0xc1b7a4].map(c => stone(c, {
+    ...masonryMaps, normalScale:new T.Vector2(.74,.74), aoMapIntensity:.8
+  }));
   const books = [0x526d75, 0x806452, 0x654d59, 0x69735b, 0x8b7352, 0x3d5362].map(c => standard(c));
+
+  // Chamfered, chipped corners give masonry a real edge silhouette instead of
+  // sharp toy cubes. Six reusable variants keep stone damage deterministic.
+  // Each face receives its own UVs; bevels have a lower vertex albedo to read as
+  // accumulated grime, independently of the scene's directional light.
+  function dressedStone(width, height, depth, variant = 0) {
+    const bevel = Math.min(width, height, depth) * .13;
+    const rings = [];
+    const positions = [], normals = [], uvs = [], colors = [];
+    const index = [];
+    // A true clipped-corner footprint, with small original imperfections.
+    const outline = [[-1,-.77],[-.78,-1],[.77,-1],[1,-.76],[1,.78],[.75,1],[-.78,1],[-1,.75]];
+    for (let layer = 0; layer < 4; layer++) {
+      const inset = layer === 0 || layer === 3 ? bevel : 0;
+      const y = [-height/2, -height/2+bevel, height/2-bevel, height/2][layer];
+      rings.push(outline.map(([x,z], i) => {
+        const damage = Math.sin((i + 1) * 2.731 + variant * 3.177) * .018;
+        return new T.Vector3(x * (width/2-inset) + damage * width,
+          y + (layer === 3 ? Math.sin(i * 4.1 + variant) * height * .026 : 0),
+          z * (depth/2-inset) + Math.cos(i * 3.93 + variant) * depth * .012);
+      }));
+    }
+    function face(points, color, uv) {
+      const start = positions.length / 3;
+      const normal = new T.Vector3().subVectors(points[1], points[0]).cross(new T.Vector3().subVectors(points[2], points[0])).normalize();
+      points.forEach((p, i) => { positions.push(p.x,p.y,p.z); normals.push(normal.x,normal.y,normal.z); uvs.push(...uv[i]); colors.push(color,color,color); });
+      for (let i = 1; i < points.length-1; i++) index.push(start,start+i,start+i+1);
+    }
+    for (let layer = 0; layer < 3; layer++) for (let i = 0; i < 8; i++) {
+      const j = (i+1)%8;
+      face([rings[layer][i],rings[layer+1][i],rings[layer+1][j],rings[layer][j]], layer===1 ? .93 : .78,
+        [[0,0],[0,1],[1,1],[1,0]]);
+    }
+    face([...rings[0]], .62, outline.map(([x,z]) => [(x+1)/2,(z+1)/2]));
+    face([...rings[3]].reverse(), 1, [...outline].reverse().map(([x,z]) => [(x+1)/2,(z+1)/2]));
+    const geometry = new T.BufferGeometry();
+    geometry.setAttribute('position', new T.Float32BufferAttribute(positions,3));
+    geometry.setAttribute('normal', new T.Float32BufferAttribute(normals,3));
+    geometry.setAttribute('uv', new T.Float32BufferAttribute(uvs,2));
+    geometry.setAttribute('color', new T.Float32BufferAttribute(colors,3));
+    geometry.setIndex(index); geometry.computeBoundingSphere();
+    return geometry;
+  }
+  for (const material of [...floorMaterials, ...wallMaterials, materials.stone, materials.stoneLight,
+    materials.stoneDark, materials.carved, materials.foundation]) material.vertexColors = true;
+  const paving = Array.from({length: 4}, (_,i) => dressedStone(1,.19,1,i));
+  const masonry = Array.from({length: 4}, (_,i) => dressedStone(1.42,.57,.54,i));
+  const stoneCrops = [[.035,.024,.191,.108],[.10,.152,.345,.226],[.069,.275,.277,.341],[.224,.388,.471,.46]];
+  masonry.forEach((geometry,i) => {
+    const uv = geometry.getAttribute('uv');
+    const [u0,v0,u1,v1] = stoneCrops[i];
+    for (let n=0;n<uv.count;n++) uv.setXY(n,u0+uv.getX(n)*(u1-u0),1-(v0+uv.getY(n)*(v1-v0)));
+    geometry.setAttribute('uv1',uv.clone());
+  });
   const geometries = {
-    tile: new T.BoxGeometry(1.94, .2, 1.94),
-    brick: new T.BoxGeometry(1.42, .57, .54),
-    block: new T.BoxGeometry(1, 1, 1),
-    column: new T.CylinderGeometry(.49, .58, 3.95, 12),
-    columnBase: new T.CylinderGeometry(.83, .94, .32, 8),
-    collar: new T.CylinderGeometry(.66, .66, .16, 12),
+    tile: paving[0], brick: masonry[0],
+    block: dressedStone(1,1,1,3),
+    column: new T.CylinderGeometry(.49, .58, 3.95, 24, 6),
+    columnBase: new T.CylinderGeometry(.83, .94, .32, 24),
+    collar: new T.CylinderGeometry(.66, .66, .16, 24),
     flute: new T.CylinderGeometry(.035, .035, 3.58, 5),
-    archStone: new T.BoxGeometry(.66, .61, 1.08),
-    tomb: new T.BoxGeometry(1.15, .73, 2.16),
-    tombLid: new T.BoxGeometry(1.32, .17, 2.34),
-    tombTrim: new T.BoxGeometry(1.38, .12, 2.4),
+    archStone: dressedStone(.66,.61,1.08,2),
+    tomb: dressedStone(1.15,.73,2.16,1),
+    tombLid: dressedStone(1.32,.17,2.34,2),
+    tombTrim: dressedStone(1.38,.12,2.4,0),
     book: new T.BoxGeometry(.48, .63, .18),
     candle: new T.CylinderGeometry(.065, .071, .34, 6),
     candleFlame: new T.ConeGeometry(.053, .19, 5),
@@ -103,41 +184,57 @@ export function createEnvironment(scene) {
     return object;
   }
 
-  // Broad slabs hide the tile seams from below, while the five tile batches supply variation.
+  // Ash-filled mortar underneath irregular, hand-laid flagstones. Paving courses
+  // use different widths, staggered joints and worn edges rather than a chessboard.
   box(0, -.34, 0, 20, .4, 46, materials.foundation);
   for (const side of [-1, 1]) for (const room of roomBands)
     box(side * 16.5, -.34, (room.min + room.max) / 2, 13, .4, room.max - room.min, materials.foundation);
-  function tile(x, z, index) {
-    instance(`floor-${index}`, geometries.tile, floorMaterials[index], x, -.08, z, 1, 1, 1, 0, random() > .5 ? Math.PI / 2 : 0);
-  }
-  for (let x = -9; x <= 9; x += 2) for (let z = -22; z <= 22; z += 2) {
-    const index = Math.abs(x) < 3 ? (z / 2 & 1 ? 1 : 2) : Math.floor(random() * floorMaterials.length);
-    tile(x, z, index);
-  }
-  for (const side of [-1, 1]) for (const room of roomBands)
-    for (let x = 11; x <= 21; x += 2) for (let z = room.min + 1; z < room.max; z += 2)
-      tile(side * x, z, Math.floor(random() * floorMaterials.length));
-
-  // Narrow stone borders and brass joints make the nave read as a built place, not a grid.
-  for (const side of [-1, 1]) {
-    box(side * 9.65, .045, 0, .23, .11, 45.4, materials.stoneLight);
-    box(side * 3.15, .034, 0, .13, .035, 44.8, materials.bronze);
-    for (let z = -21; z < 22; z += 2) {
-      instance('nave-inlay', geometries.block, materials.runeGold, side * 3.15, .059, z, .27, .012, .12);
-      instance('edge-inlay', geometries.block, materials.stoneDark, side * 8.85, .035, z, .5, .018, .5, 0, Math.PI / 4);
+  function pave(x0, x1, z0, z1) {
+    let row = 0;
+    for (let z = z0; z < z1-.15;) {
+      const course = Math.min(z1-z, [1.53,1.27,1.79,1.43][row%4]);
+      let x = x0;
+      while (x < x1-.15) {
+        let width = Math.min(x1-x, (row%2===0 && x===x0 ? 1.23 : 1.74 + random()*1.23));
+        if (x1-x-width < .50) width = x1-x;
+        const variant = Math.floor(random()*4), tone = Math.floor(random()*4);
+        instance(`flagstone-${variant}-${tone}`, paving[variant], floorMaterials[tone],
+          x+width/2, -.083 + random()*.006, z+course/2, width-.035, 1, course-.032,
+          0, 0, 0);
+        x += width;
+      }
+      z += course; row++;
     }
   }
-  const crackPoints = [];
-  for (let i = 0; i < 78; i++) {
-    const x = (random() - .5) * 17.8, z = (random() - .5) * 43.4;
-    const length = .25 + random() * .65, turn = random() * Math.PI * 2;
-    const cx = x + Math.cos(turn) * length * .45, cz = z + Math.sin(turn) * length * .45;
-    crackPoints.push(x, .026, z, cx, .026, cz, cx, .026, cz,
-      x + Math.cos(turn + .42) * length, .026, z + Math.sin(turn + .42) * length);
+  pave(-9.85,9.85,-22.85,22.85);
+  for (const side of [-1,1]) for (const room of roomBands)
+    pave(side===-1?-22.8:10.05, side===-1?-10.05:22.8, room.min+.10, room.max-.10);
+
+  // Worn limestone aisle edging, without bright repeated metallic floor joints.
+  for (const side of [-1, 1]) {
+    for (let z=-22.2; z<22.7; z+=1.81) {
+      instance('nave-border', geometries.block, materials.stoneDark, side*9.66, .045, z, .23,.11,1.76);
+      instance('worn-aisle-border', geometries.block, materials.stoneLight, side*3.15,.016,z,.14,.029,1.76);
+    }
   }
-  const crackGeometry = new T.BufferGeometry();
-  crackGeometry.setAttribute('position', new T.Float32BufferAttribute(crackPoints, 3));
-  group.add(new T.LineSegments(crackGeometry, new T.LineBasicMaterial({ color: 0x25343e, transparent: true, opacity: .7 })));
+
+  const grimeMaterial = new T.MeshStandardMaterial({
+    map: texture('grime.png', true), transparent:true, opacity:.57, roughness:.94,
+    metalness:0, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2,
+    side:T.DoubleSide
+  });
+  const wetMaterial = new T.MeshStandardMaterial({
+    map:grimeMaterial.map, color:0x716d5b, transparent:true, opacity:.27,
+    roughness:.29, metalness:.02, depthWrite:false, polygonOffset:true,
+    polygonOffsetFactor:-2, side:T.DoubleSide
+  });
+  const stainGeometry = new T.PlaneGeometry(1,1);
+  for (let i=0; i<42; i++) {
+    const side = i%2?-1:1, z = -21.8 + random()*43.2;
+    const x = side*(5.65 + random()*3.35);
+    instance(i%5===0?'damp-floor':'footing-ash', stainGeometry, i%5===0?wetMaterial:grimeMaterial,
+      x,.033,z,2.5+random()*3.3,1.1+random()*1.9,1,-Math.PI/2,0,random()*Math.PI*2);
+  }
 
   // Masonry cores plus staggered face stones. Front edges are low cutaway walls.
   function wall(x1, z1, x2, z2, height) {
@@ -146,15 +243,18 @@ export function createEnvironment(scene) {
     core.rotation.y = -angle;
     const rows = Math.max(1, Math.floor(height / .62));
     for (let row = 0; row < rows; row++) {
-      const unit = 1.46, offset = row % 2 ? .73 : 0;
-      for (let p = .05; p < length; p += unit) {
-        const begin = Math.max(0, p - offset), end = Math.min(length, p - offset + 1.42);
+      const offset = row % 2 ? .58 : 0;
+      for (let p = -.20; p < length;) {
+        const unit = 1.13 + random()*.69;
+        const begin = Math.max(0, p - offset), end = Math.min(length, p - offset + unit-.055);
+        p += unit;
         if (end - begin < .12) continue;
         const t = (begin + end) / 2 / length;
         const color = Math.floor(random() * wallMaterials.length);
-        instance(`wall-${color}`, geometries.brick, wallMaterials[color],
+        const variant = Math.floor(random()*4);
+        instance(`wall-${color}-${variant}`, masonry[variant], wallMaterials[color],
           x1 + (x2 - x1) * t, .25 + row * .62, z1 + (z2 - z1) * t,
-          (end - begin) / 1.42, 1, 1, 0, -angle);
+          (end - begin) / 1.42, .94+random()*.075, 1+random()*.075, 0, -angle);
       }
     }
     const footing = box((x1 + x2) / 2, .19, (z1 + z2) / 2, length, .34, .83, materials.stoneDark);

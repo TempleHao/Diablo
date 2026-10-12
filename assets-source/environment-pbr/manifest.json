@@ -1,0 +1,93 @@
+{
+  "repository": "playcanvas/engine",
+  "revision": "3e1e7c35f00692f3bb8aad105406b6a6d7896b7c",
+  "assetOwner": "ambientCG / Lennart Demes",
+  "license": "CC0-1.0 per each upstream *-textures.txt asset notice",
+  "normalConvention": "OpenGL (green +Y)",
+  "files": [
+    {
+      "file": "bricks076a/color.webp",
+      "upstreamPath": "examples/assets/textures/bricks076a/color.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/color.webp",
+      "bytes": 389038,
+      "sha256": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c"
+    },
+    {
+      "file": "bricks076a/normal.webp",
+      "upstreamPath": "examples/assets/textures/bricks076a/normal.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/normal.webp",
+      "bytes": 561584,
+      "sha256": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1"
+    },
+    {
+      "file": "bricks076a/roughness.webp",
+      "upstreamPath": "examples/assets/textures/bricks076a/roughness.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/roughness.webp",
+      "bytes": 163364,
+      "sha256": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692"
+    },
+    {
+      "file": "bricks076a/ao.webp",
+      "upstreamPath": "examples/assets/textures/bricks076a/ao.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/ao.webp",
+      "bytes": 284934,
+      "sha256": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3"
+    },
+    {
+      "file": "bricks076a/height.webp",
+      "upstreamPath": "examples/assets/textures/bricks076a/height.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/height.webp",
+      "bytes": 126314,
+      "sha256": "c198cf403add42682a47c1528879d1f9030ade7d4b15086f24622b59b481c670"
+    },
+    {
+      "file": "bricks076a/Bricks076A-textures.txt",
+      "upstreamPath": "examples/assets/textures/bricks076a/Bricks076A-textures.txt",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/bricks076a/Bricks076A-textures.txt",
+      "bytes": 909,
+      "sha256": "909cf94ca25f8a2b8294f0d48fe3edbe98786e755fbacd947732f4df3440a197"
+    },
+    {
+      "file": "ground092c/color.webp",
+      "upstreamPath": "examples/assets/textures/ground092c/color.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/color.webp",
+      "bytes": 115118,
+      "sha256": "fa7902c10bf1d62a13884b80c2e8c3049eca9d292cdb0c0e91100d3d9904f607"
+    },
+    {
+      "file": "ground092c/normal.webp",
+      "upstreamPath": "examples/assets/textures/ground092c/normal.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/normal.webp",
+      "bytes": 265132,
+      "sha256": "16d603d6f523f5f5d25fc113910e999c61181187230d61dcc27e84ebfb85ca82"
+    },
+    {
+      "file": "ground092c/roughness.webp",
+      "upstreamPath": "examples/assets/textures/ground092c/roughness.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/roughness.webp",
+      "bytes": 284968,
+      "sha256": "b30d4d11a0c149d265012ed845ce3bdb1e7ebfc08c461d3866d641adc5bf6024"
+    },
+    {
+      "file": "ground092c/ao.webp",
+      "upstreamPath": "examples/assets/textures/ground092c/ao.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/ao.webp",
+      "bytes": 25600,
+      "sha256": "6e8462a7b6e7de2ca5d306e396196970c5e6174cb4ab8c4c43c5b45955fa2340"
+    },
+    {
+      "file": "ground092c/height.webp",
+      "upstreamPath": "examples/assets/textures/ground092c/height.webp",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/height.webp",
+      "bytes": 84702,
+      "sha256": "c7f2ffd25075de3d2104626f6e11ae2d7d5d08c449d89e384f756913973559cb"
+    },
+    {
+      "file": "ground092c/Ground092C-textures.txt",
+      "upstreamPath": "examples/assets/textures/ground092c/Ground092C-textures.txt",
+      "url": "https://raw.githubusercontent.com/playcanvas/engine/3e1e7c35f00692f3bb8aad105406b6a6d7896b7c/examples/assets/textures/ground092c/Ground092C-textures.txt",
+      "bytes": 910,
+      "sha256": "712260f34d273f26b5dbeee3329c81ad643cf3e0ef01fca1e8021e7319fbeddf"
+    }
+  ]
+}
