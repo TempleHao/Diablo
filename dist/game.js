@@ -74,7 +74,10 @@ const clock=new T.Clock();function tick(){requestAnimationFrame(tick);const dt=M
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();worldRenderer.resize();}window.addEventListener('resize',resize);resize();scenery();player.position.set(0,0,7);camera.position.set(0,16,21);if(data.level>1||data.items.length)$('savehint').textContent='继续本机存档 · Lv. '+data.level+' · '+data.items.length+' 件装备';$('intro').showModal();tick();
 
 $('hero').disabled=true;
-$('hero').onclick=()=>{if(!mage||$('intro').open||$('result').open)return;heroWasRunning=running;running=false;clearHeldInput();$('character').showModal();stopPreview=mage.preview($('model-preview'));};
+$('hero').onclick=()=>{if(!mage||$('intro').open||$('result').open)return;heroWasRunning=running;running=false;clearHeldInput();$('character').showModal();
+ try{stopPreview=mage.preview($('model-preview'));}
+ catch(error){console.error('Character preview unavailable',error);$('model-status').hidden=false;$('model-status').textContent='人物预览暂时无法显示，请关闭后重试。';$('retry-model').hidden=true;}
+};
 $('closehero').onclick=()=>$('character').close();
 $('character').addEventListener('close',()=>{stopPreview?.();stopPreview=null;running=heroWasRunning&&!dead&&!$('intro').open&&!$('result').open&&!$('inventory').open&&!$('save-dialog').open;});
 loadMage(player).then(actor=>{mage=actor;$('start').disabled=false;$('start').innerHTML='进入灰烬地窟 <span>→</span>';$('hero').disabled=false;}).catch(error=>{console.error('Mage model load failed',error);$('start').textContent='模型加载失败';$('savehint').textContent='请刷新页面重试，或检查模型资源是否可访问。';});

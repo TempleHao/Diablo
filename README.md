@@ -1,6 +1,6 @@
 # 余烬法师 · Ember Mage
 
-**版本 0.3.0-preview.1** · 写实暗黑方向的3D美术预览；仍是单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。
+**版本 0.3.0-preview.2** · 写实暗黑方向的3D美术预览；仍是单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。
 
 [打开游戏](https://templehao.github.io/Diablo/) · [完整游戏策划](docs/bible/README.md) · [在线策划阅读版](https://templehao.github.io/Diablo/design/) · [部署工作流](https://github.com/TempleHao/Diablo/actions/workflows/pages.yml)
 
@@ -16,7 +16,7 @@
 
 ## 当前可玩内容
 
-- 法师采用连续人体网格、真实皮肤UV、可辨眼睛与手部、多层深色衣物和皮革胸带；Idle/Walk/Cast骨骼动作。人物面板支持全身、面部取景，拖转、滚轮或双指缩放。
+- 法师采用连续人体网格、真实皮肤UV、可辨眼睛与手部、发卡、多层衣物和皮革胸带；Idle/Walk/Cast骨骼动作。人物面板支持全身/面部、拖转和滚轮/双指缩放；细节加载失败可重试，关闭不会阻断回到地窟。
 - 灰烬地窟重做错缝缺角石板、风化石墙PBR、连续尖拱与断拱、浮雕/空兜帽石像、灰污潮迹和柔边火把，保留既有通路/碰撞。新增接触遮蔽与HDR输出照明。
 - 火球远程攻击、冰霜新星范围伤害与减速、闪现、冷却式治疗药水。
 - 12 名守卫与灰烬领主、三种品质随机法杖、升级、换装与分解。
@@ -50,18 +50,19 @@ npm run check
 
 ## 模型源文件
 
-当前运行模型为 `dist/models/ember-mage-realism.glb`，实际40,966三角面、163骨骼、9材质、20嵌入图像，包含Idle/Walk/Cast与面部取景挂点。人体、形变、骨架/眼睛和系统皮肤采用已登记的MakeHuman CC0图形资源；服装、装备与生成管线为本项目制作，不把第三方基底称为从零原创。来源清单见 [human-base](assets-source/human-base/README.md)。
+进入游戏使用 `dist/models/ember-mage-combat.glb`（14,713三角面/3,852,640字节）；人物查看才按需加载 `ember-mage-realism.glb`（34,451三角面/4,676,752字节）。两者均60骨骼、2材质/2 primitives、4张嵌入PBR图集，包含相同Idle/Walk/Cast与面部取景挂点。人体、形变、骨架/眼睛和系统皮肤采用已登记的MakeHuman CC0图形资源；服装、装备与生成管线为本项目制作，不把第三方基底称为从零原创。来源清单见 [human-base](assets-source/human-base/README.md)。
 
 已在Blender **4.3.2**生成候选：
 
 ```sh
 blender -b --python scripts/build-mage-realism.py -- /你的绝对路径/Diablo
+blender -b assets-source/ash-archivist/ash-archivist.blend --python scripts/refine-mage-budget.py -- /你的绝对路径/Diablo
 python3 scripts/build-environment-textures.py
 ```
 
 环境生成器本轮使用Pillow12.3.0、NumPy2.3.5；Blender脚本使用其自带NumPy。可编辑`.blend`及原创中间纹理由脚本重建，当前发布GLB不依赖这些未提交文件。旧模型与旧生成器保留，便于对照/回退。环境CC0石材来源与实际结构计数见 [ART-ENVIRONMENT](docs/ART-ENVIRONMENT.md)。
 
-这次交付是可玩的美术整改切片，**不代表已达到D2R/D4级质量**。头发、衣物裁剪/折褶与磨损、动作、怪物和完整环境仍需精修；当前候选超出策划首轮角色/骨骼/材质及部分绘制预算，缺少LOD和真机性能验证。详细已测/未测和下一步见 [ART-01验证记录](docs/VALIDATION-ART-01.md)。
+这次交付是角色精修与资源预算的预览，**没有达到D2R/D4级质量，ART-02仍在进行，美术尚未获用户验收**。新增真实发卡、张力衣褶、开领与包杖/施法姿态；战斗与近景资产分别满足策划首轮角色面数/骨骼/材质预算。人脸/头皮质感、衣物高低模雕刻与位置磨损、动作、怪物和完整环境仍需制作；布尾减面局部误差与真机未测明确列出。制作与误差证据见 [角色精修](docs/ART-02-LOOKDEV.md)、[预算记录](docs/ART-02-BUDGET.md)；当前验证见 [ART-02记录](docs/VALIDATION-ART-02.md)。
 
 ## GitHub Pages 部署
 
@@ -86,3 +87,5 @@ Chromium 桌面与手机视口检查覆盖模型加载、三段骨骼动画、�
 0.2.1的61项存档迁移/故障/恢复测试与浏览器存档回归通过，复现方法及边界见[D1-01验证记录](docs/VALIDATION-D1-01.md)。可选 `npm run check:browser` 需要另外安装Playwright Core并提供Chromium；游戏运行本身不依赖这些测试工具。
 
 0.3.0美术预览另通过23项桌面/触屏视口交互回归，新GLB与26项来源哈希检查；实际范围见[ART-01验证记录](docs/VALIDATION-ART-01.md)。可选 `npm run check:art-browser` 需要Playwright Core及Chromium。照片/截图与真机性能、美术品质验收分别记录。
+
+0.3.0-preview.2另通过61项存档测试、23项完整游戏浏览器回归、最新6项资源生命周期/取景专项及30次原生动作采样。实际范围和软件渲染限制见[ART-02验证记录](docs/VALIDATION-ART-02.md)；技术通过不表示美术验收通过。

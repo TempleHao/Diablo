@@ -16,8 +16,9 @@ for(const directory of ['assets-source/human-base/','assets-source/environment-p
   console.log(`${directory}: ${manifest.files.length} pinned source files and hashes verified.`);
 }
 
-const bytes=readFileSync(new URL('dist/models/ember-mage-realism.glb',project));
-const statistics=JSON.parse(readFileSync(new URL('assets-source/ash-archivist/statistics.json',project)));
+function checkCharacter(filename,statsFile,triangleLimit){
+const bytes=readFileSync(new URL(`dist/models/${filename}`,project));
+const statistics=JSON.parse(readFileSync(new URL(`assets-source/ash-archivist/${statsFile}`,project)));
 assert.equal(createHash('sha256').update(bytes).digest('hex'),statistics.sha256,'Model and generated statistics are from different builds');
 assert.equal(bytes.readUInt32LE(0),0x46546c67,'Invalid realism GLB');
 assert.equal(bytes.readUInt32LE(4),2);assert.equal(bytes.readUInt32LE(8),bytes.length);
@@ -64,4 +65,40 @@ for(const node of model.nodes){
   }
 }
 assert.ok(weightedVertices>0&&triangles>0,'Character geometry missing');
-console.log(JSON.stringify({realismModelBytes:bytes.length,triangles,weightedVertices,joints:model.skins[0].joints.length,materials:model.materials.length,images:model.images.length}));
+const primitives=model.meshes.flatMap(m=>m.primitives);
+assert.ok(triangles<=triangleLimit,`Triangle budget exceeded: ${filename}`);
+assert.equal(model.meshes.length,1,'Character must be joined into one skinned mesh');
+assert.equal(primitives.length,2,'Character must use exactly two atlas primitives');
+assert.equal(model.materials.length,2);assert.equal(model.images.length,4);
+for(const skin of model.skins)assert.equal(skin.joints.length,60,'Rig budget changed');
+assert.deepEqual(new Set(model.materials.map(m=>m.alphaMode||'OPAQUE')),new Set(['OPAQUE','MASK']));
+for(const material of model.materials){
+  assert.ok(material.pbrMetallicRoughness?.baseColorTexture,'Missing baked base color');
+  assert.ok(material.pbrMetallicRoughness?.metallicRoughnessTexture,'Missing baked roughness/metalness');
+  assert.ok(material.normalTexture&&material.emissiveTexture,'Missing baked normal/emission');
+  if(material.alphaMode==='MASK')assert.equal(material.alphaCutoff??.5,.5);
+}
+assert.equal(statistics.triangles,triangles);assert.equal(statistics.glbBytes,bytes.length);
+assert.equal(statistics.bones,60);assert.equal(statistics.materials,2);
+assert.equal(statistics.primitives,primitives.length);assert.equal(statistics.images,model.images.length);
+const clipTimes=model.animations.map(a=>({name:a.name,times:a.samplers.map(s=>{
+  const input=model.accessors[s.input];return {count:input.count,min:input.min,max:input.max};
+})}));
+const jointNames=model.skins[0].joints.map(i=>model.nodes[i].name);
+console.log(JSON.stringify({filename,modelBytes:bytes.length,triangles,weightedVertices,joints:jointNames.length,materials:model.materials.length,images:model.images.length}));
+return {statistics,jointNames,clipTimes};
+}
+const detail=checkCharacter('ember-mage-realism.glb','statistics.json',35000);
+const combat=checkCharacter('ember-mage-combat.glb','combat-statistics.json',15000);
+assert.deepEqual(combat.jointNames,detail.jointNames,'LOD rig order differs');
+assert.deepEqual(combat.clipTimes,detail.clipTimes,'LOD animation sampling differs');
+const report=JSON.parse(readFileSync(new URL('assets-source/ash-archivist/budget-report.json',project)));
+assert.equal(report.lods.L0.actualExport.sha256,detail.statistics.sha256);
+assert.equal(report.lods.L1.actualExport.sha256,combat.statistics.sha256);
+assert.ok(report.rig.samples.length===15,'Expected three clips at five pose samples');
+assert.ok(report.rig.samples.every(s=>s.maxVertexMeters<.0001),'Rig transfer error exceeds 0.1 mm');
+for(const lod of ['L0','L1']){
+  assert.ok(report.lods[lod].samples.length===15);
+  assert.ok(report.lods[lod].sampledBodySurfaceErrorMaxMeters<.004,'Face/hand sampled LOD error exceeds 4 mm');
+  assert.ok(report.lods[lod].samples.every(s=>s.maxBoundsMeters<.005),'LOD grounding/bounds error exceeds 5 mm');
+}

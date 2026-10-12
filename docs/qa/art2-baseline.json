@@ -1,0 +1,2474 @@
+{
+  "baselineCommit": "41a9e7361804dd88edba148734b218747cd2146f",
+  "mode": "Frozen published 0.3.0-preview.1 files and GLB; native WebGL Chromium SwiftShader render",
+  "limitations": [
+    "World colour-pass renderer.info is sampled immediately after render(world,camera), before the output quad. Three.js resets info after shadow rendering; these counts exclude shadow passes.",
+    "Software rendering: no hardware FPS or real-device performance claim."
+  ],
+  "fileHashes": {
+    "index.html": "ac6d122cbec81b5a166a86fc63744343a775e6b125074be0557215b7aa09df9e",
+    "style.css": "c2d5a321dbdbb06d7eef832db8e7c406e18969183dfe340b544a9571cdcef886",
+    "game.js": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+    "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+    "hero.js": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43",
+    "environment.js": "11dcf22ecf99559ba0791fddfedea6530f790a8935ecb05ca6ee6a4279a2f36e",
+    "save.js": "bc9b088bc36466f50d9ee5075016d6d894dffe528af373d2f2093cfca61c3f8e",
+    "save-panel.js": "d189877c39e0400135f0531a1bcea7b2afef3bced1091cbdcdf688ced2431e96",
+    "world-renderer.js": "3e954a752c3a31d223e25e7a006741a58b8da89946f49371b638953270510a62",
+    "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+    "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+    "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+    "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+    "models/ember-mage-realism.glb": "e1141c68121c8c37b6032b28e2b0c9cee04fe875a823acb85cfc97833b0eecbc",
+    "textures/environment-stone-basecolor.jpg": "3adec878a98b86fafe0e266ad59885b70ffc186a29d98a2bd77690c1d93076c7",
+    "textures/environment-stone-normal.jpg": "661c674152b0319eeef4f132e428ea6c06b0866feca7f6ae822c288b48c38424",
+    "textures/environment-stone-roughness.jpg": "8d55a15c364032e0a104001d801c4ec93cdb84bd6722cbd496e1b42d02a81307",
+    "textures/environment-floor-basecolor.jpg": "5f9bed1abbee22bf9163c471bc27d9fe2f69dbdcdd7b8a37f6021bb6af1d0967",
+    "textures/environment-floor-normal.jpg": "d5357371c0401ea2b2f460fd6d583138e9c8c05c63d994c97c48048d11d63368",
+    "textures/environment-floor-roughness.jpg": "23000b6fbfafdcf98fcc96f847a1366d3c8d841c33f9283917b9f6d98549a489",
+    "textures/environment-masonry-color.webp": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c",
+    "textures/environment-masonry-normal.webp": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1",
+    "textures/environment-masonry-roughness.webp": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692",
+    "textures/environment-masonry-ao.webp": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3",
+    "textures/environment-grime.png": "92f1e17822df7fd832c5c8a1a7ee2d7d1ebea072d4a128a28f87e6fb6dd010ed",
+    "textures/environment-flame.png": "cc639a1795aa4c8e84313e496620f152af8ec1b300b14a807096a4dc08667edf",
+    "textures/environment-banner-basecolor.jpg": "509ead54e79c540406abfeb3c8f586dc99d3c4e3ab861feab45276cfed192e70",
+    "textures/environment-banner-normal.jpg": "080afcf854f5edd98092a9793a5ea17b63be11e5fecef87dc145b73198fc620f",
+    "textures/environment-relief-basecolor.jpg": "6cab05061c3152139166ba99ce89a26e03d1d3f52a43568f9be7eb913cfcde61",
+    "textures/environment-relief-normal.jpg": "67db82fcaeec86f0e1e062ca39182b174fbe694265df48cb46584ce9334adaa9"
+  },
+  "errors": [],
+  "models": [
+    {
+      "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+      "status": 200
+    }
+  ],
+  "screenshots": [
+    "/workspace/scratch/ember-qa/art2-baseline/evidence/baseline-gameplay-desktop.png",
+    "/workspace/scratch/ember-qa/art2-baseline/evidence/baseline-full-desktop.png",
+    "/workspace/scratch/ember-qa/art2-baseline/evidence/baseline-face-desktop.png"
+  ],
+  "glb": {
+    "file": "/workspace/scratch/ember-qa/art2-baseline/dist/models/ember-mage-realism.glb",
+    "path": "/workspace/scratch/ember-qa/art2-baseline/dist/models/ember-mage-realism.glb",
+    "bytes": 7783844,
+    "sha256": "e1141c68121c8c37b6032b28e2b0c9cee04fe875a823acb85cfc97833b0eecbc",
+    "meshCount": 42,
+    "primitiveCount": 42,
+    "vertices": 22981,
+    "triangles": 40966,
+    "materials": [
+      "Patinated bronze",
+      "Cracked umber leather",
+      "Grey black hair",
+      "Weathered charcoal linen",
+      "Skin pores",
+      "Oxblood wool",
+      "Natural brown eyes",
+      "Muted amber spell focus",
+      "Fine grey brown brow strands"
+    ],
+    "materialCount": 9,
+    "skins": [
+      {
+        "name": "AshArchivistRig",
+        "joints": 163
+      }
+    ],
+    "boneNodeCount": 163,
+    "clips": [
+      {
+        "name": "Idle",
+        "tracks": 489
+      },
+      {
+        "name": "Walk",
+        "tracks": 489
+      },
+      {
+        "name": "Cast",
+        "tracks": 489
+      }
+    ],
+    "primitives": [
+      {
+        "mesh": "Bent bronze focus cage.002",
+        "vertices": 21,
+        "triangles": 28,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Bent bronze focus cage.003",
+        "vertices": 21,
+        "triangles": 28,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Broad leather waist belt.001",
+        "vertices": 384,
+        "triangles": 764,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Carved ash staff.001",
+        "vertices": 330,
+        "triangles": 640,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Close cropped scalp and recession.001",
+        "vertices": 262,
+        "triangles": 434,
+        "material": "Grey black hair"
+      },
+      {
+        "mesh": "Close fitted boot quarter stitching.004",
+        "vertices": 102,
+        "triangles": 192,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Close fitted boot quarter stitching.005",
+        "vertices": 102,
+        "triangles": 192,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Close fitted boot quarter stitching.006",
+        "vertices": 102,
+        "triangles": 192,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Close fitted boot quarter stitching.007",
+        "vertices": 102,
+        "triangles": 192,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Continuous full length linen sleeve L.001",
+        "vertices": 850,
+        "triangles": 1696,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Continuous full length linen sleeve R.001",
+        "vertices": 850,
+        "triangles": 1696,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Continuous leather boot toe box L.001",
+        "vertices": 462,
+        "triangles": 920,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Continuous leather boot toe box R.001",
+        "vertices": 462,
+        "triangles": 920,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Continuous mature face neck and articulated hands.001",
+        "vertices": 8635,
+        "triangles": 15816,
+        "material": "Skin pores"
+      },
+      {
+        "mesh": "Cube.013",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Flat fitted cross-body leather harness.001",
+        "vertices": 168,
+        "triangles": 156,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Frayed oxblood facing -1.001",
+        "vertices": 300,
+        "triangles": 596,
+        "material": "Oxblood wool"
+      },
+      {
+        "mesh": "Frayed oxblood facing 1.001",
+        "vertices": 300,
+        "triangles": 596,
+        "material": "Oxblood wool"
+      },
+      {
+        "mesh": "Cube.014",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Cube.008",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Cube.009",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Cube.010",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Cube.011",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Cube.012",
+        "vertices": 216,
+        "triangles": 108,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Proper recessed brown eyeballs.001",
+        "vertices": 1076,
+        "triangles": 2040,
+        "material": "Natural brown eyes"
+      },
+      {
+        "mesh": "Raised standing collar.001",
+        "vertices": 240,
+        "triangles": 476,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Segmented leather shoulder yoke -1.001",
+        "vertices": 306,
+        "triangles": 608,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Segmented leather shoulder yoke 1.001",
+        "vertices": 306,
+        "triangles": 608,
+        "material": "Cracked umber leather"
+      },
+      {
+        "mesh": "Shoulder mantle with gravity folds.001",
+        "vertices": 806,
+        "triangles": 1608,
+        "material": "Oxblood wool"
+      },
+      {
+        "mesh": "Icosphere.001",
+        "vertices": 240,
+        "triangles": 80,
+        "material": "Muted amber spell focus"
+      },
+      {
+        "mesh": "Split coat tail -1.001",
+        "vertices": 850,
+        "triangles": 1696,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Split coat tail 1.001",
+        "vertices": 850,
+        "triangles": 1696,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Staff leather and bronze binding.004",
+        "vertices": 96,
+        "triangles": 188,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Staff leather and bronze binding.005",
+        "vertices": 96,
+        "triangles": 188,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Staff leather and bronze binding.006",
+        "vertices": 96,
+        "triangles": 188,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Staff leather and bronze binding.007",
+        "vertices": 96,
+        "triangles": 188,
+        "material": "Patinated bronze"
+      },
+      {
+        "mesh": "Tailored continuous linen torso.001",
+        "vertices": 1394,
+        "triangles": 2784,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Tapered natural brow -1.001",
+        "vertices": 50,
+        "triangles": 48,
+        "material": "Fine grey brown brow strands"
+      },
+      {
+        "mesh": "Tapered natural brow 1.001",
+        "vertices": 50,
+        "triangles": 48,
+        "material": "Fine grey brown brow strands"
+      },
+      {
+        "mesh": "Thick stitched boot sole L.001",
+        "vertices": 132,
+        "triangles": 260,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Thick stitched boot sole R.001",
+        "vertices": 132,
+        "triangles": 260,
+        "material": "Weathered charcoal linen"
+      },
+      {
+        "mesh": "Wool trousers.001",
+        "vertices": 1200,
+        "triangles": 2188,
+        "material": "Weathered charcoal linen"
+      }
+    ]
+  },
+  "fixedWorld": {
+    "loaded": true,
+    "position": [
+      0,
+      0,
+      7
+    ],
+    "camera": [
+      0,
+      16,
+      21
+    ],
+    "running": false,
+    "elapsed": 0,
+    "worldPass": {
+      "frame": 45,
+      "calls": 158,
+      "triangles": 208334,
+      "points": 0,
+      "lines": 0
+    },
+    "worldQuad": {
+      "frame": 46,
+      "calls": 1,
+      "triangles": 2,
+      "points": 0,
+      "lines": 0
+    },
+    "environment": {
+      "triangles": 179936,
+      "meshCount": 171,
+      "instanceCount": 3365,
+      "pointLights": 4,
+      "textureFiles": 16,
+      "textureResolution": 1024
+    },
+    "clips": [
+      "Idle",
+      "Walk",
+      "Cast"
+    ],
+    "animation": {
+      "current": "Idle",
+      "mixerTime": 0,
+      "casting": 0,
+      "bones": [
+        {
+          "name": "root",
+          "q": [
+            0.6485145092010498,
+            6.107323443843382e-18,
+            6.1073991308694304e-18,
+            0.761202335357666
+          ]
+        },
+        {
+          "name": "pelvisL",
+          "q": [
+            0.7443470358848572,
+            0.6646007299423218,
+            0.05312585458159447,
+            0.03782857954502106
+          ]
+        },
+        {
+          "name": "upperleg01L",
+          "q": [
+            -0.5390263795852661,
+            -0.548139214515686,
+            0.4708038568496704,
+            0.43282532691955566
+          ]
+        },
+        {
+          "name": "upperleg02L",
+          "q": [
+            0.15046849846839905,
+            0.1640697419643402,
+            -0.13940517604351044,
+            0.9648868441581726
+          ]
+        },
+        {
+          "name": "lowerleg01L",
+          "q": [
+            0.03064153902232647,
+            -0.035538408905267715,
+            0.03954046964645386,
+            0.9981155395507812
+          ]
+        },
+        {
+          "name": "lowerleg02L",
+          "q": [
+            1.979060471057892e-9,
+            5.238690592435091e-10,
+            6.9849201977945086e-9,
+            1
+          ]
+        },
+        {
+          "name": "footL",
+          "q": [
+            -0.5507625341415405,
+            -0.02252701111137867,
+            -0.017711322754621506,
+            0.8341699242591858
+          ]
+        },
+        {
+          "name": "toe1-1L",
+          "q": [
+            -0.05544233322143555,
+            0.20482297241687775,
+            -0.04898326098918915,
+            0.9759991765022278
+          ]
+        },
+        {
+          "name": "toe1-2L",
+          "q": [
+            0.04564850777387619,
+            0.07083724439144135,
+            0.000022302201614365913,
+            0.9964428544044495
+          ]
+        },
+        {
+          "name": "toe2-1L",
+          "q": [
+            -0.10500600934028625,
+            0.28132081031799316,
+            -0.06847438961267471,
+            0.9513903856277466
+          ]
+        },
+        {
+          "name": "toe2-2L",
+          "q": [
+            0.0707692950963974,
+            -0.2811633050441742,
+            0.056506138294935226,
+            0.9553773999214172
+          ]
+        },
+        {
+          "name": "toe2-3L",
+          "q": [
+            0.01386044081300497,
+            0.08144541084766388,
+            -0.014859050512313843,
+            0.9964706897735596
+          ]
+        },
+        {
+          "name": "toe3-1L",
+          "q": [
+            -0.1282370239496231,
+            0.10686143487691879,
+            -0.029675351455807686,
+            0.9855228662490845
+          ]
+        },
+        {
+          "name": "toe3-2L",
+          "q": [
+            0.06730405241250992,
+            -0.23050419986248016,
+            0.03200189024209976,
+            0.9702132940292358
+          ]
+        },
+        {
+          "name": "toe3-3L",
+          "q": [
+            0.0006001655710861087,
+            0.09870801866054535,
+            -0.01621192693710327,
+            0.9949842095375061
+          ]
+        },
+        {
+          "name": "toe4-1L",
+          "q": [
+            -0.11503542214632034,
+            0.038592688739299774,
+            -0.013567963615059853,
+            0.9925186634063721
+          ]
+        },
+        {
+          "name": "toe4-2L",
+          "q": [
+            0.048557836562395096,
+            -0.37665054202079773,
+            0.044917624443769455,
+            0.923990786075592
+          ]
+        },
+        {
+          "name": "toe4-3L",
+          "q": [
+            0.08149649947881699,
+            0.3897421956062317,
+            -0.08897922188043594,
+            0.9129852652549744
+          ]
+        },
+        {
+          "name": "toe5-1L",
+          "q": [
+            -0.08818503469228745,
+            -0.040627818554639816,
+            0.005601775366812944,
+            0.9952594637870789
+          ]
+        },
+        {
+          "name": "toe5-2L",
+          "q": [
+            0.05915907770395279,
+            -0.4600721001625061,
+            0.06279103457927704,
+            0.8836804628372192
+          ]
+        },
+        {
+          "name": "toe5-3L",
+          "q": [
+            0.06810411810874939,
+            0.43356770277023315,
+            -0.12556318938732147,
+            0.8897273540496826
+          ]
+        },
+        {
+          "name": "pelvisR",
+          "q": [
+            0.7443470358848572,
+            -0.6646007299423218,
+            -0.05312585458159447,
+            0.03782857954502106
+          ]
+        },
+        {
+          "name": "upperleg01R",
+          "q": [
+            -0.5390263795852661,
+            0.548139214515686,
+            -0.4708038568496704,
+            0.43282532691955566
+          ]
+        },
+        {
+          "name": "upperleg02R",
+          "q": [
+            0.15046849846839905,
+            -0.1640697419643402,
+            0.13940517604351044,
+            0.9648868441581726
+          ]
+        },
+        {
+          "name": "lowerleg01R",
+          "q": [
+            0.03064153902232647,
+            0.035538408905267715,
+            -0.03954046964645386,
+            0.9981155395507812
+          ]
+        },
+        {
+          "name": "lowerleg02R",
+          "q": [
+            1.979060471057892e-9,
+            -5.238690592435091e-10,
+            -6.9849201977945086e-9,
+            1
+          ]
+        },
+        {
+          "name": "footR",
+          "q": [
+            -0.5507625341415405,
+            0.02252701111137867,
+            0.017711322754621506,
+            0.8341699242591858
+          ]
+        },
+        {
+          "name": "toe1-1R",
+          "q": [
+            -0.05544233322143555,
+            -0.20482297241687775,
+            0.04898326098918915,
+            0.9759991765022278
+          ]
+        },
+        {
+          "name": "toe1-2R",
+          "q": [
+            0.04564850777387619,
+            -0.07083724439144135,
+            -0.000022302201614365913,
+            0.9964428544044495
+          ]
+        },
+        {
+          "name": "toe2-1R",
+          "q": [
+            -0.10500600934028625,
+            -0.28132081031799316,
+            0.06847438961267471,
+            0.9513903856277466
+          ]
+        },
+        {
+          "name": "toe2-2R",
+          "q": [
+            0.0707692950963974,
+            0.2811633050441742,
+            -0.056506138294935226,
+            0.9553773999214172
+          ]
+        },
+        {
+          "name": "toe2-3R",
+          "q": [
+            0.01386044081300497,
+            -0.08144541084766388,
+            0.014859050512313843,
+            0.9964706897735596
+          ]
+        },
+        {
+          "name": "toe3-1R",
+          "q": [
+            -0.1282370239496231,
+            -0.10686143487691879,
+            0.029675351455807686,
+            0.9855228662490845
+          ]
+        },
+        {
+          "name": "toe3-2R",
+          "q": [
+            0.06730405241250992,
+            0.23050419986248016,
+            -0.03200189024209976,
+            0.9702132940292358
+          ]
+        },
+        {
+          "name": "toe3-3R",
+          "q": [
+            0.0006001655710861087,
+            -0.09870801866054535,
+            0.01621192693710327,
+            0.9949842095375061
+          ]
+        },
+        {
+          "name": "toe4-1R",
+          "q": [
+            -0.11503542214632034,
+            -0.038592688739299774,
+            0.013567963615059853,
+            0.9925186634063721
+          ]
+        },
+        {
+          "name": "toe4-2R",
+          "q": [
+            0.048557836562395096,
+            0.37665054202079773,
+            -0.044917624443769455,
+            0.923990786075592
+          ]
+        },
+        {
+          "name": "toe4-3R",
+          "q": [
+            0.08149649947881699,
+            -0.3897421956062317,
+            0.08897922188043594,
+            0.9129852652549744
+          ]
+        },
+        {
+          "name": "toe5-1R",
+          "q": [
+            -0.08818503469228745,
+            0.040627818554639816,
+            -0.005601775366812944,
+            0.9952594637870789
+          ]
+        },
+        {
+          "name": "toe5-2R",
+          "q": [
+            0.05915907770395279,
+            0.4600721001625061,
+            -0.06279103457927704,
+            0.8836804628372192
+          ]
+        },
+        {
+          "name": "toe5-3R",
+          "q": [
+            0.06810411810874939,
+            -0.43356770277023315,
+            0.12556318938732147,
+            0.8897273540496826
+          ]
+        },
+        {
+          "name": "spine05",
+          "q": [
+            -0.7714826464653015,
+            -5.5885736662930015e-18,
+            -7.131443352536097e-18,
+            0.636250376701355
+          ]
+        },
+        {
+          "name": "spine04",
+          "q": [
+            0.23048746585845947,
+            -7.43879388965875e-19,
+            -1.3236089212736645e-18,
+            0.9730753302574158
+          ]
+        },
+        {
+          "name": "spine03",
+          "q": [
+            -0.19569481909275055,
+            2.7794383207657145e-18,
+            3.039660449283312e-18,
+            0.980664849281311
+          ]
+        },
+        {
+          "name": "spine02",
+          "q": [
+            0.07025448232889175,
+            -1.3133799024212572e-18,
+            -1.510278563313353e-18,
+            0.9975290894508362
+          ]
+        },
+        {
+          "name": "breastL",
+          "q": [
+            -0.32024651765823364,
+            -0.621035635471344,
+            -0.7141256928443909,
+            0.042208194732666016
+          ]
+        },
+        {
+          "name": "breastR",
+          "q": [
+            -0.32024651765823364,
+            0.621035635471344,
+            0.7141256928443909,
+            0.042208194732666016
+          ]
+        },
+        {
+          "name": "spine01",
+          "q": [
+            0.22302643954753876,
+            -2.498748945040307e-23,
+            -4.5259119500018805e-24,
+            0.974812388420105
+          ]
+        },
+        {
+          "name": "clavicleL",
+          "q": [
+            -0.5058133602142334,
+            -0.5477025508880615,
+            -0.3994130492210388,
+            0.5335204005241394
+          ]
+        },
+        {
+          "name": "shoulder01L",
+          "q": [
+            -0.36907532811164856,
+            -0.3289216160774231,
+            0.09290162473917007,
+            0.8642703890800476
+          ]
+        },
+        {
+          "name": "upperarm01L",
+          "q": [
+            -0.2844753563404083,
+            -0.11885277181863785,
+            0.1750514805316925,
+            0.935042679309845
+          ]
+        },
+        {
+          "name": "upperarm02L",
+          "q": [
+            0.015755528584122658,
+            0.013097686693072319,
+            -0.0031164558604359627,
+            0.9997852444648743
+          ]
+        },
+        {
+          "name": "lowerarm01L",
+          "q": [
+            -0.24802322685718536,
+            0.049112167209386826,
+            -0.29071712493896484,
+            0.9227979779243469
+          ]
+        },
+        {
+          "name": "lowerarm02L",
+          "q": [
+            2.123415470123291e-7,
+            -8.512288900419662e-7,
+            3.501772880554199e-7,
+            1
+          ]
+        },
+        {
+          "name": "wristL",
+          "q": [
+            -0.10265636444091797,
+            -0.14998027682304382,
+            -0.019409580156207085,
+            0.9831535220146179
+          ]
+        },
+        {
+          "name": "finger1-1L",
+          "q": [
+            -0.20801208913326263,
+            0.8441217541694641,
+            -0.47808146476745605,
+            0.12501013278961182
+          ]
+        },
+        {
+          "name": "finger1-2L",
+          "q": [
+            -0.18247529864311218,
+            0.34200403094291687,
+            0.06427548825740814,
+            0.9195676445960999
+          ]
+        },
+        {
+          "name": "finger1-3L",
+          "q": [
+            0.0008128967601805925,
+            0.4547670781612396,
+            -0.17138509452342987,
+            0.8739641904830933
+          ]
+        },
+        {
+          "name": "metacarpal1L",
+          "q": [
+            -0.08080059289932251,
+            0.018572984263300896,
+            -0.06749048084020615,
+            0.9942693114280701
+          ]
+        },
+        {
+          "name": "finger2-1L",
+          "q": [
+            0.053176991641521454,
+            -0.39469850063323975,
+            0.13849517703056335,
+            0.9067549109458923
+          ]
+        },
+        {
+          "name": "finger2-2L",
+          "q": [
+            0.06447774916887283,
+            -0.23992101848125458,
+            0.09161141514778137,
+            0.9643069505691528
+          ]
+        },
+        {
+          "name": "finger2-3L",
+          "q": [
+            0.04534634202718735,
+            -0.12403746694326401,
+            0.04680243507027626,
+            0.9901353716850281
+          ]
+        },
+        {
+          "name": "metacarpal2L",
+          "q": [
+            0.08502078056335449,
+            0.13209015130996704,
+            0.01306647714227438,
+            0.9874983429908752
+          ]
+        },
+        {
+          "name": "finger3-1L",
+          "q": [
+            -0.032577142119407654,
+            -0.4227617383003235,
+            0.2002124786376953,
+            0.8832475543022156
+          ]
+        },
+        {
+          "name": "finger3-2L",
+          "q": [
+            -0.018283125013113022,
+            -0.131819948554039,
+            0.06023034825921059,
+            0.9892733097076416
+          ]
+        },
+        {
+          "name": "finger3-3L",
+          "q": [
+            0.032745931297540665,
+            -0.08337749540805817,
+            0.04263701289892197,
+            0.9950668215751648
+          ]
+        },
+        {
+          "name": "metacarpal3L",
+          "q": [
+            0.0873827114701271,
+            0.17508678138256073,
+            -0.0016005085781216621,
+            0.9806662797927856
+          ]
+        },
+        {
+          "name": "finger4-1L",
+          "q": [
+            0.025686364620923996,
+            -0.3792996406555176,
+            0.2427569031715393,
+            0.8924915194511414
+          ]
+        },
+        {
+          "name": "finger4-2L",
+          "q": [
+            -0.04161813482642174,
+            -0.10255725681781769,
+            0.04782241955399513,
+            0.9927048683166504
+          ]
+        },
+        {
+          "name": "finger4-3L",
+          "q": [
+            0.04496850073337555,
+            -0.08582794666290283,
+            0.057570282369852066,
+            0.993628203868866
+          ]
+        },
+        {
+          "name": "metacarpal4L",
+          "q": [
+            0.20057260990142822,
+            0.04618358984589577,
+            0.1322646141052246,
+            0.9696101546287537
+          ]
+        },
+        {
+          "name": "finger5-1L",
+          "q": [
+            -0.04544544965028763,
+            -0.26658231019973755,
+            0.16992855072021484,
+            0.947624921798706
+          ]
+        },
+        {
+          "name": "finger5-2L",
+          "q": [
+            -0.024890558794140816,
+            -0.1272086352109909,
+            0.08003565669059753,
+            0.9883282780647278
+          ]
+        },
+        {
+          "name": "finger5-3L",
+          "q": [
+            0.01612365059554577,
+            -0.008285588584840298,
+            0.007612260058522224,
+            0.9998067021369934
+          ]
+        },
+        {
+          "name": "clavicleR",
+          "q": [
+            -0.5058133602142334,
+            0.5477025508880615,
+            0.3994130492210388,
+            0.5335204005241394
+          ]
+        },
+        {
+          "name": "shoulder01R",
+          "q": [
+            -0.36907532811164856,
+            0.3289216160774231,
+            -0.09290162473917007,
+            0.8642703890800476
+          ]
+        },
+        {
+          "name": "upperarm01R",
+          "q": [
+            -0.2844753563404083,
+            0.11885277181863785,
+            -0.1750514805316925,
+            0.935042679309845
+          ]
+        },
+        {
+          "name": "upperarm02R",
+          "q": [
+            0.015755528584122658,
+            -0.013097686693072319,
+            0.0031164558604359627,
+            0.9997852444648743
+          ]
+        },
+        {
+          "name": "lowerarm01R",
+          "q": [
+            -0.24802322685718536,
+            -0.049112167209386826,
+            0.29071712493896484,
+            0.9227979779243469
+          ]
+        },
+        {
+          "name": "lowerarm02R",
+          "q": [
+            2.123415470123291e-7,
+            8.512288900419662e-7,
+            -3.501772880554199e-7,
+            1
+          ]
+        },
+        {
+          "name": "wristR",
+          "q": [
+            -0.36449041962623596,
+            0.6449752449989319,
+            -0.32258933782577515,
+            0.5891432762145996
+          ]
+        },
+        {
+          "name": "finger1-1R",
+          "q": [
+            -0.2252723127603531,
+            -0.9095065593719482,
+            0.33749061822891235,
+            0.09027902781963348
+          ]
+        },
+        {
+          "name": "finger1-2R",
+          "q": [
+            -0.38303473591804504,
+            -0.31904396414756775,
+            -0.13896165788173676,
+            0.855678141117096
+          ]
+        },
+        {
+          "name": "finger1-3R",
+          "q": [
+            -0.10815498232841492,
+            -0.4725874066352844,
+            0.11335013806819916,
+            0.8672458529472351
+          ]
+        },
+        {
+          "name": "metacarpal1R",
+          "q": [
+            -0.08080065250396729,
+            -0.01856507919728756,
+            0.06749026477336884,
+            0.9942694306373596
+          ]
+        },
+        {
+          "name": "finger2-1R",
+          "q": [
+            -0.11902732402086258,
+            0.41375094652175903,
+            -0.061460673809051514,
+            0.9004805684089661
+          ]
+        },
+        {
+          "name": "finger2-2R",
+          "q": [
+            -0.29780322313308716,
+            0.25678199529647827,
+            0.003913735039532185,
+            0.9194351434707642
+          ]
+        },
+        {
+          "name": "finger2-3R",
+          "q": [
+            -0.2731855511665344,
+            0.13248547911643982,
+            -0.004748193547129631,
+            0.9527826309204102
+          ]
+        },
+        {
+          "name": "metacarpal2R",
+          "q": [
+            0.08502018451690674,
+            -0.1320837289094925,
+            -0.013066591694951057,
+            0.9874992370605469
+          ]
+        },
+        {
+          "name": "finger3-1R",
+          "q": [
+            -0.19879718124866486,
+            0.45296457409858704,
+            -0.11676739901304245,
+            0.8612015843391418
+          ]
+        },
+        {
+          "name": "finger3-2R",
+          "q": [
+            -0.3839208781719208,
+            0.14475466310977936,
+            -0.007040248718112707,
+            0.9119217991828918
+          ]
+        },
+        {
+          "name": "finger3-3R",
+          "q": [
+            -0.2867015600204468,
+            0.09262514114379883,
+            -0.013782782480120659,
+            0.9534321427345276
+          ]
+        },
+        {
+          "name": "metacarpal3R",
+          "q": [
+            0.08738160878419876,
+            -0.17508047819137573,
+            0.0016002944903448224,
+            0.9806674718856812
+          ]
+        },
+        {
+          "name": "finger4-1R",
+          "q": [
+            -0.143327534198761,
+            0.4183189272880554,
+            -0.16675300896167755,
+            0.881283164024353
+          ]
+        },
+        {
+          "name": "finger4-2R",
+          "q": [
+            -0.40686309337615967,
+            0.11297910660505295,
+            -0.0063725123181939125,
+            0.9064532518386841
+          ]
+        },
+        {
+          "name": "finger4-3R",
+          "q": [
+            -0.2746610641479492,
+            0.09971539676189423,
+            -0.027150632813572884,
+            0.9559712409973145
+          ]
+        },
+        {
+          "name": "metacarpal4R",
+          "q": [
+            0.20057104527950287,
+            -0.046178415417671204,
+            -0.13226473331451416,
+            0.9696106910705566
+          ]
+        },
+        {
+          "name": "finger5-1R",
+          "q": [
+            -0.22359217703342438,
+            0.2938777506351471,
+            -0.11652292311191559,
+            0.9219896197319031
+          ]
+        },
+        {
+          "name": "finger5-2R",
+          "q": [
+            -0.3897054195404053,
+            0.14781850576400757,
+            -0.027143439278006554,
+            0.9085937738418579
+          ]
+        },
+        {
+          "name": "finger5-3R",
+          "q": [
+            -0.3039685785770416,
+            0.010281490162014961,
+            -0.004566805902868509,
+            0.9526156187057495
+          ]
+        },
+        {
+          "name": "neck01",
+          "q": [
+            -0.05699829384684563,
+            -9.776317957844186e-17,
+            -7.129491537162717e-17,
+            0.9983742833137512
+          ]
+        },
+        {
+          "name": "neck02",
+          "q": [
+            0.02720728889107704,
+            2.1644930379881641e-16,
+            1.7334148100732992e-16,
+            0.9996298551559448
+          ]
+        },
+        {
+          "name": "neck03",
+          "q": [
+            0.09266818314790726,
+            -1.9905429108686728e-16,
+            -1.361234224052374e-16,
+            0.9956970810890198
+          ]
+        },
+        {
+          "name": "head",
+          "q": [
+            -0.20764166116714478,
+            6.030770690565682e-17,
+            5.934907736760176e-17,
+            0.9782049655914307
+          ]
+        },
+        {
+          "name": "jaw",
+          "q": [
+            0.9578277468681335,
+            3.95043650322762e-19,
+            -2.174304727677926e-19,
+            0.2873431146144867
+          ]
+        },
+        {
+          "name": "special04",
+          "q": [
+            -0.7795396447181702,
+            7.128987276441123e-24,
+            6.649496003458989e-23,
+            0.6263529658317566
+          ]
+        },
+        {
+          "name": "oris02",
+          "q": [
+            -0.09108715504407883,
+            9.496455882900722e-24,
+            5.8885334796954804e-24,
+            0.9958429336547852
+          ]
+        },
+        {
+          "name": "oris01",
+          "q": [
+            -0.12433949112892151,
+            1.4331830866272658e-23,
+            5.0565317437201945e-24,
+            0.992239773273468
+          ]
+        },
+        {
+          "name": "oris06L",
+          "q": [
+            -0.39498066902160645,
+            -0.701823353767395,
+            -0.28919100761413574,
+            0.5174967050552368
+          ]
+        },
+        {
+          "name": "oris07L",
+          "q": [
+            0.18427948653697968,
+            0.44922205805778503,
+            0.34371718764305115,
+            0.8038029074668884
+          ]
+        },
+        {
+          "name": "oris06R",
+          "q": [
+            -0.39498066902160645,
+            0.701823353767395,
+            0.28919100761413574,
+            0.5174967050552368
+          ]
+        },
+        {
+          "name": "oris07R",
+          "q": [
+            0.18427948653697968,
+            -0.44922205805778503,
+            -0.34371718764305115,
+            0.8038029074668884
+          ]
+        },
+        {
+          "name": "tongue00",
+          "q": [
+            0.9957185983657837,
+            8.77050426828837e-24,
+            -3.6200545908894747e-25,
+            0.09243687242269516
+          ]
+        },
+        {
+          "name": "tongue01",
+          "q": [
+            0.8869305849075317,
+            -4.947770622970378e-23,
+            -9.93005012401183e-24,
+            0.4619027376174927
+          ]
+        },
+        {
+          "name": "tongue02",
+          "q": [
+            0.06828344613313675,
+            -1.7815683987317907e-24,
+            -8.20076841215422e-24,
+            0.9976659417152405
+          ]
+        },
+        {
+          "name": "tongue03",
+          "q": [
+            0.2440742701292038,
+            2.944966262255445e-24,
+            -2.9007674506981337e-23,
+            0.969756543636322
+          ]
+        },
+        {
+          "name": "tongue04",
+          "q": [
+            0.000005386769771575928,
+            3.7103579639004527e-28,
+            -6.276735689029248e-28,
+            1
+          ]
+        },
+        {
+          "name": "tongue07L",
+          "q": [
+            0.6270132064819336,
+            0.6672298312187195,
+            -0.16700688004493713,
+            0.36574244499206543
+          ]
+        },
+        {
+          "name": "tongue07R",
+          "q": [
+            0.6270132064819336,
+            -0.6672298312187195,
+            0.16700688004493713,
+            0.36574244499206543
+          ]
+        },
+        {
+          "name": "tongue06L",
+          "q": [
+            0.752653181552887,
+            0.633085310459137,
+            0.0008264303905889392,
+            0.1808742731809616
+          ]
+        },
+        {
+          "name": "tongue06R",
+          "q": [
+            0.752653181552887,
+            -0.633085310459137,
+            -0.0008264303905889392,
+            0.1808742731809616
+          ]
+        },
+        {
+          "name": "tongue05L",
+          "q": [
+            0.6750093698501587,
+            0.7292799353599548,
+            0.05086793377995491,
+            0.0996273010969162
+          ]
+        },
+        {
+          "name": "tongue05R",
+          "q": [
+            0.6750093698501587,
+            -0.7292799353599548,
+            -0.05086793377995491,
+            0.0996273010969162
+          ]
+        },
+        {
+          "name": "levator02L",
+          "q": [
+            -0.8007748126983643,
+            -0.24923254549503326,
+            -0.24473151564598083,
+            0.4865688681602478
+          ]
+        },
+        {
+          "name": "levator03L",
+          "q": [
+            -0.4542488157749176,
+            -0.1994611620903015,
+            0.10890188068151474,
+            0.861402153968811
+          ]
+        },
+        {
+          "name": "levator04L",
+          "q": [
+            0.05997225642204285,
+            -0.011491597630083561,
+            0.026754070073366165,
+            0.9977752566337585
+          ]
+        },
+        {
+          "name": "levator05L",
+          "q": [
+            -0.08349015563726425,
+            -0.21626317501068115,
+            0.24867603182792664,
+            0.9404360055923462
+          ]
+        },
+        {
+          "name": "levator02R",
+          "q": [
+            -0.8007748126983643,
+            0.24923254549503326,
+            0.24473151564598083,
+            0.4865688681602478
+          ]
+        },
+        {
+          "name": "levator03R",
+          "q": [
+            -0.4542488157749176,
+            0.1994611620903015,
+            -0.10890188068151474,
+            0.861402153968811
+          ]
+        },
+        {
+          "name": "levator04R",
+          "q": [
+            0.05997225642204285,
+            0.011491597630083561,
+            -0.026754070073366165,
+            0.9977752566337585
+          ]
+        },
+        {
+          "name": "levator05R",
+          "q": [
+            -0.08349015563726425,
+            0.21626317501068115,
+            -0.24867603182792664,
+            0.9404360055923462
+          ]
+        },
+        {
+          "name": "special01",
+          "q": [
+            0.739192545413971,
+            4.501864826358732e-19,
+            -2.5081964404288972e-20,
+            0.6734941601753235
+          ]
+        },
+        {
+          "name": "oris04L",
+          "q": [
+            0.7690396308898926,
+            0.5313584804534912,
+            -0.02957046963274479,
+            0.3540646731853485
+          ]
+        },
+        {
+          "name": "oris03L",
+          "q": [
+            -0.18876692652702332,
+            -0.1855631023645401,
+            0.14696064591407776,
+            0.9530666470527649
+          ]
+        },
+        {
+          "name": "oris04R",
+          "q": [
+            0.7690396308898926,
+            -0.5313584804534912,
+            0.02957046963274479,
+            0.3540646731853485
+          ]
+        },
+        {
+          "name": "oris03R",
+          "q": [
+            -0.18876692652702332,
+            0.1855631023645401,
+            -0.14696064591407776,
+            0.9530666470527649
+          ]
+        },
+        {
+          "name": "oris06",
+          "q": [
+            0.7110843062400818,
+            3.529364321047531e-23,
+            -3.767866949410241e-23,
+            0.7031068205833435
+          ]
+        },
+        {
+          "name": "oris05",
+          "q": [
+            -0.16681678593158722,
+            -1.9907793200631512e-23,
+            3.833735020616114e-24,
+            0.9859879016876221
+          ]
+        },
+        {
+          "name": "special03",
+          "q": [
+            0.7225773930549622,
+            4.506463433576644e-19,
+            -1.4129340230482492e-20,
+            0.6912901401519775
+          ]
+        },
+        {
+          "name": "levator06L",
+          "q": [
+            -0.9771755337715149,
+            -0.18308965861797333,
+            0.0057283309288322926,
+            0.10757956653833389
+          ]
+        },
+        {
+          "name": "levator06R",
+          "q": [
+            -0.9771755337715149,
+            0.18308965861797333,
+            -0.0057283309288322926,
+            0.10757956653833389
+          ]
+        },
+        {
+          "name": "special06L",
+          "q": [
+            0.6610323786735535,
+            0.4641238749027252,
+            0.4557262063026428,
+            0.3740839958190918
+          ]
+        },
+        {
+          "name": "special05L",
+          "q": [
+            0.30580970644950867,
+            -0.4372176229953766,
+            0.39797958731651306,
+            0.7462797164916992
+          ]
+        },
+        {
+          "name": "eyeL",
+          "q": [
+            -0.5594322681427002,
+            0.0955941304564476,
+            -0.1403343826532364,
+            0.8112974762916565
+          ]
+        },
+        {
+          "name": "orbicularis03L",
+          "q": [
+            -0.6859376430511475,
+            -0.23731517791748047,
+            0.12379536777734756,
+            0.6766430139541626
+          ]
+        },
+        {
+          "name": "orbicularis04L",
+          "q": [
+            -0.44919317960739136,
+            -0.018647948279976845,
+            -0.03306151181459427,
+            0.892628014087677
+          ]
+        },
+        {
+          "name": "special06R",
+          "q": [
+            0.6610323786735535,
+            -0.4641238749027252,
+            -0.4557262063026428,
+            0.3740839958190918
+          ]
+        },
+        {
+          "name": "special05R",
+          "q": [
+            0.30580970644950867,
+            0.4372176229953766,
+            -0.39797958731651306,
+            0.7462797164916992
+          ]
+        },
+        {
+          "name": "eyeR",
+          "q": [
+            -0.5594322681427002,
+            -0.0955941304564476,
+            0.1403343826532364,
+            0.8112974762916565
+          ]
+        },
+        {
+          "name": "orbicularis03R",
+          "q": [
+            -0.6859376430511475,
+            0.23731517791748047,
+            -0.12379536777734756,
+            0.6766430139541626
+          ]
+        },
+        {
+          "name": "orbicularis04R",
+          "q": [
+            -0.44919317960739136,
+            0.018647948279976845,
+            0.03306151181459427,
+            0.892628014087677
+          ]
+        },
+        {
+          "name": "temporalis01L",
+          "q": [
+            -0.2538408041000366,
+            0.6900187134742737,
+            0.6775363087654114,
+            0.019587120041251183
+          ]
+        },
+        {
+          "name": "oculi02L",
+          "q": [
+            0.16359078884124756,
+            -0.5983137488365173,
+            -0.25399526953697205,
+            0.7421219944953918
+          ]
+        },
+        {
+          "name": "oculi01L",
+          "q": [
+            -0.28249719738960266,
+            0.3476845622062683,
+            -0.14616799354553223,
+            0.8820123076438904
+          ]
+        },
+        {
+          "name": "temporalis01R",
+          "q": [
+            -0.2538408041000366,
+            -0.6900187134742737,
+            -0.6775363087654114,
+            0.019587120041251183
+          ]
+        },
+        {
+          "name": "oculi02R",
+          "q": [
+            0.16359078884124756,
+            0.5983137488365173,
+            0.25399526953697205,
+            0.7421219944953918
+          ]
+        },
+        {
+          "name": "oculi01R",
+          "q": [
+            -0.28249719738960266,
+            -0.3476845622062683,
+            0.14616799354553223,
+            0.8820123076438904
+          ]
+        },
+        {
+          "name": "temporalis02L",
+          "q": [
+            0.16724486649036407,
+            0.5905500054359436,
+            0.5798688530921936,
+            0.5357536673545837
+          ]
+        },
+        {
+          "name": "risorius02L",
+          "q": [
+            0.5148403644561768,
+            -0.6961010694503784,
+            0.496314138174057,
+            0.06367919594049454
+          ]
+        },
+        {
+          "name": "risorius03L",
+          "q": [
+            0.3582919239997864,
+            0.15480653941631317,
+            -0.21768653392791748,
+            0.894580602645874
+          ]
+        },
+        {
+          "name": "temporalis02R",
+          "q": [
+            0.16724486649036407,
+            -0.5905500054359436,
+            -0.5798688530921936,
+            0.5357536673545837
+          ]
+        },
+        {
+          "name": "risorius02R",
+          "q": [
+            0.5148403644561768,
+            0.6961010694503784,
+            -0.496314138174057,
+            0.06367919594049454
+          ]
+        },
+        {
+          "name": "risorius03R",
+          "q": [
+            0.3582919239997864,
+            -0.15480653941631317,
+            0.21768653392791748,
+            0.894580602645874
+          ]
+        }
+      ]
+    },
+    "model": {
+      "meshes": [
+        {
+          "name": "Bent_bronze_focus_cage",
+          "skinned": true,
+          "vertices": 21,
+          "triangles": 28,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Bent_bronze_focus_cage001",
+          "skinned": true,
+          "vertices": 21,
+          "triangles": 28,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Broad_leather_waist_belt",
+          "skinned": true,
+          "vertices": 384,
+          "triangles": 764,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Carved_ash_staff",
+          "skinned": true,
+          "vertices": 330,
+          "triangles": 640,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Close_cropped_scalp_and_recession",
+          "skinned": true,
+          "vertices": 262,
+          "triangles": 434,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching",
+          "skinned": true,
+          "vertices": 102,
+          "triangles": 192,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching001",
+          "skinned": true,
+          "vertices": 102,
+          "triangles": 192,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching002",
+          "skinned": true,
+          "vertices": 102,
+          "triangles": 192,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching003",
+          "skinned": true,
+          "vertices": 102,
+          "triangles": 192,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Continuous_full_length_linen_sleeve_L",
+          "skinned": true,
+          "vertices": 850,
+          "triangles": 1696,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Continuous_full_length_linen_sleeve_R",
+          "skinned": true,
+          "vertices": 850,
+          "triangles": 1696,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Continuous_leather_boot_toe_box_L",
+          "skinned": true,
+          "vertices": 462,
+          "triangles": 920,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Continuous_leather_boot_toe_box_R",
+          "skinned": true,
+          "vertices": 462,
+          "triangles": 920,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Continuous_mature_face_neck_and_articulated_hands",
+          "skinned": true,
+          "vertices": 8635,
+          "triangles": 15816,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Exposed_parchment_edge",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Flat_fitted_cross-body_leather_harness",
+          "skinned": true,
+          "vertices": 168,
+          "triangles": 156,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Frayed_oxblood_facing_-1",
+          "skinned": true,
+          "vertices": 300,
+          "triangles": 596,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Frayed_oxblood_facing_1",
+          "skinned": true,
+          "vertices": 300,
+          "triangles": 596,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Grimoire_spine",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Hollow_forged_belt_clasp",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Hollow_forged_belt_clasp001",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Hollow_forged_belt_clasp002",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Hollow_forged_belt_clasp003",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Leather_grimoire",
+          "skinned": true,
+          "vertices": 216,
+          "triangles": 108,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Proper_recessed_brown_eyeballs",
+          "skinned": true,
+          "vertices": 1076,
+          "triangles": 2040,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Raised_standing_collar",
+          "skinned": true,
+          "vertices": 240,
+          "triangles": 476,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Segmented_leather_shoulder_yoke_-1",
+          "skinned": true,
+          "vertices": 306,
+          "triangles": 608,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Segmented_leather_shoulder_yoke_1",
+          "skinned": true,
+          "vertices": 306,
+          "triangles": 608,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Shoulder_mantle_with_gravity_folds",
+          "skinned": true,
+          "vertices": 806,
+          "triangles": 1608,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Small_amber_focus",
+          "skinned": true,
+          "vertices": 240,
+          "triangles": 80,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Split_coat_tail_-1",
+          "skinned": true,
+          "vertices": 850,
+          "triangles": 1696,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Split_coat_tail_1",
+          "skinned": true,
+          "vertices": 850,
+          "triangles": 1696,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding",
+          "skinned": true,
+          "vertices": 96,
+          "triangles": 188,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding001",
+          "skinned": true,
+          "vertices": 96,
+          "triangles": 188,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding002",
+          "skinned": true,
+          "vertices": 96,
+          "triangles": 188,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding003",
+          "skinned": true,
+          "vertices": 96,
+          "triangles": 188,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Tailored_continuous_linen_torso",
+          "skinned": true,
+          "vertices": 1394,
+          "triangles": 2784,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Tapered_natural_brow_-1",
+          "skinned": true,
+          "vertices": 50,
+          "triangles": 48,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Tapered_natural_brow_1",
+          "skinned": true,
+          "vertices": 50,
+          "triangles": 48,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Thick_stitched_boot_sole_L",
+          "skinned": true,
+          "vertices": 132,
+          "triangles": 260,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Thick_stitched_boot_sole_R",
+          "skinned": true,
+          "vertices": 132,
+          "triangles": 260,
+          "groups": 0,
+          "materialCount": 1
+        },
+        {
+          "name": "Wool_trousers",
+          "skinned": true,
+          "vertices": 1200,
+          "triangles": 2188,
+          "groups": 0,
+          "materialCount": 1
+        }
+      ],
+      "meshCount": 42,
+      "geometryCount": 42,
+      "materialCount": 9,
+      "boneCount": 163,
+      "skins": [
+        {
+          "name": "Bent_bronze_focus_cage",
+          "joints": 163
+        },
+        {
+          "name": "Bent_bronze_focus_cage001",
+          "joints": 163
+        },
+        {
+          "name": "Broad_leather_waist_belt",
+          "joints": 163
+        },
+        {
+          "name": "Carved_ash_staff",
+          "joints": 163
+        },
+        {
+          "name": "Close_cropped_scalp_and_recession",
+          "joints": 163
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching",
+          "joints": 163
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching001",
+          "joints": 163
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching002",
+          "joints": 163
+        },
+        {
+          "name": "Close_fitted_boot_quarter_stitching003",
+          "joints": 163
+        },
+        {
+          "name": "Continuous_full_length_linen_sleeve_L",
+          "joints": 163
+        },
+        {
+          "name": "Continuous_full_length_linen_sleeve_R",
+          "joints": 163
+        },
+        {
+          "name": "Continuous_leather_boot_toe_box_L",
+          "joints": 163
+        },
+        {
+          "name": "Continuous_leather_boot_toe_box_R",
+          "joints": 163
+        },
+        {
+          "name": "Continuous_mature_face_neck_and_articulated_hands",
+          "joints": 163
+        },
+        {
+          "name": "Exposed_parchment_edge",
+          "joints": 163
+        },
+        {
+          "name": "Flat_fitted_cross-body_leather_harness",
+          "joints": 163
+        },
+        {
+          "name": "Frayed_oxblood_facing_-1",
+          "joints": 163
+        },
+        {
+          "name": "Frayed_oxblood_facing_1",
+          "joints": 163
+        },
+        {
+          "name": "Grimoire_spine",
+          "joints": 163
+        },
+        {
+          "name": "Hollow_forged_belt_clasp",
+          "joints": 163
+        },
+        {
+          "name": "Hollow_forged_belt_clasp001",
+          "joints": 163
+        },
+        {
+          "name": "Hollow_forged_belt_clasp002",
+          "joints": 163
+        },
+        {
+          "name": "Hollow_forged_belt_clasp003",
+          "joints": 163
+        },
+        {
+          "name": "Leather_grimoire",
+          "joints": 163
+        },
+        {
+          "name": "Proper_recessed_brown_eyeballs",
+          "joints": 163
+        },
+        {
+          "name": "Raised_standing_collar",
+          "joints": 163
+        },
+        {
+          "name": "Segmented_leather_shoulder_yoke_-1",
+          "joints": 163
+        },
+        {
+          "name": "Segmented_leather_shoulder_yoke_1",
+          "joints": 163
+        },
+        {
+          "name": "Shoulder_mantle_with_gravity_folds",
+          "joints": 163
+        },
+        {
+          "name": "Small_amber_focus",
+          "joints": 163
+        },
+        {
+          "name": "Split_coat_tail_-1",
+          "joints": 163
+        },
+        {
+          "name": "Split_coat_tail_1",
+          "joints": 163
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding",
+          "joints": 163
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding001",
+          "joints": 163
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding002",
+          "joints": 163
+        },
+        {
+          "name": "Staff_leather_and_bronze_binding003",
+          "joints": 163
+        },
+        {
+          "name": "Tailored_continuous_linen_torso",
+          "joints": 163
+        },
+        {
+          "name": "Tapered_natural_brow_-1",
+          "joints": 163
+        },
+        {
+          "name": "Tapered_natural_brow_1",
+          "joints": 163
+        },
+        {
+          "name": "Thick_stitched_boot_sole_L",
+          "joints": 163
+        },
+        {
+          "name": "Thick_stitched_boot_sole_R",
+          "joints": 163
+        },
+        {
+          "name": "Wool_trousers",
+          "joints": 163
+        }
+      ],
+      "scale": [
+        1.12,
+        1.12,
+        1.12
+      ],
+      "bounds": {
+        "min": [
+          -0.47097133653374335,
+          0.020159812456290713,
+          6.7177424946346
+        ],
+        "max": [
+          0.47134865368054607,
+          2.277966074990069,
+          7.451315512482932
+        ]
+      }
+    }
+  },
+  "previewFull": {
+    "height": 2.013019495958246,
+    "facePosition": [
+      -0.02400883168718617,
+      1.7927175647356777,
+      0.13474593260075945
+    ],
+    "camera": [
+      0.07,
+      1.086509747979123,
+      3.9313306289253545
+    ],
+    "view": "full",
+    "zoom": 1,
+    "rotation": -0.18,
+    "boundsMin": [
+      -0.4614127388999195,
+      0.017999832550259713,
+      -0.29485759011717017
+    ],
+    "boundsMax": [
+      0.4256974570248911,
+      2.0310193285085054,
+      0.46696462638444547
+    ],
+    "mixerTime": 0.08330000000000291,
+    "pointers": 0,
+    "render": {
+      "frame": 37,
+      "calls": 43,
+      "triangles": 41222,
+      "points": 0,
+      "lines": 0
+    },
+    "memory": {
+      "geometries": 43,
+      "textures": 63
+    }
+  },
+  "previewFace": {
+    "height": 2.013019495958246,
+    "facePosition": [
+      -0.02400883168718617,
+      1.7927175647356777,
+      0.13474593260075945
+    ],
+    "camera": [
+      0.07,
+      1.8127175647356777,
+      1.2158444101914412
+    ],
+    "view": "face",
+    "zoom": 1,
+    "rotation": 0,
+    "boundsMin": [
+      -0.4614127388999195,
+      0.017999832550259713,
+      -0.29485759011717017
+    ],
+    "boundsMax": [
+      0.4256974570248911,
+      2.0310193285085054,
+      0.46696462638444547
+    ],
+    "mixerTime": 0.38330000000000286,
+    "pointers": 0,
+    "render": {
+      "frame": 43,
+      "calls": 43,
+      "triangles": 41222,
+      "points": 0,
+      "lines": 0
+    },
+    "memory": {
+      "geometries": 43,
+      "textures": 63
+    }
+  }
+}

@@ -1,0 +1,2925 @@
+{
+  "root": "/workspace/sites/ember-mage-art2",
+  "url": "http://127.0.0.1:5183",
+  "outputDir": "/workspace/scratch/ember-qa/art2-final/evidence",
+  "stage": "ART-02 frozen candidate desktop and touch-viewport regression",
+  "checks": [
+    {
+      "name": "new-GLB-load-and-Idle",
+      "detail": {
+        "resource": [
+          {
+            "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+            "status": 200
+          },
+          {
+            "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+            "status": 200
+          }
+        ],
+        "clips": [
+          "Idle",
+          "Walk",
+          "Cast"
+        ],
+        "movingBones": [
+          "spine02",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "keyboard-movement-Walk-Idle",
+      "detail": {
+        "positionBefore": [
+          0,
+          0,
+          7
+        ],
+        "positionAfter": [
+          1,
+          0,
+          7
+        ],
+        "movingBones": [
+          "upperleg01L",
+          "upperleg01R",
+          "lowerleg01R",
+          "spine02",
+          "upperarm01L",
+          "upperarm01R",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "ice-and-Cast-action",
+      "detail": {
+        "manaBefore": 100,
+        "manaAfter": 70,
+        "cast": {
+          "running": true,
+          "time": 0.1614583283662796,
+          "weight": 0.7999998569488526,
+          "enabled": true
+        },
+        "movingBones": [
+          "upperleg01L",
+          "upperleg01R",
+          "lowerleg01R",
+          "spine02",
+          "upperarm01L",
+          "lowerarm01L",
+          "wristL",
+          "finger2-1L",
+          "finger3-1L",
+          "finger4-1L",
+          "finger5-1L",
+          "upperarm01R",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "fire-projectile",
+      "detail": {
+        "shots": 1,
+        "cooldown": 0.34
+      }
+    },
+    {
+      "name": "blink",
+      "detail": {
+        "positionBefore": [
+          1,
+          0,
+          7
+        ],
+        "positionAfter": [
+          2.904809341912612,
+          0,
+          1.3103865358916993
+        ]
+      }
+    },
+    {
+      "name": "character-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "preview-pointer-rotation-wheel-zoom",
+      "detail": {
+        "rotation": [
+          -0.18,
+          0.9480000000000002
+        ],
+        "zoom": [
+          1,
+          1.1735108709918103
+        ]
+      }
+    },
+    {
+      "name": "native-face-frame",
+      "detail": {
+        "facePosition": [
+          0.0013496462845900828,
+          1.7922542326976842,
+          0.1382339225882667
+        ],
+        "camera": [
+          0.07,
+          1.8122542326976843,
+          1.2193324001789485
+        ],
+        "detailQuality": "detail"
+      }
+    },
+    {
+      "name": "preview-resize",
+      "detail": {
+        "display": [
+          468,
+          350
+        ],
+        "buffer": [
+          468,
+          350
+        ],
+        "pageOverflow": false
+      }
+    },
+    {
+      "name": "save-above-character-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "nested-save-close-retains-character-pause",
+      "detail": {}
+    },
+    {
+      "name": "save-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "save-close-resumes",
+      "detail": {}
+    },
+    {
+      "name": "inventory-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "inventory-close-resumes",
+      "detail": {}
+    },
+    {
+      "name": "390x844-touch-move-and-ice",
+      "detail": {
+        "position": [
+          [
+            0,
+            0,
+            7
+          ],
+          [
+            0.6757763158235895,
+            0,
+            7
+          ]
+        ],
+        "continuesMovingAfterIceRelease": true,
+        "iceCooldown": 4.88,
+        "mana": 70.84
+      }
+    },
+    {
+      "name": "touch-release-joystick-preserves-held-fire",
+      "detail": {
+        "heldAfterJoystickRelease": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "elapsed": [
+          0.6171000000089406,
+          1.137100000008941
+        ],
+        "newProjectileAges": [
+          0.04
+        ]
+      }
+    },
+    {
+      "name": "character-pause-clears-held-touch",
+      "detail": {
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "menuInvocation": "Native click handler invoked programmatically while joystick pointer held"
+      }
+    },
+    {
+      "name": "touch-preview-drag-pinch-and-fit",
+      "detail": {
+        "modal": {
+          "x": 19,
+          "y": 48.90625,
+          "width": 352,
+          "height": 746.1875
+        },
+        "rotation": [
+          -0.18,
+          0.10000000000000003
+        ],
+        "zoom": [
+          1,
+          0.7885571604645334
+        ]
+      }
+    },
+    {
+      "name": "touch-release-in-character-does-not-stick-after-resume",
+      "detail": {
+        "elapsed": [
+          1.467400000005961,
+          1.6274000000059612
+        ],
+        "position": [
+          1.4389342105604317,
+          0,
+          7
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        }
+      }
+    },
+    {
+      "name": "touch-save-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "touch-save-fit-and-resume",
+      "detail": {
+        "modal": {
+          "x": 19,
+          "y": 179.0625,
+          "width": 352,
+          "height": 485.859375
+        }
+      }
+    },
+    {
+      "name": "browser-console-and-resources",
+      "detail": {
+        "desktop": {
+          "errors": [],
+          "bad": [],
+          "warnings": [],
+          "failed": [],
+          "hashes": {
+            "index.html": "0b1a27f6e86b35d78a10e3d0430f55844e22b5633e6be9232fb50de4276b2ebe",
+            "style.css": "ef323ed418b5f1c935aab7bb7340edecc1ed03f29d8c7686e42464aa1b27fc3c",
+            "game.js": "fd6e271a437f7515daefeb7510c62791999ba7555c7ce742df7afe62d95b6bb2",
+            "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+            "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+            "environment.js": "11dcf22ecf99559ba0791fddfedea6530f790a8935ecb05ca6ee6a4279a2f36e",
+            "save.js": "bc9b088bc36466f50d9ee5075016d6d894dffe528af373d2f2093cfca61c3f8e",
+            "save-panel.js": "d189877c39e0400135f0531a1bcea7b2afef3bced1091cbdcdf688ced2431e96",
+            "world-renderer.js": "3e954a752c3a31d223e25e7a006741a58b8da89946f49371b638953270510a62",
+            "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+            "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+            "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+            "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+            "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+            "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+            "textures/environment-stone-basecolor.jpg": "3adec878a98b86fafe0e266ad59885b70ffc186a29d98a2bd77690c1d93076c7",
+            "textures/environment-stone-normal.jpg": "661c674152b0319eeef4f132e428ea6c06b0866feca7f6ae822c288b48c38424",
+            "textures/environment-stone-roughness.jpg": "8d55a15c364032e0a104001d801c4ec93cdb84bd6722cbd496e1b42d02a81307",
+            "textures/environment-floor-basecolor.jpg": "5f9bed1abbee22bf9163c471bc27d9fe2f69dbdcdd7b8a37f6021bb6af1d0967",
+            "textures/environment-floor-normal.jpg": "d5357371c0401ea2b2f460fd6d583138e9c8c05c63d994c97c48048d11d63368",
+            "textures/environment-floor-roughness.jpg": "23000b6fbfafdcf98fcc96f847a1366d3c8d841c33f9283917b9f6d98549a489",
+            "textures/environment-masonry-color.webp": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c",
+            "textures/environment-masonry-normal.webp": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1",
+            "textures/environment-masonry-roughness.webp": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692",
+            "textures/environment-masonry-ao.webp": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3",
+            "textures/environment-grime.png": "92f1e17822df7fd832c5c8a1a7ee2d7d1ebea072d4a128a28f87e6fb6dd010ed",
+            "textures/environment-flame.png": "cc639a1795aa4c8e84313e496620f152af8ec1b300b14a807096a4dc08667edf",
+            "textures/environment-banner-basecolor.jpg": "509ead54e79c540406abfeb3c8f586dc99d3c4e3ab861feab45276cfed192e70",
+            "textures/environment-banner-normal.jpg": "080afcf854f5edd98092a9793a5ea17b63be11e5fecef87dc145b73198fc620f",
+            "textures/environment-relief-basecolor.jpg": "6cab05061c3152139166ba99ce89a26e03d1d3f52a43568f9be7eb913cfcde61",
+            "textures/environment-relief-normal.jpg": "67db82fcaeec86f0e1e062ca39182b174fbe694265df48cb46584ce9334adaa9",
+            "models/ember-mage-realism.glb": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3"
+          },
+          "resourceModels": [
+            {
+              "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+              "status": 200
+            },
+            {
+              "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+              "status": 200
+            }
+          ],
+          "detailRequests": 1
+        },
+        "mobile": {
+          "errors": [],
+          "bad": [],
+          "warnings": [],
+          "failed": [],
+          "hashes": {
+            "index.html": "0b1a27f6e86b35d78a10e3d0430f55844e22b5633e6be9232fb50de4276b2ebe",
+            "style.css": "ef323ed418b5f1c935aab7bb7340edecc1ed03f29d8c7686e42464aa1b27fc3c",
+            "game.js": "fd6e271a437f7515daefeb7510c62791999ba7555c7ce742df7afe62d95b6bb2",
+            "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+            "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+            "environment.js": "11dcf22ecf99559ba0791fddfedea6530f790a8935ecb05ca6ee6a4279a2f36e",
+            "save.js": "bc9b088bc36466f50d9ee5075016d6d894dffe528af373d2f2093cfca61c3f8e",
+            "save-panel.js": "d189877c39e0400135f0531a1bcea7b2afef3bced1091cbdcdf688ced2431e96",
+            "world-renderer.js": "3e954a752c3a31d223e25e7a006741a58b8da89946f49371b638953270510a62",
+            "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+            "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+            "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+            "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+            "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+            "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+            "textures/environment-stone-basecolor.jpg": "3adec878a98b86fafe0e266ad59885b70ffc186a29d98a2bd77690c1d93076c7",
+            "textures/environment-stone-normal.jpg": "661c674152b0319eeef4f132e428ea6c06b0866feca7f6ae822c288b48c38424",
+            "textures/environment-stone-roughness.jpg": "8d55a15c364032e0a104001d801c4ec93cdb84bd6722cbd496e1b42d02a81307",
+            "textures/environment-floor-basecolor.jpg": "5f9bed1abbee22bf9163c471bc27d9fe2f69dbdcdd7b8a37f6021bb6af1d0967",
+            "textures/environment-floor-normal.jpg": "d5357371c0401ea2b2f460fd6d583138e9c8c05c63d994c97c48048d11d63368",
+            "textures/environment-floor-roughness.jpg": "23000b6fbfafdcf98fcc96f847a1366d3c8d841c33f9283917b9f6d98549a489",
+            "textures/environment-masonry-color.webp": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c",
+            "textures/environment-masonry-normal.webp": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1",
+            "textures/environment-masonry-roughness.webp": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692",
+            "textures/environment-masonry-ao.webp": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3",
+            "textures/environment-grime.png": "92f1e17822df7fd832c5c8a1a7ee2d7d1ebea072d4a128a28f87e6fb6dd010ed",
+            "textures/environment-flame.png": "cc639a1795aa4c8e84313e496620f152af8ec1b300b14a807096a4dc08667edf",
+            "textures/environment-banner-basecolor.jpg": "509ead54e79c540406abfeb3c8f586dc99d3c4e3ab861feab45276cfed192e70",
+            "textures/environment-banner-normal.jpg": "080afcf854f5edd98092a9793a5ea17b63be11e5fecef87dc145b73198fc620f",
+            "textures/environment-relief-basecolor.jpg": "6cab05061c3152139166ba99ce89a26e03d1d3f52a43568f9be7eb913cfcde61",
+            "textures/environment-relief-normal.jpg": "67db82fcaeec86f0e1e062ca39182b174fbe694265df48cb46584ce9334adaa9",
+            "models/ember-mage-realism.glb": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3"
+          },
+          "resourceModels": [
+            {
+              "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+              "status": 200
+            },
+            {
+              "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+              "status": 200
+            }
+          ],
+          "detailRequests": 1
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "/workspace/scratch/ember-qa/art2-final/evidence/art2-full-desktop.png",
+    "/workspace/scratch/ember-qa/art2-final/evidence/art2-face-desktop.png",
+    "/workspace/scratch/ember-qa/art2-final/evidence/realism-mobile-gameplay.png",
+    "/workspace/scratch/ember-qa/art2-final/evidence/realism-mobile-face.png",
+    "/workspace/scratch/ember-qa/art2-final/evidence/realism-mobile-save.png"
+  ],
+  "limitations": [
+    "Headless Chromium, SwiftShader software rendering. No hardware FPS, real-device mobile, temperature or battery claim.",
+    "Read-only snapshots append diagnostic functions only to intercepted HTTP responses. Touch input is CDP emulation.",
+    "Technical pass does not establish user visual acceptance or D2R/D4 commercial art quality.",
+    "Character menu click while joystick held invokes the native click handler programmatically; physical two-finger menu tapping is untested."
+  ],
+  "desktopInfo": {
+    "errors": [],
+    "bad": [],
+    "warnings": [],
+    "failed": [],
+    "hashes": {
+      "index.html": "0b1a27f6e86b35d78a10e3d0430f55844e22b5633e6be9232fb50de4276b2ebe",
+      "style.css": "ef323ed418b5f1c935aab7bb7340edecc1ed03f29d8c7686e42464aa1b27fc3c",
+      "game.js": "fd6e271a437f7515daefeb7510c62791999ba7555c7ce742df7afe62d95b6bb2",
+      "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+      "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+      "environment.js": "11dcf22ecf99559ba0791fddfedea6530f790a8935ecb05ca6ee6a4279a2f36e",
+      "save.js": "bc9b088bc36466f50d9ee5075016d6d894dffe528af373d2f2093cfca61c3f8e",
+      "save-panel.js": "d189877c39e0400135f0531a1bcea7b2afef3bced1091cbdcdf688ced2431e96",
+      "world-renderer.js": "3e954a752c3a31d223e25e7a006741a58b8da89946f49371b638953270510a62",
+      "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+      "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+      "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+      "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+      "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+      "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+      "textures/environment-stone-basecolor.jpg": "3adec878a98b86fafe0e266ad59885b70ffc186a29d98a2bd77690c1d93076c7",
+      "textures/environment-stone-normal.jpg": "661c674152b0319eeef4f132e428ea6c06b0866feca7f6ae822c288b48c38424",
+      "textures/environment-stone-roughness.jpg": "8d55a15c364032e0a104001d801c4ec93cdb84bd6722cbd496e1b42d02a81307",
+      "textures/environment-floor-basecolor.jpg": "5f9bed1abbee22bf9163c471bc27d9fe2f69dbdcdd7b8a37f6021bb6af1d0967",
+      "textures/environment-floor-normal.jpg": "d5357371c0401ea2b2f460fd6d583138e9c8c05c63d994c97c48048d11d63368",
+      "textures/environment-floor-roughness.jpg": "23000b6fbfafdcf98fcc96f847a1366d3c8d841c33f9283917b9f6d98549a489",
+      "textures/environment-masonry-color.webp": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c",
+      "textures/environment-masonry-normal.webp": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1",
+      "textures/environment-masonry-roughness.webp": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692",
+      "textures/environment-masonry-ao.webp": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3",
+      "textures/environment-grime.png": "92f1e17822df7fd832c5c8a1a7ee2d7d1ebea072d4a128a28f87e6fb6dd010ed",
+      "textures/environment-flame.png": "cc639a1795aa4c8e84313e496620f152af8ec1b300b14a807096a4dc08667edf",
+      "textures/environment-banner-basecolor.jpg": "509ead54e79c540406abfeb3c8f586dc99d3c4e3ab861feab45276cfed192e70",
+      "textures/environment-banner-normal.jpg": "080afcf854f5edd98092a9793a5ea17b63be11e5fecef87dc145b73198fc620f",
+      "textures/environment-relief-basecolor.jpg": "6cab05061c3152139166ba99ce89a26e03d1d3f52a43568f9be7eb913cfcde61",
+      "textures/environment-relief-normal.jpg": "67db82fcaeec86f0e1e062ca39182b174fbe694265df48cb46584ce9334adaa9",
+      "models/ember-mage-realism.glb": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3"
+    },
+    "resourceModels": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ],
+    "detailRequests": 1
+  },
+  "fixedWorld": {
+    "loaded": true,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Cast"
+    ],
+    "animation": {
+      "current": "Idle",
+      "mixerTime": 0,
+      "casting": 0,
+      "actions": {
+        "Idle": {
+          "running": true,
+          "time": 0,
+          "weight": 1,
+          "enabled": true
+        },
+        "Walk": {
+          "running": false,
+          "time": 0,
+          "weight": 1,
+          "enabled": true
+        },
+        "Cast": {
+          "running": false,
+          "time": 0,
+          "weight": 1,
+          "enabled": true
+        }
+      },
+      "bones": [
+        {
+          "name": "root",
+          "q": [
+            0.6485145092010498,
+            6.107323443843382e-18,
+            6.1073991308694304e-18,
+            0.761202335357666
+          ]
+        },
+        {
+          "name": "upperleg01L",
+          "q": [
+            0.6437984704971313,
+            -0.11215727776288986,
+            -0.008964658714830875,
+            0.7568777799606323
+          ]
+        },
+        {
+          "name": "upperleg02L",
+          "q": [
+            0.15046852827072144,
+            0.16407014429569244,
+            -0.13940532505512238,
+            0.9648867249488831
+          ]
+        },
+        {
+          "name": "lowerleg01L",
+          "q": [
+            0.030641507357358932,
+            -0.03553839772939682,
+            0.039540499448776245,
+            0.998115599155426
+          ]
+        },
+        {
+          "name": "lowerleg02L",
+          "q": [
+            4.773028638993537e-9,
+            8.905773007938933e-9,
+            7.799827450583052e-9,
+            1
+          ]
+        },
+        {
+          "name": "footL",
+          "q": [
+            -0.5507626533508301,
+            -0.022527022287249565,
+            -0.0177113339304924,
+            0.834169864654541
+          ]
+        },
+        {
+          "name": "upperleg01R",
+          "q": [
+            0.6437984704971313,
+            0.11215727776288986,
+            0.008964658714830875,
+            0.7568777799606323
+          ]
+        },
+        {
+          "name": "upperleg02R",
+          "q": [
+            0.15046852827072144,
+            -0.16407014429569244,
+            0.13940532505512238,
+            0.9648867249488831
+          ]
+        },
+        {
+          "name": "lowerleg01R",
+          "q": [
+            0.030641507357358932,
+            0.03553839772939682,
+            -0.039540499448776245,
+            0.998115599155426
+          ]
+        },
+        {
+          "name": "lowerleg02R",
+          "q": [
+            4.773028638993537e-9,
+            -8.905773007938933e-9,
+            -7.799827450583052e-9,
+            1
+          ]
+        },
+        {
+          "name": "footR",
+          "q": [
+            -0.5507626533508301,
+            0.022527022287249565,
+            0.0177113339304924,
+            0.834169864654541
+          ]
+        },
+        {
+          "name": "spine05",
+          "q": [
+            -0.7714826464653015,
+            -5.5885736662930015e-18,
+            -7.131443352536097e-18,
+            0.636250376701355
+          ]
+        },
+        {
+          "name": "spine04",
+          "q": [
+            0.23048746585845947,
+            -7.43879388965875e-19,
+            -1.3236089212736645e-18,
+            0.9730753302574158
+          ]
+        },
+        {
+          "name": "spine03",
+          "q": [
+            -0.19569481909275055,
+            2.7794383207657145e-18,
+            3.039660449283312e-18,
+            0.980664849281311
+          ]
+        },
+        {
+          "name": "spine02",
+          "q": [
+            0.07025448232889175,
+            -1.3133799024212572e-18,
+            -1.510278563313353e-18,
+            0.9975290894508362
+          ]
+        },
+        {
+          "name": "spine01",
+          "q": [
+            0.22302643954753876,
+            -2.498748945040307e-23,
+            -4.5259119500018805e-24,
+            0.974812388420105
+          ]
+        },
+        {
+          "name": "shoulder01L",
+          "q": [
+            -0.8163278102874756,
+            -0.45444566011428833,
+            -0.3314037322998047,
+            0.13137602806091309
+          ]
+        },
+        {
+          "name": "upperarm01L",
+          "q": [
+            -0.28447479009628296,
+            -0.11884962767362595,
+            0.1750524640083313,
+            0.9350430369377136
+          ]
+        },
+        {
+          "name": "upperarm02L",
+          "q": [
+            0.015755480155348778,
+            0.013097710907459259,
+            -0.0031165010295808315,
+            0.9997852444648743
+          ]
+        },
+        {
+          "name": "lowerarm01L",
+          "q": [
+            -0.24802309274673462,
+            0.04911226034164429,
+            -0.2907170355319977,
+            0.9227980375289917
+          ]
+        },
+        {
+          "name": "lowerarm02L",
+          "q": [
+            1.7508864402770996e-7,
+            -9.164214134216309e-7,
+            2.812594175338745e-7,
+            1
+          ]
+        },
+        {
+          "name": "wristL",
+          "q": [
+            -0.10265634953975677,
+            -0.1499803364276886,
+            -0.019409554079174995,
+            0.9831535220146179
+          ]
+        },
+        {
+          "name": "finger1-1L",
+          "q": [
+            -0.20801211893558502,
+            0.8441216945648193,
+            -0.4780815839767456,
+            0.1250099390745163
+          ]
+        },
+        {
+          "name": "finger1-2L",
+          "q": [
+            -0.18247534334659576,
+            0.3420039713382721,
+            0.06427553296089172,
+            0.9195676445960999
+          ]
+        },
+        {
+          "name": "finger1-3L",
+          "q": [
+            0.0008129393681883812,
+            0.45476701855659485,
+            -0.17138510942459106,
+            0.8739641904830933
+          ]
+        },
+        {
+          "name": "finger2-1L",
+          "q": [
+            -0.04446018859744072,
+            -0.36799371242523193,
+            0.10740843415260315,
+            0.9225330948829651
+          ]
+        },
+        {
+          "name": "finger2-2L",
+          "q": [
+            0.0644776001572609,
+            -0.2399211972951889,
+            0.09161147475242615,
+            0.9643068909645081
+          ]
+        },
+        {
+          "name": "finger2-3L",
+          "q": [
+            0.04534635320305824,
+            -0.12403777986764908,
+            0.04680242761969566,
+            0.9901353120803833
+          ]
+        },
+        {
+          "name": "finger3-1L",
+          "q": [
+            0.07489463686943054,
+            -0.31825584173202515,
+            0.17760998010635376,
+            0.9282019138336182
+          ]
+        },
+        {
+          "name": "finger3-2L",
+          "q": [
+            -0.018283162266016006,
+            -0.13182008266448975,
+            0.060230400413274765,
+            0.989273190498352
+          ]
+        },
+        {
+          "name": "finger3-3L",
+          "q": [
+            0.03274589031934738,
+            -0.0833776518702507,
+            0.04263705387711525,
+            0.9950668215751648
+          ]
+        },
+        {
+          "name": "finger4-1L",
+          "q": [
+            0.14507447183132172,
+            -0.2369566261768341,
+            0.19899359345436096,
+            0.939790666103363
+          ]
+        },
+        {
+          "name": "finger4-2L",
+          "q": [
+            -0.041618168354034424,
+            -0.10255736112594604,
+            0.047822363674640656,
+            0.9927048683166504
+          ]
+        },
+        {
+          "name": "finger4-3L",
+          "q": [
+            0.04496840387582779,
+            -0.08582800626754761,
+            0.057570282369852066,
+            0.9936282634735107
+          ]
+        },
+        {
+          "name": "finger5-1L",
+          "q": [
+            0.1891103982925415,
+            -0.25481000542640686,
+            0.23873145878314972,
+            0.917777955532074
+          ]
+        },
+        {
+          "name": "finger5-2L",
+          "q": [
+            -0.024890528991818428,
+            -0.12720872461795807,
+            0.08003554493188858,
+            0.988328218460083
+          ]
+        },
+        {
+          "name": "finger5-3L",
+          "q": [
+            0.016123678535223007,
+            -0.008285602554678917,
+            0.007612280547618866,
+            0.9998067021369934
+          ]
+        },
+        {
+          "name": "shoulder01R",
+          "q": [
+            -0.8163278102874756,
+            0.45444566011428833,
+            0.3314037322998047,
+            0.13137602806091309
+          ]
+        },
+        {
+          "name": "upperarm01R",
+          "q": [
+            -0.28447479009628296,
+            0.11884962767362595,
+            -0.1750524640083313,
+            0.9350430369377136
+          ]
+        },
+        {
+          "name": "upperarm02R",
+          "q": [
+            0.015755480155348778,
+            -0.013097710907459259,
+            0.0031165010295808315,
+            0.9997852444648743
+          ]
+        },
+        {
+          "name": "lowerarm01R",
+          "q": [
+            -0.24802309274673462,
+            -0.04911226034164429,
+            0.2907170355319977,
+            0.9227980375289917
+          ]
+        },
+        {
+          "name": "lowerarm02R",
+          "q": [
+            1.7508864402770996e-7,
+            9.164214134216309e-7,
+            -2.812594175338745e-7,
+            1
+          ]
+        },
+        {
+          "name": "wristR",
+          "q": [
+            -0.45984721183776855,
+            0.27230972051620483,
+            0.27723222970962524,
+            0.7984549403190613
+          ]
+        },
+        {
+          "name": "finger1-1R",
+          "q": [
+            -0.12288755178451538,
+            -0.9033675193786621,
+            0.40873298048973083,
+            0.04199071601033211
+          ]
+        },
+        {
+          "name": "finger1-2R",
+          "q": [
+            -0.33230677247047424,
+            -0.4780937731266022,
+            -0.11944563686847687,
+            0.8041961193084717
+          ]
+        },
+        {
+          "name": "finger1-3R",
+          "q": [
+            -0.13853463530540466,
+            -0.5317214131355286,
+            0.20482520759105682,
+            0.8100167512893677
+          ]
+        },
+        {
+          "name": "finger2-1R",
+          "q": [
+            -0.0929347425699234,
+            0.41882020235061646,
+            -0.28278058767318726,
+            0.8578974008560181
+          ]
+        },
+        {
+          "name": "finger2-2R",
+          "q": [
+            0.1756499856710434,
+            0.35637906193733215,
+            -0.5215159058570862,
+            0.7550908923149109
+          ]
+        },
+        {
+          "name": "finger2-3R",
+          "q": [
+            0.2686624228954315,
+            0.23171712458133698,
+            -0.3901722729206085,
+            0.8496429920196533
+          ]
+        },
+        {
+          "name": "finger3-1R",
+          "q": [
+            0.011038911528885365,
+            0.3446902334690094,
+            -0.3552725613117218,
+            0.8688200116157532
+          ]
+        },
+        {
+          "name": "finger3-2R",
+          "q": [
+            0.03808468207716942,
+            0.16916637122631073,
+            -0.5334071516990662,
+            0.8278944492340088
+          ]
+        },
+        {
+          "name": "finger3-3R",
+          "q": [
+            0.16184107959270477,
+            0.12795868515968323,
+            -0.4484963119029999,
+            0.8696465492248535
+          ]
+        },
+        {
+          "name": "finger4-1R",
+          "q": [
+            0.06467531621456146,
+            0.25277143716812134,
+            -0.374110609292984,
+            0.8899241089820862
+          ]
+        },
+        {
+          "name": "finger4-2R",
+          "q": [
+            -0.05835232511162758,
+            0.07010123133659363,
+            -0.5285167694091797,
+            0.8440088033676147
+          ]
+        },
+        {
+          "name": "finger4-3R",
+          "q": [
+            0.10247816890478134,
+            0.06117206811904907,
+            -0.4812586009502411,
+            0.8684160709381104
+          ]
+        },
+        {
+          "name": "finger5-1R",
+          "q": [
+            0.1102103590965271,
+            0.2577868700027466,
+            -0.4145878851413727,
+            0.8657462000846863
+          ]
+        },
+        {
+          "name": "finger5-2R",
+          "q": [
+            0.0013090078718960285,
+            0.03161850944161415,
+            -0.5501548051834106,
+            0.8344628810882568
+          ]
+        },
+        {
+          "name": "finger5-3R",
+          "q": [
+            0.09819189459085464,
+            -0.05320444703102112,
+            -0.42934292554855347,
+            0.8962099552154541
+          ]
+        },
+        {
+          "name": "neck01",
+          "q": [
+            -0.05699829384684563,
+            -9.776317957844186e-17,
+            -7.129491537162717e-17,
+            0.9983742833137512
+          ]
+        },
+        {
+          "name": "head",
+          "q": [
+            -0.08903341740369797,
+            8.598707241866743e-17,
+            8.448876377920318e-17,
+            0.9960286617279053
+          ]
+        }
+      ]
+    },
+    "position": [
+      0,
+      0,
+      7
+    ],
+    "camera": [
+      0,
+      16,
+      21
+    ],
+    "running": false,
+    "elapsed": 0,
+    "hp": 112,
+    "mana": 100,
+    "fireHeld": false,
+    "firePointerIds": [],
+    "shots": 0,
+    "shotDetails": [],
+    "effects": 0,
+    "cd": {
+      "fire": 0,
+      "ice": 0,
+      "blink": 0,
+      "heal": 0
+    },
+    "keys": [],
+    "joy": {
+      "x": 0,
+      "y": 0,
+      "id": null
+    },
+    "hdr": true,
+    "environment": {
+      "triangles": 179936,
+      "meshCount": 171,
+      "instanceCount": 3365,
+      "pointLights": 4,
+      "textureFiles": 16,
+      "textureResolution": 1024
+    },
+    "renderer": {
+      "frame": 48,
+      "calls": 1,
+      "triangles": 2,
+      "points": 0,
+      "lines": 0
+    },
+    "worldPass": {
+      "frame": 47,
+      "calls": 118,
+      "triangles": 182081,
+      "points": 0,
+      "lines": 0
+    },
+    "worldQuad": {
+      "frame": 48,
+      "calls": 1,
+      "triangles": 2,
+      "points": 0,
+      "lines": 0
+    },
+    "data": {
+      "level": 1,
+      "xp": 0,
+      "items": [],
+      "equipped": null,
+      "clears": 0
+    }
+  },
+  "combatScene": {
+    "meshes": [
+      {
+        "name": "Bent_bronze_focus_cage007",
+        "skinned": true,
+        "vertices": 6930,
+        "triangles": 11609,
+        "groups": 0,
+        "materialCount": 1
+      },
+      {
+        "name": "Bent_bronze_focus_cage007_1",
+        "skinned": true,
+        "vertices": 3036,
+        "triangles": 3104,
+        "groups": 0,
+        "materialCount": 1
+      }
+    ],
+    "meshCount": 2,
+    "geometryCount": 2,
+    "materialCount": 2,
+    "boneCount": 60,
+    "skins": [
+      {
+        "name": "Bent_bronze_focus_cage007",
+        "joints": 60
+      },
+      {
+        "name": "Bent_bronze_focus_cage007_1",
+        "joints": 60
+      }
+    ],
+    "scale": [
+      1.12,
+      1.12,
+      1.12
+    ],
+    "bounds": {
+      "min": [
+        -0.46866062398978126,
+        0.019923566117075624,
+        6.716107165546945
+      ],
+      "max": [
+        0.4689975937029594,
+        2.277966274986896,
+        7.4417863874941785
+      ]
+    },
+    "faceAnchor": [
+      -1.8854283699475893e-22,
+      2.0092794048886367,
+      7.148959450843907
+    ]
+  },
+  "mobileInfo": {
+    "errors": [],
+    "bad": [],
+    "warnings": [],
+    "failed": [],
+    "hashes": {
+      "index.html": "0b1a27f6e86b35d78a10e3d0430f55844e22b5633e6be9232fb50de4276b2ebe",
+      "style.css": "ef323ed418b5f1c935aab7bb7340edecc1ed03f29d8c7686e42464aa1b27fc3c",
+      "game.js": "fd6e271a437f7515daefeb7510c62791999ba7555c7ce742df7afe62d95b6bb2",
+      "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+      "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+      "environment.js": "11dcf22ecf99559ba0791fddfedea6530f790a8935ecb05ca6ee6a4279a2f36e",
+      "save.js": "bc9b088bc36466f50d9ee5075016d6d894dffe528af373d2f2093cfca61c3f8e",
+      "save-panel.js": "d189877c39e0400135f0531a1bcea7b2afef3bced1091cbdcdf688ced2431e96",
+      "world-renderer.js": "3e954a752c3a31d223e25e7a006741a58b8da89946f49371b638953270510a62",
+      "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+      "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+      "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+      "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+      "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+      "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+      "textures/environment-stone-basecolor.jpg": "3adec878a98b86fafe0e266ad59885b70ffc186a29d98a2bd77690c1d93076c7",
+      "textures/environment-stone-normal.jpg": "661c674152b0319eeef4f132e428ea6c06b0866feca7f6ae822c288b48c38424",
+      "textures/environment-stone-roughness.jpg": "8d55a15c364032e0a104001d801c4ec93cdb84bd6722cbd496e1b42d02a81307",
+      "textures/environment-floor-basecolor.jpg": "5f9bed1abbee22bf9163c471bc27d9fe2f69dbdcdd7b8a37f6021bb6af1d0967",
+      "textures/environment-floor-normal.jpg": "d5357371c0401ea2b2f460fd6d583138e9c8c05c63d994c97c48048d11d63368",
+      "textures/environment-floor-roughness.jpg": "23000b6fbfafdcf98fcc96f847a1366d3c8d841c33f9283917b9f6d98549a489",
+      "textures/environment-masonry-color.webp": "bac84c53bde1ed4fcc55c35eced761abbd10c97c78877b2efa908bd38928306c",
+      "textures/environment-masonry-normal.webp": "f665f94b33c0d8e1c0e2b999c4c752ef2b61d12ea9c3aa80491bce057629f2e1",
+      "textures/environment-masonry-roughness.webp": "da879f34af6a133564a41f4e508037cf60c40847ce8f5c48721bed6a291dc692",
+      "textures/environment-masonry-ao.webp": "3ea160a4980951fa63ae8c4fff842c503d98a915f4a67712cde80c1f22a09eb3",
+      "textures/environment-grime.png": "92f1e17822df7fd832c5c8a1a7ee2d7d1ebea072d4a128a28f87e6fb6dd010ed",
+      "textures/environment-flame.png": "cc639a1795aa4c8e84313e496620f152af8ec1b300b14a807096a4dc08667edf",
+      "textures/environment-banner-basecolor.jpg": "509ead54e79c540406abfeb3c8f586dc99d3c4e3ab861feab45276cfed192e70",
+      "textures/environment-banner-normal.jpg": "080afcf854f5edd98092a9793a5ea17b63be11e5fecef87dc145b73198fc620f",
+      "textures/environment-relief-basecolor.jpg": "6cab05061c3152139166ba99ce89a26e03d1d3f52a43568f9be7eb913cfcde61",
+      "textures/environment-relief-normal.jpg": "67db82fcaeec86f0e1e062ca39182b174fbe694265df48cb46584ce9334adaa9",
+      "models/ember-mage-realism.glb": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3"
+    },
+    "resourceModels": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ],
+    "detailRequests": 1
+  },
+  "touchTrace": [
+    {
+      "type": "pointerdown",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "open-save-intro",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "start",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 6
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "model-view-full",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "character",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "model-view-face",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "closehero",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "saves",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "export-save",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "close-save",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    }
+  ]
+}

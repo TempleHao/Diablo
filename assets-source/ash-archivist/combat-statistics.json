@@ -1,0 +1,25 @@
+{
+  "name": "Ash Archivist / 灰烬典籍守望者",
+  "lod": "L1",
+  "triangles": 14713,
+  "meshes": 1,
+  "primitives": 2,
+  "bones": 60,
+  "materials": 2,
+  "images": 4,
+  "glbBytes": 3852640,
+  "sha256": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+  "clips": [
+    "Idle",
+    "Walk",
+    "Cast"
+  ],
+  "heightMeters": 1.91,
+  "baseLicense": "CC0 1.0",
+  "textures": "Actual baked PBR atlases: original authored/procedural maps and CC0 MakeHuman eyes/skin",
+  "limitations": [
+    "No measured real-device GPU frame rate, memory, heat or battery evidence",
+    "Commercial D2R/D4 art quality is not established",
+    "Inactive face/toe helper channels are merged; separate facial animation requires the source rig"
+  ]
+}
