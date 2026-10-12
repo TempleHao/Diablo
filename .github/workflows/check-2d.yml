@@ -22,5 +22,7 @@ jobs:
           node --test tests/2d-core.test.mjs
       - name: Browser runtime smoke tests
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-wqy-microhei
           npm install --no-save --package-lock=false playwright-core@1.56.1
           SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs
