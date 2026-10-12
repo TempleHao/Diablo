@@ -25,8 +25,8 @@
     "taskId": "ART-02",
     "trigger": "continuation",
     "startedAt": "2026-10-12T17:21:28Z",
-    "heartbeatAt": "2026-10-12T17:52:26Z",
-    "leaseExpiresAt": "2026-10-12T19:52:26.000Z"
+    "heartbeatAt": "2026-10-12T18:05:09Z",
+    "leaseExpiresAt": "2026-10-12T20:05:09.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -34,30 +34,48 @@
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
   "resumeBranch": "checkpoint/art-02",
-  "resumeCommit": "3a4b93f43271d131806423f4b16be9b4d56b2388",
+  "resumeCommit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
   "nextAction": "Complete ART-02 C native browser/close-race/retry/context-GPU reuse/touch/save regressions on checkpoint/art-02, integrate verified preview only, check Pages. ART-02 stays in_progress: next bounded D is scalp/hair, face UV/skin and cloth sculpt/wear/high-to-low bake; user commercial-art acceptance remains unmet.",
   "lastAttempt": {
     "runId": "auto-ART-02-20261012172128-73c3b1d8",
     "taskId": "ART-02",
     "startedAt": "2026-10-12T17:21:28Z",
     "status": "running",
-    "phase": "imported-lod-evidence-saved-final-browser-face-fix-check-in-progress",
-    "checkpointCommit": "3a4b93f43271d131806423f4b16be9b4d56b2388",
+    "phase": "bounded-abc-validated-awaiting-integration",
+    "checkpointCommit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
     "validation": {
-      "assetCheck": "passed: both LOD budgets, hashes, skin, animation parity and 26 source files",
       "saveTests": {
         "passed": 61,
         "failed": 0
       },
-      "browser": "in progress; no acceptance claim",
-      "deployment": "not yet integrated"
+      "browserGameChecks": {
+        "passed": 23,
+        "failed": 0
+      },
+      "latestLifecycleChecks": {
+        "passed": 6,
+        "failed": 0
+      },
+      "nativePoseSamples": 30,
+      "assetCheck": "Two LODs / 26 pinned sources / actual hashes, budgets, weights, clip parity passed",
+      "portable": "lifecycle and poses independently run; standalone 23 path-config copy syntax/review only",
+      "unverified": [
+        "Commercial D2R/D4 and user art acceptance",
+        "Real-device GPU/FPS/thermals/battery",
+        "Live github.io browser due network policy"
+      ],
+      "knownArtDefects": [
+        "Cloth-tail normal/atlas/decimation spots/fold lines",
+        "L1 sampled cloth-tail surface error58.132mm",
+        "Waxy skin/faint brow/scalp shell/cloth surface wear"
+      ]
     }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T17:52:26Z",
+  "lastUpdatedAt": "2026-10-12T18:05:09Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality not met; preview remains first slice, monsters remain prototype",
     "Real Android/iOS performance, GPU memory, thermals/battery and user research not tested",
@@ -74,8 +92,8 @@
   },
   "lastWorkBranch": {
     "name": "checkpoint/art-02",
-    "commit": "3a4b93f43271d131806423f4b16be9b4d56b2388",
-    "status": "native-browser-final-check-in-progress"
+    "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
+    "status": "validated-partial-awaiting-integration"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
