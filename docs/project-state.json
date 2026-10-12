@@ -3,10 +3,10 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.2.1",
   "designVersion": "1.0",
-  "status": "ready",
+  "status": "running",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
-  "nextTaskId": "D1-02",
+  "nextTaskId": "ART-01",
   "completedTaskIds": [
     "D0-PLAYABLE",
     "DOC-BIBLE-1",
@@ -19,7 +19,14 @@
     "jobId": 114644183385,
     "conclusion": "success"
   },
-  "activeRun": null,
+  "activeRun": {
+    "runId": "manual-ART-01-20261012051455-3dbf40df",
+    "taskId": "ART-01",
+    "trigger": "user-feedback",
+    "startedAt": "2026-10-12T05:14:55Z",
+    "heartbeatAt": "2026-10-12T05:14:55Z",
+    "leaseExpiresAt": "2026-10-12T07:14:55.000Z"
+  },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
@@ -27,42 +34,19 @@
   },
   "resumeBranch": null,
   "resumeCommit": null,
-  "nextAction": "D1-02: read current contracts and ARCHITECTURE; extract implemented skills, character stats and single-wand definitions into stable validated IDs and finite behavior handlers; add independently recomputable damage examples. Do not expose unimplemented affixes.",
+  "nextAction": "ART-01: establish realistic anatomy/cloth/PBR asset pipeline and rebuild a playable visual slice; save small tested checkpoints. User art target remains unaccepted until actual rendering demonstrates it. D1-02 deferred by latest user feedback.",
   "lastAttempt": {
-    "runId": "manual-D1-01-20261012021441000-2d139678",
-    "taskId": "D1-01",
-    "startedAt": "2026-10-12T02:14:41.000Z",
-    "status": "done",
-    "phase": "validated-published",
-    "validation": {
-      "saveTests": {
-        "passed": 61,
-        "failed": 0
-      },
-      "syntaxAndAssets": "passed",
-      "browser": "Desktop and 390x844 touch viewport regressions passed; not real-phone performance",
-      "sourceHashes": "12 released source/test/README files match verified local candidate",
-      "unverified": [
-        "Real phone performance, thermal/battery behavior and user research",
-        "Full cross-page atomic transactions",
-        "Live github.io URL browser regression: network policy blocks host"
-      ]
-    },
-    "finishedAt": "2026-10-12T02:59:15Z",
-    "codeCommit": "0d3de9e71f65a931be27637ae5f1cedca67e7cf7",
-    "checkpointCommit": "f20379b6533a11b7934b30e4a65b27e4ce6cf924",
-    "deployment": {
-      "commit": "0d3de9e71f65a931be27637ae5f1cedca67e7cf7",
-      "runId": 38197767064,
-      "jobId": 114644183385,
-      "conclusion": "success"
-    }
+    "runId": "manual-ART-01-20261012051455-3dbf40df",
+    "taskId": "ART-01",
+    "startedAt": "2026-10-12T05:14:55Z",
+    "status": "running",
+    "phase": "art-source-and-rebuild"
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T02:59:15Z",
+  "lastUpdatedAt": "2026-10-12T05:14:55Z",
   "validationLimitations": [
     "D1-01 complete; remaining D1/D2/D3 systems are planned, not implemented in 0.2.1",
     "Browser mobile viewport checks are not real-device performance tests",
@@ -81,5 +65,12 @@
     "name": "checkpoint/d1-01",
     "commit": "f20379b6533a11b7934b30e4a65b27e4ce6cf924",
     "status": "validated-integrated"
+  },
+  "userFeedback": {
+    "recordedAt": "2026-10-12T05:14:55Z",
+    "priority": "art-before-D1-02",
+    "currentArt": "rejected-by-user",
+    "request": "Rebuild character and full scene environment toward realistic dark fantasy quality comparable to Diablo II Resurrected / Diablo IV. Existing rigid small-game primitive modeling is unacceptable.",
+    "targetAcceptance": "Not met; no AAA-quality claim based only on more polygons, concept images or lighting."
   }
 }
