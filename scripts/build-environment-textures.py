@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Original, deterministic, tileable limestone PBR maps for the Cinder Archive.
 
-No photographs, downloaded textures, or game assets are used. The files and this
-generator are distributed under the repository's MIT license. This is surface
-art for this game's stonework, not a claim of scanned material or AAA fidelity.
+This generator creates original maps, rather than processing downloaded images.
+The original generator and its output have no public license selected. Separate
+CC0 masonry files are copied by the documented asset pipeline, not this script.
+These maps are not scanned materials or a claim of AAA fidelity.
 """
 from pathlib import Path
 import json
@@ -164,5 +165,5 @@ save_rgb('environment-relief-basecolor.jpg', rgb)
 save_rgb('environment-relief-normal.jpg', normal_map(relief_height, 30))
 
 files = sorted(p for p in OUT.glob('environment-*') if '-masonry-' not in p.name)
-print(json.dumps({'size': SIZE, 'license': 'MIT, original procedural source',
+print(json.dumps({'size': SIZE, 'license': 'Original procedural source; no public license selected',
                   'files': [{'path': str(p.relative_to(OUT.parent.parent)), 'bytes': p.stat().st_size} for p in files]}, indent=2))

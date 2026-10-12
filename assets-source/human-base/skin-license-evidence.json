@@ -1,0 +1,12 @@
+{
+  "asset": "middleage_caucasian_male",
+  "author": "makehuman_system",
+  "license": "CC0-1.0",
+  "officialAssetCatalog": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+  "verifiedAt": "2026-10-12",
+  "evidence": "Official system asset catalog skin row names middleage_caucasian_male / makehuman_system / CC0. Fixed mirror directory has the identical system asset name; original texture filename retained in source manifest.",
+  "historicalMirrorNote": "The mirror README carries an older AGPL-derived archive statement. This project includes only the named graphical asset released under the current official asset-specific CC0 grant, not mirror program code.",
+  "sourceDigest": "2fcba10dea50d21dcd5b2582ac7cbe82bb2a0a5ddc9fd9ea55587056734d7d31",
+  "officialDownloadAvailability": "Official files2 host was denied by current executor network policy; no bypass attempted. Selected texture bytes come from pinned public GitHub mirror, not the official ZIP.",
+  "identityBasis": "Official named system asset matches pinned mirror directory identity. Official ZIP bytes have not been compared; this is not a byte-equivalence claim."
+}

@@ -1,5 +1,6 @@
 {
   "repository": "makehumancommunity/makehuman",
+  "sourceScope": "Default source for anatomy/rig/eyes; per-file upstreamRepository and upstreamRevision override for named system skin",
   "revision": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
   "license": "CC0-1.0 for bundled graphical assets; see LICENSE.md sections C and D",
   "files": [
@@ -93,6 +94,16 @@
       "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/eyes/high-poly/high-poly.mhclo",
       "bytes": 72490,
       "sha256": "b183cfe37120ab726f9b3f2ea6cd3a64c44ce7b4bd91a77c841cf70c04f83a0d"
+    },
+    {
+      "file": "middleage_caucasian_male_diffuse.png",
+      "upstreamRepository": "makehuman-js/makehuman-data",
+      "upstreamRevision": "e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f",
+      "upstreamPath": "public/data/skins/middleage_caucasian_male/textures/middleage_lightskinned_male_diffuse.png",
+      "url": "https://raw.githubusercontent.com/makehuman-js/makehuman-data/e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/middleage_caucasian_male/textures/middleage_lightskinned_male_diffuse.png",
+      "bytes": 262955,
+      "sha256": "2fcba10dea50d21dcd5b2582ac7cbe82bb2a0a5ddc9fd9ea55587056734d7d31",
+      "license": "Current asset-specific CC0 grant by MakeHuman Community; see skin-license-evidence.json"
     }
   ]
 }

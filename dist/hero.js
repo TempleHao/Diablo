@@ -4,10 +4,10 @@ import {clone} from './vendor/utils/SkeletonUtils.js';
 import {createReflectionEnvironment} from './lighting.js';
 
 export async function loadMage(parent) {
-  const asset = await new GLTFLoader().loadAsync(new URL('./models/ember-mage.glb', import.meta.url).href);
+  const asset = await new GLTFLoader().loadAsync(new URL('./models/ember-mage-realism.glb', import.meta.url).href);
   const model = asset.scene;
   model.name = 'EmberMage';
-  model.scale.setScalar(1.22);
+  model.scale.setScalar(1.12);
   model.traverse(o => {
     if (o.isMesh) {o.castShadow=true;o.receiveShadow=true;}
   });
@@ -39,10 +39,11 @@ export async function loadMage(parent) {
       renderer.outputColorSpace=T.SRGBColorSpace;
       renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
       const scene=new T.Scene();
-      scene.add(new T.HemisphereLight(0xe3e0d8,0x29221b,.65));
-      const light=new T.DirectionalLight(0xffe4bd,3.2);light.position.set(-2,4,3);scene.add(light);
+      scene.add(new T.HemisphereLight(0xe3e0d8,0x29221b,.85));
+      const light=new T.DirectionalLight(0xfff1dd,5.0);light.position.set(-2,4,3);scene.add(light);
+      const fill=new T.DirectionalLight(0xc2c9cd,1.8);fill.position.set(2,2,3);scene.add(fill);
       const rim=new T.DirectionalLight(0xadc1d0,1.75);rim.position.set(2,2,-2);scene.add(rim);
-      const reflection=createReflectionEnvironment(renderer);scene.environment=reflection.texture;scene.environmentIntensity=.55;
+      const reflection=createReflectionEnvironment(renderer);scene.environment=reflection.texture;scene.environmentIntensity=.75;
       const copy=clone(model);copy.scale.setScalar(1);copy.rotation.y=-.18;scene.add(copy);
       copy.updateMatrixWorld(true);
       copy.traverse(o=>{if(o.isSkinnedMesh){o.skeleton.update();o.computeBoundingBox();}});
@@ -81,7 +82,7 @@ export async function loadMage(parent) {
       document.getElementById('model-view-face')?.addEventListener('click',()=>setView('face'),options);
       const resizeObserver=new ResizeObserver(()=>{if(!active)return;renderer.setSize(canvas.clientWidth,canvas.clientHeight,false);camera.aspect=canvas.clientWidth/canvas.clientHeight;camera.updateProjectionMatrix();frame();});resizeObserver.observe(canvas);
       setView('full');
-      function render(now){if(!active)return;const dt=Math.min((now-previous)/1000,.05);previous=now;mixer.update(dt);renderer.render(scene,camera);requestAnimationFrame(render);}
+      function render(now){if(!active)return;const dt=Math.max(0,Math.min((now-previous)/1000,.05));previous=now;mixer.update(dt);renderer.render(scene,camera);requestAnimationFrame(render);}
       requestAnimationFrame(render);
       return ()=>{active=false;abort.abort();resizeObserver.disconnect();pointers.clear();mixer.stopAllAction();reflection.dispose();renderer.dispose();pedestal.geometry.dispose();pedestal.material.dispose();};
     }

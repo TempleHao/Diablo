@@ -1,6 +1,6 @@
 # 余烬法师 · Ember Mage
 
-**版本 0.2.1** · 原创暗黑风格的 3D 网页单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。
+**版本 0.3.0-preview.1** · 写实暗黑方向的3D美术预览；仍是单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。
 
 [打开游戏](https://templehao.github.io/Diablo/) · [完整游戏策划](docs/bible/README.md) · [在线策划阅读版](https://templehao.github.io/Diablo/design/) · [部署工作流](https://github.com/TempleHao/Diablo/actions/workflows/pages.yml)
 
@@ -16,8 +16,8 @@
 
 ## 当前可玩内容
 
-- 法师 3D 模型：银发、面部、分层衣袍、护肩、腰带、靴子与水晶法杖；待机、行走、施法骨骼动作，可打开人物面板拖动旋转查看。
-- 灰烬地窟：石砖大殿、互通侧室、立柱、拱廊、火把、祭坛与环境装饰，场景碰撞配合可走区域。
+- 法师采用连续人体网格、真实皮肤UV、可辨眼睛与手部、多层深色衣物和皮革胸带；Idle/Walk/Cast骨骼动作。人物面板支持全身、面部取景，拖转、滚轮或双指缩放。
+- 灰烬地窟重做错缝缺角石板、风化石墙PBR、连续尖拱与断拱、浮雕/空兜帽石像、灰污潮迹和柔边火把，保留既有通路/碰撞。新增接触遮蔽与HDR输出照明。
 - 火球远程攻击、冰霜新星范围伤害与减速、闪现、冷却式治疗药水。
 - 12 名守卫与灰烬领主、三种品质随机法杖、升级、换装与分解。
 - 本机存档保留等级、装备、通关次数；死亡保留已拾取成长，通关后下一轮敌人和掉落提高。
@@ -50,15 +50,18 @@ npm run check
 
 ## 模型源文件
 
-`dist/models/ember-mage.glb` 是游戏使用的模型，包含 9 个骨骼与 Idle、Walk、Cast 动作。`scripts/build-mage.py` 是可复现的原创 Blender 建模脚本。
+当前运行模型为 `dist/models/ember-mage-realism.glb`，实际40,966三角面、163骨骼、9材质、20嵌入图像，包含Idle/Walk/Cast与面部取景挂点。人体、形变、骨架/眼睛和系统皮肤采用已登记的MakeHuman CC0图形资源；服装、装备与生成管线为本项目制作，不把第三方基底称为从零原创。来源清单见 [human-base](assets-source/human-base/README.md)。
 
-使用 Blender 4.3.2 生成 GLB 与可编辑的 `.blend` 文件：
+已在Blender **4.3.2**生成候选：
 
 ```sh
-blender -b --python scripts/build-mage.py -- /你的绝对路径/Diablo
+blender -b --python scripts/build-mage-realism.py -- /你的绝对路径/Diablo
+python3 scripts/build-environment-textures.py
 ```
 
-生成的 `.blend` 位于 assets-source，默认不提交；源码包另附原生模型。游戏模型采用风格化造型，尚不是正式写实美术。
+环境生成器本轮使用Pillow12.3.0、NumPy2.3.5；Blender脚本使用其自带NumPy。可编辑`.blend`及原创中间纹理由脚本重建，当前发布GLB不依赖这些未提交文件。旧模型与旧生成器保留，便于对照/回退。环境CC0石材来源与实际结构计数见 [ART-ENVIRONMENT](docs/ART-ENVIRONMENT.md)。
+
+这次交付是可玩的美术整改切片，**不代表已达到D2R/D4级质量**。头发、衣物裁剪/折褶与磨损、动作、怪物和完整环境仍需精修；当前候选超出策划首轮角色/骨骼/材质及部分绘制预算，缺少LOD和真机性能验证。详细已测/未测和下一步见 [ART-01验证记录](docs/VALIDATION-ART-01.md)。
 
 ## GitHub Pages 部署
 
@@ -74,7 +77,7 @@ blender -b --python scripts/build-mage.py -- /你的绝对路径/Diablo
 
 ## 第三方声明
 
-Three.js 0.170.0 及其 GLTFLoader、BufferGeometryUtils、SkeletonUtils 使用 MIT 许可证，见 THREE-LICENSE.txt 与 dist/vendor/THREE-LICENSE.txt。本项目未为原创代码、模型或美术选定许可证。
+Three.js 0.170.0 及其 GLTFLoader、BufferGeometryUtils、SkeletonUtils 使用 MIT 许可证，见 THREE-LICENSE.txt 与 dist/vendor/THREE-LICENSE.txt。MakeHuman图形资产及所列ambientCG石材采用CC0，固定来源/当前许可证据见assets-source清单；本项目原创代码和美术尚未选定公开许可证。
 
 ## 验证记录
 

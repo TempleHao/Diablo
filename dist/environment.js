@@ -1,7 +1,7 @@
 import * as T from './vendor/three.module.js';
 
-// The Cinder Archive: an original, open-roof limestone crypt. Surface textures
-// are baked by scripts/build-environment-textures.py; no third-party art assets.
+// The Cinder Archive: original open-roof limestone architecture. Surfaces use
+// original seeded procedural maps plus documented CC0 ambientCG stone maps.
 // The route/collision contract is the same as the first playable crypt.
 export function createEnvironment(scene) {
   const group = new T.Group();

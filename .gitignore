@@ -2,6 +2,8 @@ node_modules/
 *.zip
 *.blend1
 assets-source/*.blend
+assets-source/ash-archivist/*.blend
+assets-source/ash-archivist/*.png
 preview.png
 gameplay.png
 mobile.png

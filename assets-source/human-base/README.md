@@ -1,7 +1,10 @@
+> 来源范围：基底、形变、骨架和眼睛的默认上游是 makehumancommunity/makehuman；皮肤另来自下文固定镜像。每条manifest记录的repo/revision覆盖默认来源，不能把多源文件称为全出自同一仓库。
+
 # Continuous human source mesh
 
-This directory contains unmodified graphical assets from the MakeHuman Community
-repository, fixed at revision `a8bc2d54ff0ac92e78ff71431b1023eda42bf482`.
+The default anatomy, rig, morph and eye assets are unmodified MakeHuman Community
+assets at revision `a8bc2d54ff0ac92e78ff71431b1023eda42bf482`. The named skin comes
+from a separate pinned mirror described below; its per-file source overrides the default.
 Download URLs, byte lengths and SHA-256 hashes are recorded in `manifest.json`.
 
 ## License evidence
@@ -43,3 +46,7 @@ Palmius, Jonas Hauquier and, for the original macro targets, Manuel Bastioni.
 These sources establish continuous anatomy and clear redistribution rights.
 They do not by themselves supply production skin textures, authored mage
 clothing, final animation, a facial rig or a finished high-budget character.
+
+## 真实中年男性皮肤色彩
+
+`middleage_caucasian_male_diffuse.png`对应同名官方系统皮肤；[当前官方资产目录](https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html)明确将该资产列为 makehuman_system 作者、CC0。固定GitHub镜像、SHA及旧档AGPL说明与当前资产级许可的范围区分见 manifest.json 和 skin-license-evidence.json。只使用此图形资源，不包含镜像程序代码。

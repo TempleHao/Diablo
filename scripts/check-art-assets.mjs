@@ -17,6 +17,8 @@ for(const directory of ['assets-source/human-base/','assets-source/environment-p
 }
 
 const bytes=readFileSync(new URL('dist/models/ember-mage-realism.glb',project));
+const statistics=JSON.parse(readFileSync(new URL('assets-source/ash-archivist/statistics.json',project)));
+assert.equal(createHash('sha256').update(bytes).digest('hex'),statistics.sha256,'Model and generated statistics are from different builds');
 assert.equal(bytes.readUInt32LE(0),0x46546c67,'Invalid realism GLB');
 assert.equal(bytes.readUInt32LE(4),2);assert.equal(bytes.readUInt32LE(8),bytes.length);
 const jsonLength=bytes.readUInt32LE(12);
