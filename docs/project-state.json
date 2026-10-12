@@ -25,8 +25,8 @@
     "taskId": "ART-02",
     "trigger": "continuation",
     "startedAt": "2026-10-12T17:21:28Z",
-    "heartbeatAt": "2026-10-12T17:37:25Z",
-    "leaseExpiresAt": "2026-10-12T19:37:25.000Z"
+    "heartbeatAt": "2026-10-12T17:44:52Z",
+    "leaseExpiresAt": "2026-10-12T19:44:52.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -34,30 +34,30 @@
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
   "resumeBranch": "checkpoint/art-02",
-  "resumeCommit": "32cbc1e29dee71cd576252dfdbb047b83bff6206",
-  "nextAction": "Resume ART-02 from checkpoint/art-02: freeze revised raw character after native render inspection, run real atlas/rig/LOD exporter, implement lazy persistent close-up viewer, verify final assets and browser/save/touch behavior before main integration.",
+  "resumeCommit": "56bc65f95fe04173e1b05c38db4f6472667af5aa",
+  "nextAction": "Complete ART-02 C native browser/close-race/retry/context-GPU reuse/touch/save regressions on checkpoint/art-02, integrate verified preview only, check Pages. ART-02 stays in_progress: next bounded D is scalp/hair, face UV/skin and cloth sculpt/wear/high-to-low bake; user commercial-art acceptance remains unmet.",
   "lastAttempt": {
     "runId": "auto-ART-02-20261012172128-73c3b1d8",
     "taskId": "ART-02",
     "startedAt": "2026-10-12T17:21:28Z",
     "status": "running",
-    "phase": "lazy-viewer-source-saved-final-assets-and-native-tests-pending",
-    "checkpointCommit": "32cbc1e29dee71cd576252dfdbb047b83bff6206",
+    "phase": "final-lod-assets-saved-native-browser-tests-running",
+    "checkpointCommit": "56bc65f95fe04173e1b05c38db4f6472667af5aa",
     "validation": {
-      "pythonCompilation": "passed for three source scripts",
-      "preliminaryBudget": "Independent old-source run only; final new character not yet verified",
-      "unverified": [
-        "New lookdev visual result",
-        "Final budget GLBs and native regressions",
-        "Deployment"
-      ]
+      "assetCheck": "passed: both LOD budgets, hashes, skin, animation parity and 26 source files",
+      "saveTests": {
+        "passed": 61,
+        "failed": 0
+      },
+      "browser": "in progress; no acceptance claim",
+      "deployment": "not yet integrated"
     }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T17:37:25Z",
+  "lastUpdatedAt": "2026-10-12T17:44:52Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality not met; preview remains first slice, monsters remain prototype",
     "Real Android/iOS performance, GPU memory, thermals/battery and user research not tested",
@@ -74,8 +74,8 @@
   },
   "lastWorkBranch": {
     "name": "checkpoint/art-02",
-    "commit": "32cbc1e29dee71cd576252dfdbb047b83bff6206",
-    "status": "source-checkpoint-unverified"
+    "commit": "56bc65f95fe04173e1b05c38db4f6472667af5aa",
+    "status": "assets-verified-browser-pending"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
