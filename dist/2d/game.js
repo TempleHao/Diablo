@@ -9,6 +9,11 @@ const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
 let kills = 0, total = 12, boss = null, frameIndex = 0, nextId = 1, manualAim = null, messageTimes = new Map();
+const enemyWaves = [
+  ['wretch','wretch','archer','wretch'],
+  ['brute','archer','wretch','wretch'],
+  ['brute','archer','wretch','brute']
+];
 const cooldowns = {fire:0,ice:0,blink:0,heal:0};
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#d9a0f0'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
@@ -45,6 +50,19 @@ function encounterPoint(i) {
   }
   return randomPoint();
 }
+function spawnWave(index){
+  const group=enemyWaves[index]||[];
+  group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
+  announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
+}
+function findBossPoint(){
+  // A short, reachable walk down the central aisle instead of spawning inside masonry.
+  for(const delta of [310,390,240,-280,460]){
+    const p={x:hero.x,y:clamp(hero.y-delta,TILE*3,HEIGHT-TILE*3)};
+    if(walkable(p.x,p.y,45,dungeon))return p;
+  }
+  return {x:WIDTH/2,y:TILE*5.7};
+}
 function build() {
   const seed = 20261013 + profile.clears*19;
   rng=mulberry32(seed); dungeon=makeDungeon(seed);
@@ -52,8 +70,7 @@ function build() {
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
-  const kinds=['wretch','wretch','archer','wretch','brute','archer','wretch','wretch','brute','archer','wretch','brute'];
-  kinds.forEach((kind,i)=>spawn(kind,i<4?encounterPoint(i):null));
+  spawnWave(0);
   ui.boss.hidden=true;
   ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
@@ -188,7 +205,9 @@ function dealDamage(e,damage){
     boss=null;ui.boss.hidden=true;profile.clears++;persist();
     announce('炉心重燃，地窟净化完成！',true);showModal('victory');
   }else{
-    kills++;if(kills>=total&&!boss)spawn('boss',{x:hero.x,y:clamp(hero.y-310,TILE*4,HEIGHT-TILE*3)});
+    kills++;
+    if(kills===4||kills===8)spawnWave(kills/4);
+    if(kills>=total&&!boss)spawn('boss',findBossPoint());
     persist();
   }
 }
