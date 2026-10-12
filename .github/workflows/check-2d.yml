@@ -1,7 +1,7 @@
 name: 2D game validation
 on:
   push:
-    branches: [feature/2d-ember-dungeon]
+    branches: [main, feature/2d-ember-dungeon]
     paths: ['dist/2d/**','tests/2d-*.mjs','.github/workflows/check-2d.yml','package.json']
   pull_request:
     paths: ['dist/2d/**','tests/2d-*.mjs','.github/workflows/check-2d.yml','package.json']
