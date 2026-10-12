@@ -1,0 +1,2113 @@
+{
+  "stage": "ART-01 candidate desktop and touch-viewport regression",
+  "checks": [
+    {
+      "name": "new-GLB-load-and-Idle",
+      "detail": {
+        "resource": [
+          {
+            "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+            "status": 200
+          }
+        ],
+        "clips": [
+          "Idle",
+          "Walk",
+          "Cast"
+        ],
+        "movingBones": [
+          "spine02",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "keyboard-movement-Walk-Idle",
+      "detail": {
+        "positionBefore": [
+          0,
+          0,
+          7
+        ],
+        "positionAfter": [
+          1,
+          0,
+          7
+        ],
+        "movingBones": [
+          "upperleg01L",
+          "upperleg01R",
+          "lowerleg01R",
+          "spine02",
+          "upperarm01L",
+          "upperarm01R",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "ice-and-Cast-action",
+      "detail": {
+        "manaBefore": 100,
+        "manaAfter": 70,
+        "cast": {
+          "running": true,
+          "time": 0.1614583283662796,
+          "weight": 0.7999998569488526,
+          "enabled": true
+        },
+        "movingBones": [
+          "upperleg01L",
+          "upperleg01R",
+          "lowerleg01R",
+          "spine02",
+          "upperarm01L",
+          "lowerarm01L",
+          "upperarm01R",
+          "head"
+        ]
+      }
+    },
+    {
+      "name": "fire-projectile",
+      "detail": {
+        "shots": 1,
+        "cooldown": 0.34
+      }
+    },
+    {
+      "name": "blink",
+      "detail": {
+        "positionBefore": [
+          1,
+          0,
+          7
+        ],
+        "positionAfter": [
+          -0.32574400675315807,
+          0,
+          1.1482991507974276
+        ]
+      }
+    },
+    {
+      "name": "character-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "preview-pointer-rotation-wheel-zoom",
+      "detail": {
+        "rotation": [
+          -0.18,
+          0.9480000000000002
+        ],
+        "zoom": [
+          1,
+          1.1735108709918103
+        ]
+      }
+    },
+    {
+      "name": "native-face-frame",
+      "detail": {
+        "facePosition": [
+          -0.022572607566802315,
+          1.7952624615459951,
+          0.1247035079813729
+        ],
+        "camera": [
+          0.07,
+          1.8152624615459951,
+          1.2058019855720548
+        ]
+      }
+    },
+    {
+      "name": "preview-resize",
+      "detail": {
+        "display": [
+          468,
+          350
+        ],
+        "buffer": [
+          468,
+          350
+        ],
+        "pageOverflow": false
+      }
+    },
+    {
+      "name": "save-above-character-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "nested-save-close-retains-character-pause",
+      "detail": {}
+    },
+    {
+      "name": "save-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "save-close-resumes",
+      "detail": {}
+    },
+    {
+      "name": "inventory-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "inventory-close-resumes",
+      "detail": {}
+    },
+    {
+      "name": "390x844-touch-move-and-ice",
+      "detail": {
+        "position": [
+          [
+            0,
+            0,
+            7
+          ],
+          [
+            0.7631578947368421,
+            0,
+            7
+          ]
+        ],
+        "continuesMovingAfterIceRelease": true,
+        "iceCooldown": 4.88,
+        "mana": 70.84
+      }
+    },
+    {
+      "name": "touch-release-joystick-preserves-held-fire",
+      "detail": {
+        "heldAfterJoystickRelease": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "elapsed": [
+          0.64,
+          1.1600000000000004
+        ],
+        "newProjectileAges": [
+          0.39999999999999997,
+          0.04
+        ]
+      }
+    },
+    {
+      "name": "character-pause-clears-held-touch",
+      "detail": {
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "menuInvocation": "Native click handler invoked programmatically while joystick pointer held"
+      }
+    },
+    {
+      "name": "touch-preview-drag-pinch-and-fit",
+      "detail": {
+        "modal": {
+          "x": 19,
+          "y": 48.90625,
+          "width": 352,
+          "height": 746.1875
+        },
+        "rotation": [
+          -0.18,
+          0.10000000000000003
+        ],
+        "zoom": [
+          1,
+          0.7885571604645334
+        ]
+      }
+    },
+    {
+      "name": "touch-release-in-character-does-not-stick-after-resume",
+      "detail": {
+        "elapsed": [
+          1.4866000000089414,
+          1.6466000000089416
+        ],
+        "position": [
+          1.5263157894736843,
+          0,
+          7
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        }
+      }
+    },
+    {
+      "name": "touch-save-modal-pauses",
+      "detail": {
+        "running": false,
+        "elapsedStable": true,
+        "positionStable": true,
+        "renderFrames": 4,
+        "heldInputCleared": true
+      }
+    },
+    {
+      "name": "touch-save-fit-and-resume",
+      "detail": {
+        "modal": {
+          "x": 19,
+          "y": 179.0625,
+          "width": 352,
+          "height": 485.859375
+        }
+      }
+    },
+    {
+      "name": "browser-console-and-resources",
+      "detail": {
+        "desktop": {
+          "errors": [],
+          "bad": [],
+          "warnings": [],
+          "failed": [],
+          "hashes": {
+            "game": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+            "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+          },
+          "resourceModels": [
+            {
+              "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+              "status": 200
+            }
+          ]
+        },
+        "mobile": {
+          "errors": [],
+          "bad": [],
+          "warnings": [],
+          "failed": [],
+          "hashes": {
+            "game": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+            "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+          },
+          "resourceModels": [
+            {
+              "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+              "status": 200
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    "/workspace/scratch/art-qa/realism-mobile-gameplay.png",
+    "/workspace/scratch/art-qa/realism-mobile-face.png",
+    "/workspace/scratch/art-qa/realism-mobile-save.png"
+  ],
+  "limitations": [
+    "Headless Chromium, SwiftShader software rendering. No hardware FPS, real-device mobile, temperature or battery claim.",
+    "Read-only snapshots append diagnostic functions only to intercepted HTTP responses. Touch input is CDP emulation.",
+    "Technical pass does not establish user visual acceptance or D2R/D4 commercial art quality.",
+    "Character menu click while joystick held invokes the native click handler programmatically; physical two-finger menu tapping is untested."
+  ],
+  "desktopInfo": {
+    "errors": [],
+    "bad": [],
+    "warnings": [],
+    "failed": [],
+    "hashes": {
+      "game": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+      "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+    },
+    "resourceModels": [
+      {
+        "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ]
+  },
+  "qaHarnessRepair": {
+    "initialEvidence": "/workspace/scratch/art-qa/realism-regression-first-harness-failure.json",
+    "partialMoveEvidence": "/workspace/scratch/art-qa/realism-regression-partial-move-harness-failure.json",
+    "protocolReference": "/workspace/scratch/ember-qa/node_modules/playwright-core/types/protocol.d.ts:9588",
+    "reason": "Original partial touchEnd supplied surviving points instead of released points, lifting fire itself. Chromium 151 accepts nonempty touchEnd as released points despite the published empty-only protocol comment. Corrected partial end supplies lifted joystick/skill points and verifies DOM pointerup IDs. touchMove omitting a point did not release it and was rejected by assertions.",
+    "desktopRepeated": false
+  },
+  "mobileInfo": {
+    "errors": [],
+    "bad": [],
+    "warnings": [],
+    "failed": [],
+    "hashes": {
+      "game": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+      "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+    },
+    "resourceModels": [
+      {
+        "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ]
+  },
+  "touchTrace": [
+    {
+      "type": "pointerdown",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "open-save-intro",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "start",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "start",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "ice",
+      "pointerId": 3,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 2
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 2,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "B",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 5
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 5,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": true,
+        "firePointerIds": [
+          4
+        ],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "fire",
+      "pointerId": 4,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0.7631578947368421,
+          "y": 0,
+          "id": 6
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "joystick",
+      "pointerId": 6,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "model-view-full",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 7,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "gotpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 8,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "lostpointercapture",
+      "target": "model-preview",
+      "pointerId": 9,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "character",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "model-view-face",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "model-view-face",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "closehero",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "closehero",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "saves",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": true,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "saves",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerdown",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "export-save",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "pointerup",
+      "target": "close-save",
+      "pointerId": 1,
+      "visible": "visible",
+      "phase": "bubble",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    },
+    {
+      "type": "blur",
+      "target": "close-save",
+      "visible": "visible",
+      "phase": "capture",
+      "state": {
+        "running": false,
+        "fireHeld": false,
+        "firePointerIds": [],
+        "joy": {
+          "x": 0,
+          "y": 0,
+          "id": null
+        },
+        "keys": []
+      }
+    }
+  ],
+  "completedAt": "2026-10-12T12:50:09.441348+00:00",
+  "executionExitCode": 0,
+  "artifactHashes": {
+    "dist/game.js": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+    "dist/hero.js": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43",
+    "dist/models/ember-mage-realism.glb": "e1141c68121c8c37b6032b28e2b0c9cee04fe875a823acb85cfc97833b0eecbc"
+  },
+  "screenshotHashes": {
+    "/workspace/scratch/art-qa/realism-mobile-gameplay.png": "21e9f16d829c11919d9eaafb0d0d78830fac83c72338487c8da3f9e50af65b1f",
+    "/workspace/scratch/art-qa/realism-mobile-face.png": "cf8021dcd716255fde7550e054c317974777fc92dea2a378966a692ea8566ea6",
+    "/workspace/scratch/art-qa/realism-mobile-save.png": "c143ab889f5a98a55f53178bfe74ded8d5a9d8464f579acb6e82a450c96b6ab4"
+  },
+  "priorViewEvidence": {
+    "json": "/workspace/scratch/art-qa/character-final-first-views.json",
+    "hashes": {
+      "game": "1d58d89a5bdf2cff0f18910b03980a1a57ca1f0ed47d5ee2f733ec7cd137a77c",
+      "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+    },
+    "heroSourceStillMatches": true,
+    "gameSourceStillMatches": false,
+    "note": "Original full/face/back views retain the same hero source; original gameplay view predates updated world illumination. Latest mobile gameplay screenshot is current."
+  },
+  "notTested": [
+    "Real physical phone/browser/GPU performance, FPS, memory, temperature, battery",
+    "Physical two-finger character menu activation; menu native click handler was invoked programmatically while joystick touch remained held",
+    "User visual acceptance or D2R/D4 commercial art-quality parity",
+    "Live Pages deployment and remote public URL in this QA task"
+  ],
+  "browserLifecycle": {
+    "maxConcurrentBrowsers": 1,
+    "desktopRuns": 1,
+    "touchRuns": 3,
+    "reason": "Two earlier mobile attempts exposed CDP harness semantics, preserved as harness failures; desktop pass was not repeated."
+  }
+}

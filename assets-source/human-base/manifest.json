@@ -1,0 +1,109 @@
+{
+  "repository": "makehumancommunity/makehuman",
+  "sourceScope": "Default source for anatomy/rig/eyes; per-file upstreamRepository and upstreamRevision override for named system skin",
+  "revision": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+  "license": "CC0-1.0 for bundled graphical assets; see LICENSE.md sections C and D",
+  "files": [
+    {
+      "file": "base.obj",
+      "upstreamPath": "makehuman/data/3dobjs/base.obj",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/3dobjs/base.obj",
+      "bytes": 1749303,
+      "sha256": "8e761e6624b8f54536409135d1636da63b32486a90d4897f84e121d144f6fb4c"
+    },
+    {
+      "file": "default.mhskel",
+      "upstreamPath": "makehuman/data/rigs/default.mhskel",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/rigs/default.mhskel",
+      "bytes": 117790,
+      "sha256": "99f179bce0aa850b45d4191a1d0d234c5851f881c057439470ded3bddf729a24"
+    },
+    {
+      "file": "default_weights.mhw",
+      "upstreamPath": "makehuman/data/rigs/default_weights.mhw",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/rigs/default_weights.mhw",
+      "bytes": 897521,
+      "sha256": "0f3641d651ae3d00ad6b4ccee43142edb109d3bd909d27d9e4139ef1beed8625"
+    },
+    {
+      "file": "LICENSE.md",
+      "upstreamPath": "LICENSE.md",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/LICENSE.md",
+      "bytes": 3598,
+      "sha256": "edd99571ca62698f78c943fd4fffb159a413c315fa0d4819d3cec5cadaf8b4f1"
+    },
+    {
+      "file": "LICENSE.ASSETS.md",
+      "upstreamPath": "LICENSE.ASSETS.md",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/LICENSE.ASSETS.md",
+      "bytes": 6962,
+      "sha256": "f6089cba01cb570a24712b41ab8a586ccd3cc5ef53dc266ca50b95c288956d2c"
+    },
+    {
+      "file": "caucasian-male-young.target",
+      "upstreamPath": "makehuman/data/targets/macrodetails/caucasian-male-young.target",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/targets/macrodetails/caucasian-male-young.target",
+      "bytes": 396479,
+      "sha256": "70e228ba7164737dae664454394536fc5935fa48d333c1a97d77e2dc6eacc5f5"
+    },
+    {
+      "file": "caucasian-male-old.target",
+      "upstreamPath": "makehuman/data/targets/macrodetails/caucasian-male-old.target",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/targets/macrodetails/caucasian-male-old.target",
+      "bytes": 400125,
+      "sha256": "b0d2b1d58cba0358af59833740e70229265f7da1c20a11240f4123b7192cfd6d"
+    },
+    {
+      "file": "head-age-incr.target",
+      "upstreamPath": "makehuman/data/targets/head/head-age-incr.target",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/targets/head/head-age-incr.target",
+      "bytes": 59255,
+      "sha256": "ff677345bd81e3f439bdf75496bbee620ca3c3f029955a546837afd283abf73a"
+    },
+    {
+      "file": "high-poly.obj",
+      "upstreamPath": "makehuman/data/eyes/high-poly/high-poly.obj",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/eyes/high-poly/high-poly.obj",
+      "bytes": 100882,
+      "sha256": "da2493215b708a344c33dc72f2a9a5b8fa985dcc5a70ad3b208995cf871da8e1"
+    },
+    {
+      "file": "brown_eye.png",
+      "upstreamPath": "makehuman/data/eyes/materials/brown_eye.png",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/eyes/materials/brown_eye.png",
+      "bytes": 610817,
+      "sha256": "4659691c7295ad6206c78b003e5fd0e5f91dcd53032fa914a229bb48cabe424b"
+    },
+    {
+      "file": "universal-male-young-averagemuscle-averageweight.target",
+      "upstreamPath": "makehuman/data/targets/macrodetails/universal-male-young-averagemuscle-averageweight.target",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/targets/macrodetails/universal-male-young-averagemuscle-averageweight.target",
+      "bytes": 604,
+      "sha256": "4ba5396ddabda448ece15650a566fbebfbb10239256ccb201e8f883429e12249"
+    },
+    {
+      "file": "male-young-averagemuscle-averageweight-maxheight.target",
+      "upstreamPath": "makehuman/data/targets/macrodetails/height/male-young-averagemuscle-averageweight-maxheight.target",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/targets/macrodetails/height/male-young-averagemuscle-averageweight-maxheight.target",
+      "bytes": 420920,
+      "sha256": "3baacc70187410ebba2b62c56a53775266ab859b7844d47e658d36ee78493621"
+    },
+    {
+      "file": "high-poly.mhclo",
+      "upstreamPath": "makehuman/data/eyes/high-poly/high-poly.mhclo",
+      "url": "https://raw.githubusercontent.com/makehumancommunity/makehuman/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/eyes/high-poly/high-poly.mhclo",
+      "bytes": 72490,
+      "sha256": "b183cfe37120ab726f9b3f2ea6cd3a64c44ce7b4bd91a77c841cf70c04f83a0d"
+    },
+    {
+      "file": "middleage_caucasian_male_diffuse.png",
+      "upstreamRepository": "makehuman-js/makehuman-data",
+      "upstreamRevision": "e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f",
+      "upstreamPath": "public/data/skins/middleage_caucasian_male/textures/middleage_lightskinned_male_diffuse.png",
+      "url": "https://raw.githubusercontent.com/makehuman-js/makehuman-data/e5d1a42cb469025a6d2b3ecea3e0252e6feccc1f/public/data/skins/middleage_caucasian_male/textures/middleage_lightskinned_male_diffuse.png",
+      "bytes": 262955,
+      "sha256": "2fcba10dea50d21dcd5b2582ac7cbe82bb2a0a5ddc9fd9ea55587056734d7d31",
+      "license": "Current asset-specific CC0 grant by MakeHuman Community; see skin-license-evidence.json"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "stage": "Native desktop face screenshot only; full regression not repeated",
+  "header": "EMBER MAGE · 美术预览 0.3.0",
+  "info": {
+    "errors": [],
+    "bad": [],
+    "warnings": [],
+    "failed": [],
+    "hashes": {
+      "game": "62c782341e67a3abcfb1c0aa6adc679593e8312177457a8514412dab1a9c9775",
+      "hero": "cc5823cd03c976b4ac52dc1b47d988557fd7ee869a4749cd8123cb208106bf43"
+    },
+    "resourceModels": [
+      {
+        "url": "http://127.0.0.1:5182/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ]
+  },
+  "preview": {
+    "height": 2.01552720602532,
+    "facePosition": [
+      -0.023840193146733486,
+      1.793834735015688,
+      0.1313563549618869
+    ],
+    "camera": [
+      0.07,
+      1.813834735015688,
+      1.2124548325525688
+    ],
+    "view": "face",
+    "zoom": 1,
+    "rotation": 0,
+    "boundsMin": [
+      -0.46158761862194675,
+      0.017999832550259713,
+      -0.29463097693827944
+    ],
+    "boundsMax": [
+      0.4259218013950261,
+      2.0335270385755795,
+      0.46817688787130884
+    ],
+    "mixerTime": 0.1666999999999971,
+    "pointers": 0
+  },
+  "screenshot": "/workspace/scratch/art-qa/release-face.png",
+  "sha256": "6e4d8877f55c078a2f3e6011153e8c8d8a6f04380c9dc6a2acbfe4c5915cc2de",
+  "limitations": [
+    "Headless Chromium SwiftShader; no real-device or hardware performance evidence.",
+    "Native UI clicks and default renderer; diagnostic snapshots only, no scene/pose/material override."
+  ]
+}
