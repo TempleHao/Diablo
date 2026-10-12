@@ -30,7 +30,7 @@ Chromium/headless SwiftShader真实运行，最新模块下23项完整游戏回�
 
 证据：[完整游戏23项](qa/art2-browser-regression.json)、[最新6专项](qa/art2-lifecycle-final.json)、[原生30采样](qa/art2-native-poses.json)、[上版冻结结构与成本](qa/art2-baseline.json)。实际图：[本版全身](screenshots/art2-full-desktop.png)、[本版面部](screenshots/art2-face-desktop.png)、[手机视口](screenshots/art2-mobile-face.png)；相同镜头[上版全身](screenshots/art2-before-full-desktop.png)/[上版面部](screenshots/art2-before-face-desktop.png)。这些都是实际GLB渲染，不是概念图。
 
-Pages尚未集成验证，代码提交成功不等于部署成功。
+代码`69b3fe3e1a93888461f68303c3fc68dee5dab432`已集成main；Pages运行[38288739602](https://github.com/TempleHao/Diablo/actions/runs/38288739602)、job114943347491的check/upload/deploy全部success。已验证候选`e325f59c3bd8c168b8152884c4595213b7b5f5e4`，51个交付文件的Git blob SHA与本地候选一致。此发布仅为A/B/C阶段预览；ART-02仍in_progress。github.io直接访问受环境网络策略阻止，没有执行线上URL浏览器回归。
 
 ## 未测试与未达到
 

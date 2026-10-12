@@ -3,7 +3,7 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.3.0-preview.2",
   "designVersion": "1.0",
-  "status": "running",
+  "status": "ready",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "ART-02",
@@ -13,35 +13,28 @@
     "D1-01",
     "ART-01"
   ],
-  "lastCompletedWorkCommit": "41a9e7361804dd88edba148734b218747cd2146f",
+  "lastCompletedWorkCommit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
   "lastKnownSuccessfulDeployment": {
-    "commit": "41a9e7361804dd88edba148734b218747cd2146f",
-    "runId": 38252648722,
-    "jobId": 114822611976,
+    "commit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+    "runId": 38288739602,
+    "jobId": 114943347491,
     "conclusion": "success"
   },
-  "activeRun": {
-    "runId": "auto-ART-02-20261012172128-73c3b1d8",
-    "taskId": "ART-02",
-    "trigger": "continuation",
-    "startedAt": "2026-10-12T17:21:28Z",
-    "heartbeatAt": "2026-10-12T18:06:53Z",
-    "leaseExpiresAt": "2026-10-12T20:06:53.000Z"
-  },
+  "activeRun": null,
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
-  "resumeBranch": "checkpoint/art-02",
-  "resumeCommit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-  "nextAction": "Check Pages for verified ART-02 A/B/C preview integration, persist actual deployment and release this lease. Then same ART-02 finite D: repair cloth-tail normal/atlas/decimation artifacts, refine scalp/hair, face UV/skin roughness and garment high-to-low normal/wear. User art target remains unmet; do not advance ART-03/D1.",
+  "resumeBranch": null,
+  "resumeCommit": null,
+  "nextAction": "ART-02 D (same in_progress package): from latest main, repair cloth-tail normal/atlas/decimation black spots/fold lines, then scalp/hair integration, face UV/skin roughness and garment cut/tension/high-to-low normal bake/position wear. Save per bounded step and compare actual native close-up/gameplay. Commercial/user art acceptance remains unmet; do not jump to ART-03 or D1-02.",
   "lastAttempt": {
     "runId": "auto-ART-02-20261012172128-73c3b1d8",
     "taskId": "ART-02",
     "startedAt": "2026-10-12T17:21:28Z",
-    "status": "running",
-    "phase": "verified-partial-preview-integrating-pages-pending",
+    "status": "partial-validated-and-published",
+    "phase": "bounded-abc-preview-published-art-task-still-in-progress",
     "checkpointCommit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
     "validation": {
       "saveTests": {
@@ -70,13 +63,22 @@
         "Waxy skin/faint brow/scalp shell/cloth surface wear"
       ]
     },
-    "integrationFromCheckpoint": "e325f59c3bd8c168b8152884c4595213b7b5f5e4"
+    "integrationFromCheckpoint": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
+    "finishedAt": "2026-10-12T18:09:03Z",
+    "codeCommit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+    "deployment": {
+      "commit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+      "runId": 38288739602,
+      "jobId": 114943347491,
+      "conclusion": "success"
+    },
+    "publishedFiles": "51 changed deliverable files match verified local snapshot by Git blob SHA"
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T18:06:53Z",
+  "lastUpdatedAt": "2026-10-12T18:09:03Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
     "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
@@ -95,7 +97,7 @@
   "lastWorkBranch": {
     "name": "checkpoint/art-02",
     "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-    "status": "validated-partial-awaiting-integration"
+    "status": "validated-partial-integrated"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
@@ -154,12 +156,19 @@
         "D: cloth normal/atlas/decimation artifacts, scalp/hair/face UV/skin and garment high-to-low surface polish",
         "User commercial-art acceptance"
       ],
-      "verifiedPreviewVersion": "0.3.0-preview.2"
+      "verifiedPreviewVersion": "0.3.0-preview.2",
+      "publishedSubsteps": [
+        "A",
+        "B",
+        "C"
+      ],
+      "codeCommit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+      "deployment": {
+        "commit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+        "runId": 38288739602,
+        "jobId": 114943347491,
+        "conclusion": "success"
+      }
     }
-  },
-  "deploymentPending": {
-    "version": "0.3.0-preview.2",
-    "fromCheckpoint": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-    "status": "pending"
   }
 }
