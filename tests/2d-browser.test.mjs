@@ -22,6 +22,13 @@ try{
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
     await page.waitForTimeout(300);
+    // Real sprite art must load and decode, not just a successful HTML response.
+    const spriteState = await page.evaluate(async () => {
+      const art = await import('./art.js');
+      await art.preload();
+      return art.artStatus();
+    });
+    assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
