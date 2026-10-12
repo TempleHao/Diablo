@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131a"><meta name="description" content="余烬纪事 2D：原创俯视角地牢动作 RPG。单机免费，刷怪、装备与成长。">
+<title>余烬纪事 2D | 灰烬边境</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
+<header class="topbar">
+  <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 原型 v0.1</span><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+</header>
+<section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · 地窟入口</span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
+<div class="eventlog" id="eventlog" aria-live="polite"></div>
+<div id="boss-ui" class="bossbar" hidden><span>空潮领主 · 失名者</span><div class="meter"><i id="boss-meter"></i></div></div>
+<div class="minimap"><canvas id="minimap" width="150" height="112" aria-label="小地图"></canvas><small>灰烬地窟</small></div>
+<footer class="hud">
+  <div class="vitalblock"><div class="orb health"><span id="hp-num">105</span><small>生命</small></div><div class="portrait"><span>✦</span><strong id="level">LV 01</strong></div><div class="orb energy"><span id="mana-num">100</span><small>法力</small></div><div class="xpbar"><i id="xp-fill"></i></div></div>
+  <div class="abilitybar" id="abilitybar">
+    <button type="button" data-skill="fire" class="fire"><span class="ability-icon">✹</span><b>余烬箭</b><small>1 · 连发</small><i></i></button>
+    <button type="button" data-skill="ice" class="ice"><span class="ability-icon">❄</span><b>霜环</b><small>2 · 30 法力</small><i></i></button>
+    <button type="button" data-skill="blink" class="blink"><span class="ability-icon">ϟ</span><b>闪现</b><small>空格 · 20 法力</small><i></i></button>
+    <button type="button" data-skill="heal" class="heal"><span class="ability-icon">✚</span><b>药水</b><small>3 · 恢复生命</small><i></i></button>
+  </div>
+  <div class="resource"><small>金币</small><strong id="gold">0</strong><small>精华</small><strong id="essence">0</strong></div>
+</footer>
+<div class="joystick" id="joystick" aria-label="触摸摇杆"><span id="stick"></span></div>
+<div class="tip">WASD 移动 · 鼠标瞄准 / 左键攻击 · B 行囊 · ESC 暂停</div>
+<div id="scrim" class="scrim">
+  <section class="modal" id="modal" aria-live="polite">
+    <div class="crest">✦</div><span class="eyebrow">原创俯视角暗黑 ARPG</span>
+    <h1>余烬<span>纪事</span></h1>
+    <p class="lead">断昼之后，最后的火种在黑暗里微微颤动。</p>
+    <p>你是灰烬边境的持灯者。深入地窟，击败徘徊的空潮仆从，夺回失落的炉心。装备与成长将随每一次远征保留。</p>
+    <div class="features"><span>✧ 2D 即时战斗</span><span>✧ 随机装备</span><span>✧ 离线本机存档</span></div>
+    <button class="primary" id="modal-primary" type="button">进入灰烬地窟 <span>→</span></button>
+    <button class="subtle" id="modal-secondary" type="button" hidden>继续游戏</button>
+    <small class="fineprint">免费单人原型 · 不使用原版暗黑破坏神素材 · 建议桌面或手机横屏</small>
+  </section>
+</div>
+<div id="inventory" class="panel-wrap" hidden>
+  <section class="inventory-panel" role="dialog" aria-modal="true" aria-labelledby="inv-heading">
+    <div class="panel-head"><div><span class="eyebrow">持灯者 / 装备与成长</span><h2 id="inv-heading">旅人的行囊</h2></div><button type="button" id="inv-close" class="icon-button">✕</button></div>
+    <div class="character-stats" id="character-stats"></div>
+    <div class="equipment" id="equipment"></div>
+    <div class="panel-subhead"><strong>背包</strong><span id="bag-count">0 / 30</span></div>
+    <div class="inventory-items" id="inventory-items"></div>
+    <div class="save-buttons"><button id="export-save" type="button">导出角色存档</button><button id="import-save" type="button">导入存档</button><input type="file" id="save-file" accept=".json,application/json" hidden></div>
+    <small class="fineprint">装备点击即可穿戴；未装备的物品可分解为精华。存档自动保存到当前浏览器。</small>
+  </section>
+</div>
+<script type="module" src="./game.js"></script>
+</body>
+</html>
