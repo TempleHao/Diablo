@@ -38,7 +38,7 @@ function build() {
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
-  const kinds=['wretch','wretch','archer','wretch','brute','archer','wretch','wretch','brute','archer','wretch','wretch','archer','brute'];
+  const kinds=['wretch','wretch','archer','wretch','brute','archer','wretch','wretch','brute','archer','wretch','brute'];
   for(const kind of kinds)spawn(kind);
   ui.boss.hidden=true;
   ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
@@ -294,11 +294,17 @@ function render(){
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
   Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick);
-  for(const b of dungeon.blocks)if(b.x+b.w>cam.x-25&&b.x<cam.x+vw+25&&b.y+b.h>cam.y-25&&b.y<cam.y+vh+25)stoneDraw(b);
-  for(const t of dungeon.torches)if(Math.abs(t.x-hero.x)<vw+100&&Math.abs(t.y-hero.y)<vh+100)torchDraw(t);
-  for(const d of drops) Art.loot(ctx,d,tick);
-  for(const e of enemies)enemyDraw(e);
-  heroDraw();
+  // Painter's order: stonework and props occlude actors when they stand behind them.
+  const layers=[];
+  for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
+    layers.push({y:b.y+b.h+9,render:()=>stoneDraw(b)});
+  for(const t of dungeon.torches)if(t.x>cam.x-160&&t.x<cam.x+vw+160&&t.y>cam.y-160&&t.y<cam.y+vh+160)
+    layers.push({y:t.y+13,render:()=>torchDraw(t)});
+  for(const d of drops)layers.push({y:d.y+7,render:()=>Art.loot(ctx,d,tick)});
+  for(const e of enemies)layers.push({y:e.y+10,render:()=>enemyDraw(e)});
+  layers.push({y:hero.y+10,render:heroDraw});
+  layers.sort((a,b)=>a.y-b.y);
+  for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
   for(const h of hazards){ctx.strokeStyle=h.type==='nova'?'#9bdffcaa':'#ad72d18c';ctx.lineWidth=h.type==='nova'?9:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,7);ctx.stroke();}
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
