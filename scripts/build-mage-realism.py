@@ -119,7 +119,7 @@ cloth = textured('Weathered charcoal linen', (.061,.055,.050), 'cloth')
 red = textured('Oxblood wool', (.115,.032,.024), 'cloth')
 leather = textured('Cracked umber leather', (.098,.060,.034), 'leather')
 metal = textured('Patinated bronze', (.19,.145,.080), 'metal', .75)
-hair = textured('Grey black hair', (.044,.039,.035), 'hair')
+hair = textured('Grey black hair', (.019,.017,.015), 'hair')
 dark = bpy.data.materials.new('Eye wet dark'); dark.use_nodes=True
 dark.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=(.095,.065,.036,1)
 dark.node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.24
@@ -161,8 +161,13 @@ body=source_mesh('Continuous mature face neck and articulated hands',visible,ski
 colors=body.data.color_attributes.new(name='SkinTint',type='BYTE_COLOR',domain='CORNER')
 for loop in body.data.loops:
     v=body.data.vertices[loop.vertex_index].co
-    stubble=max(0,min(1,(1.785-v.z)/.055)) if v.y<-.045 and v.z>1.67 else 0
-    colors.data[loop.index].color=(1-stubble*.23,1-stubble*.27,1-stubble*.27,1)
+    # The beard fades at the cheek rather than making a horizontal painted band.
+    cheekline=1.757+.018*(abs(v.x)/.063)**.6
+    stubble=max(0,min(1,(cheekline-v.z)/.021)) if v.y<-.045 and 1.69<v.z<1.795 else 0
+    lip_clear=math.exp(-((v.z-1.734)/.007)**2)*math.exp(-(v.x/.023)**4)
+    stubble*=1-lip_clear*.90
+    stipple=.80+.20*math.sin(v.x*1867+math.sin(v.z*1121)*2.5)**2
+    colors.data[loop.index].color=(1-stubble*.19*stipple,1-stubble*.23*stipple,1-stubble*.22*stipple,1)
 snodes=skin.node_tree.nodes;slinks=skin.node_tree.links;sp=snodes.get('Principled BSDF')
 oldlink=next(l for l in slinks if l.to_node==sp and l.to_socket==sp.inputs['Base Color'])
 baseout=oldlink.from_socket;slinks.remove(oldlink)
@@ -202,8 +207,18 @@ for k in range(17):
     row=[]
     for j in range(41):
         a=j/40*math.tau
-        fold=.0025*math.sin(a*13+z*7)+.002*math.sin(a*7-z*6)
-        row.append(((rx+fold)*math.sin(a),-(ry+fold)*math.cos(a),z))
+        # Broad bias folds descend from the shoulder/armpit and gather at the belt.
+        # Their amplitude is tied to garment tension, instead of uniform ripples.
+        waist=math.exp(-((z-1.14)/.100)**2)
+        chest=math.exp(-((z-1.44)/.17)**2)
+        side_tension=abs(math.sin(a))**4
+        front=max(0,math.cos(a))**2
+        fold=.0020*math.sin(a*11+z*7)
+        fold+=waist*(.0070*math.sin(a*9+z*16)+.0045*math.sin(a*15-z*7))
+        fold+=chest*side_tension*.008*math.sin(a*6+z*27)
+        fold+=front*.0035*math.sin(a*7-z*20)*chest
+        neck_open=.027*max(0,math.cos(a))**3*math.exp(-((t-1)/.15)**2)
+        row.append(((rx+fold)*math.sin(a),-(ry+fold)*math.cos(a),z+.002*waist*math.sin(a*9)-neck_open))
     torso_rows.append(row)
 strip('Tailored continuous linen torso',torso_rows,cloth)
 for side,sgn in [('L',1),('R',-1)]:
@@ -221,7 +236,10 @@ for side,sgn in [('L',1),('R',-1)]:
         radius=.088*(1-t)+.055*t+.008*math.sin(t*math.pi)
         row=[]
         for j in range(25):
-            a=j/24*math.tau;r=radius+.0028*math.sin(a*7+t*4)+.002*math.sin(t*30)*math.sin(a)**2
+            a=j/24*math.tau
+            elbow_fold=math.exp(-((t-.51)/.105)**2)*(.008*math.sin(t*58+a*1.4)+.003*math.sin(t*33-a*2))
+            cuff_gather=math.exp(-((t-.92)/.085)**2)*.004*math.sin(a*8+t*29)
+            r=radius+.0025*math.sin(a*7+t*4)+elbow_fold*(.40+.60*math.sin(a)**2)+cuff_gather
             row.append(p+r*(axis*math.cos(a)+other*math.sin(a)))
         rows.append(row)
     strip('Continuous full length linen sleeve '+side,rows,cloth)
@@ -242,7 +260,9 @@ for side in [-1,1]:
         for j in range(25):
             a=(.22+j/24*(math.pi-.42))*side
             rx=.225+t*.073; ry=.155+t*.08
-            fold=math.sin(a*11+t*.55)*(.003+t*.014)
+            fold=math.sin(a*9+t*.55)*(.005+t*.019)
+            fold+=math.exp(-((t-.12)/.17)**2)*.007*math.sin(a*12+t*21)
+            fold+=.004*math.sin(a*5-t*3.8)*math.sin(t*math.pi)
             row.append(((rx+fold)*math.sin(a),-(ry+fold)*math.cos(a),z+.028*math.sin(a*3)*t*t))
         rows.append(row)
     strip('Split coat tail '+str(side),rows,cloth)
@@ -269,7 +289,8 @@ for k in range(13):
     for j in range(31):
         a=-math.pi*.53+j/30*math.pi*1.06
         width=.31+math.sin(t*math.pi)*.02+t*.04
-        row.append((math.sin(a)*width, .055+math.cos(a)*(.105+t*.075),1.65-t*.38-.035*math.cos(a*5)*t))
+        sag=.021*math.sin(a*4+t*5)*math.sin(t*math.pi)
+        row.append((math.sin(a)*(width+sag), .055+math.cos(a)*(.105+t*.075+sag),1.65-t*.38-.035*math.cos(a*5)*t))
     rows.append(row)
 strip('Shoulder mantle with gravity folds',rows,red,'spine01')
 
@@ -292,8 +313,17 @@ def band(name, center, radii, height, mat, bone, count=64):
         z=center[2]+(k/2-.5)*height
         rows.append([(center[0]+radii[0]*math.sin(j/(count-1)*math.tau),center[1]-radii[1]*math.cos(j/(count-1)*math.tau),z) for j in range(count)])
     return strip(name,rows,mat,bone)
-band('Broad leather waist belt',(0,-.017,1.095),(.227,.164),.085,leather,'root')
-band('Raised standing collar',(0,-.013,1.677),(.085,.092),.076,leather,'neck01',40)
+band('Broad leather waist belt',(0,0,1.095),(.226,.157),.085,leather,'root')
+collar_rows=[]
+for k in range(5):
+    row=[]
+    for a in np.linspace(0,math.tau,48):
+        front=max(0,math.cos(a))**3
+        z=1.650+k/4*.059-.025*front
+        row.append((.079*math.sin(a),-.008-.080*math.cos(a),z))
+    collar_rows.append(row)
+strip('Soft open front standing leather collar',collar_rows,leather,'neck01')
+tube('Rounded rolled collar top',[(.079*math.sin(a),-.008-.080*math.cos(a),1.709-.025*max(0,math.cos(a))**3) for a in np.linspace(0,math.tau,49)],.0022,leather,'neck01',6)
 for side in [-1,1]:
     # Anatomically curved leather shoulder yoke rather than spherical pauldrons.
     rows=[]
@@ -301,7 +331,8 @@ for side in [-1,1]:
         t=k/8;row=[]
         for j in range(17):
             u=j/16
-            row.append((side*(.145+.205*t),-.082+u*.185,1.62-.060*t+.038*math.sin(u*math.pi)))
+            # Soft, anatomically seated leather yoke: no pointed floating pauldron.
+            row.append((side*(.130+.145*t),-.082+u*.174,1.636-.086*t+.026*math.sin(u*math.pi)-.005*math.sin(t*math.pi*3)))
         rows.append(row)
     strip('Segmented leather shoulder yoke '+str(side),rows,leather,'shoulder01.'+('L' if side>0 else 'R'))
     for z in [.22,.29]:
@@ -317,6 +348,29 @@ for k in range(20):
     rows.append([(x-.019,torso_front(x-.019,z-.014)-.010,z-.014),(x+.019,torso_front(x+.019,z+.014)-.010,z+.014)])
 harness=strip('Flat fitted cross-body leather harness',rows,leather,'spine02')
 harness.data.set_sharp_from_angle(angle=.75)
+# Real garment construction reads through sewn edges and overlapping panels.
+for side in [-1,1]:
+    seam=[]
+    for z in np.linspace(1.15,1.60,20):
+        x=side*(.105+.018*math.sin((z-1.15)/.45*math.pi))
+        seam.append((x,torso_front(x,z)-.012,z))
+    tube('Raised sewn facing margin '+str(side),seam,.0017,red,None,6)
+    seam=[]
+    for t in np.linspace(0,1,14):
+        x=side*(.130+.145*t);z=1.636-.086*t-.005*math.sin(t*math.pi*3)
+        seam.append((x,-.084,z+.002))
+    tube('Shoulder yoke rolled seam '+str(side),seam,.0020,leather,'shoulder01.'+('L' if side>0 else 'R'),6)
+    # Interrupted stitches are seated in the yoke, rather than rivets or clutter.
+    for t in np.linspace(.09,.92,11):
+        x=side*(.130+.145*t);z=1.636-.086*t-.005*math.sin(t*math.pi*3)
+        tube('Subdued yoke saddle stitch',[(x,-.082,z+.003),(x+side*.003,-.082,z+.002)],.0006,red,'shoulder01.'+('L' if side>0 else 'R'),4)
+# Cross harness terminates beneath the standing collar and under the waist belt.
+for k in [-1,1]:
+    edge=[]
+    for t in np.linspace(0,1,24):
+        x=-.155+t*.30+k*.018;z=1.56-t*.41+k*.013
+        edge.append((x,torso_front(x,z)-.016,z))
+    tube('Rolled leather chest harness edge',edge,.0014,leather,'spine02',6)
 def cube(name,loc,scale,mat,bone):
     bpy.ops.mesh.primitive_cube_add(size=1,location=loc);obj=bpy.context.object;obj.name=name;obj.scale=scale
     bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
@@ -369,7 +423,7 @@ if eye_path.exists():
 def hairline(v):
     front=max(0,min(1,(-v[1]+.025)/.15))
     temple=math.exp(-((abs(v[0])-.066)/.026)**2)
-    return v[2]-(1.775+.083*front+.020*temple*front)
+    return v[2]-(1.775+.083*front+.020*temple*front+.0018*math.sin(v[0]*174)*front)
 # Clip the existing cranial polygons against a continuous receding hairline.
 # Interpolated boundary vertices remove the previous square, jagged edge.
 hairverts=[];hairfaces=[];hairuv=[]
@@ -391,6 +445,93 @@ bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bp
 for v in scalp.data.vertices:v.co+=v.normal*.0018
 scalp.data.update()
 
+# Original strand cards have a rooted, swept direction and lifted silhouette.
+# The close crop above is only a dark underlayer: 136 overlapping tapered cards
+# provide the broken hairline, crown volume, temple flow and soft nape edge.
+# This atlas is authored procedurally, rather than a downloaded groom or game asset.
+H,W=1024,512
+hy,hx=np.mgrid[:H,:W];u=(hx+.5)/W;v=(hy+.5)/H
+hair_alpha=np.zeros((H,W),dtype=np.float32)
+hair_shade=np.zeros((H,W),dtype=np.float32)
+for n in range(28):
+    strand_center=(n+.55)/28 + .010*np.sin(v*5.1+n*.71)+.003*np.sin(v*19+n)
+    root_width=.0035+((n*7)%11)*.00024
+    taper=np.clip((1-v)/.21,0,1)**.55
+    strand=np.exp(-((u-strand_center)/(root_width*taper+.0003))**4)
+    strand*=np.clip(v/.023,0,1)*np.clip((1-v-.015*((n*13)%7))/ .065,0,1)
+    hair_alpha=np.maximum(hair_alpha,strand)
+    hair_shade=np.maximum(hair_shade,strand*(.40+.28*((n*11)%17)/17))
+hair_rgba=np.zeros((H,W,4),np.float32)
+hair_rgba[:,:,:3]=np.array([.060,.052,.044])[None,None,:]*(.68+hair_shade[:,:,None])
+# A few silver fibres keep the mature character's grey hair subdued in light.
+silver=(np.sin(u*28*math.tau+v*.8)>.97)&(hair_alpha>.4)
+hair_rgba[:,:,:3]+=silver[:,:,None]*np.array([.032,.029,.025])
+hair_rgba[:,:,3]=hair_alpha
+hair_im=bpy.data.images.new('Original swept strand RGBA',width=W,height=H,alpha=True)
+hair_im.pixels.foreach_set(hair_rgba.ravel());hair_im.filepath_raw=str(out/'Original swept strand RGBA.png');hair_im.file_format='PNG';hair_im.save();hair_im.pack()
+strand_hair=bpy.data.materials.new('Original swept grey black hair MASK');strand_hair.use_nodes=True
+hp=strand_hair.node_tree.nodes.get('Principled BSDF');hp.inputs['Roughness'].default_value=.71
+ht=strand_hair.node_tree.nodes.new('ShaderNodeTexImage');ht.image=hair_im
+strand_hair.node_tree.links.new(ht.outputs['Color'],hp.inputs['Base Color'])
+hc=strand_hair.node_tree.nodes.new('ShaderNodeMath');hc.operation='GREATER_THAN';hc.inputs[1].default_value=.34
+strand_hair.node_tree.links.new(ht.outputs['Alpha'],hc.inputs[0]);strand_hair.node_tree.links.new(hc.outputs[0],hp.inputs['Alpha'])
+strand_hair.surface_render_method='DITHERED';strand_hair.use_backface_culling=False
+def hair_card(name,path,width):
+    verts=[];rows=[]
+    for k,p in enumerate(path):
+        p=np.asarray(p);t=k/(len(path)-1)
+        tangent=np.asarray(path[min(k+1,len(path)-1)])-np.asarray(path[max(0,k-1)])
+        normal=p-np.array([0,.013,1.804]);normal/=np.linalg.norm(normal)
+        across=np.cross(tangent,normal);across/=np.linalg.norm(across)
+        w=width*(.72+.28*math.sin(t*math.pi))*max(.08,min(1,(1-t)*6))
+        rows.append([p-across*w*.5,p+across*w*.5])
+    faces=[(k*2,k*2+1,k*2+3,k*2+2) for k in range(len(rows)-1)]
+    uv=[[(0,k/(len(rows)-1)),(1,k/(len(rows)-1)),(1,(k+1)/(len(rows)-1)),(0,(k+1)/(len(rows)-1))] for k in range(len(rows)-1)]
+    return make_mesh(name,[p for row in rows for p in row],faces,strand_hair,uv,rigid='head')
+def crown_point(x,y,lift):
+    z=1.803+.108*math.sqrt(max(.045,1-(x/.089)**2-((y-.014)/.109)**2))
+    p=np.array([x,y,z]);normal=p-np.array([0,.014,1.803]);normal/=np.linalg.norm(normal)
+    return p+normal*lift
+for layer in range(3):
+    for j in range(24):
+        x=-.073+j/23*.146
+        path=[]
+        edge=math.sqrt(max(.10,1-(x/.089)**2))
+        front_y=.014-.109*edge*.88
+        back_y=.014+.109*edge*.74
+        for k in range(9):
+            t=k/8;y=front_y+layer*.0018+t*(back_y-front_y-layer*.006)
+            sweep=.010*math.sin(t*math.pi)*(1-abs(x)/.095)
+            path.append(crown_point(x+sweep,y,.003+layer*.003+.006*math.sin(t*math.pi)))
+        hair_card('Swept crown strand card %d %d'%(layer,j),path,.0105)
+# Eight readable, irregular forelocks bridge the frontal underlayer and crown.
+# Their roots follow the recession and their lift is limited to normal hair volume.
+for j in range(8):
+    x=-.051+j/7*.102;edge=math.sqrt(1-(x/.089)**2);path=[]
+    for k in range(10):
+        t=k/9;y=.014-.109*edge*.94+t*.105
+        p=crown_point(x+.014*math.sin(t*math.pi),y,.004+.012*math.sin(t*math.pi))
+        p[2]+=.002*math.sin(j*2.3+t*4.7)*math.sin(t*math.pi)
+        path.append(p)
+    hair_card('Broken frontal forelock '+str(j),path,.014)
+for side in [-1,1]:
+    for j in range(22):
+        a=-.75+j/21*1.5
+        path=[]
+        for k in range(8):
+            t=k/7;ang=a+t*.38
+            x=side*(.073+.013*math.sin(t*math.pi))*math.cos(ang*.48)
+            y=.006+.075*math.sin(ang)-.009*(1-t)
+            z=1.877-j%3*.006-t*(.055+.019*math.cos(a))
+            path.append((x,y,z))
+        hair_card('Combed temple and sideburn card %d %d'%(side,j),path,.010)
+for j in range(20):
+    a=-1.10+j/19*2.20;path=[]
+    for k in range(8):
+        t=k/7
+        path.append((.078*math.sin(a),.013+.085*math.cos(a)+.004*math.sin(t*math.pi),1.873-t*.086-j%3*.002))
+    hair_card('Tapered nape strand card %d'%j,path,.012)
+
 # Small tapered brow ribbons follow the anatomical brow ridge. They remain
 # flush to the face; separate raised cylinders would distort its silhouette.
 brow=bpy.data.materials.new('Fine grey brown brow strands');brow.use_nodes=True
@@ -399,7 +540,7 @@ brow_y,brow_x=np.mgrid[:128,:512]
 strand=np.maximum(0,np.sin(brow_x*.58+brow_y*.16+np.sin(brow_x*.061)))**5
 envelope=np.exp(-((brow_y-64)/29)**2)*np.sin((brow_x+.5)/512*math.pi)**.35
 alpha=np.clip((strand*.95+.10)*envelope,0,1)
-brow_rgba=np.zeros((128,512,4),np.float32);brow_rgba[:,:,:3]=(.28,.23,.19);brow_rgba[:,:,3]=alpha
+brow_rgba=np.zeros((128,512,4),np.float32);brow_rgba[:,:,:3]=(.070,.055,.042);brow_rgba[:,:,3]=alpha
 brow_im=bpy.data.images.new('Original fine brow alpha',width=512,height=128,alpha=True)
 brow_im.pixels.foreach_set(brow_rgba.ravel());brow_im.filepath_raw=str(out/'Original fine brow alpha.png');brow_im.file_format='PNG';brow_im.save();brow_im.pack()
 bt=brow.node_tree.nodes.new('ShaderNodeTexImage');bt.image=brow_im
@@ -411,7 +552,7 @@ for side in [-1,1]:
         t=k/24;x=side*(.014+t*.044);z=1.808+.003*math.sin(t*math.pi)-.004*t
         nearby=coords[(abs(coords[:,0]-x)<.009)&(abs(coords[:,2]-z)<.007)]
         y=nearby[:,1].min()-.0015
-        width=.0006+.0015*math.sin(t*math.pi)**.65
+        width=.0008+.0023*math.sin(t*math.pi)**.65
         rows.append([(x,y,z-width),(x,y-.0007,z+width)])
     browuv=[[(k/24,0),(k/24,1),((k+1)/24,1),((k+1)/24,0)] for k in range(24)]
     make_mesh('Tapered natural brow '+str(side),[p for row in rows for p in row],[(k*2,k*2+1,k*2+3,k*2+2) for k in range(24)],brow,browuv,rigid='head')
@@ -471,20 +612,31 @@ for side,sign in [('L',1),('R',-1)]:
     if pb:
         m=pb.matrix.copy();pos=m.translation.copy();m=Matrix.Rotation(.40*sign,4,'Y')@m;m.translation=pos;pb.matrix=m
 bpy.context.view_layer.update()
-# Turn the wrist so the finger curl encloses a vertical shaft. Leaving its
-# default plane produced a horizontal pinch beside, rather than around, staff.
+# Orient the actual palm transverse axis along the staff. A fixed Euler wrist
+# rotation had left the palm horizontal, with the shaft sitting on a finger shelf.
 pb=rig.pose.bones['wrist.R'];m=pb.matrix.copy();pos=m.translation.copy()
-m=Matrix.Rotation(-math.pi/2,4,'Y')@m;m.translation=pos;pb.matrix=m
+across=(rig.pose.bones['finger2-1.R'].head-rig.pose.bones['finger5-1.R'].head).normalized()
+longitudinal=(rig.pose.bones['finger3-1.R'].head-pb.tail)
+longitudinal=(longitudinal-across*longitudinal.dot(across)).normalized()
+palm_basis=Matrix((across,longitudinal,across.cross(longitudinal))).transposed()
+grip_basis=Matrix((Vector((0,0,1)),Vector((0,-1,0)),Vector((1,0,0)))).transposed()
+m=(grip_basis@palm_basis.inverted()).to_4x4()@m;m.translation=pos;pb.matrix=m
+bpy.context.view_layer.update()
+def curl_about_shaft(name,angle):
+    pb=rig.pose.bones.get(name)
+    if not pb:return
+    m=pb.matrix.copy();p=m.translation.copy()
+    m=Matrix.Rotation(angle,4,'Z')@m;m.translation=p;pb.matrix=m
+    bpy.context.view_layer.update()
 for finger in range(2,6):
-    for knuckle,angle in [(1,-.38),(2,-.76),(3,-.65)]:
-        pb=rig.pose.bones.get('finger%d-%d.R'%(finger,knuckle))
-        if pb:pb.rotation_mode='XYZ';pb.rotation_euler.x=angle
-for knuckle,angle in [(1,-.32),(2,-.45),(3,-.25)]:
-    pb=rig.pose.bones['finger1-%d.R'%knuckle];pb.rotation_mode='XYZ';pb.rotation_euler.x=angle
+    for knuckle,angle in [(1,.40),(2,1.02),(3,.90)]:
+        curl_about_shaft('finger%d-%d.R'%(finger,knuckle),angle)
+for knuckle,angle in [(1,-.30),(2,-.48),(3,-.35)]:
+    curl_about_shaft('finger1-%d.R'%knuckle,angle)
 bpy.context.view_layer.update()
 staff_matrix=rig.pose.bones[staffbone].matrix @ rig.data.bones[staffbone].matrix_local.inverted()
 staff_inverse=staff_matrix.inverted()
-grip=(rig.pose.bones['finger3-1.R'].head+rig.pose.bones['finger3-3.R'].tail)*.5
+grip=rig.pose.bones['finger3-1.R'].head+Vector((.026,-.023,0))
 staff_shift=Vector((grip.x-staffx,grip.y+.115,0))
 deps=bpy.context.evaluated_depsgraph_get()
 for obj,_,_ in parts:
@@ -516,10 +668,16 @@ for clip,length in [('Idle',72),('Walk',32),('Cast',30)]:
             rot('spine02',1,math.sin(phase)*.018)
         else:
             wave=math.sin((frame-1)/length*math.pi)
-            rot('upperarm01.L',0,-wave*.78);rot('lowerarm01.L',0,-wave*.42)
-            rot('spine02',0,-wave*.035);rot('head',0,wave*.025)
+            rot('upperarm01.L',0,-wave*.95);rot('lowerarm01.L',0,-wave*.48)
+            rot('upperarm01.L',2,wave*.20);rot('wrist.L',2,-wave*.18)
+            for finger in range(2,6):
+                rot('finger%d-1.L'%finger,0,-wave*(.12+(finger-2)*.04))
+            rot('spine02',0,-wave*.065);rot('spine02',1,wave*.09)
+            rot('upperleg01.R',0,-wave*.045);rot('lowerleg01.R',0,wave*.075)
+            rig.pose.bones['root'].location=Vector((-.008*wave,0,-.008*wave))
+            rot('head',0,wave*.045);rot('head',1,-wave*.045)
         for bone in rig.pose.bones:
-            if any(abs(x)>.00001 for x in bone.rotation_euler) or bone.name in ['root','head','spine02','upperleg01.L','upperleg01.R','lowerleg01.L','lowerleg01.R','upperarm01.L','upperarm01.R','lowerarm01.L']:
+            if any(abs(x)>.00001 for x in bone.rotation_euler) or bone.name in ['root','head','spine02','upperleg01.L','upperleg01.R','lowerleg01.L','lowerleg01.R','upperarm01.L','upperarm01.R','lowerarm01.L','wrist.L','finger2-1.L','finger3-1.L','finger4-1.L','finger5-1.L']:
                 bone.keyframe_insert(data_path='rotation_euler',frame=frame);bone.keyframe_insert(data_path='location',frame=frame)
     rig.animation_data.action=None
     track=rig.animation_data.nla_tracks.new();track.name=clip;track.strips.new(clip,1,action)
