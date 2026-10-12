@@ -15,7 +15,7 @@ try{
   if(!browser)throw new Error('Chromium missing/unavailable: '+launchError?.message);
   await sleep(750);
   for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true}]){
-    const context=await browser.newContext(viewport);
+    const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},isMobile:viewport.isMobile,hasTouch:!!viewport.hasTouch,deviceScaleFactor:1});
     const page=await context.newPage(),errs=[];
     page.on('pageerror',e=>errs.push(e.message));
     const response=await page.goto('http://127.0.0.1:8765/2d/',{waitUntil:'load'});
