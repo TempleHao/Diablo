@@ -1,10 +1,11 @@
 {
   "name": "ember-mage",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 5173 --directory dist",
-    "check": "node --check dist/game.js && node --check dist/hero.js && node --check dist/environment.js && node scripts/check-assets.mjs"
+    "check": "node --check dist/game.js && node --check dist/hero.js && node --check dist/environment.js && node --check dist/save.js && node --check dist/save-panel.js && node scripts/check-assets.mjs && node --test tests/save.test.mjs",
+    "check:browser": "node tests/browser-smoke.cjs final"
   }
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "TempleHao/Diablo",
-  "gameVersion": "0.2.0",
+  "gameVersion": "0.2.1",
   "designVersion": "1.0",
   "status": "running",
   "currentMilestone": "D1",
@@ -23,8 +23,8 @@
     "taskId": "D1-01",
     "trigger": "user",
     "startedAt": "2026-10-12T02:14:41.000Z",
-    "heartbeatAt": "2026-10-12T02:55:10Z",
-    "leaseExpiresAt": "2026-10-12T04:55:10.000Z"
+    "heartbeatAt": "2026-10-12T02:56:19Z",
+    "leaseExpiresAt": "2026-10-12T04:56:19.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -33,13 +33,13 @@
   },
   "resumeBranch": "checkpoint/d1-01",
   "resumeCommit": "f20379b6533a11b7934b30e4a65b27e4ce6cf924",
-  "nextAction": "D1-01 candidate 0.2.1 passed 61 save tests and browser regressions; publish main using branch-head lease, then verify Pages deployment before marking done.",
+  "nextAction": "Verify Pages Actions for the 0.2.1 main code commit; only on successful checks and deployment mark D1-01 done and advance to D1-02.",
   "lastAttempt": {
     "runId": "manual-D1-01-20261012021441000-2d139678",
     "taskId": "D1-01",
     "startedAt": "2026-10-12T02:14:41.000Z",
     "status": "running",
-    "phase": "validated-awaiting-integration",
+    "phase": "integrating-awaiting-pages",
     "validation": {
       "saveTests": {
         "passed": 61,
@@ -53,7 +53,7 @@
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T02:55:10Z",
+  "lastUpdatedAt": "2026-10-12T02:56:19Z",
   "validationLimitations": [
     "Full planned systems are not implemented in Demo 0.2.0",
     "Browser mobile viewport checks are not real-device performance tests",

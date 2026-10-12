@@ -1,0 +1,20 @@
+{
+  "level": 7,
+  "xp": 123,
+  "items": [
+    {
+      "id": "159f142b-0972-447b-b8de-9c9166e98b20",
+      "name": "寒霜法杖",
+      "rarity": 1,
+      "power": 18
+    },
+    {
+      "id": "69e1f847-86d5-4e87-a963-c7b1cb656f15",
+      "name": "余烬秘杖",
+      "rarity": 2,
+      "power": 31
+    }
+  ],
+  "equipped": "69e1f847-86d5-4e87-a963-c7b1cb656f15",
+  "clears": 3
+}
