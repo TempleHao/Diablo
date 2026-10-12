@@ -409,6 +409,8 @@ def reduce(obj, ratio):
     active(obj)
     dec = obj.modifiers.new('Geometric budget collapse', 'DECIMATE')
     dec.ratio = max(.06, ratio); dec.use_collapse_triangulate = True
+    while obj.modifiers.find(dec.name) > 0:
+        bpy.ops.object.modifier_move_up(modifier=dec.name)
     bpy.ops.object.modifier_apply(modifier=dec.name)
     # Collapse can interpolate two original four-weight vertices into more
     # influences. Make the intended runtime skin explicit before measuring it.
@@ -431,7 +433,7 @@ def tree(obj):
 
 
 LODS = {}
-for lod, target in (('L0', 34500), ('L1', 14900)):
+for lod, target in (('L0', 34500), ('L1', 14750)):
     objects = []
     for source in PARTS:
         obj = source.copy(); obj.data = source.data.copy(); obj.name = lod+' '+source.name
@@ -439,8 +441,8 @@ for lod, target in (('L0', 34500), ('L1', 14900)):
         if lod == 'L1':
             if is_body(source): reduce(obj, .46)
             elif is_eye(source): reduce(obj, .40)
-    fixed = sum(triangles(o) for o, s in zip(objects, PARTS) if is_body(s) or protected(s) or is_eye(s))
-    flexible = sum(triangles(o) for o, s in zip(objects, PARTS) if not (is_body(s) or protected(s) or is_eye(s)))
+    fixed = sum(triangles(o) for o, s in zip(objects, PARTS) if is_body(s) or protected(s) or is_eye(s) or triangles(o) < 100)
+    flexible = sum(triangles(o) for o, s in zip(objects, PARTS) if not (is_body(s) or protected(s) or is_eye(s)) and triangles(o) >= 100)
     ratio = min(1, (target-fixed)/max(1, flexible))
     assert ratio > .06, 'Protected geometry leaves no viable clothing budget'
     reduction = []

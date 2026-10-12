@@ -24,21 +24,26 @@ export function createMagePreview(combatAsset,canvas,requestDetail) {
   const status=document.getElementById('model-status'),retry=document.getElementById('retry-model');
 
   function adopt(asset) {
+    const rotation=copy?.rotation.y??(view==='face'?0:-.18);
     if(copy){mixer.stopAllAction();mixer.uncacheRoot(copy);scene.remove(copy);
       copy.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.boneTexture?.dispose();});}
-    copy=clone(asset.scene);copy.scale.setScalar(1);copy.rotation.y=view==='face'?0:-.18;scene.add(copy);
+    copy=clone(asset.scene);copy.scale.setScalar(1);copy.rotation.y=rotation;scene.add(copy);
     mixer=new T.AnimationMixer(copy);
     const idle=asset.animations.find(c=>c.name==='Idle');if(idle)mixer.clipAction(idle).play();mixer.update(0);
     copy.updateMatrixWorld(true);
     copy.traverse(o=>{if(o.isSkinnedMesh){o.skeleton.update();o.computeBoundingBox();}});
     bounds=new T.Box3().setFromObject(copy);height=T.MathUtils.clamp(bounds.max.y-bounds.min.y,1.6,2.5);
+    frame();
+  }
+  function refreshFacePosition() {
+    copy.updateMatrixWorld(true);
     const faceAnchor=copy.getObjectByName('face_focus'),headBone=copy.getObjectByName('head')||copy.getObjectByName('Head');
     if(faceAnchor)faceAnchor.getWorldPosition(facePosition);
     else if(headBone){headBone.getWorldPosition(facePosition);facePosition.y+=.20;}
     else facePosition.set(0,1.78,0);
-    frame();
   }
   function frame() {
+    refreshFacePosition();
     const face=view==='face',targetY=face?facePosition.y:height*.5;
     const frameHeight=face?.62:height*1.12;
     const distance=frameHeight/(2*Math.tan(T.MathUtils.degToRad(16)))*zoom;
