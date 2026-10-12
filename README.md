@@ -87,3 +87,5 @@ Chromium 桌面与手机视口检查覆盖模型加载、三段骨骼动画、�
 0.2.1的61项存档迁移/故障/恢复测试与浏览器存档回归通过，复现方法及边界见[D1-01验证记录](docs/VALIDATION-D1-01.md)。可选 `npm run check:browser` 需要另外安装Playwright Core并提供Chromium；游戏运行本身不依赖这些测试工具。
 
 0.3.0美术预览另通过23项桌面/触屏视口交互回归，新GLB与26项来源哈希检查；实际范围见[ART-01验证记录](docs/VALIDATION-ART-01.md)。可选 `npm run check:art-browser` 需要Playwright Core及Chromium。照片/截图与真机性能、美术品质验收分别记录。
+
+0.3.0-preview.2另通过61项存档测试、23项完整游戏浏览器回归、最新6项资源生命周期/取景专项及30次原生动作采样。实际范围和软件渲染限制见[ART-02验证记录](docs/VALIDATION-ART-02.md)；技术通过不表示美术验收通过。

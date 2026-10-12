@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-12T17:58:01.366Z",
+  "pass": true,
+  "record": {
+    "name": "component-initial-only-combat",
+    "detail": {
+      "models": [
+        {
+          "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+          "status": 200
+        }
+      ],
+      "detailRequests": 0,
+      "observedAt": "Before the first character open; isolated recheck for immutable initial request evidence",
+      "moduleHashes": {
+        "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+        "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+        "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+        "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+        "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+        "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+        "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+        "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa"
+      }
+    }
+  }
+}

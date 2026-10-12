@@ -36,3 +36,11 @@ This run delivers bounded ART-02 A/B/C steps only. ART-02 remains in_progress be
 Saved final GLB-import face/grip and Walk9 offline evidence, updated inspection action-name handling, true budget documentation, architecture and candidate README. Verified transferred files from checkpoint C: 21/21 Git blob hashes match the tested local snapshot. Native browser lifecycle/30 GLTFLoader poses have preliminary success; latest face-anchor correction is being tested before integration. Final publication acceptance still pending. Completed extra offline Cast imports were not claimed: those renders were stopped to let browser QA run.
 
 Observed visual issues remain recorded: L0/L1 cloth-tail black spots/fold lines, hard L1 seams/staff bands, waxy skin/scalp shell. Repair cloth normal-map/atlas/decimation artifacts first in finite ART-02 D, then actual high-to-low surface polish. Current ART-02 overall remains in_progress and user art target remains unmet.
+
+## Verified A/B/C candidate — 2026-10-12T18:05:09Z
+
+0.3.0-preview.2: eight production modules/new-old GLB/26 source hashes/two real budget GLBs/top-four weights/animation parity and 61 save tests pass. Latest frozen game HTTP files: 23 desktop/touch checks pass with zero page/console/resource errors. Latest viewer SHA256 4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa; six lifecycle/framing checks pass and corrected combat-only initial request independently rechecked. Native two LODs × three clips × five times = 30 pose samples pass. Saved portable lifecycle/poses independently rerun; standalone portable 23 configuration copy only syntax/review checked, acceptance from same-logic frozen HTTP execution.
+
+All original/generated/runtime/source/evidence files are saved. Native GLB screenshots, before/after images and immutable JSON reports are under docs/screenshots and docs/qa. No concept render is counted as a playable screenshot. Candidate is verified for these bounded functional checks; integration/Pages still pending. ART-02 remains in_progress and commercial/user art acceptance remains unmet.
+
+Next after successful release: ART-02 D, repair cloth-tail normals/atlas/decimation artifacts, then scalp/hair, face UV/skin roughness and garment high-to-low surface bake/wear. No environment or D1 task is taken in this round.

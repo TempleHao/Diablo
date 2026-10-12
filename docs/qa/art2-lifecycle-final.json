@@ -1,0 +1,325 @@
+{
+  "stage": "Final actual hero/mage-preview component lifecycle, native WebGL, final face-position fix",
+  "checks": [
+    {
+      "name": "component-initial-only-combat",
+      "detail": {
+        "models": [
+          {
+            "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+            "status": 200
+          }
+        ]
+      }
+    },
+    {
+      "name": "back-facing-detail-adoption-keeps-rotation-and-face-frames-front-anchor",
+      "detail": {
+        "beforeRotation": 3.1288000488281247,
+        "highRotation": 3.1288000488281247,
+        "facePosition": [
+          0.00043641726167960223,
+          1.7928715294412894,
+          0.1364078011220611
+        ],
+        "camera": [
+          0.07,
+          1.8128715294412894,
+          1.2175062787127429
+        ]
+      }
+    },
+    {
+      "name": "final-three-reopens-same-context-and-no-static-gpu-reuploads",
+      "detail": {
+        "requests": 1,
+        "before": [
+          {
+            "id": 1,
+            "canvasId": "model-preview",
+            "type": "webgl2",
+            "bufferData": 85,
+            "bufferBytes": 2301012,
+            "texImage2D": 9,
+            "texImage3D": 2,
+            "deleteBuffer": 49,
+            "deleteTexture": 3
+          }
+        ],
+        "after": [
+          {
+            "id": 1,
+            "canvasId": "model-preview",
+            "type": "webgl2",
+            "bufferData": 85,
+            "bufferBytes": 2301012,
+            "texImage2D": 9,
+            "texImage3D": 2,
+            "deleteBuffer": 49,
+            "deleteTexture": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "final-close-during-load-does-not-adopt-render-upload-or-create-ghost",
+      "detail": {
+        "before": {
+          "height": 2.016109561490911,
+          "facePosition": [
+            -0.02381084548422273,
+            1.7939994686505683,
+            0.13085072874460613
+          ],
+          "camera": [
+            0.07,
+            1.0880547807454555,
+            3.9373653788611316
+          ],
+          "view": "full",
+          "zoom": 1,
+          "rotation": -0.18,
+          "boundsMin": [
+            -0.48230502452581303,
+            0.017788898318817394,
+            -0.32429492613056154
+          ],
+          "boundsMax": [
+            0.457362092144264,
+            2.0338984598097283,
+            0.46304749110194277
+          ],
+          "mixerTime": 0.1833000000000002,
+          "pointers": 0,
+          "active": false,
+          "session": 2,
+          "raf": 11,
+          "quality": "combat",
+          "render": {
+            "frame": 40,
+            "calls": 3,
+            "triangles": 14969,
+            "points": 0,
+            "lines": 0
+          },
+          "memory": {
+            "geometries": 3,
+            "textures": 7
+          },
+          "clips": [
+            "Idle",
+            "Walk",
+            "Cast"
+          ],
+          "model": {
+            "meshes": [
+              {
+                "name": "Bent_bronze_focus_cage007",
+                "skinned": true,
+                "vertices": 6930,
+                "triangles": 11609
+              },
+              {
+                "name": "Bent_bronze_focus_cage007_1",
+                "skinned": true,
+                "vertices": 3036,
+                "triangles": 3104
+              }
+            ],
+            "meshCount": 2,
+            "geometryCount": 2,
+            "materialCount": 2,
+            "boneCount": 60
+          }
+        },
+        "after": {
+          "height": 2.016109561490911,
+          "facePosition": [
+            -0.02381084548422273,
+            1.7939994686505683,
+            0.13085072874460613
+          ],
+          "camera": [
+            0.07,
+            1.0880547807454555,
+            3.9373653788611316
+          ],
+          "view": "full",
+          "zoom": 1,
+          "rotation": -0.18,
+          "boundsMin": [
+            -0.48230502452581303,
+            0.017788898318817394,
+            -0.32429492613056154
+          ],
+          "boundsMax": [
+            0.457362092144264,
+            2.0338984598097283,
+            0.46304749110194277
+          ],
+          "mixerTime": 0.1833000000000002,
+          "pointers": 0,
+          "active": false,
+          "session": 2,
+          "raf": 11,
+          "quality": "combat",
+          "render": {
+            "frame": 40,
+            "calls": 3,
+            "triangles": 14969,
+            "points": 0,
+            "lines": 0
+          },
+          "memory": {
+            "geometries": 3,
+            "textures": 7
+          },
+          "clips": [
+            "Idle",
+            "Walk",
+            "Cast"
+          ],
+          "model": {
+            "meshes": [
+              {
+                "name": "Bent_bronze_focus_cage007",
+                "skinned": true,
+                "vertices": 6930,
+                "triangles": 11609
+              },
+              {
+                "name": "Bent_bronze_focus_cage007_1",
+                "skinned": true,
+                "vertices": 3036,
+                "triangles": 3104
+              }
+            ],
+            "meshCount": 2,
+            "geometryCount": 2,
+            "materialCount": 2,
+            "boneCount": 60
+          }
+        },
+        "gpu": [
+          {
+            "id": 1,
+            "canvasId": "model-preview",
+            "type": "webgl2",
+            "bufferData": 69,
+            "bufferBytes": 750818,
+            "texImage2D": 9,
+            "texImage3D": 2,
+            "deleteBuffer": 49,
+            "deleteTexture": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "final-reopen-after-closed-response-uses-detail-cache",
+      "detail": {
+        "requests": 1,
+        "quality": "detail"
+      }
+    },
+    {
+      "name": "final-detail-failure-retains-combat-and-button-retry-recovers",
+      "detail": {
+        "message": "角色细节暂时加载失败，可重试。",
+        "requests": 2,
+        "expectedInjectedHTTP": [
+          {
+            "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+            "status": 503
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "Component HTML uses the actual production hero and viewer modules with native open/close buttons. Game input/pause/layout integration is covered separately by the 23 desktop/touch/save checks.",
+    "Software WebGL counts and lifecycle evidence; no hardware performance claim."
+  ],
+  "mainInfo": {
+    "errors": [],
+    "models": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ],
+    "bad": [],
+    "hashes": {
+      "three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+      "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+      "GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+      "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+      "BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+      "SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+      "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54"
+    },
+    "detailRequests": 1
+  },
+  "raceInfo": {
+    "errors": [],
+    "models": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ],
+    "bad": [],
+    "hashes": {
+      "three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+      "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+      "GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+      "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+      "BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+      "SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+      "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54"
+    },
+    "detailRequests": 1
+  },
+  "failureInfo": {
+    "errors": [],
+    "models": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-combat.glb",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 503
+      },
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 200
+      }
+    ],
+    "bad": [
+      {
+        "url": "http://127.0.0.1:5183/models/ember-mage-realism.glb",
+        "status": 503
+      }
+    ],
+    "hashes": {
+      "three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+      "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+      "GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+      "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+      "SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+      "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+      "BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c"
+    },
+    "detailRequests": 2
+  }
+}
