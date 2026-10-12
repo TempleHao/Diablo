@@ -25,29 +25,39 @@
     "taskId": "ART-02",
     "trigger": "continuation",
     "startedAt": "2026-10-12T17:21:28Z",
-    "heartbeatAt": "2026-10-12T17:21:28Z",
-    "leaseExpiresAt": "2026-10-12T19:21:28.000Z"
+    "heartbeatAt": "2026-10-12T17:33:24Z",
+    "leaseExpiresAt": "2026-10-12T19:33:24.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
-  "resumeBranch": null,
-  "resumeCommit": null,
-  "nextAction": "ART-02 A: refine visible hair/cloth/hand details; B: simplify nonessential rig, atlas materials and create verified combat LOD; C: lazy-load close-up model and validate geometry, pose parity, touch/save/viewer regressions. Persist checkpoints per substep; no AAA or real-device performance claim.",
+  "resumeBranch": "checkpoint/art-02",
+  "resumeCommit": "d821b19af0c217697a41cfc00b55015bd3b36872",
+  "nextAction": "Resume ART-02 from checkpoint/art-02: freeze revised raw character after native render inspection, run real atlas/rig/LOD exporter, implement lazy persistent close-up viewer, verify final assets and browser/save/touch behavior before main integration.",
   "lastAttempt": {
     "runId": "auto-ART-02-20261012172128-73c3b1d8",
     "taskId": "ART-02",
     "startedAt": "2026-10-12T17:21:28Z",
     "status": "running",
-    "phase": "inspect-published-character-and-bounded-substeps"
+    "phase": "source-checkpoint-a-saved-native-render-and-final-budget-pending",
+    "checkpointCommit": "d821b19af0c217697a41cfc00b55015bd3b36872",
+    "validation": {
+      "pythonCompilation": "passed for three source scripts",
+      "preliminaryBudget": "Independent old-source run only; final new character not yet verified",
+      "unverified": [
+        "New lookdev visual result",
+        "Final budget GLBs and native regressions",
+        "Deployment"
+      ]
+    }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T17:21:28Z",
+  "lastUpdatedAt": "2026-10-12T17:33:24Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality not met; preview remains first slice, monsters remain prototype",
     "Real Android/iOS performance, GPU memory, thermals/battery and user research not tested",
@@ -63,9 +73,9 @@
     "configuredAt": "2026-10-11T21:19:10.848248+00:00"
   },
   "lastWorkBranch": {
-    "name": "checkpoint/art-01",
-    "commit": "099dc20d47e02546c74e16813dde15f2a3c61243",
-    "status": "validated-integrated"
+    "name": "checkpoint/art-02",
+    "commit": "d821b19af0c217697a41cfc00b55015bd3b36872",
+    "status": "source-checkpoint-unverified"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
