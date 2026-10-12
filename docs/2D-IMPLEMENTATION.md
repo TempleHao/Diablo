@@ -69,3 +69,12 @@ Playwright Core 和 Chrome 是**浏览器自动化测试**的可选依赖，玩�
 既有 \`.github/workflows/pages.yml\` 发布整个 \`dist/\`，因此只要主分支包含 \`dist/2d/\`，原有 Pages 成功发布后 \`/Diablo/2d/\` 就会作为子目录可用。不要为 2D 覆盖根目录 3D index。
 
 发生 2D 阻断故障时，仅撤销新增的 2D 相关入口或代码提交，不删除既有 3D 发布文件；通过 PR 与部署记录定位版本。
+
+
+## 真实画面证据（2026-10-13）
+
+- GitHub Actions 工作流：https://github.com/TempleHao/Diablo/actions/runs/38295741221
+- Chromium 桌面图：../docs/screenshots/2d-v0.2-desktop.jpg
+- Chromium 模拟手机 390 × 844（实际指定 viewport、isMobile 和 hasTouch）截图：../docs/screenshots/2d-v0.2-mobile.jpg
+- 这两张由相同仓库提交在浏览器中实际执行战斗场景后截取，没有用绘图软件或生成式概念图代替游戏画面。
+- 真实 iOS 设备上帧率、触控手感与持久运行仍未测试，必须与浏览器模拟测试区分。
