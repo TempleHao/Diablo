@@ -1,0 +1,26 @@
+name: 2D game validation
+on:
+  push:
+    branches: [feature/2d-ember-dungeon]
+    paths: ['dist/2d/**','tests/2d-*.mjs','.github/workflows/check-2d.yml','package.json']
+  pull_request:
+    paths: ['dist/2d/**','tests/2d-*.mjs','.github/workflows/check-2d.yml','package.json']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Static checks and pure game rules
+        run: |
+          node --check dist/2d/core.js
+          node --check dist/2d/game.js
+          node --test tests/2d-core.test.mjs
+      - name: Browser runtime smoke tests
+        run: |
+          npm install --no-save --package-lock=false playwright-core@1.56.1
+          node tests/2d-browser.test.mjs
