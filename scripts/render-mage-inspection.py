@@ -24,7 +24,12 @@ scene.cycles.samples=32;scene.cycles.use_denoising=False
 scene.render.resolution_x=900;scene.render.resolution_y=900
 for track in rig.animation_data.nla_tracks:track.mute=True
 def action_for(clip):
-    return next((a for a in bpy.data.actions if a.name==clip or a.name.endswith('|'+clip)),None)
+    # glTF importer names actions with their rig/slot suffix, unlike raw source.
+    action=next((strip.action for track in rig.animation_data.nla_tracks for strip in track.strips if clip in track.name or clip in strip.name or clip in strip.action.name),None)
+    action=action or next((a for a in bpy.data.actions if clip in a.name),None)
+    if action is None:raise RuntimeError('Missing required inspection action '+clip)
+    print('ART2_ACTION',clip,action.name,flush=True)
+    return action
 rig.animation_data.action=action_for('Idle');scene.frame_set(1)
 if label:
     camera.location=(.75,-2.30,1.87);camera.rotation_euler=(Vector((0,-.03,1.74))-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.lens=92

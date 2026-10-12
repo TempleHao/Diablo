@@ -30,3 +30,9 @@ Final budgeted binaries, SHA-matched statistics, 15-sample full per-part budget 
 - Preview preserves rotation on detail replacement and refreshes face anchor when reframing. Initialization failure remains closable. Lifecycle/context/GPU/touch/native rendering acceptance still pending.
 
 This run delivers bounded ART-02 A/B/C steps only. ART-02 remains in_progress because production-quality surface sculpt/bake, facial/scalp/cloth polish and user art acceptance are unmet. Next finite step after a verified preview publication is ART-02 D: refine scalp/hair integration, face UV/detail and skin roughness, and cloth surface/folds/wear with actual high-to-low normal bake; do not skip to ART-03 or D1 while this art feedback is unresolved.
+
+## Checkpoint 4 — 2026-10-12T17:52:26Z
+
+Saved final GLB-import face/grip and Walk9 offline evidence, updated inspection action-name handling, true budget documentation, architecture and candidate README. Verified transferred files from checkpoint C: 21/21 Git blob hashes match the tested local snapshot. Native browser lifecycle/30 GLTFLoader poses have preliminary success; latest face-anchor correction is being tested before integration. Final publication acceptance still pending. Completed extra offline Cast imports were not claimed: those renders were stopped to let browser QA run.
+
+Observed visual issues remain recorded: L0/L1 cloth-tail black spots/fold lines, hard L1 seams/staff bands, waxy skin/scalp shell. Repair cloth normal-map/atlas/decimation artifacts first in finite ART-02 D, then actual high-to-low surface polish. Current ART-02 overall remains in_progress and user art target remains unmet.

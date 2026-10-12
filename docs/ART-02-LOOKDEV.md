@@ -32,8 +32,21 @@ blender -b assets-source/ash-archivist/ash-archivist.blend --python scripts/rend
 
 此环境Blender未编入OpenImageDenoise，初次额外证据渲染失败后已关闭denoise重新完整渲染。生成脚本与证据脚本通过Python语法编译。
 
+预算管线完成后的额外Walk第9帧16样本对照：[原模](screenshots/art2-raw-walk-studio.png) / [实际L1 GLB导入](screenshots/art2-l1-walk-studio.png)。本帧布尾外轮廓与开口基本保持，未见大面积撕开；L1靴面和尾摆出现较硬折线/阴影。本单帧不能排除预算报告的Walk局部表面58.1毫米最大偏差，因此保留为动态表面质量缺口，不能据硬预算通过即称视觉无误差。
+
+实际最终GLB清除原模后重新导入同一studio场景的32样本近景：[L0](screenshots/art2-l0-face-studio.png) / [L1](screenshots/art2-l1-face-studio.png)。L0脸、发际与领口和原模基本保持，没有大片合图错色或发卡透明丢失；L1的肩边、衣襟与领口出现更硬边/折线，保留作游戏远镜资产，不替代人物近景。源代码仍保留原先皮肤/头皮/衣物质量缺口。
+
+实际最终GLB的32样本握杖近景：[L0](screenshots/art2-l0-grip-studio.png) / [L1](screenshots/art2-l1-grip-studio.png)。手掌和四指包杖基本保持。L1杖环/腰带产生明显三角折面，L0/L1局部布尾出现原模没有的少量黑斑/折痕，仍需法线/合图边和低模表面修整。为释放资源给浏览器QA，额外导入Cast/Walk的两并行离线渲染在未完成时终止；没有把未完成图记为已验证。原模Cast证据与预算代理完成的L1 Walk第9帧对照分别如上。
+
+导入器生成的动作名为`Idle_AshArchivistRig`、`Cast_AshArchivistRig`、`Walk_AshArchivistRig`。复查通过NLA strip/action含名查找，并在缺少动作时明确报错，避免把静态rest帧误记为动作证据。可复现最终GLB导入检查：
+
+```sh
+blender -b assets-source/ash-archivist/ash-archivist.blend --python scripts/render-mage-inspection.py -- /absolute/project/path --asset /absolute/project/path/dist/models/ember-mage-realism.glb --label l0
+blender -b assets-source/ash-archivist/ash-archivist.blend --python scripts/render-mage-inspection.py -- /absolute/project/path --asset /absolute/project/path/dist/models/ember-mage-combat.glb --label l1
+```
+
 ## 未达到的目标
 
 **本次没有达到D2R/D4商业美术品质，也没有完成用户美术验收。**前额发际及握杖已有可见改进，仍有侧颅底层反光偏壳状、眉/胡茬偏淡、皮肤苍白及蜡感、衣物褶皱幅度偏保守的问题。肩袖连接、皮革层次、装备连接与手部细小缝隙需要进一步人工近景修整，材质缺少位置相关磨损和高低模法线烘焙。Walk仍是循环角度首稿；没有动捕、碰撞布料或表情动画。
 
-下一阶段预算管线必须另验真实skin joints数、材质/primitive数、L0/L1和表面误差；本步骤的离线高模证据不代替最终GLB的近景、动作和游戏镜头复查。没有实际Android/iOS设备测试。
+预算管线的真实skin joints数、材质/primitive数、L0/L1和表面误差已另验，详见ART-02-BUDGET；本步骤的离线原模/GLB导入证据不代替原生游戏镜头与交互回归。商业品质和上述表面缺口仍未解决，没有实际Android/iOS设备测试。
