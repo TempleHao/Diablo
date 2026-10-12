@@ -43,3 +43,5 @@ npm run dev
 存档schema仍为2，旧0.2.0与0.2.1角色继续使用；导入先预览/确认，失败不替换。完整策划不重建。下一工作是明确的ART-02角色精修与战斗LOD/rig、随后ART-03环境和怪物美术；用户美术目标未验收前不回到D1-02。
 
 可选浏览器复现：安装 `playwright-core@1.64.0`（`npm install --no-save --package-lock=false playwright-core@1.64.0`），启动本地服务后另终端运行 `npm run check:art-browser`。`tests/art-browser-smoke.cjs`默认URL为5173、Chromium为/usr/bin/chromium，ART_QA_URL/ART_CHROMIUM_PATH/ART_QA_OUTPUT可覆盖。测试使用临时上下文，HTTP响应内注入只读快照，不向生产源码添加调试入口。本轮23项实际脚本通过；归入仓库时仅路径/loader/辅助代码收为单文件，已核对测试函数相同并做语法检查，未另重复完整回归。
+
+发布验收：代码 `41a9e7361804dd88edba148734b218747cd2146f`，Actions运行 `38252648722`、job `114822611976`检查/上传/Pages成功；发布文件与已测文件核对一致。此结果没有补做真机或线上URL浏览器验证。
