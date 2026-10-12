@@ -24,8 +24,8 @@
     "taskId": "ART-01",
     "trigger": "continuation",
     "startedAt": "2026-10-12T12:34:42Z",
-    "heartbeatAt": "2026-10-12T12:34:42Z",
-    "leaseExpiresAt": "2026-10-12T14:34:42.000Z"
+    "heartbeatAt": "2026-10-12T12:49:45Z",
+    "leaseExpiresAt": "2026-10-12T14:49:45.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -33,21 +33,28 @@
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
   "resumeBranch": "checkpoint/art-01",
-  "resumeCommit": "2d173faa58fbd39e48f86163e06b4df512098db7",
-  "nextAction": "ART-01: fix eye-shell alpha and remaining hair/neck/grip/strap defects; add officially CC0 named skin with pinned mirror evidence; then verify native rendering, animations, collision, old saves and two-touch inputs before any candidate release.",
+  "resumeCommit": "e2f167e90044a59dca1cd9f48fd91af87835a2f2",
+  "nextAction": "Save corrected GLB SHA e1141c68121c8c37b6032b28e2b0c9cee04fe875a823acb85cfc97833b0eecbc and final QA artifacts to checkpoint/art-01, verify package hashes/tests, then conditionally integrate preview and inspect Pages.",
   "lastAttempt": {
     "runId": "resume-ART-01-20261012123442-6fcb5de2",
     "taskId": "ART-01",
     "startedAt": "2026-10-12T12:34:42Z",
     "status": "running",
-    "phase": "restore-checkpoint-and-validate-latest-local-candidate",
-    "baseCheckpoint": "2d173faa58fbd39e48f86163e06b4df512098db7"
+    "phase": "corrected-sources-saved-binary-upload-next",
+    "baseCheckpoint": "2d173faa58fbd39e48f86163e06b4df512098db7",
+    "checkpointCommit": "e2f167e90044a59dca1cd9f48fd91af87835a2f2",
+    "validation": {
+      "unit": "61 save tests passed; seven JS syntax, old/new GLB and 26 source hashes checked locally",
+      "browser": "Desktop and actual two-touch partial-release passed on new local GLB; final phone viewer check finishing",
+      "packagedCheckpoint": "Source newer than binary; SHA checker deliberately fails until new GLB saved or rebuilt",
+      "artQuality": "Still not equivalent to D2R/D4"
+    }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T12:34:42Z",
+  "lastUpdatedAt": "2026-10-12T12:49:45Z",
   "validationLimitations": [
     "D1-01 complete; remaining D1/D2/D3 systems are planned, not implemented in 0.2.1",
     "Browser mobile viewport checks are not real-device performance tests",
