@@ -44,9 +44,9 @@ try{
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
     await page.waitForTimeout(200);
-    if(viewport.width===1365 && process.env.SCREENSHOT_FOR_REVIEW==='1') {
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1') {
       const screenshot=await page.screenshot({type:'jpeg',quality:54});
-      console.log('GAME_SCREENSHOT_BASE64:'+screenshot.toString('base64'));
+      console.log((viewport.isMobile?'GAME_MOBILE_SCREENSHOT_BASE64:':'GAME_SCREENSHOT_BASE64:')+screenshot.toString('base64'));
     }
     assert.deepEqual(errs,[],'page JS exceptions');
     console.log('Smoke passed', viewport.width+'x'+viewport.height);
