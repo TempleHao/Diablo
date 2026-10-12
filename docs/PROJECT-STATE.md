@@ -39,3 +39,11 @@
 `status`为ready/running/blocked/paused/complete；`nextTaskId`指向队列；`activeRun`保存租约或null；`resumeBranch/resumeCommit/nextAction`定位中断步骤；`lastAttempt`记录真实结果；`blocked`记录已观察原因。`lastCompletedWorkCommit`仅标已验证工作的提交，不标尚未核验的候选。
 
 一个任务的done需要交付、验证、必要的迁移与部署都达到该任务要求。保存了部分代码应标in_progress；工具或额度阻止开工应标blocked；没有任何新结果时不制造更新记录。完成D3并验收后设置complete并暂停本项目定时任务；D4另立范围和服务预算。
+
+## D1-01 本轮可靠断点（2026-10-12）
+
+- main可玩版仍为0.2.0；候选0.2.1保存在 `checkpoint/d1-01`，未在此断点声称已部署。
+- 已实现存档schema2、旧法杖/成长迁移、自动备份、导入预览与确认、手动可逆恢复点、损坏/未来版本保护和原档导出；保存/界面模块已抽离。
+- `npm run check`：61项测试、五模块语法、GLB/蒙皮/动作通过；桌面与390×844触屏视口回归通过。详见 [验证记录](VALIDATION-D1-01.md)。真实手机性能及完整并发事务未验证。
+- 下一动作：核对JSON租约持有人与main最新头，以条件更新集成候选，检查GitHub Actions的检查与Pages部署，成功后标D1-01完成、下一项D1-02。
+- 最近可靠提交由main的 `resumeCommit` 定位；代码保存成功不代表Pages已发布。原策划1.0不重建。
