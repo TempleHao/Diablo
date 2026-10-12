@@ -15,13 +15,20 @@ try{
   if(!browser)throw new Error('Chromium missing/unavailable: '+launchError?.message);
   await sleep(750);
   for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true}]){
-    const context=await browser.newContext(viewport);
+    const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},isMobile:viewport.isMobile,hasTouch:!!viewport.hasTouch,deviceScaleFactor:1});
     const page=await context.newPage(),errs=[];
     page.on('pageerror',e=>errs.push(e.message));
     const response=await page.goto('http://127.0.0.1:8765/2d/',{waitUntil:'load'});
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
     await page.waitForTimeout(300);
+    // Real sprite art must load and decode, not just a successful HTML response.
+    const spriteState = await page.evaluate(async () => {
+      const art = await import('./art.js');
+      await art.preload();
+      return art.artStatus();
+    });
+    assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
@@ -37,6 +44,10 @@ try{
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
     await page.waitForTimeout(200);
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1') {
+      const screenshot=await page.screenshot({type:'jpeg',quality:54});
+      console.log((viewport.isMobile?'GAME_MOBILE_SCREENSHOT_BASE64:':'GAME_SCREENSHOT_BASE64:')+screenshot.toString('base64'));
+    }
     assert.deepEqual(errs,[],'page JS exceptions');
     console.log('Smoke passed', viewport.width+'x'+viewport.height);
     await context.close();

@@ -1,4 +1,4 @@
-# 《余烬纪事 2D》实施说明（v0.1）
+# 《余烬纪事 2D》实施说明（v0.2）
 
 更新日期：2026-10-13
 
@@ -6,8 +6,8 @@
 
 - 原仓库：TempleHao/Diablo，原 3D 版本保持 \`dist/index.html\`、\`dist/game.js\` 和所有 GLB 资源不变，原有 3D 存档格式不变。
 - 2D 版本：\`dist/2d/index.html\`，预计在原有 GitHub Pages 地址后添加 \`/2d/\` 即可访问。
-- 2D 选择 Canvas 2D 绘图和 JavaScript ES Modules，不引用 Three.js、CDN 和服务端接口。
-- 同一仓库内两个版本分别维护；“2D v0.1”独立于 3D 预览版 \`0.3.0-preview.2\`。
+- 2D 使用自带 CC0 授权精灵图集、Canvas 2D 绘图和 JavaScript ES Modules，不引用 Three.js、CDN 和服务端接口。
+- 同一仓库内两个版本分别维护；“2D v0.2”独立于 3D 预览版 \`0.3.0-preview.2\`。
 
 ## 当前已经实现
 
@@ -22,6 +22,8 @@
 
 | 文件 | 用途 |
 |---|---|
+| \`dist/2d/art.js\` | 真正的 2D 精灵动画、地砖、墙体与正确场景遮挡 |
+| \`dist/2d/art/0x72-dungeon-atlas.png\` | 本地 CC0 精灵图集，来源另见 2D-ART-SOURCES.md |
 | \`dist/2d/index.html\` | 独立页面、HUD、菜单和操作区域 |
 | \`dist/2d/style.css\` | 响应式界面与幻想风格 |
 | \`dist/2d/game.js\` | Canvas 绘制、状态机、AI、战斗和输入 |
@@ -48,7 +50,7 @@ Playwright Core 和 Chrome 是**浏览器自动化测试**的可选依赖，玩�
 
 - 已检查：游戏模块语法，地图生成及关键碰撞和存档规则；在真实 Chromium 的桌面/手机视口加载 2D 页面、开始游戏、移动和施法、打开关闭背包、暂停恢复（以 GitHub Actions 运行结果为准）。
 - 尚未检查：真实手机性能、长时间完整通关、各等级掉落概率、完整 Boss 战难度、无障碍键盘导航、全部设备兼容性和长期留存。
-- 界面当前是原创矢量/几何 2D 原型美术，不是达到商业 2D 游戏的逐帧精灵动画或正式像素美术完成版。
+- 界面当前是基于可追溯 CC0 图集的像素 2D 原型美术，不是达到商业 2D 游戏的逐帧精灵动画或正式像素美术完成版。
 - 自动保存使用 \`ember-chronicles-2d-v1\`；它**不读取、修改或迁移**原 3D 的 \`ember-mage-v1\` 等存档。清理网站数据可能造成角色丢失，建议使用背包内导出功能。
 - 没有账号、云存档、多人联机、服务器经济或付费服务。GitHub Pages 是静态托管。
 
@@ -67,3 +69,12 @@ Playwright Core 和 Chrome 是**浏览器自动化测试**的可选依赖，玩�
 既有 \`.github/workflows/pages.yml\` 发布整个 \`dist/\`，因此只要主分支包含 \`dist/2d/\`，原有 Pages 成功发布后 \`/Diablo/2d/\` 就会作为子目录可用。不要为 2D 覆盖根目录 3D index。
 
 发生 2D 阻断故障时，仅撤销新增的 2D 相关入口或代码提交，不删除既有 3D 发布文件；通过 PR 与部署记录定位版本。
+
+
+## 真实画面证据（2026-10-13）
+
+- GitHub Actions 工作流：https://github.com/TempleHao/Diablo/actions/runs/38295741221
+- Chromium 桌面图：../docs/screenshots/2d-v0.2-desktop.jpg
+- Chromium 模拟手机 390 × 844（实际指定 viewport、isMobile 和 hasTouch）截图：../docs/screenshots/2d-v0.2-mobile.jpg
+- 这两张由相同仓库提交在浏览器中实际执行战斗场景后截取，没有用绘图软件或生成式概念图代替游戏画面。
+- 真实 iOS 设备上帧率、触控手感与持久运行仍未测试，必须与浏览器模拟测试区分。

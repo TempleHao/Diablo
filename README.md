@@ -1,10 +1,18 @@
 # 余烬法师 · Ember Mage
 
-> **新增独立 2D 原型（v0.1）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **新增独立 2D 精灵美术版（v0.2）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
 > **[直接体验 2D 版](https://templehao.github.io/Diablo/2d/)** · [2D 实现与测试说明](docs/2D-IMPLEMENTATION.md) · [2D 自动化检查](https://github.com/TempleHao/Diablo/actions/workflows/check-2d.yml)
 >
-> 2D 版已实现法师移动、火球/霜环/闪现/药水、近战与远程怪物、首领、装备拾取、三槽换装、分解、等级与本机存档，支持键鼠和手机触摸操作。仍为第一幕战斗原型，完整剧情、多职业、打造与完整美术尚未实现。2D 存档独立于 3D 存档。
+> 2D v0.2 已使用 CC0 地牢精灵图集绘制动态人物、怪物、墙体及地面，并改进场景前后遮挡和开场遭遇战；详见 [素材来源及许可](docs/2D-ART-SOURCES.md)。游戏已实现法师移动、火球/霜环/闪现/药水、近战与远程怪物、首领、装备拾取、三槽换装、分解、等级与本机存档，支持键鼠和手机触摸操作。仍为第一幕战斗原型，完整剧情、多职业、打造与完整美术尚未实现。2D 存档独立于 3D 存档。
+
+**2D v0.2 真实浏览器运行截图**（GitHub Actions 中的 Chromium，非概念图）：
+
+![2D 桌面版游戏截图](docs/screenshots/2d-v0.2-desktop.jpg)
+
+[查看 390×844 手机视口截图](docs/screenshots/2d-v0.2-mobile.jpg) · [查看产生截图的自动化测试](https://github.com/TempleHao/Diablo/actions/runs/38295741221)
+
+当前 2D 美术是可玩且有动作帧的统一像素图集版本，仍与《暗黑破坏神 II 重制版》的高精度手工美术存在明显差距；不应误认为完整美术验收已结束。
 
 
 **版本 0.3.0-preview.2** · 写实暗黑方向的3D美术预览；仍是单人刷怪原型。第一版专注法师，支持电脑与手机浏览器。

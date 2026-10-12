@@ -1,3 +1,4 @@
+import * as Art from './art.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
@@ -8,6 +9,11 @@ const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
 let kills = 0, total = 12, boss = null, frameIndex = 0, nextId = 1, manualAim = null, messageTimes = new Map();
+const enemyWaves = [
+  ['wretch','wretch','archer','wretch'],
+  ['brute','archer','wretch','wretch'],
+  ['brute','archer','wretch','brute']
+];
 const cooldowns = {fire:0,ice:0,blink:0,heal:0};
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#d9a0f0'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
@@ -30,15 +36,42 @@ function randomPoint(minDist=260) {
   }
   return {x:WIDTH/2,y:HEIGHT*.2};
 }
+function encounterPoint(i) {
+  // Near the starting chamber so the first screen includes an actual encounter.
+  const angles=[-0.45,-2.75,-1.35,-2.15];
+  const distanceFromHero=[330,320,370,415];
+  const a=angles[i%angles.length],radius=distanceFromHero[i%distanceFromHero.length];
+  const candidate={x:hero.x+Math.cos(a)*radius,y:hero.y+Math.sin(a)*radius};
+  if(walkable(candidate.x,candidate.y,28,dungeon))return candidate;
+  for(let n=0;n<96;n++) {
+    const angle=rng()*Math.PI*2,dist=255+rng()*250;
+    const p={x:hero.x+Math.cos(angle)*dist,y:hero.y+Math.sin(angle)*dist};
+    if(walkable(p.x,p.y,28,dungeon))return p;
+  }
+  return randomPoint();
+}
+function spawnWave(index){
+  const group=enemyWaves[index]||[];
+  group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
+  if(index>0)announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
+}
+function findBossPoint(){
+  // A short, reachable walk down the central aisle instead of spawning inside masonry.
+  for(const delta of [310,390,240,-280,460]){
+    const p={x:hero.x,y:clamp(hero.y-delta,TILE*3,HEIGHT-TILE*3)};
+    if(walkable(p.x,p.y,45,dungeon))return p;
+  }
+  return {x:WIDTH/2,y:TILE*5.7};
+}
 function build() {
+  ui.log.replaceChildren();messageTimes.clear();
   const seed = 20261013 + profile.clears*19;
   rng=mulberry32(seed); dungeon=makeDungeon(seed);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
-  const kinds=['wretch','wretch','archer','wretch','brute','archer','wretch','wretch','brute','archer','wretch','wretch','archer','brute'];
-  for(const kind of kinds)spawn(kind);
+  spawnWave(0);
   ui.boss.hidden=true;
   ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
@@ -53,7 +86,7 @@ function spawn(kind,location=null) {
   enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，失名者已经苏醒！',true);}
   return e;
 }
-function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); }
+function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
 function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
@@ -173,7 +206,9 @@ function dealDamage(e,damage){
     boss=null;ui.boss.hidden=true;profile.clears++;persist();
     announce('炉心重燃，地窟净化完成！',true);showModal('victory');
   }else{
-    kills++;if(kills>=total&&!boss)spawn('boss',{x:WIDTH/2,y:TILE*5.7});
+    kills++;
+    if(kills===4||kills===8)spawnWave(kills/4);
+    if(kills>=total&&!boss)spawn('boss',findBossPoint());
     persist();
   }
 }
@@ -271,85 +306,12 @@ function update(dt){
   for(const h of [...hazards]){h.life-=dt;h.r+=(h.max-h.r)*dt*13;if(h.life<=0)hazards.splice(hazards.indexOf(h),1);}
   updateHud();
 }
-function floorDraw(){
-  ctx.fillStyle='#171d22';ctx.fillRect(0,0,WIDTH,HEIGHT);
-  const x0=Math.max(0,Math.floor(cam.x/TILE)-1),x1=Math.min(WIDTH/TILE,Math.ceil((cam.x+vw)/TILE)+1);
-  const y0=Math.max(0,Math.floor(cam.y/TILE)-1),y1=Math.min(HEIGHT/TILE,Math.ceil((cam.y+vh)/TILE)+1);
-  for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
-    const hash=((x*73856093^y*19349663)>>>0),shade=hash%5;
-    ctx.fillStyle=['#222930','#232b31','#252c32','#21282e','#242a2f'][shade];
-    const ox=x*TILE,oy=y*TILE;
-    ctx.fillRect(ox+1,oy+1,TILE-2,TILE-2);
-    ctx.strokeStyle='#141a1f';ctx.lineWidth=2;ctx.strokeRect(ox+1,oy+1,TILE-2,TILE-2);
-    if(hash%3===0){ctx.strokeStyle='#34383a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ox+12,oy+19);ctx.lineTo(ox+31,oy+20);ctx.lineTo(ox+37,oy+34);ctx.stroke();}
-    if(hash%7===0){ctx.fillStyle='#394039';ctx.fillRect(ox+55,oy+53,10,2);ctx.fillRect(ox+60,oy+58,4,5);}
-    if(hash%11===0){ctx.fillStyle='#3d312a';ctx.beginPath();ctx.ellipse(ox+25,oy+50,19,9,.5,0,Math.PI*2);ctx.fill();}
-  }
-  ctx.fillStyle='#0b1219';
-  ctx.fillRect(0,0,WIDTH,TILE);ctx.fillRect(0,HEIGHT-TILE,WIDTH,TILE);ctx.fillRect(0,0,TILE,HEIGHT);ctx.fillRect(WIDTH-TILE,0,TILE,HEIGHT);
-  // 远古炉心祭坛指引玩家寻找北方的敌人。
-  const glow=ctx.createRadialGradient(WIDTH/2,TILE*5.7,0,WIDTH/2,TILE*5.7,150);
-  glow.addColorStop(0,'#a8563840');glow.addColorStop(1,'#a8563800');
-  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(WIDTH/2,TILE*5.7,150,0,Math.PI*2);ctx.fill();
-  ctx.save();ctx.translate(WIDTH/2,TILE*5.7);ctx.strokeStyle='#6c543d';ctx.lineWidth=3;
-  for(const r of [70,100]){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();}
-  for(let a=0;a<Math.PI*2;a+=Math.PI/4){ctx.rotate(Math.PI/4);ctx.fillStyle='#79634b';ctx.fillRect(-6,-100,12,21);}ctx.restore();
-}
-function stoneDraw(b){
-  ctx.save();ctx.translate(b.x,b.y);
-  ctx.fillStyle='#080b0d99';ctx.fillRect(8,10,b.w,b.h);
-  ctx.fillStyle=b.variant===1?'#303740':b.variant===2?'#3a3938':'#353b41';
-  ctx.fillRect(0,0,b.w,b.h);ctx.fillStyle='#46505a';ctx.fillRect(0,0,b.w,4);ctx.fillRect(0,0,4,b.h);
-  ctx.fillStyle='#1c2228';ctx.fillRect(0,b.h-7,b.w,7);ctx.fillRect(b.w-6,0,6,b.h);
-  ctx.strokeStyle='#55575a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(6,b.h*.63);ctx.lineTo(b.w*.44,b.h*.56);ctx.lineTo(b.w*.67,b.h*.82);ctx.stroke();ctx.restore();
-}
-function torchDraw(t){
-  const g=ctx.createRadialGradient(t.x,t.y,2,t.x,t.y,133);
-  g.addColorStop(0,'#ed8b3870');g.addColorStop(.33,'#a95a3037');g.addColorStop(1,'#94481a00');
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(t.x,t.y,133,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#332922';ctx.fillRect(t.x-3,t.y-6,6,22);
-  const flame=8+Math.sin(tick*8+t.x)*3;
-  ctx.fillStyle='#ffb55b';ctx.beginPath();ctx.ellipse(t.x,t.y-8,5,flame,.12,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#fff0b3';ctx.beginPath();ctx.ellipse(t.x,t.y-5,2,5,0,0,Math.PI*2);ctx.fill();
-}
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick); }
+function stoneDraw(b){ Art.pillar(ctx,b); }
+function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
-function enemyDraw(e){
-  const b=e.kind==='boss', brute=e.kind==='brute', arch=e.kind==='archer', r=e.radius;
-  ctx.save();ctx.translate(e.x,e.y+Math.sin(e.phase)*2);
-  ellipse(0,10,r*1.15,r*.48,'#090b0d9c');
-  if(b){const a=ctx.createRadialGradient(0,0,10,0,0,100);a.addColorStop(0,'#ae43893c');a.addColorStop(1,'#a63c6000');ctx.fillStyle=a;ctx.beginPath();ctx.arc(0,0,100,0,7);ctx.fill();}
-  ctx.fillStyle=b?'#3e254a':arch?'#303c49':brute?'#554038':'#414642';
-  ctx.beginPath();ctx.moveTo(-r*.65,-r*.45);ctx.lineTo(r*.68,-r*.45);ctx.lineTo(r, r*.75);ctx.lineTo(-r,r*.75);ctx.closePath();ctx.fill();
-  ellipse(0,-r*.32,r*.66,r*.63,b?'#8a6279':brute?'#76655b':'#87908b');
-  ctx.fillStyle=b?'#281b34':'#24282c';ctx.beginPath();ctx.arc(0,-r*.42,r*.76,Math.PI,0);ctx.lineTo(r*.7,-r*.1);ctx.lineTo(-r*.7,-r*.1);ctx.closePath();ctx.fill();
-  if(b){ctx.strokeStyle='#b98baa';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-r*.4,-r*.75);ctx.quadraticCurveTo(-r*1.4,-r*1.8,-r*1.15,-r*2.2);ctx.moveTo(r*.4,-r*.75);ctx.quadraticCurveTo(r*1.4,-r*1.8,r*1.15,-r*2.2);ctx.stroke();}
-  ellipse(-r*.23,-r*.2,b?5:3,b?5:3,b?'#eaa2ff':'#ff9d6c');ellipse(r*.23,-r*.2,b?5:3,b?5:3,b?'#eaa2ff':'#ff9d6c');
-  if(arch){ctx.strokeStyle='#a2b4ba';ctx.lineWidth=3;ctx.beginPath();ctx.arc(r*.5,0,r*.65,-1.4,1.4);ctx.stroke();}
-  if(e.hp<e.maxHp){ctx.fillStyle='#160f16';ctx.fillRect(-r,-r*1.4,r*2,5);ctx.fillStyle=b?'#d381b8':'#cf6a5c';ctx.fillRect(-r,-r*1.4,r*2*clamp(e.hp/e.maxHp,0,1),5);}
-  if(e.slow){ctx.strokeStyle='#9ee4fa88';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,r+5,0,7);ctx.stroke();}
-  ctx.restore();
-}
-function heroDraw(){
-  ctx.save();ctx.translate(hero.x,hero.y);
-  const flash=hero.invuln>0&&Math.floor(tick*12)%2===0;
-  ellipse(0,13,22,8,'#04070c99');
-  const aura=ctx.createRadialGradient(0,0,2,0,0,56);aura.addColorStop(0,'#ca9a4050');aura.addColorStop(1,'#ca9a4000');
-  ctx.fillStyle=aura;ctx.beginPath();ctx.arc(0,0,56,0,7);ctx.fill();
-  ctx.rotate(hero.angle+Math.PI/2);
-  if(!flash){
-    const gait=Math.sin(hero.walk)*2;
-    ellipse(-7,16+gait,6,12,'#111e28');ellipse(7,16-gait,6,12,'#16202b');
-    ctx.fillStyle='#30576f';ctx.beginPath();ctx.moveTo(-14,-4);ctx.lineTo(14,-4);ctx.lineTo(20,22);ctx.lineTo(-20,22);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#4e8295';ctx.beginPath();ctx.moveTo(-14,-5);ctx.lineTo(-9,13);ctx.lineTo(5,17);ctx.lineTo(14,-5);ctx.closePath();ctx.fill();
-    ellipse(0,-10,14,13,'#253947');ellipse(0,-14,10,9,'#c9b5a0');
-    ctx.fillStyle='#112431';ctx.beginPath();ctx.arc(0,-14,14,Math.PI,0);ctx.lineTo(10,-10);ctx.lineTo(-10,-10);ctx.closePath();ctx.fill();
-    ellipse(-4,-12,1.3,1.3,'#d3e4e3');ellipse(4,-12,1.3,1.3,'#d3e4e3');
-    ctx.strokeStyle='#a88755';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(14,11);ctx.lineTo(19,-19);ctx.stroke();
-    ellipse(19,-21,6,6,hero.cast>0?'#ffe6a3':'#edaa63');
-  }
-  ctx.restore();
-  ctx.strokeStyle='#dca95c60';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(hero.x,hero.y+12,26,11,0,0,7);ctx.stroke();
-}
+function enemyDraw(e){ Art.enemy(ctx,e,tick); }
+function heroDraw(){ Art.hero(ctx,hero,tick); }
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
   if(m.kind==='ember'){
@@ -362,21 +324,29 @@ function render(){
   if(!hero){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#121b22';ctx.fillRect(0,0,vw,vh);return;}
   cam.x=clamp(hero.x-vw/2,0,Math.max(0,WIDTH-vw));
   cam.y=clamp(hero.y-vh/2,0,Math.max(0,HEIGHT-vh));
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,vw,vh);
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,vw,vh);
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
-  for(const b of dungeon.blocks)if(b.x+b.w>cam.x-25&&b.x<cam.x+vw+25&&b.y+b.h>cam.y-25&&b.y<cam.y+vh+25)stoneDraw(b);
-  for(const t of dungeon.torches)if(Math.abs(t.x-hero.x)<vw+100&&Math.abs(t.y-hero.y)<vh+100)torchDraw(t);
-  for(const d of drops){
-    const color=palette.rare[d.item.rarity],bob=Math.sin(tick*3+d.x)*4;
-    const g=ctx.createRadialGradient(d.x,d.y,2,d.x,d.y,54);g.addColorStop(0,color+'8c');g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.beginPath();ctx.arc(d.x,d.y,54,0,7);ctx.fill();
-    ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(d.x,d.y-18+bob);ctx.lineTo(d.x+9,d.y-7+bob);ctx.lineTo(d.x,d.y+5+bob);ctx.lineTo(d.x-9,d.y-7+bob);ctx.closePath();ctx.fill();
-    ctx.fillStyle=color+'77';ctx.fillRect(d.x-1,d.y-64,2,43);
-  }
-  for(const e of enemies)enemyDraw(e);
-  heroDraw();
+  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick);
+  // Painter's order: stonework and props occlude actors when they stand behind them.
+  const layers=[];
+  for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
+    layers.push({y:b.y+b.h+9,render:()=>stoneDraw(b)});
+  for(const t of dungeon.torches)if(t.x>cam.x-160&&t.x<cam.x+vw+160&&t.y>cam.y-160&&t.y<cam.y+vh+160)
+    layers.push({y:t.y+13,render:()=>torchDraw(t)});
+  for(const d of drops)layers.push({y:d.y+7,render:()=>Art.loot(ctx,d,tick)});
+  for(const e of enemies)layers.push({y:e.y+10,render:()=>enemyDraw(e)});
+  layers.push({y:hero.y+10,render:heroDraw});
+  layers.sort((a,b)=>a.y-b.y);
+  for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
-  for(const h of hazards){ctx.strokeStyle=h.type==='nova'?'#9bdffcaa':'#ad72d18c';ctx.lineWidth=h.type==='nova'?9:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,7);ctx.stroke();}
+  for(const h of hazards){
+    ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
+    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':'#bf80e8';
+    ctx.shadowColor=h.type==='nova'?'#8acde5':'#9e77c7';ctx.shadowBlur=15;
+    ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
