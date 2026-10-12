@@ -133,7 +133,9 @@ export function createEnvironment(scene) {
   const geometries = {
     tile: paving[0], brick: masonry[0],
     block: dressedStone(1,1,1,3),
-    column: new T.CylinderGeometry(.49, .58, 3.95, 24, 6),
+    simpleBlock:new T.BoxGeometry(1,1,1),
+    column: new T.CylinderGeometry(.49, .58, 3.95, 24, 1),
+    columnRib:new T.CylinderGeometry(.49,.58,3.95,10,1),
     columnBase: new T.CylinderGeometry(.83, .94, .32, 24),
     collar: new T.CylinderGeometry(.66, .66, .16, 24),
     flute: new T.CylinderGeometry(.035, .035, 3.58, 5),
@@ -159,11 +161,14 @@ export function createEnvironment(scene) {
     return object;
   }
   function box(x, y, z, w, h, d, material = materials.stone, parent = group) {
-    const object = mesh(geometries.block, material, x, y, z, null, parent);
+    const geometry = !material.vertexColors || Math.min(w,h,d)<.08 ? geometries.simpleBlock : geometries.block;
+    const object = mesh(geometry, material, x, y, z, null, parent);
     object.scale.set(w, h, d);
     return object;
   }
   function instance(name, geometry, material, x, y, z, sx = 1, sy = 1, sz = 1, rx = 0, ry = 0, rz = 0) {
+    // Book ribbons / iron nails don't need the sixty triangles of a stone.
+    if (geometry===geometries.block && (!material.vertexColors || Math.min(sx,sy,sz)<.08)) geometry=geometries.simpleBlock;
     if (!batches.has(name)) batches.set(name, { geometry, material, matrices: [] });
     transform.position.set(x, y, z);
     transform.rotation.set(rx, ry, rz);
@@ -229,6 +234,16 @@ export function createEnvironment(scene) {
     polygonOffsetFactor:-2, side:T.DoubleSide
   });
   const stainGeometry = new T.PlaneGeometry(1,1);
+  const flameTexture = texture('flame.png',true);
+  const flameCardMaterial = new T.MeshBasicMaterial({map:flameTexture,transparent:true,
+    depthWrite:false,side:T.DoubleSide,opacity:.91,blending:T.AdditiveBlending});
+  const flameCard = new T.BufferGeometry();
+  flameCard.setAttribute('position',new T.Float32BufferAttribute([
+    -.20,-.445,0,.20,-.445,0,.20,.445,0,-.20,.445,0,
+    0,-.445,-.20,0,-.445,.20,0,.445,.20,0,.445,-.20],3));
+  flameCard.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,1,1,0,1,0,0,1,0,1,1,0,1],2));
+  flameCard.setIndex([0,1,2,0,2,3,4,5,6,4,6,7]);
+  flameCard.computeVertexNormals();
   for (let i=0; i<42; i++) {
     const side = i%2?-1:1, z = -21.8 + random()*43.2;
     const x = side*(5.65 + random()*3.35);
@@ -259,8 +274,12 @@ export function createEnvironment(scene) {
     }
     const footing = box((x1 + x2) / 2, .19, (z1 + z2) / 2, length, .34, .83, materials.stoneDark);
     footing.rotation.y = -angle;
-    const cap = box((x1 + x2) / 2, height - .01, (z1 + z2) / 2, length + .08, .19, .76, materials.carved);
-    cap.rotation.y = -angle;
+    for (let p=0;p<length;p+=1.61) {
+      const span = Math.min(1.57,length-p), t=(p+span/2)/length;
+      instance('chipped-wall-cap', geometries.block, materials.carved,
+        x1+(x2-x1)*t,height-.015+(random()-.5)*.022,z1+(z2-z1)*t,
+        span,.19,.76,0,-angle);
+    }
   }
   wall(-10, -23, 10, -23, 5.1);
   wall(-10, 23, 10, 23, .88);
@@ -277,12 +296,40 @@ export function createEnvironment(scene) {
         box(side * 10, .3, door + dz, 1.15, .3, .85, materials.stoneLight);
         box(side * 10, 3.82, door + dz, 1.05, .22, .82, materials.stoneLight);
       }
-      // A flat lintel and carved keystone leave a generous five-metre door below.
-      box(side * 10, 4.27, door, .81, .47, 5.65, materials.stone);
-      box(side * 10, 4.25, door, .94, .78, .46, materials.carved);
-      for (const dz of [-1.7, -1.05, -.4, .4, 1.05, 1.7])
-        instance('door-frieze', geometries.block, materials.bronze, side * 10, 4.52, door + dz, .85, .055, .23);
+      // Dressed, staggered lintel stones leave the original five-metre route open.
+      for (let i=0;i<7;i++) instance('door-lintel',geometries.archStone,materials.carved,
+        side*10,4.31,door+(i-3)*.77,1.2,.82,.69);
+      box(side*10,4.38,door,.92,.66,.58,materials.stoneLight);
+      for (const dz of [-1.72,1.72])
+        instance('door-frieze',geometries.block,materials.stoneDark,side*10,4.51,door+dz,.9,.055,.22);
     }
+  }
+
+  // Burned ceremonial cloth provides a soft material and irregular silhouette
+  // among the stone courses. The hanging is folded geometry, not a flat poster.
+  const clothMaterial = new T.MeshStandardMaterial({
+    map:texture('banner-basecolor.jpg',true),normalMap:texture('banner-normal.jpg'),
+    normalScale:new T.Vector2(.17,.17),roughness:.98,metalness:0,side:T.DoubleSide
+  });
+  function hangingCloth() {
+    const p=[],uv=[],idx=[];const columns=12,rows=22;
+    for(let row=0;row<=rows;row++) for(let column=0;column<=columns;column++) {
+      const u=column/columns,v=row/rows;
+      let y=1.64-v*3.28;
+      if(row===rows) y+=.07+Math.sin(column*2.61)*.085+(column===4?.18:0)+(column===9?.26:0);
+      p.push((u-.5)*1.40,y,(Math.sin(u*Math.PI*5.4)*.067+Math.sin(v*6+u*4)*.019)*(v*.18+.82));
+      uv.push(u,1-v);
+    }
+    for(let row=0;row<rows;row++) for(let col=0;col<columns;col++) {
+      const a=row*(columns+1)+col,b=a+columns+1;idx.push(a,b,a+1,a+1,b,b+1);
+    }
+    const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(p,3));
+    geometry.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geometry.setIndex(idx);geometry.computeVertexNormals();return geometry;
+  }
+  const hangingGeometry=hangingCloth();
+  for(const side of [-1,1]) for(const z of [-5.3,7.6]) {
+    instance('burned-funerary-cloth',hangingGeometry,clothMaterial,side*9.64,2.04,z,1,1,1,0,side===1?-Math.PI/2:Math.PI/2);
+    beam(side*9.66,3.72,z-.82,side*9.66,3.72,z+.82,.033,materials.iron);
   }
 
   // Fluted nave piers and stone voussoirs are instanced across both arcades.
@@ -296,22 +343,44 @@ export function createEnvironment(scene) {
     instance('column-neck', geometries.collar, materials.stoneLight, x, 1.04, z);
     instance('column-capital', geometries.block, materials.stoneLight, x, 5.02, z, 1.37, .37, 1.37);
     instance('column-capital-top', geometries.block, materials.carved, x, 5.29, z, 1.64, .17, 1.64);
-    for (let i = 0; i < 12; i++) {
-      const angle = i / 12 * Math.PI * 2;
-      instance('column-flutes', geometries.flute, materials.stoneDark,
-        x + Math.cos(angle) * .504, 2.77, z + Math.sin(angle) * .504);
+    for (let i=0;i<8;i++) {
+      const angle=i/8*Math.PI*2;
+      instance('column-rib',geometries.columnRib,materials.stoneLight,
+        x+Math.cos(angle)*.51,2.66,z+Math.sin(angle)*.51,.18,.95,.18);
     }
     for (const dx of [-.48, .48]) for (const dz of [-.48, .48])
-      instance('capital-carving', geometries.block, materials.bronze, x + dx, 4.99, z + dz, .15, .18, .15, 0, Math.PI / 4);
+      instance('capital-carving', geometries.block, materials.stoneDark, x + dx, 4.99, z + dz, .15, .18, .15, 0, Math.PI / 4);
   }
+  // Continuous pointed ribs replace the row of fifteen obvious box segments.
+  // The outer dressed stone and fine parallel mouldings share the same path.
+  function gothicPath(start=0,end=1) {
+    const path = new T.CurvePath();
+    path.add(new T.CubicBezierCurve3(new T.Vector3(0,5.28,-4.94),new T.Vector3(0,7.32,-4.94),
+      new T.Vector3(0,8.72,-2.31),new T.Vector3(0,9.39,0)));
+    path.add(new T.CubicBezierCurve3(new T.Vector3(0,9.39,0),new T.Vector3(0,8.72,2.31),
+      new T.Vector3(0,7.32,4.94),new T.Vector3(0,5.28,4.94)));
+    if (start===0 && end===1) return path;
+    return new T.CatmullRomCurve3(Array.from({length:25},(_,i)=>path.getPoint(start+(end-start)*i/24)));
+  }
+  const archSection = new T.Shape();
+  [[-.30,-.21],[-.25,-.26],[.25,-.26],[.30,-.21],[.30,.21],[.25,.26],[-.25,.26],[-.30,.21]].forEach(([x,y],i)=>
+    i===0?archSection.moveTo(x,y):archSection.lineTo(x,y));
+  archSection.closePath();
+  const ribGeometry = new T.ExtrudeGeometry(archSection,{steps:40,bevelEnabled:false,extrudePath:gothicPath()});
+  const ribMoulding = new T.TubeGeometry(gothicPath(),30,.065,6,false);
+  const brokenRibA = new T.ExtrudeGeometry(archSection,{steps:16,bevelEnabled:false,extrudePath:gothicPath(0,.37)});
+  const brokenRibB = new T.ExtrudeGeometry(archSection,{steps:17,bevelEnabled:false,extrudePath:gothicPath(.61,1)});
   for (const side of [-1, 1]) for (const center of [-15, -5, 5, 15]) {
-    for (let i = 0; i < 15; i++) {
-      const a = (i + .5) / 15 * Math.PI;
-      instance('arcade-voussoirs', geometries.archStone, materials.stone,
-        side * 8.25, 5.37 + Math.sin(a) * 4.91, center + Math.cos(a) * 4.91,
-        1, 1, 1, Math.PI / 2 - a);
+    const broken = side===1 && center===5;
+    if (broken) {
+      instance('broken-rib-a',brokenRibA,materials.carved,side*8.25,0,center);
+      instance('broken-rib-b',brokenRibB,materials.carved,side*8.25,0,center);
+    } else {
+      instance('gothic-rib',ribGeometry,materials.carved,side*8.25,0,center);
+      for (const offset of [-.32,.32])
+        instance('gothic-moulding',ribMoulding,materials.stoneDark,side*8.25+offset,0,center);
     }
-    instance('arcade-keystone', geometries.block, materials.carved, side * 8.25, 10.27, center, .82, .88, .76);
+    if (!broken) instance('arcade-keystone',geometries.block,materials.stoneLight,side*8.25,9.43,center,.83,.54,.68);
   }
 
   // A recessed northern apse: stone relief, bronze sun, and extinguished braziers.
@@ -320,13 +389,17 @@ export function createEnvironment(scene) {
     box(x, 2.52, -22.15, .47, 4.91, .75, materials.stoneLight);
     box(x, 4.93, -22.15, .8, .21, 1.01, materials.carved);
   }
-  const apseSun = mesh(new T.TorusGeometry(1.15, .095, 8, 48), materials.bronze, 0, 3.34, -22.35);
-  mesh(new T.OctahedronGeometry(.52), materials.bronze, 0, 3.34, -22.36);
-  for (let i = 0; i < 12; i++) {
-    const angle = i * Math.PI / 6;
-    const ray = box(Math.cos(angle) * 1.55, 3.34 + Math.sin(angle) * 1.55, -22.33, .11, .46, .1, materials.bronze);
-    ray.rotation.z = angle - Math.PI / 2;
-  }
+  const reliefMaterial = new T.MeshStandardMaterial({
+    map:texture('relief-basecolor.jpg',true),normalMap:texture('relief-normal.jpg'),
+    color:0xc9c0aa,normalScale:new T.Vector2(.65,.65),roughness:.95,metalness:0,
+    polygonOffset:true,polygonOffsetFactor:-1
+  });
+  const relief = mesh(new T.PlaneGeometry(3.82,4.23),reliefMaterial,0,2.76,-22.50);
+  relief.name='Defaced solar funerary relief';
+  // The defaced symbol is stone, not a floating golden sun. Broken relief
+  // corners and fallen fragments describe the desecration of the archive.
+  for (const x of [-2.17,2.16]) for (const y of [.67,4.76])
+    instance('relief-broken-corner',geometries.archStone,materials.stoneDark,x,y,-22.39,.48,.48,.35,0,0,.24);
   for (const x of [-5.85, 5.85]) {
     mesh(new T.CylinderGeometry(.72, .5, .45, 8), materials.iron, x, .55, -20.9);
     instance('apse-brazier-feet', geometries.block, materials.stoneDark, x, .19, -20.9, 1.3, .32, 1.3);
@@ -371,14 +444,41 @@ export function createEnvironment(scene) {
     collision(x, z, 1.93);
   }
   altar(18.5, -18.2, false);
-  // Hooded, faceless funerary idol behind the eastern altar.
+  // A folded, hooded limestone saint. Dense silhouette folds and an actual hood
+  // opening replace the placeholder cone-body / sphere-head stack.
   box(18.5, .43, -20.16, 1.88, .75, 1.31, materials.stoneDark);
-  mesh(new T.ConeGeometry(.81, 2.17, 7), materials.carved, 18.5, 1.74, -20.16);
-  mesh(new T.SphereGeometry(.34, 9, 7), materials.stoneDark, 18.5, 3.02, -20.11);
-  mesh(new T.ConeGeometry(.49, .98, 7), materials.stoneLight, 18.5, 3.39, -20.18);
+  function foldedRobe() {
+    const vertices=[],uv=[],indices=[];
+    const sides=48, rows=22;
+    for (let row=0;row<=rows;row++) {
+      const t=row/rows, y=t*2.22;
+      const radius=.76*(1-t)+.37*t+.20*Math.exp(-Math.pow((t-.79)*7,2));
+      for (let i=0;i<=sides;i++) {
+        const a=i/sides*Math.PI*2;
+        const fold=(Math.cos(a*13+t*.65)*.035+Math.cos(a*7-t*.5)*.032)*(1-t*.48);
+        vertices.push(Math.sin(a)*(radius+fold),y+Math.cos(a*7)*.015*(1-t),Math.cos(a)*(radius+fold)*.69);
+        uv.push(i/sides,t);
+      }
+    }
+    for (let row=0;row<rows;row++) for (let i=0;i<sides;i++) {
+      const a=row*(sides+1)+i,b=a+sides+1;
+      indices.push(a,a+1,b,a+1,b+1,b);
+    }
+    const geometry=new T.BufferGeometry();
+    geometry.setAttribute('position',new T.Float32BufferAttribute(vertices,3));
+    geometry.setAttribute('uv',new T.Float32BufferAttribute(uv,2));
+    geometry.setIndex(indices);geometry.computeVertexNormals();return geometry;
+  }
+  mesh(foldedRobe(),materials.carved,18.5,.77,-20.16);
+  const hood = mesh(new T.SphereGeometry(.48,28,18,Math.PI*.12,Math.PI*1.76,0,Math.PI*.83),
+    materials.carved,18.5,3.08,-20.23,[.05,Math.PI,0]);
+  hood.scale.set(1,1.19,.84);
+  const hoodVoid=mesh(new T.SphereGeometry(.29,20,14),materials.mortar,18.5,3.08,-19.99);
+  hoodVoid.scale.set(.88,1.2,.28);
   for (const sign of [-1, 1]) {
-    const arm = box(18.5 + sign * .65, 2.24, -20.14, .31, 1.26, .4, materials.carved);
-    arm.rotation.z = sign * .65;
+    const arm=mesh(new T.CapsuleGeometry(.20,.68,4,12),materials.carved,18.5+sign*.50,2.32,-20.0);
+    arm.rotation.z=sign*.53;
+    mesh(new T.SphereGeometry(.12,12,8),materials.stoneLight,18.5+sign*.21,1.98,-19.64);
   }
 
   // Archive shelves: six book-material batches, with bands and uneven spines.
@@ -449,9 +549,8 @@ export function createEnvironment(scene) {
     const flame = new T.Group();
     flame.position.set(fx, 2.91, fz);
     group.add(flame);
-    mesh(new T.ConeGeometry(.15, .57, 7), materials.flameEdge, 0, .02, 0, null, flame);
-    const core = mesh(new T.ConeGeometry(.09, .4, 6), materials.flameCore, 0, -.025, 0, null, flame);
-    core.castShadow = false;
+    const outer=mesh(flameCard,flameCardMaterial,0,.065,0,null,flame);
+    outer.castShadow=false;
     animatedFlames.push({ object: flame, phase: random() * 6.28 });
     if (lit) {
       const light = new T.PointLight(0xffb66b, 13, 17, 2);
@@ -505,7 +604,7 @@ export function createEnvironment(scene) {
   localRing(1.72, materials.runeBlue, .026, portal, .091);
   const portalInner = localRing(1.27, materials.blueGlow, .026, portal, .101);
   localRing(.43, materials.bronze, .025, portal, .092);
-  const mistMaterial = new T.MeshBasicMaterial({ color: 0x579eac, transparent: true, opacity: .13, depthWrite: false, side: T.DoubleSide });
+  const mistMaterial = new T.MeshBasicMaterial({ color: 0x579eac, transparent: true, opacity: .047, depthWrite: false, side: T.DoubleSide });
   const mist = mesh(new T.CircleGeometry(1.6, 64), mistMaterial, 0, .09, 0, [-Math.PI / 2, 0, 0], portal);
   mist.castShadow = false;
   for (let i = 0; i < 10; i++) {
@@ -554,7 +653,7 @@ export function createEnvironment(scene) {
     const object = new T.InstancedMesh(batch.geometry, batch.material, batch.matrices.length);
     object.name = name;
     batch.matrices.forEach((matrix, i) => object.setMatrixAt(i, matrix));
-    object.castShadow = !name.includes('floor') && !name.includes('inlay') && !name.includes('flame');
+    object.castShadow = !batch.material.transparent && !name.includes('floor') && !name.includes('flagstone') && !name.includes('inlay') && !name.includes('flame');
     object.receiveShadow = true;
     object.instanceMatrix.needsUpdate = true;
     object.computeBoundingSphere();
@@ -580,13 +679,17 @@ export function createEnvironment(scene) {
       item.object.scale.set(1 + flicker, 1 + flicker * 1.8, 1 - flicker);
       item.object.rotation.z = Math.sin(t * 7 + item.phase) * .055;
     }
-    for (const item of animatedLights)
-      item.object.intensity = 12.7 + Math.sin(t * 9 + item.phase) * .7 + Math.sin(t * 17 + item.phase) * .3;
+    for (const item of animatedLights) {
+      item.object.intensity=12.7+Math.sin(t*9+item.phase)*.7+Math.sin(t*17+item.phase)*.3;
+      // Shader light count stays fixed; out-of-reach lights cost no fragments.
+      // Do not toggle visibility per frame (it would change shader defines).
+      if (playerPosition && item.object.position.distanceTo(playerPosition)>34) item.object.intensity=0;
+    }
     portalInner.rotation.z = t * .1;
     bossInner.rotation.z = -t * .025;
-    materials.blueGlow.opacity = .58 + Math.sin(t * 1.8) * .1;
-    materials.redGlow.opacity = .39 + Math.sin(t * 1.4) * .08;
-    mistMaterial.opacity = .115 + Math.sin(t * 1.9) * .025;
+    materials.blueGlow.opacity = .28 + Math.sin(t * 1.8) * .045;
+    materials.redGlow.opacity = .20 + Math.sin(t * 1.4) * .035;
+    mistMaterial.opacity = .041 + Math.sin(t * 1.9) * .009;
     for (const spark of portalSparks) {
       const a = spark.angle + t * .14;
       spark.object.position.set(Math.sin(a) * 1.69, .16 + ((t * .17 + spark.phase) % 1) * .78, Math.cos(a) * 1.69);
@@ -599,5 +702,16 @@ export function createEnvironment(scene) {
   }
 
   update(0, 0, null);
-  return { group, obstacles, walkable, update };
+  // Structural budget; renderer.info gives the actual visible pass budget.
+  let triangles=0, meshCount=0, instanceCount=0;
+  group.traverse(object=>{
+    if (!object.isMesh) return;
+    meshCount++;
+    const count=object.isInstancedMesh?object.count:1;
+    instanceCount+=count;
+    triangles+=(object.geometry.index?object.geometry.index.count:object.geometry.attributes.position.count)/3*count;
+  });
+  const artStats=Object.freeze({triangles,meshCount,instanceCount,pointLights:animatedLights.length,
+    textureFiles:16,textureResolution:1024});
+  return { group, obstacles, walkable, update, artStats };
 }

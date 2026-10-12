@@ -1,0 +1,21 @@
+{
+  "name": "Ash Archivist / 灰烬典籍守望者",
+  "triangles": 39508,
+  "meshes": 40,
+  "bones": 163,
+  "glbBytes": 7670312,
+  "sha256": "29bfca79de2e4b4aa05cac7da88b08e0d283b87c05098b0021da9520a1c96f47",
+  "clips": [
+    "Idle",
+    "Walk",
+    "Cast"
+  ],
+  "heightMeters": 1.91,
+  "baseLicense": "CC0 1.0",
+  "textures": "Original seeded procedural PBR plus CC0 MakeHuman brown eye image",
+  "limitations": [
+    "No claim of AAA/D2R/D4 quality equivalence",
+    "Animation authored as a first pass, no motion capture",
+    "No true mobile GPU performance evidence"
+  ]
+}

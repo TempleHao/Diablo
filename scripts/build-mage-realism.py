@@ -151,15 +151,24 @@ def source_mesh(name, face_list, mat, expansion=0):
         obj.data.update()
     return obj
 body=source_mesh('Continuous mature face neck and articulated hands',visible,skin)
-shirtfaces=[]; pantsfaces=[]; bootfaces=[]
+# Subtle stubble uses the continuous facial mesh's vertex colours, rather than
+# another cone or floating beard. Eyelids and lips remain anatomical geometry.
+colors=body.data.color_attributes.new(name='SkinTint',type='BYTE_COLOR',domain='CORNER')
+for loop in body.data.loops:
+    v=body.data.vertices[loop.vertex_index].co
+    stubble=max(0,min(1,(1.785-v.z)/.055)) if v.y<-.045 and v.z>1.67 else 0
+    colors.data[loop.index].color=(1-stubble*.23,1-stubble*.27,1-stubble*.27,1)
+snodes=skin.node_tree.nodes;slinks=skin.node_tree.links;sp=snodes.get('Principled BSDF')
+oldlink=next(l for l in slinks if l.to_node==sp and l.to_socket==sp.inputs['Base Color'])
+baseout=oldlink.from_socket;slinks.remove(oldlink)
+attr=snodes.new('ShaderNodeVertexColor');attr.layer_name='SkinTint'
+mix=snodes.new('ShaderNodeMixRGB');mix.blend_type='MULTIPLY';mix.inputs[0].default_value=1
+slinks.new(baseout,mix.inputs[1]);slinks.new(attr.outputs['Color'],mix.inputs[2]);slinks.new(mix.outputs['Color'],sp.inputs['Base Color'])
+pantsfaces=[]
 for f in bodyfaces:
     c=coords[[i for i,_ in f]].mean(axis=0)
-    if .93<c[2]<1.685 and not(abs(c[0])>.44 and c[2]<1.39): shirtfaces.append(f)
-    elif .16<c[2]<=1.01: pantsfaces.append(f)
-    elif c[2]<=.285: bootfaces.append(f)
-shirt=source_mesh('Tailored long sleeves and linen tunic',shirtfaces,cloth,.028)
+    if .20<c[2]<=1.01: pantsfaces.append(f)
 pants=source_mesh('Wool trousers',pantsfaces,cloth,.016)
-boots=source_mesh('Anatomical worn leather boots',bootfaces,leather,.023)
 
 def strip(name, rows, material, bone=None):
     verts=[p for row in rows for p in row]; width=len(rows[0]); faces=[]
@@ -171,14 +180,56 @@ def strip(name, rows, material, bone=None):
     bpy.context.view_layer.objects.active=obj;bpy.ops.object.modifier_apply(modifier=sol.name)
     return obj
 
+# Tailored torso: a closed ring surface with actual cloth ease, rather than an
+# offset of the naked chest. It avoids copied muscles/breasts in the garment.
+torso_rows=[]
+for k in range(17):
+    t=k/16;z=.985+t*.714
+    if z<1.54:rx=.217+.021*math.sin((z-.985)/.555*math.pi);ry=.143+.014*math.sin(t*math.pi)
+    else:
+        q=(z-1.54)/.159;rx=.235*(1-q)+.071*q;ry=.146*(1-q)+.066*q
+    row=[]
+    for j in range(41):
+        a=j/40*math.tau
+        fold=.0025*math.sin(a*13+z*7)+.002*math.sin(a*7-z*6)
+        row.append(((rx+fold)*math.sin(a),-(ry+fold)*math.cos(a),z))
+    torso_rows.append(row)
+strip('Tailored continuous linen torso',torso_rows,cloth)
+for side,sgn in [('L',1),('R',-1)]:
+    defs=rigdata['bones'];shoulder=joint[defs['upperarm01.'+side]['head']]
+    elbow=joint[defs['lowerarm01.'+side]['head']]
+    wrist=joint[defs['wrist.'+side]['head']]
+    rows=[]
+    for k in range(17):
+        t=k/16
+        if t<.50: p=shoulder*(1-t*2)+elbow*(t*2)
+        else:p=elbow*(2-t*2)+wrist*(t*2-1)
+        direction=(wrist-shoulder);direction/=np.linalg.norm(direction)
+        axis=np.cross(direction,np.array([0,1,0]));axis/=np.linalg.norm(axis)
+        other=np.cross(direction,axis)
+        radius=.088*(1-t)+.055*t+.008*math.sin(t*math.pi)
+        row=[]
+        for j in range(25):
+            a=j/24*math.tau;r=radius+.0028*math.sin(a*7+t*4)+.002*math.sin(t*30)*math.sin(a)**2
+            row.append(p+r*(axis*math.cos(a)+other*math.sin(a)))
+        rows.append(row)
+    strip('Continuous full length linen sleeve '+side,rows,cloth)
+    # Rounded boot quarters and a broad toe box hide individual toes entirely.
+    ankle=joint[defs['foot.'+side]['head']]
+    rows=[]
+    for z,rx,ry,cy in [(.018,.069,.16,-.050),(.035,.073,.17,-.050),(.09,.074,.15,-.047),(.155,.065,.092,-.012),(.22,.062,.069,.008),(.29,.066,.074,.008),(.325,.066,.074,.008)]:
+        rows.append([(ankle[0]+rx*math.sin(j/32*math.tau),cy-ry*math.cos(j/32*math.tau),z) for j in range(33)])
+    strip('Continuous leather boot toe box '+side,rows,leather,'foot.'+side)
+    strip('Thick stitched boot sole '+side,rows[:2],cloth,'foot.'+side)
+
 # Open front and back coat tails: distinct cloth panels, folds and asymmetric hems.
 for side in [-1,1]:
     rows=[]
-    for k in range(24):
-        t=k/23;z=1.11-t*.74
+    for k in range(17):
+        t=k/16;z=1.11-t*.74
         row=[]
-        for j in range(31):
-            a=(.22+j/30*(math.pi-.42))*side
+        for j in range(25):
+            a=(.22+j/24*(math.pi-.42))*side
             rx=.225+t*.073; ry=.155+t*.08
             fold=math.sin(a*11+t*.55)*(.003+t*.014)
             row.append(((rx+fold)*math.sin(a),-(ry+fold)*math.cos(a),z+.028*math.sin(a*3)*t*t))
@@ -195,10 +246,10 @@ for side in [-1,1]:
 
 # Soft mantle draped across back, leaving the neck/head silhouette readable.
 rows=[]
-for k in range(18):
-    t=k/17; row=[]
-    for j in range(41):
-        a=-math.pi*.53+j/40*math.pi*1.06
+for k in range(13):
+    t=k/12; row=[]
+    for j in range(31):
+        a=-math.pi*.53+j/30*math.pi*1.06
         width=.31+math.sin(t*math.pi)*.02+t*.04
         row.append((math.sin(a)*width, .055+math.cos(a)*(.105+t*.075),1.65-t*.38-.035*math.cos(a*5)*t))
     rows.append(row)
@@ -265,15 +316,23 @@ if eye_path.exists():
     ep=eye_mat.node_tree.nodes.get('Principled BSDF');ep.inputs['Roughness'].default_value=.25
     tex=eye_mat.node_tree.nodes.new('ShaderNodeTexImage');tex.image=bpy.data.images.load(str(source/'brown_eye.png'));tex.image.pack()
     eye_mat.node_tree.links.new(tex.outputs['Color'],ep.inputs['Base Color'])
-    # The eyes share the canonical MakeHuman coordinate frame, and follow the
-    # macro target shifts by the actual eye joint displacement.
-    verts=np.asarray([convert(v) for v in ev])
-    for side in [-1,1]:
-        eye_group='helper-l-eye' if side>0 else 'helper-r-eye'
-        canonical=convert(np.asarray([.30775*side,7.28415,1.24535]))
-        shift=coords[list(groups[eye_group])].mean(0)-canonical
-        for i,v in enumerate(verts):
-            if v[0]*side>0:verts[i]+=shift
+    # Reconstruct the official eye proxy from the morphed basemesh, using its
+    # barycentric attachment and axis scale, rather than its exported OBJ frame.
+    mapping=(source/'high-poly.mhclo').read_text().splitlines()
+    axis_scale=np.ones(3)
+    for line in mapping:
+        p=line.split()
+        if p and p[0] in ['x_scale','y_scale','z_scale']:
+            axis='xyz'.index(p[0][0]);axis_scale[axis]=abs(raw[int(p[1]),axis]-raw[int(p[2]),axis])/float(p[3])
+    proxy=[];in_verts=False
+    for line in mapping:
+        p=line.split()
+        if p and p[0]=='verts':in_verts=True;continue
+        if in_verts and len(p)==9 and p[0][0].isdigit():
+            ids=list(map(int,p[:3]));w=np.asarray(list(map(float,p[3:6])));offset=np.asarray(list(map(float,p[6:9])))
+            proxy.append(convert((raw[ids]*w[:,None]).sum(0)+offset*axis_scale))
+    if len(proxy)!=len(ev):raise RuntimeError('Eye proxy vertex count mismatch')
+    verts=np.asarray(proxy)
     make_mesh('Proper recessed brown eyeballs',verts,[[i for i,_ in f] for _,f in ef],eye_mat,[[eu[t] for _,t in f] for _,f in ef],rigid='head')
 
 # Scalp is a contiguous shell following the actual cranium. Hairline recedes
@@ -283,12 +342,6 @@ for f in bodyfaces:
     c=coords[[i for i,_ in f]].mean(0)
     if c[2]>1.855 or c[2]>1.765 and c[1]>-.023: headfaces.append(f)
 scalp=source_mesh('Close cropped scalp and recession',headfaces,hair,.003)
-for side in [-1,1]:
-    rows=[]
-    for k in range(12):
-        t=k/11
-        rows.append([(side*(.083+.013*math.sin(t*math.pi)), -.015+j/5*.050, 1.84-t*.103+.008*math.sin(j/5*math.pi)) for j in range(6)])
-    strip('Grey temple strands '+str(side),rows,hair,'head')
 
 # Staff: restrained aged wood, asymmetric bronze cage, small amber focus.
 staffbone='wrist.R'
@@ -344,10 +397,21 @@ for side,sign in [('L',1),('R',-1)]:
     pb=rig.pose.bones.get('upperarm01.'+side)
     if pb:
         m=pb.matrix.copy();pos=m.translation.copy();m=Matrix.Rotation(.40*sign,4,'Y')@m;m.translation=pos;pb.matrix=m
+for finger in range(2,6):
+    for knuckle,angle in [(1,-.38),(2,-.76),(3,-.65)]:
+        pb=rig.pose.bones.get('finger%d-%d.R'%(finger,knuckle))
+        if pb:pb.rotation_mode='XYZ';pb.rotation_euler.x=angle
 bpy.context.view_layer.update()
+staff_matrix=rig.pose.bones[staffbone].matrix @ rig.data.bones[staffbone].matrix_local.inverted()
+staff_inverse=staff_matrix.inverted()
+grip=rig.pose.bones['wrist.R'].head+Vector((-.014,-.031,-.025))
+staff_shift=Vector((grip.x-staffx,grip.y+.115,0))
 deps=bpy.context.evaluated_depsgraph_get()
 for obj,_,_ in parts:
     evaluated=obj.evaluated_get(deps);new=bpy.data.meshes.new_from_object(evaluated,depsgraph=deps)
+    if obj.name.startswith(('Carved ash staff','Bent bronze focus cage','Staff leather and bronze binding','Small amber focus')):
+        inverse_world=obj.matrix_world.inverted()
+        for v in new.vertices:v.co=inverse_world@(staff_inverse@(obj.matrix_world@v.co)+staff_shift)
     old=obj.data;obj.data=new
     for mod in list(obj.modifiers):obj.modifiers.remove(mod)
     mod=obj.modifiers.new('Smooth anatomical skinning','ARMATURE');mod.object=rig
@@ -380,6 +444,11 @@ for clip,length in [('Idle',72),('Walk',32),('Cast',30)]:
     rig.animation_data.action=None
     track=rig.animation_data.nla_tracks.new();track.name=clip;track.strips.new(clip,1,action)
 scene.frame_set(1)
+focus=bpy.data.objects.new('face_focus',None);bpy.context.collection.objects.link(focus)
+focus.empty_display_type='SPHERE';focus.empty_display_size=.018
+focus.parent=rig;focus.parent_type='BONE';focus.parent_bone='head'
+bpy.context.view_layer.update();focus.matrix_world=Matrix.Translation(Vector((0,-.133,1.794)))
+focus['purpose']='Original anatomical face framing anchor; glTF Y is approximately 1.794 m'
 
 # Neutral studio evidence renders, excluded from the glTF asset.
 def light(name,loc,energy,color,size):
@@ -398,7 +467,7 @@ scene.render.resolution_x=900;scene.render.resolution_y=900;scene.render.filepat
 
 bpy.ops.object.select_all(action='DESELECT')
 for obj,_,_ in parts:obj.select_set(True)
-rig.select_set(True);bpy.context.view_layer.objects.active=rig
+rig.select_set(True);focus.select_set(True);bpy.context.view_layer.objects.active=rig
 asset=root/'dist/models/ember-mage-realism.glb'
 bpy.ops.export_scene.gltf(filepath=str(asset),export_format='GLB',use_selection=True,export_animations=True,export_animation_mode='NLA_TRACKS',export_force_sampling=True,export_skins=True,export_apply=False,export_image_format='AUTO')
 bpy.ops.wm.save_as_mainfile(filepath=str(out/'ash-archivist.blend'))

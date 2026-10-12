@@ -101,6 +101,39 @@ grime = np.stack([.095 + field * .06, .085 + field * .045, .069 + field * .036, 
 Image.fromarray(np.uint8(grime * 255), 'RGBA').resize((small, small), Image.Resampling.LANCZOS).save(
     OUT / 'environment-grime.png', optimize=True)
 
+# A soft, emissive flame card, instead of an orange low-poly cone. Crossed cards
+# are reserved for the ten wall sconces; floor candles stay tiny simple details.
+h, w = 512, 256
+fy, fx = np.mgrid[0:h, 0:w]
+v = 1-fy/(h-1)
+u = fx/(w-1)*2-1
+lean = .11*np.sin(v*9)+.06*np.sin(v*23)
+width = .47*(1-v)**.52+.009
+shape = np.clip((1-np.abs(u-lean)/width)*1.65, 0, 1)
+shape *= np.clip(v*19,0,1)*np.clip((1-v)*18,0,1)
+core = np.clip((1-np.abs(u-lean)/(width*.50))*1.3,0,1)*np.clip(1-v*1.10,0,1)
+flame = np.stack([np.ones_like(v),.24+core*.67,.025+core*.54,shape**1.6*.94],axis=2)
+Image.fromarray(np.uint8(flame*255),'RGBA').save(OUT/'environment-flame.png',optimize=True)
+
+# Original charred cloth for the archive's funerary hangings; woven micro-normal
+# and a faded, deliberately simple solar mark, not a borrowed franchise emblem.
+by,bx=np.mgrid[0:1024,0:512]
+cloth_noise=fractal([9,43,257],[3,1,.4])[:,:512]
+weave=(np.sin(bx*np.pi*.93)*np.sin(by*np.pi*.97))*.012
+cloth=np.stack([.13+(cloth_noise-.5)*.035,.143+(cloth_noise-.5)*.037,.137+(cloth_noise-.5)*.030],axis=2)
+emblem=Image.new('L',(512,1024),0);draw=ImageDraw.Draw(emblem)
+draw.line((43,0,43,1013),fill=149,width=8);draw.line((468,0,468,1013),fill=149,width=8)
+draw.ellipse((156,283,356,483),outline=194,width=11)
+for i in range(12):
+ a=i*np.pi/6
+ draw.line((256+np.cos(a)*119,383+np.sin(a)*119,256+np.cos(a)*165,383+np.sin(a)*165),fill=182,width=9)
+mark=np.asarray(emblem,np.float32)/255*(.60+cloth_noise*.35)
+cloth+=mark[:,:,None]*np.array([.21,.169,.073])
+burnt=np.clip((by/1024-.73)*2.8,0,.76)*(1-cloth_noise*.40)
+cloth*=1-burnt[:,:,None]
+save_rgb('environment-banner-basecolor.jpg',cloth)
+save_rgb('environment-banner-normal.jpg',normal_map(cloth_noise*.003+weave,10))
+
 # Original funerary relief: radiating broken sun and inset lines carved in stone.
 relief = Image.new('L', (SIZE, SIZE), 145)
 draw = ImageDraw.Draw(relief)
@@ -130,6 +163,6 @@ rgb = np.stack([.41 + (r-.55)*.18 + (stone_noise-.5)*.04,
 save_rgb('environment-relief-basecolor.jpg', rgb)
 save_rgb('environment-relief-normal.jpg', normal_map(relief_height, 30))
 
-files = sorted(OUT.glob('environment-*'))
+files = sorted(p for p in OUT.glob('environment-*') if '-masonry-' not in p.name)
 print(json.dumps({'size': SIZE, 'license': 'MIT, original procedural source',
                   'files': [{'path': str(p.relative_to(OUT.parent.parent)), 'bytes': p.stat().st_size} for p in files]}, indent=2))

@@ -16,7 +16,7 @@ export function createReflectionEnvironment(renderer) {
     mesh.position.set(...card.p);mesh.lookAt(0,1,0);studio.add(mesh);
   }
   const generator = new T.PMREMGenerator(renderer);
-  const target = generator.fromScene(studio,0.08,0.1,30);
+  const target = generator.fromScene(studio,0.03,0.1,30);
   generator.dispose();
   studio.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});
   return target;

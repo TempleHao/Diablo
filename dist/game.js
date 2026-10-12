@@ -9,8 +9,9 @@ const $=id=>document.getElementById(id), clamp=(n,a,b)=>Math.max(a,Math.min(b,n)
 let renderer;try{renderer=new T.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});}catch(e){$('intro').showModal();$('start').disabled=true;$('savehint').textContent='设备未能启动 WebGL，请使用支持 3D 的浏览器。';throw e;}
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.4));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.setClearColor(0x100f0e);renderer.outputColorSpace=T.SRGBColorSpace;
 const scene=new T.Scene();scene.fog=new T.FogExp2(0x171614,.014);const camera=new T.PerspectiveCamera(42,1,.1,100);
-scene.add(new T.HemisphereLight(0xbac6d0,0x342b22,.58));
-const sun=new T.DirectionalLight(0xe6d1ac,2.05);sun.position.set(-10,18,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;Object.assign(sun.shadow.camera,{left:-25,right:25,top:25,bottom:-25});scene.add(sun);
+scene.add(new T.HemisphereLight(0xbac6d0,0x342b22,.72));
+const sun=new T.DirectionalLight(0xd1d5d4,2.05);sun.position.set(-10,18,7);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.normalBias=.025;sun.shadow.bias=-.0003;Object.assign(sun.shadow.camera,{left:-25,right:25,top:25,bottom:-25});scene.add(sun);
+const fill=new T.DirectionalLight(0x9fafbd,.42);fill.position.set(7,8,-8);scene.add(fill);
 const reflectionEnvironment=createReflectionEnvironment(renderer);scene.environment=reflectionEnvironment.texture;scene.environmentIntensity=.23;
 const worldRenderer=createWorldRenderer(renderer,camera);
 const mats={stone:new T.MeshStandardMaterial({color:0x42474b,roughness:.95}),wall:new T.MeshStandardMaterial({color:0x30363a,roughness:.9}),robe:new T.MeshStandardMaterial({color:0x416888,roughness:.8}),gold:new T.MeshStandardMaterial({color:0xcaa668,metalness:.65,roughness:.35})};
