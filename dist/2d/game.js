@@ -53,7 +53,7 @@ function encounterPoint(i) {
 function spawnWave(index){
   const group=enemyWaves[index]||[];
   group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
-  announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
+  if(index>0)announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
 }
 function findBossPoint(){
   // A short, reachable walk down the central aisle instead of spawning inside masonry.
@@ -64,6 +64,7 @@ function findBossPoint(){
   return {x:WIDTH/2,y:TILE*5.7};
 }
 function build() {
+  ui.log.replaceChildren();messageTimes.clear();
   const seed = 20261013 + profile.clears*19;
   rng=mulberry32(seed); dungeon=makeDungeon(seed);
   const s=stats(profile);
@@ -85,7 +86,7 @@ function spawn(kind,location=null) {
   enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，失名者已经苏醒！',true);}
   return e;
 }
-function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); }
+function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
 function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
@@ -339,7 +340,13 @@ function render(){
   layers.sort((a,b)=>a.y-b.y);
   for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
-  for(const h of hazards){ctx.strokeStyle=h.type==='nova'?'#9bdffcaa':'#ad72d18c';ctx.lineWidth=h.type==='nova'?9:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,7);ctx.stroke();}
+  for(const h of hazards){
+    ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
+    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':'#bf80e8';
+    ctx.shadowColor=h.type==='nova'?'#8acde5':'#9e77c7';ctx.shadowBlur=15;
+    ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
