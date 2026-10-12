@@ -24,29 +24,35 @@
     "taskId": "ART-01",
     "trigger": "user-feedback",
     "startedAt": "2026-10-12T05:14:55Z",
-    "heartbeatAt": "2026-10-12T05:14:55Z",
-    "leaseExpiresAt": "2026-10-12T07:14:55.000Z"
+    "heartbeatAt": "2026-10-12T05:25:38Z",
+    "leaseExpiresAt": "2026-10-12T07:25:38.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
-  "resumeBranch": null,
-  "resumeCommit": null,
-  "nextAction": "ART-01: establish realistic anatomy/cloth/PBR asset pipeline and rebuild a playable visual slice; save small tested checkpoints. User art target remains unaccepted until actual rendering demonstrates it. D1-02 deferred by latest user feedback.",
+  "resumeBranch": "checkpoint/art-01",
+  "resumeCommit": "18e83f5413d84b7c0cf9adffa7d8752c4fbf7a1b",
+  "nextAction": "Continue checkpoint/art-01: fix continuous character garment/eye/boot defects and PMREM sigma warning, finish representative crypt; only publish candidate after actual GLB, render, collision, save and desktop/touch checks.",
   "lastAttempt": {
     "runId": "manual-ART-01-20261012051455-3dbf40df",
     "taskId": "ART-01",
     "startedAt": "2026-10-12T05:14:55Z",
     "status": "running",
-    "phase": "art-source-and-rebuild"
+    "phase": "sources-and-pipeline-checkpointed",
+    "checkpointCommit": "18e83f5413d84b7c0cf9adffa7d8752c4fbf7a1b",
+    "validation": {
+      "sourceLicenses": "CC0 source manifests and SHA verified",
+      "newArt": "not accepted; character first-build defects being corrected",
+      "runtime": "initialization smoke ongoing; complete regressions not run"
+    }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T05:14:55Z",
+  "lastUpdatedAt": "2026-10-12T05:25:38Z",
   "validationLimitations": [
     "D1-01 complete; remaining D1/D2/D3 systems are planned, not implemented in 0.2.1",
     "Browser mobile viewport checks are not real-device performance tests",
