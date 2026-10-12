@@ -481,7 +481,7 @@ def hair_card(name,path,width):
     for k,p in enumerate(path):
         p=np.asarray(p);t=k/(len(path)-1)
         tangent=np.asarray(path[min(k+1,len(path)-1)])-np.asarray(path[max(0,k-1)])
-        normal=p-np.array([0,.013,1.804]);normal/=np.linalg.norm(normal)
+        normal=p-np.array([0,-.060,1.804]);normal/=np.linalg.norm(normal)
         across=np.cross(tangent,normal);across/=np.linalg.norm(across)
         w=width*(.72+.28*math.sin(t*math.pi))*max(.08,min(1,(1-t)*6))
         rows.append([p-across*w*.5,p+across*w*.5])
@@ -489,16 +489,16 @@ def hair_card(name,path,width):
     uv=[[(0,k/(len(rows)-1)),(1,k/(len(rows)-1)),(1,(k+1)/(len(rows)-1)),(0,(k+1)/(len(rows)-1))] for k in range(len(rows)-1)]
     return make_mesh(name,[p for row in rows for p in row],faces,strand_hair,uv,rigid='head')
 def crown_point(x,y,lift):
-    z=1.803+.108*math.sqrt(max(.045,1-(x/.089)**2-((y-.014)/.109)**2))
-    p=np.array([x,y,z]);normal=p-np.array([0,.014,1.803]);normal/=np.linalg.norm(normal)
+    z=1.803+.108*math.sqrt(max(.045,1-(x/.089)**2-((y+.060)/.113)**2))
+    p=np.array([x,y,z]);normal=p-np.array([0,-.060,1.803]);normal/=np.linalg.norm(normal)
     return p+normal*lift
 for layer in range(3):
     for j in range(24):
         x=-.073+j/23*.146
         path=[]
         edge=math.sqrt(max(.10,1-(x/.089)**2))
-        front_y=.014-.109*edge*.88
-        back_y=.014+.109*edge*.74
+        front_y=-.060-.113*edge*.88
+        back_y=-.060+.113*edge*.74
         for k in range(9):
             t=k/8;y=front_y+layer*.0018+t*(back_y-front_y-layer*.006)
             sweep=.010*math.sin(t*math.pi)*(1-abs(x)/.095)
@@ -509,7 +509,7 @@ for layer in range(3):
 for j in range(8):
     x=-.051+j/7*.102;edge=math.sqrt(1-(x/.089)**2);path=[]
     for k in range(10):
-        t=k/9;y=.014-.109*edge*.94+t*.105
+        t=k/9;y=-.060-.113*edge*.90+t*.105
         p=crown_point(x+.014*math.sin(t*math.pi),y,.004+.012*math.sin(t*math.pi))
         p[2]+=.002*math.sin(j*2.3+t*4.7)*math.sin(t*math.pi)
         path.append(p)
@@ -521,7 +521,7 @@ for side in [-1,1]:
         for k in range(8):
             t=k/7;ang=a+t*.38
             x=side*(.073+.013*math.sin(t*math.pi))*math.cos(ang*.48)
-            y=.006+.075*math.sin(ang)-.009*(1-t)
+            y=-.060+.095*math.sin(ang)-.004*(1-t)
             z=1.877-j%3*.006-t*(.055+.019*math.cos(a))
             path.append((x,y,z))
         hair_card('Combed temple and sideburn card %d %d'%(side,j),path,.010)
@@ -529,7 +529,7 @@ for j in range(20):
     a=-1.10+j/19*2.20;path=[]
     for k in range(8):
         t=k/7
-        path.append((.078*math.sin(a),.013+.085*math.cos(a)+.004*math.sin(t*math.pi),1.873-t*.086-j%3*.002))
+        path.append((.076*math.sin(a),-.060+(.102-.018*t)*math.cos(a)+.003*math.sin(t*math.pi),1.873-t*.086-j%3*.002))
     hair_card('Tapered nape strand card %d'%j,path,.012)
 
 # Small tapered brow ribbons follow the anatomical brow ridge. They remain

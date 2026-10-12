@@ -381,6 +381,7 @@ OPAQUE = atlas_material('Ash atlas opaque', False)
 MASK = atlas_material('Ash atlas cutout', True)
 alpha_names = {m['material'] for m in alpha_sources}
 for obj in PARTS:
+    obj['budgetPreserveHairCards'] = any('hair mask' in material.name.lower() for material in obj.data.materials)
     destinations = [1 if obj.data.materials[p.material_index].name in alpha_names else 0 for p in obj.data.polygons]
     obj.data.materials.clear(); obj.data.materials.append(OPAQUE); obj.data.materials.append(MASK)
     for polygon, index in zip(obj.data.polygons, destinations): polygon.material_index = index
@@ -399,7 +400,8 @@ def is_body(obj): return 'face neck and articulated hands' in obj.name
 def is_eye(obj): return 'eyeball' in obj.name
 def protected(obj):
     name = obj.name.lower()
-    return any(n in name for n in ('scalp', 'hair', 'brow', 'focus', 'ash staff'))
+    return obj.get('budgetPreserveHairCards', False) or any(n in name for n in (
+        'scalp', 'hair', 'strand', 'forelock', 'sideburn', 'brow', 'focus', 'ash staff'))
 
 
 def reduce(obj, ratio):
@@ -455,12 +457,12 @@ for lod, target in (('L0', 34500), ('L1', 14900)):
         source_points = np.concatenate(list(ref['parts'].values()))
         detail = {}
         for obj, source in zip(objects, PARTS):
-            if is_body(source) or is_eye(source) or protected(source):
-                bvh = tree(obj)
-                coords = ref['parts'][source.name]
-                errors = [bvh.find_nearest(Vector(p))[3] for p in coords[::3]]
-                detail[source.name] = {'samples': len(errors), 'maxMeters': float(max(errors)),
-                                       'rmsMeters': float(np.sqrt(np.mean(np.square(errors))))}
+            bvh = tree(obj)
+            coords = ref['parts'][source.name]
+            errors = [bvh.find_nearest(Vector(p))[3] for p in coords[::3]]
+            detail[source.name] = {'samples': len(errors), 'maxMeters': float(max(errors)),
+                                   'rmsMeters': float(np.sqrt(np.mean(np.square(errors)))),
+                                   'unchangedGeometry': protected(source)}
         surface_errors.append({'clip': clip, 'frame': frame, 'details': detail,
             'maxBoundsMeters': float(abs(bounds(current)-bounds(source_points)).max()),
             'boundsMeters': bounds(current).tolist(),
@@ -470,6 +472,9 @@ for lod, target in (('L0', 34500), ('L1', 14900)):
     assert total <= (35000 if lod == 'L0' else 15000), 'Triangle limit missed: '+str(total)
     body_error = max(d['maxMeters'] for r in surface_errors for n, d in r['details'].items() if 'face neck' in n)
     assert body_error < .004, 'Face/hand reduction exceeds 4 mm sampled surface error: '+str(body_error)
+    assert max(r['maxBoundsMeters'] for r in surface_errors) < .005, 'LOD changes grounding or silhouette bounds by more than 5 mm'
+    unchanged_error = max(d['maxMeters'] for r in surface_errors for d in r['details'].values() if d['unchangedGeometry'])
+    assert unchanged_error < .0005, 'Protected hair, brow, staff or focus geometry changed'
     LODS[lod] = {'triangles': total, 'parts': reduction, 'samples': surface_errors,
                  'sampledBodySurfaceErrorMaxMeters': body_error}
     bpy.ops.object.select_all(action='DESELECT')
