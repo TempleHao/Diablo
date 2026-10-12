@@ -3,7 +3,7 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.2.0",
   "designVersion": "1.0",
-  "status": "ready",
+  "status": "running",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "D1-01",
@@ -18,7 +18,14 @@
     "jobId": 114498601963,
     "conclusion": "success"
   },
-  "activeRun": null,
+  "activeRun": {
+    "runId": "manual-D1-01-20261012021441000-2d139678",
+    "taskId": "D1-01",
+    "trigger": "user",
+    "startedAt": "2026-10-12T02:14:41.000Z",
+    "heartbeatAt": "2026-10-12T02:14:41.000Z",
+    "leaseExpiresAt": "2026-10-12T04:14:41.000Z"
+  },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
@@ -27,12 +34,17 @@
   "resumeBranch": null,
   "resumeCommit": null,
   "nextAction": "Read latest user direction and repository; verify existing game baseline and save migration protection for D1-01.",
-  "lastAttempt": null,
+  "lastAttempt": {
+    "runId": "manual-D1-01-20261012021441000-2d139678",
+    "taskId": "D1-01",
+    "startedAt": "2026-10-12T02:14:41.000Z",
+    "status": "running"
+  },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-11T21:19:10.848248+00:00",
+  "lastUpdatedAt": "2026-10-12T02:14:41.000Z",
   "validationLimitations": [
     "Full planned systems are not implemented in Demo 0.2.0",
     "Browser mobile viewport checks are not real-device performance tests",
