@@ -64,7 +64,16 @@
       "gateIds": [
         "G02"
       ],
-      "evidence": []
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "12c770bef56238e72bce6b6d10da3fa1f8628c05"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38387621782"
+        }
+      ]
     },
     "F3": {
       "status": "pending",
@@ -200,7 +209,7 @@
       "id": "P1-002",
       "severity": "P1",
       "status": "open",
-      "description": "Boss 无专属掉落/首杀机制，通关后自动重置"
+      "description": "Boss现有首杀专属传奇/区域掉落且击杀后不会自动重置，但缺少城镇/下一层/传送与跨刷新掉落持久化完整流程，仍禁止最终发布"
     },
     {
       "id": "P1-003",
@@ -232,21 +241,20 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F2：实现独立安全主城与野外入口、可回城/重返地牢、击杀Boss后的可选下一层与手动重刷；确保迷宫/副本切换与当前2D角色存档兼容，新增浏览器交互测试。优先同步解决 P1-002 的 Boss 专属掉落与重复结算。",
+  "nextAction": "F2 下一个代码切片：实现主城安全区（铁匠/商人/仓库/传送师）和野外/地牢入口的显式导航；设置击败首领后的可选继续探索/下一层/手动重刷，且保证 Boss 战利品刷新后不会丢失。添加浏览器流程与老存档迁移回归，保持现有 A 向美术 P1 阻断。",
   "lastAttempt": {
     "at": "2026-10-13",
-    "phase": "F1",
-    "status": "passed-topology-and-first-browser-door-transition",
+    "phase": "F2",
+    "status": "partial-playable-boss-loot",
     "verified": {
-      "commit": "68feaf5437cb89b921f78683371ab75746a7b67d",
-      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38386923283",
-      "screenshots": [
-        "docs/screenshots/2d-f1-maze-desktop.jpg",
-        "docs/screenshots/2d-f1-maze-mobile.jpg"
-      ],
-      "physicalMazeSeeds": 100
+      "commit": "12c770bef56238e72bce6b6d10da3fa1f8628c05",
+      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38387621782",
+      "unitTests": [
+        "tests/2d-boss-loot.test.mjs",
+        "tests/2d-maze-world.test.mjs"
+      ]
     },
-    "caveat": "This is real navigable PIXEL prototype; not A-direction 2.5D art. PR remains Draft; no main/Pages release."
+    "caveat": "Regional loot and first kill guarantee are implemented/tested in branch only; no town/world or A-direction art acceptance. Draft PR #6, not deployed."
   },
   "candidate": {
     "status": "none",
