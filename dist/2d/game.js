@@ -22,6 +22,18 @@ const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null, selectedRingSlot=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
+for(const id of ['mage-skin-start','mage-skin-inventory']){
+  const select=$(id);
+  select.value=profile.heroSkin;
+  select.addEventListener('change',()=>{
+    profile.heroSkin=select.value;
+    for(const other of ['mage-skin-start','mage-skin-inventory'])$(other).value=profile.heroSkin;
+    hero&&(hero.skin=profile.heroSkin);
+    persist();
+    announce('法师形象已切换：'+select.options[select.selectedIndex].text,true);
+  });
+}
+
 function renderSkillBar(){
   const bar=$('abilitybar');bar.replaceChildren();
   for(const key of profile.activeSkills){
