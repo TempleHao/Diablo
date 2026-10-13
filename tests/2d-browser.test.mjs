@@ -112,6 +112,10 @@ try{
     const effects=await page.evaluate(()=>window.__ember2dQA.castPreview('nova'));
     assert.equal(effects.skill,'nova');
     assert.ok(effects.count>0,'skill effects must create visible particles');
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const fxShot=await page.screenshot({type:'jpeg',quality:73});
+      console.log((viewport.width===1365?'VFX_DESKTOP_BASE64:':viewport.width===390?'VFX_MOBILE_BASE64:':'VFX_LANDSCAPE_BASE64:')+fxShot.toString('base64'));
+    }
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
