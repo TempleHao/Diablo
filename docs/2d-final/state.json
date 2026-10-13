@@ -240,6 +240,12 @@
       "severity": "P1",
       "status": "open",
       "description": "F2 branch does not persist unclaimed boss ground loot across refresh; code write blocked by safety check on 2026-10-13. New real screenshots unavailable."
+    },
+    {
+      "id": "P1-008",
+      "severity": "P1",
+      "status": "open",
+      "description": "Original 2.5D masonry asset authored but renderer integration blocked; no new gameplay screenshot or visual acceptance."
     }
   ],
   "deltaTop3": [
@@ -247,16 +253,20 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "Run v0.3.3+maze rules, 100 seeds, Boss/portal/save, Chromium PC/mobile and audit; commit actual screenshots, fix regressions. Keep PR Draft until F8 and user confirmation.",
+  "nextAction": "On isolated 2D branch, safely integrate original dist/2d/masonry-art.js into maze-world.js with two-pass floor/wall draw after write access is restored; then run 100-seed, real Chromium PC/portrait/landscape and audit, collect actual game screenshots; reconcile main v0.3.4 UI without overwriting saves or 3D.",
   "lastAttempt": {
     "at": "2026-10-14",
-    "phase": "F2",
-    "status": "integrated-code-awaiting-ci-and-visual-evidence",
+    "phase": "F4",
+    "status": "partial-unintegrated-art-write-blocked",
     "verified": {
-      "mainBaseline": "4b6a20c89d22d80be60938dc94fd239f1a4d4e19",
-      "sourcePR": 6
+      "main": "840c902f394305dba808588d3926d4e29de79375",
+      "mainCI": "https://github.com/TempleHao/Diablo/actions/runs/38434303596",
+      "pages": "https://github.com/TempleHao/Diablo/actions/runs/38434303361",
+      "artAssetCommit": "8aa6266baf8e3a4bcf73c3e2a0c79f6b436aa1ac",
+      "branch": "feature/2d-maze-topology-f1"
     },
-    "caveat": "Branch integrates v0.3.3 and maze; requires fresh CI, browser screenshots and visual review."
+    "blocker": "Source update_file for dist/2d/maze-world.js rejected by OpenAI safety checks. Newly authored CC0 masonry module exists but is NOT imported or rendered; no new real-game screenshot or art gate. Do not claim visual upgrade. V8 deterministic/fallback smoke passed; full CI pending.",
+    "caveat": "PR #6 remains draft and is behind main v0.3.4; keep 3D and saves untouched."
   },
   "candidate": {
     "status": "none",
