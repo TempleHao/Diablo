@@ -17,6 +17,24 @@ try{
   for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true}]){
     const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},isMobile:viewport.isMobile,hasTouch:!!viewport.hasTouch,deviceScaleFactor:1});
     const page=await context.newPage(),errs=[];
+    // Dedicated visual regression character: no fixture is shipped in the game itself.
+    await page.addInitScript(()=>{
+      const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
+        id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:0,armor,value:300,setId
+      });
+      localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
+        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},
+        inventory:[
+          item('staff','weapon','余烬裁决长杖',3,[{key:'power',value:28},{key:'fire',value:13},{key:'crit',value:5}],55),
+          item('helmet','head','龙焰冠冕',4,[{key:'resistFire',value:12}],0,8,24,'dragonflame'),
+          item('robe','robe','龙焰法衣',4,[{key:'hp',value:23}],0,54,38,'dragonflame'),
+          item('gloves','gloves','旧日秘纹手套',2,[{key:'haste',value:9},{key:'critDmg',value:12}]),
+          item('ring','ring1','冻土秘银指环',2,[{key:'cold',value:9},{key:'crit',value:3}]),
+          item('amulet','amulet','流浪先知护符',2,[{key:'mana',value:22},{key:'skillCold',value:1}])
+        ],
+        equipped:{weapon:'staff',head:'helmet',robe:'robe',ring1:'ring'}
+      }));
+    });
     page.on('pageerror',e=>errs.push(e.message));
     const response=await page.goto('http://127.0.0.1:8765/2d/',{waitUntil:'load'});
     assert.equal(response.status(),200);
@@ -43,6 +61,12 @@ try{
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
     assert.equal(await page.locator('.catalog-skill').count(),7);
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
+    await page.locator('.item-detail').first().evaluate(el=>el.click());
+    assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const visual=await page.screenshot({type:'jpeg',quality:62});
+      console.log((viewport.isMobile?'INVENTORY_MOBILE_BASE64:':'INVENTORY_DESKTOP_BASE64:')+visual.toString('base64'));
+    }
     await page.click('#inv-close');
     assert.equal(await page.locator('#inventory').isVisible(),false);
     await page.click('#btn-pause');
