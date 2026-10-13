@@ -1,61 +1,95 @@
 /**
- * Original procedural high-resolution hooded mage for small camera zoom.
- * Crisp vector silhouette at any device DPR. This is a readable interim sprite,
- * NOT the approved realistic 2.5D animated character deliverable.
+ * Ember Chronicles 2D - a compact, original dark-fantasy mage renderer.
+ * Foot-anchored silhouette designed for 0.55-0.67x display scale.
+ * Source vectors are deliberately high resolution for small screens.
+ * Interim game artwork; not the final realistic A-direction animated sprite.
  */
-export function drawMage(ctx,p,tick,gear={}){
-  ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));
-  const isLeft=Math.cos(p.angle)<-.2,walking=Math.abs(p.walk??0)>.01;
-  if(isLeft)ctx.scale(-1,1);
-  const t=Math.sin((p.walk||tick*2))*2;
-  const cast=p.cast>0;
-  const cape=gear.robe?.rarity>=3?'#702b33':'#443f4a';
-  const metal=gear.head?.rarity>=3?'#bf9862':'#77808d';
-  const gleam=gear.weapon?.rarity>=3?'#ff9f4c':'#77bcf2';
-  const poly=(pts,color,edge='#11151e',lw=2)=>{ctx.beginPath();ctx.moveTo(...pts[0]);for(const xy of pts.slice(1))ctx.lineTo(...xy);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.strokeStyle=edge;ctx.lineWidth=lw;ctx.stroke();};
-  // Contact shadow.
-  ctx.fillStyle='#02040ab5';ctx.beginPath();ctx.ellipse(0,6,26,10,0,0,Math.PI*2);ctx.fill();
-  // Cloak tail, upper body proportions, split hem showing boots.
-  poly([[-17,-51],[-30,-8],[-19,-8],[-9,-13],[0,-6],[12,-14],[26,-8],[16,-52]],cape);
-  poly([[-13,-42],[-11,-10],[-3,-9],[0,-33]],'#36343e');
-  poly([[1,-33],[5,-9],[16,-10],[13,-43]],'#3a333b');
-  poly([[-16,-11],[-4,-11],[-1,2],[-15,2]],'#322b2f','#0d1016');
-  poly([[4,-11],[16,-11],[18,2],[2,2]],'#302d36','#0d1016');
-  // Chest armor, shoulders and belt.
-  poly([[-20,-64],[-13,-74],[12,-74],[19,-64],[15,-31],[-15,-31]],'#33353d');
-  poly([[-14,-69],[0,-61],[14,-69],[12,-44],[0,-40],[-13,-44]],'#5b5356','#b99b73');
-  poly([[-22,-66],[-11,-73],[-8,-61],[-18,-56],[-24,-60]],metal);
-  poly([[11,-73],[23,-66],[25,-60],[18,-56],[8,-61]],metal);
-  poly([[-17,-38],[17,-38],[16,-30],[-17,-30]],'#644a35','#be966a');
-  poly([[-5,-39],[5,-39],[5,-29],[-5,-29]],'#a88553');
-  ctx.fillStyle='#e5b475';ctx.fillRect(-2,-36,4,5);
-  // Folded hood with shadowed young-looking face (no enlarged elder-man bitmap).
-  poly([[-21,-74],[-23,-89],[-17,-104],[0,-110],[17,-102],[22,-89],[20,-75],[13,-68],[-14,-68]],'#282a36','#0e111c',2.2);
-  poly([[-14,-92],[-4,-102],[7,-101],[15,-88],[13,-76],[-9,-77]],'#9b7765','#25242a');
-  poly([[-14,-91],[-6,-106],[0,-111],[9,-104],[19,-90],[11,-85],[5,-95],[-5,-94]],'#46434a','#bab2ad',1.3);
-  poly([[-13,-85],[-6,-93],[6,-94],[12,-86],[9,-78],[-10,-78]],'#182028','#0b1018');
-  ctx.fillStyle='#d8ab88';ctx.beginPath();ctx.moveTo(-4,-79);ctx.lineTo(0,-76);ctx.lineTo(3,-79);ctx.fill();
-  ctx.fillStyle='#f0af75';ctx.fillRect(-9,-85,5,1.5);ctx.fillRect(4,-85,5,1.5);
-  // Arms bend through cast pose.
-  poly([[-17,-62],[-23,-54],[-19,-37],[-12,-37],[-11,-55]],'#66525a');
-  poly([[15,-62],[23,-55],[19,-38],[12,-39],[11,-55]],'#66525a');
-  if(cast){
-    poly([[12,-53],[24,-68],[35,-60],[25,-46],[19,-39]],'#85736b',metal);
-    const g=ctx.createRadialGradient(32,-64,0,32,-64,22);
-    g.addColorStop(0,'#fff4b8');g.addColorStop(.36,gleam);g.addColorStop(1,'#fb8b3000');
-    ctx.fillStyle=g;ctx.beginPath();ctx.arc(32,-64,22,0,Math.PI*2);ctx.fill();
-  }else{
-    poly([[12,-53],[21,-42],[15,-31],[9,-35]],'#837064');
+export function drawMage(ctx,actor,time,gear={}){
+  ctx.save();
+  ctx.translate(actor.x,actor.y);
+  if(Math.cos(actor.angle||0)<-.2)ctx.scale(-1,1);
+  const step=Math.sin(actor.walk||time*2)*1.8,cast=(actor.cast||0)>0;
+  const legendary=gear.head?.rarity>=3||gear.robe?.rarity>=3;
+  const cloak=gear.robe?.rarity>=3?'#493038':'#242b35';
+  const metal=gear.head?.rarity>=3?'#b08a5c':'#849099';
+  const magic=gear.weapon?.rarity>=3?'#e7a56c':'#89bad9';
+  function shape(pts,fill,edge='#101721',width=1.1){
+    ctx.beginPath();ctx.moveTo(...pts[0]);for(const pt of pts.slice(1))ctx.lineTo(...pt);
+    ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+    if(edge){ctx.strokeStyle=edge;ctx.lineWidth=width;ctx.stroke();}
   }
-  // Realizable weapon silhouette; staff set vertically in front.
-  ctx.strokeStyle='#271c21';ctx.lineWidth=5;ctx.lineCap='round';
-  ctx.beginPath();ctx.moveTo(27,-6);ctx.lineTo(33,-99);ctx.stroke();
-  ctx.strokeStyle='#b48c56';ctx.lineWidth=2.2;ctx.beginPath();ctx.moveTo(28,-6);ctx.lineTo(34,-96);ctx.stroke();
-  poly([[33,-116],[24,-99],[29,-94],[33,-101],[37,-94],[42,-99]],metal);
-  const orb=ctx.createRadialGradient(33,-103,0,33,-103,13);
-  orb.addColorStop(0,'#fff3dc');orb.addColorStop(.3,gleam);orb.addColorStop(1,'#ee742600');
-  ctx.fillStyle=orb;ctx.beginPath();ctx.arc(33,-103,13,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle=gear.weapon?.rarity>=3?'#e0bc72':'#73818b';
-  ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(33,-103,6.5,0,Math.PI*2);ctx.stroke();
+  function roundedLine(points,color,width=2){
+    ctx.beginPath();ctx.moveTo(...points[0]);for(const pt of points.slice(1))ctx.lineTo(...pt);
+    ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=color;ctx.stroke();
+  }
+  const fade=(colors,y1=-90,y2=0)=>{
+    const gradient=ctx.createLinearGradient(0,y1,0,y2);
+    for(const [at,color] of colors)gradient.addColorStop(at,color);
+    return gradient;
+  };
+  // Soft contact shadow avoids the enlarged, flat cartoon halo of the prior version.
+  ctx.fillStyle='#05060aa0';ctx.beginPath();ctx.ellipse(0,3,21,6,0,0,Math.PI*2);ctx.fill();
+  // The two boots are animated subtly, and remain anatomically attached to the hem.
+  shape([[-11,-19],[-2,-19],[-3,-3],[-15,-3],[-16,-9]],'#2b3036','#0f1115');
+  shape([[2,-19],[11,-19],[15,-10],[14,-3],[3,-3]],'#303238','#0f1115');
+  roundedLine([[-14,-5],[-4,-5]],'#73706b',1.5);
+  roundedLine([[4,-5],[14,-5]],'#73706b',1.5);
+  // Narrow flowing cape, shadow-side fold, and red textile accent.
+  const hemSwing=step;
+  shape([[-12,-72],[-23,-53],[-27+hemSwing,-12],[-23,-4],[-9,-16],[1,-7],
+    [12,-18],[23+hemSwing,-5],[25,-14],[20,-60],[12,-74]],
+    fade([[0,'#47414a'],[.3,cloak],[1,'#161b23']]),'#14151a',1.5);
+  shape([[-10,-60],[-14,-26],[-18,-10],[-8,-23],[-2,-17],[-2,-55]],'#2e222a',null);
+  shape([[5,-63],[9,-29],[20,-11],[13,-18],[5,-47]],'#24252c',null);
+  roundedLine([[-21,-17],[-15,-25],[-10,-46]],'#846e5f80',1.5);
+  // Body is long and thin rather than chibi-sized; waist has functional layered armor.
+  shape([[-15,-74],[14,-74],[19,-59],[13,-37],[-14,-37],[-19,-58]],
+    fade([[0,'#5b5f65'],[.6,'#343a43'],[1,'#222831']]),'#0e141b',1.6);
+  shape([[-9,-67],[0,-63],[10,-68],[12,-45],[0,-42],[-12,-46]],
+    '#4a4547','#a79377',1.3);
+  shape([[-6,-61],[0,-58],[8,-61],[6,-52],[0,-48],[-7,-53]],
+    '#343d45','#7a8287',.8);
+  shape([[-17,-42],[18,-42],[16,-33],[-15,-33]],'#554133','#151820',1.2);
+  shape([[-5,-42],[5,-42],[5,-32],[-5,-32]],'#a0845d','#1e1d1e',.9);
+  ctx.fillStyle='#ddd3b3';ctx.fillRect(-1.2,-39,2.4,3);
+  // Shoulders: small faceted pauldrons, not oversized square cartoon plates.
+  shape([[-17,-76],[-24,-67],[-23,-60],[-17,-57],[-11,-64],[-12,-73]],metal,'#1c242a',1.1);
+  shape([[13,-75],[23,-68],[24,-60],[18,-58],[11,-65]],metal,'#1c242a',1.1);
+  roundedLine([[-23,-67],[-18,-70],[-13,-68]],'#ead2a36e',1.1);
+  roundedLine([[14,-68],[19,-70],[23,-66]],'#ead2a36e',1.1);
+  // Slim forearms and enclosed gloves. Caster arm raises only while casting.
+  shape([[-17,-63],[-22,-52],[-17,-35],[-10,-34],[-10,-52]],'#4c4a50','#16191e');
+  shape([[16,-63],[22,-54],[19,-38],[12,-38],[10,-54]],'#515159','#16191e');
+  shape([[-18,-42],[-12,-42],[-13,-31],[-20,-32]],'#554035','#1c2024');
+  if(cast)shape([[12,-46],[24,-67],[29,-62],[23,-46],[18,-36]],'#847b74','#263037');
+  else shape([[12,-41],[19,-42],[19,-32],[12,-31]],'#67534a','#21232a');
+  // Hood has a sharper crown and narrower facial opening (no oversized elderly face).
+  shape([[-15,-76],[-17,-91],[-12,-105],[0,-111],[12,-105],[17,-91],[15,-76],
+      [9,-73],[-9,-73]],
+    fade([[0,'#444850'],[.5,'#292e38'],[1,'#181d25']], '#11141c',1.6);
+  shape([[-11,-93],[-5,-102],[3,-103],[12,-94],[10,-79],[-9,-79]],
+    '#1a2028','#0a1118',1.2);
+  // Suggest a masked face with two narrow highlights, leaving the face mysterious.
+  shape([[-6,-82],[5,-82],[2,-77],[-4,-77]],'#715a52',null);
+  roundedLine([[-8,-88],[-2,-89]],'#bb9a7c',1);
+  roundedLine([[2,-89],[8,-88]],'#bb9a7c',1);
+  roundedLine([[-13,-96],[-5,-105],[2,-107],[11,-97]],legendary?'#c9a572':'#84848a',1.3);
+  if(legendary){
+    ctx.fillStyle='#ce875625';ctx.beginPath();ctx.arc(0,-91,18,0,Math.PI*2);ctx.fill();
+    roundedLine([[-7,-98],[0,-103],[7,-98]],'#bc8a56',1);
+  }
+  // Staff and socket silhouette is slender and legible; magical highlight is subdued.
+  roundedLine([[27,-7],[33,-103]],'#241d21',5);
+  roundedLine([[27.5,-8],[33.5,-102]],'#9f8364',2.1);
+  shape([[34,-117],[25,-105],[28,-97],[33,-101],[38,-97],[42,-106]],
+    '#686f74','#1a2630',1.2);
+  ctx.save();ctx.shadowBlur=11;ctx.shadowColor=magic;ctx.fillStyle=magic;
+  ctx.beginPath();ctx.ellipse(33,-108,4.3,6.8,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  roundedLine([[30,-111],[33,-115],[36,-110]],'#e6dcc6',1);
+  if(cast){
+    const glow=ctx.createRadialGradient(27,-57,0,27,-57,23);
+    glow.addColorStop(0,'#ffffffb0');glow.addColorStop(.35,magic+'aa');glow.addColorStop(1,'#00000000');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(27,-57,23,0,Math.PI*2);ctx.fill();
+  }
   ctx.restore();
 }
