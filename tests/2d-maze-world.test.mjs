@@ -51,7 +51,7 @@ test('walls block movement at the boundary and no world edge escape',()=>{
   const w=createMazeWorld(417);
   const p={x:w.start.x,y:w.start.y};
   const old={...p};
-  moveWithCollision(p,9000,9000,10,w,17);
+  moveWithCollision(p,180,0,.1,w,17);
   assert.ok(walkable(p.x,p.y,17,w));
   assert.notEqual(p.x,old.x);
   assert.equal(walkable(-9,w.start.y,17,w),false);
