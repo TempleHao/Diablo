@@ -129,30 +129,80 @@ $('btn-inventory').onclick=showInventory;
 function closeInventory(){$('inventory').hidden=true;clearInput();}
 $('inv-close').onclick=closeInventory;
 $('inventory').addEventListener('pointerdown',e=>{if(e.target===$('inventory'))closeInventory();});
-function renderInventory(){
-  const s=stats(profile);
-  $('character-stats').innerHTML='<span>等级 <strong>'+profile.level+'</strong></span><span>法术攻击 <strong>'+s.power+'</strong></span><span>生命 <strong>'+s.hp+'</strong></span><span>法力 <strong>'+s.mana+'</strong></span><span>已净化 <strong>'+profile.clears+'</strong></span>';
-  const equipment=$('equipment');equipment.replaceChildren();
-  for(const [slot,name] of [['weapon','武器'],['robe','法袍'],['charm','护符']]){
-    const el=document.createElement('div');el.className='slot';
-    const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
-    const a=document.createElement('small'),b=document.createElement('b');a.textContent=name;b.textContent=item?.name||'尚未装备';if(item)b.classList.add('rarity-'+item.rarity);el.append(a,b);equipment.append(el);
+function applyEquipmentChange(operate){
+  const old=stats(profile);operate();const now=stats(profile);
+  if(hero){
+    hero.maxHp=now.hp;hero.maxMana=now.mana;
+    hero.hp=clamp(hero.hp+now.hp-old.hp,1,now.hp);
+    hero.mana=clamp(hero.mana+now.mana-old.mana,0,now.mana);
   }
-  $('bag-count').textContent=profile.inventory.length+' / 30';
+  persist();renderInventory();updateHud();
+}
+function inspectItem(item){
+  const panel=$('item-inspect');panel.replaceChildren();
+  if(!item){panel.textContent='选择一件装备查看随机词缀、品质与属性变化。';return;}
+  const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
+  const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
+  panel.append(title,meta);
+  const list=document.createElement('ul');
+  for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
+  if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
+  panel.append(list);
+  if(item.setId){
+    const set=SETS[item.setId],count=Object.values(profile.equipped).map(id=>profile.inventory.find(i=>i.id===id)).filter(i=>i?.setId===item.setId).length;
+    const p=document.createElement('p');p.className='set-description';p.textContent=set.name+'（已装备 '+count+'/3） · 2 件：'+set.two+' · 3 件：'+set.three;panel.append(p);
+  }
+  const target=item.slot.startsWith('ring')?(profile.equipped.ring1?'ring2':'ring1'):item.slot;
+  const worn=profile.inventory.find(i=>i.id===profile.equipped[target]);
+  const delta=Math.round(itemScore(item)-itemScore(worn||{power:0,hp:0,mana:0,armor:0,affixes:[]}));
+  const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
+  compare.textContent='相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 评分变化 '+(delta>0?'+':'')+delta;
+  panel.append(compare);
+}
+function renderInventory(){
+  const statsNow=stats(profile),statFields=[
+    ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
+    ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
+    ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
+    ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
+    ['已净化',profile.clears]
+  ];
+  const char=$('character-stats');char.replaceChildren();
+  for(const [k,v] of statFields){const node=document.createElement('span');const b=document.createElement('strong');node.textContent=k+' ';b.textContent=v;node.append(b);char.append(node);}
+  const equipment=$('equipment');equipment.replaceChildren();
+  for(const [slot,label,glyph] of SLOTS){
+    const node=document.createElement('button');node.type='button';node.className='slot equipment-slot';
+    const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
+    const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
+    title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
+    node.append(name,title);
+    node.onclick=()=>{if(item){inspectItem(item);if(confirm('卸下 '+item.name+'？'))applyEquipmentChange(()=>profile.equipped[slot]=null);}else inspectItem(null);};
+    equipment.append(node);
+  }
+  $('bag-count').textContent=profile.inventory.length+' / '+MAX_ITEMS;
   const bag=$('inventory-items');bag.replaceChildren();
-  if(!profile.inventory.length){const p=document.createElement('p');p.className='empty';p.textContent='行囊空空。击败怪物，靠近掉落的光芒即可拾取。';bag.append(p);}
-  for(const item of [...profile.inventory].sort((a,b)=>b.rarity-a.rarity||b.power-a.power)){
-    const el=document.createElement('div');el.className='item';
-    const detail=document.createElement('div'),name=document.createElement('strong'),info=document.createElement('small');
-    name.className='rarity-'+item.rarity;name.textContent=item.name;
-    info.textContent=[item.power?'攻击 +'+item.power:'',item.hp?'生命 +'+item.hp:'',item.mana?'法力 +'+item.mana:''].filter(Boolean).join(' · ');detail.append(name,info);
+  if(!profile.inventory.length){const p=document.createElement('p');p.className='empty';p.textContent='行囊空空。击败怪物并靠近掉落光柱，可获得随机装备和词缀。';bag.append(p);}
+  for(const item of [...profile.inventory].sort((a,b)=>b.rarity-a.rarity||b.ilvl-a.ilvl)){
+    const node=document.createElement('div');node.className='item';
+    const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
+    const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
+    const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
+    detail.append(title,desc);detail.onclick=()=>inspectItem(item);
     const actions=document.createElement('div');actions.className='item-actions';
-    const use=document.createElement('button');const worn=profile.equipped[item.slot]===item.id;
-    use.textContent=worn?'已装备':'装备';use.disabled=worn;
-    use.onclick=()=>{const old=stats(profile);equip(profile,item.id);const now=stats(profile);if(hero){hero.maxHp=now.hp;hero.maxMana=now.mana;hero.hp=clamp(hero.hp+now.hp-old.hp,1,now.hp);hero.mana=clamp(hero.mana+now.mana-old.mana,0,now.mana);}persist();renderInventory();};
+    const worn=Object.values(profile.equipped).includes(item.id);
+    const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
+    use.onclick=()=>applyEquipmentChange(()=>equip(profile,item.id,(item.slot.startsWith('ring')&&!profile.equipped.ring1)?'ring1':item.slot.startsWith('ring')&&!profile.equipped.ring2?'ring2':null));
     const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn;
-    recycle.onclick=()=>{salvage(profile,item.id);persist();renderInventory();};
-    actions.append(use,recycle);el.append(detail,actions);bag.append(el);
+    recycle.onclick=()=>applyEquipmentChange(()=>salvage(profile,item.id));
+    actions.append(use,recycle);node.append(detail,actions);bag.append(node);
+  }
+  inspectItem(null);
+  const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
+  for(const [key,skill] of Object.entries(SKILLS)){
+    const btn=document.createElement('button');btn.type='button';
+    btn.className='catalog-skill '+(profile.level<skill.unlocked?'unavailable':'');
+    btn.textContent=skill.icon+' '+skill.name+' · '+skill.desc+'（'+skill.unlocked+' 级解锁）';
+    btn.onclick=()=>announce(skill.name+'：'+skill.desc,true);skillPanel.append(btn);
   }
 }
 $('export-save').onclick=()=>{
@@ -165,7 +215,7 @@ $('save-file').onchange=async e=>{
   if(file.size>500000){alert('文件过大，无法导入。');return;}
   try{
     const raw=JSON.parse(await file.text());
-    if(raw?.version!==1 || !Array.isArray(raw.inventory)){alert('存档版本或结构不兼容。');return;}
+    if(![1,2].includes(raw?.version) || !Array.isArray(raw.inventory)){alert('存档版本或结构不兼容。');return;}
     const candidate=sanitizeSave(raw);
     if(!confirm('确认导入并覆盖当前 2D 角色？此操作无法撤销，建议先导出原存档。'))return;
     profile=candidate;persist();build();state='playing';closeInventory();announce('角色存档已导入');
@@ -207,7 +257,7 @@ function dealDamage(e,damage){
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
   if(bossDied||rng()<.42)dropItem(e.x,e.y,bossDied);
   if(bossDied){
-    boss=null;ui.boss.hidden=true;profile.clears++;persist();
+    boss=null;ui.boss.hidden=true;profile.clears++;profile.region=(profile.region+1)%REGION_DATA.length;persist();
     announce('炉心重燃，地窟净化完成！',true);showModal('victory');
   }else{
     kills++;
@@ -217,8 +267,8 @@ function dealDamage(e,damage){
   }
 }
 function dropItem(x,y,rare=false) {
-  const item=createItem(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++);
-  if(rare){item.rarity=Math.max(item.rarity,2);item.name=({'weapon':'余烬权杖','robe':'烬纹长袍','charm':'炉心秘印'})[item.slot];}
+  const item=makeLoot(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++,{boss:rare});
+  if(rare&&item.rarity<2){item.rarity=2;item.name='司祭战利品 · '+item.name;}
   drops.push({x,y,item,age:0});floatText(x,y-38,item.name,palette.rare[item.rarity]);
 }
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
@@ -300,7 +350,7 @@ function update(dt){
   for(const d of [...drops]){
     d.age+=dt;
     if(distance(hero,d)<58){
-      if(profile.inventory.length>=30){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
+      if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
       puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();
     }
