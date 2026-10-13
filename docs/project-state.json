@@ -26,8 +26,8 @@
     "substep": "D1-cloth-surface-artifact",
     "trigger": "continuation",
     "startedAt": "2026-10-13T03:22:28Z",
-    "heartbeatAt": "2026-10-13T03:27:17Z",
-    "leaseExpiresAt": "2026-10-13T05:27:17.000Z"
+    "heartbeatAt": "2026-10-13T03:31:24Z",
+    "leaseExpiresAt": "2026-10-13T05:31:24.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -35,7 +35,7 @@
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
   "resumeBranch": "checkpoint/art-02-d1",
-  "resumeCommit": "21ba0bebcc98893f8082709ec05745b2d0010641",
+  "resumeCommit": "d059362fbfbe64a32a56f70cebfd9f87b39b0c26",
   "nextAction": "ART-02 D1: reproduce and repair cloth-tail normal/atlas/decimation black spots/fold lines on latest main; inspect real UV/tangent/shell/weight overlap, save source checkpoint early, verify final L0/L1 native shots and motion/skin/budget regressions before integration. Leave independent dist/2d and its systems untouched; face/scalp/cloth production polish remains later ART-02 work.",
   "lastAttempt": {
     "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
@@ -43,21 +43,35 @@
     "substep": "D1-cloth-surface-artifact",
     "startedAt": "2026-10-13T03:22:28Z",
     "status": "running",
-    "phase": "source-only-source-saved-generation-and-native-cloth-diagnosis-pending",
-    "checkpointCommit": "21ba0bebcc98893f8082709ec05745b2d0010641",
+    "phase": "fresh-source-verified-budget-experiment-saved-actual-candidate-running",
+    "checkpointCommit": "d059362fbfbe64a32a56f70cebfd9f87b39b0c26",
     "validation": {
       "pythonCompilation": "passed",
+      "sourceGeneration": {
+        "mode": "source-only",
+        "generatorSha256": "b255e064a4d5c7aabff0fb716f16fb07df13cde0bd15dceec95f2cb9e5e5de9c",
+        "sourceBlendSha256": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+        "triangles": 45710,
+        "bones": 163,
+        "clips": [
+          "Idle",
+          "Walk",
+          "Cast"
+        ],
+        "packedImages": 22,
+        "publishedAssetsTouched": false
+      },
       "publishedAssets": "unchanged",
-      "sourceGeneration": "in progress",
-      "clothDiagnosis": "in progress",
-      "finalModels": "not generated/verified"
+      "nativeBaseline": "Fixed viewer normal/zero nearly identical; old studio black spot not reproduced; neutral tail folds remain",
+      "finalModels": "scratch first candidate in progress, unverified",
+      "deployment": "unchanged existing release"
     }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-13T03:27:17Z",
+  "lastUpdatedAt": "2026-10-13T03:31:24Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
     "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
@@ -75,8 +89,8 @@
   },
   "lastWorkBranch": {
     "name": "checkpoint/art-02-d1",
-    "commit": "21ba0bebcc98893f8082709ec05745b2d0010641",
-    "status": "source-checkpoint-unverified"
+    "commit": "d059362fbfbe64a32a56f70cebfd9f87b39b0c26",
+    "status": "budget-source-checkpoint-unverified"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
