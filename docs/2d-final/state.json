@@ -278,7 +278,7 @@
   "updatedAt": "2026-10-13",
   "lastWritePermissionProbe": {
     "at": "2026-10-13",
-    "purpose": "User-present GitHub write authorization check; no gameplay or 3D changes",
-    "status": "authorization-check"
+    "purpose": "Explicit user authorization; verify isolated 2D branch write access",
+    "status": "write-check-pending"
   }
 }
