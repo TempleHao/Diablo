@@ -20,7 +20,7 @@ try{
     // Dedicated visual regression character: no fixture is shipped in the game itself.
     await page.addInitScript(()=>{
       const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
-        id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:0,armor,value:300,setId
+        id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId
       });
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
         version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},
@@ -30,9 +30,10 @@ try{
           item('robe','robe','龙焰法衣',4,[{key:'hp',value:23}],0,54,38,'dragonflame'),
           item('gloves','gloves','旧日秘纹手套',2,[{key:'haste',value:9},{key:'critDmg',value:12}]),
           item('ring','ring1','冻土秘银指环',2,[{key:'cold',value:9},{key:'crit',value:3}]),
-          item('amulet','amulet','流浪先知护符',2,[{key:'mana',value:22},{key:'skillCold',value:1}])
+          item('amulet','amulet','流浪先知护符',2,[{key:'mana',value:22},{key:'skillCold',value:1}]),
+          item('focus','offhand','深渊祷言秘典',2,[{key:'regen',value:4}])
         ],
-        equipped:{weapon:'staff',head:'helmet',robe:'robe',ring1:'ring'}
+        equipped:{weapon:'staff',head:'helmet',robe:'robe',ring1:'ring',offhand:'focus'}
       }));
     });
     page.on('pageerror',e=>errs.push(e.message));
@@ -60,7 +61,7 @@ try{
     await page.keyboard.press('4');
     await page.keyboard.press('q');
     await page.waitForTimeout(960);
-    assert.ok(Number(await page.locator('#mana-num').innerText())<100,'spell mana should really be consumed');
+    assert.ok(Number(await page.locator('#mana-num').innerText())<170,'spell mana should really be consumed');
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
