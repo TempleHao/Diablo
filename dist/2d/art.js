@@ -1,3 +1,4 @@
+import {drawEquipmentIcon} from './equipment-icons.js';
 /**
  * 余烬纪事 · 2D 美术层
  * Sprite art: 0x72 DungeonTileset II v1.7 (CC0 1.0).
@@ -59,7 +60,7 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
     if(v%21===0)sprite(ctx,FRAME.skull,x*S+12,y*S+12,25,25);
     if(v%9===0){ctx.fillStyle='#10131855';ctx.fillRect(x*S+6,y*S+3,6,17);}
   }
-  const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c'];
+  const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c','#1c232b52','#24381e4b','#13324850','#401a104f'];
   ctx.fillStyle=tints[region]||tints[0];ctx.fillRect(cam.x,cam.y,vw,vh);
   // One visual identity per region: gates, ritual stains, cave fractures, or corrupted ground.
   const S2=96;
@@ -72,6 +73,10 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
       }
       if(region===3&&v%8===0){ctx.strokeStyle='#7398a35c';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(ox+12,oy+72);ctx.lineTo(ox+44,oy+28);ctx.lineTo(ox+69,oy+46);ctx.stroke();}
       if(region===4&&v%11===0){ctx.fillStyle='#6c3d7844';ctx.beginPath();ctx.arc(ox+31,oy+65,20,0,Math.PI*2);ctx.fill();}
+      if(region===5&&v%6===0){ctx.strokeStyle='#8d9e9266';ctx.beginPath();ctx.arc(ox+48,oy+46,24,0,Math.PI*2);ctx.stroke();}
+      if(region===6&&v%10===0){ctx.fillStyle='#536e3360';ctx.fillRect(ox+5,oy+19,53,11);}
+      if(region===7&&v%8===0){ctx.strokeStyle='#b5dff275';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(ox+12,oy+76);ctx.lineTo(ox+31,oy+27);ctx.lineTo(ox+60,oy+49);ctx.stroke();}
+      if(region===8&&v%10===0){ctx.fillStyle='#9a3a254e';ctx.beginPath();ctx.moveTo(ox+15,oy+70);ctx.lineTo(ox+40,oy+18);ctx.lineTo(ox+70,oy+74);ctx.fill();}
       if(region===1&&v%9===0){ctx.fillStyle='#151a1acc';ctx.fillRect(ox+20,oy+15,62,9);ctx.strokeStyle='#8d785866';ctx.strokeRect(ox+20,oy+15,62,9);}
     }
   // Carved northern ritual circle, deliberately placed beneath characters.
@@ -135,9 +140,9 @@ export function scenery(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   const y0=Math.max(3,Math.floor(cam.y/S)),y1=Math.min(Math.floor(worldH/S)-3,Math.ceil((cam.y+vh)/S));
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
     const h=hash(x,y,933 ^ seed ^ ((region+1)*1193));
-    if(h%[101,83,155,117,92][region]===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
-    if(h%[281,91,137,304,99][region]===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
-    if(h%[193,163,67,107,79][region]===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
+    if(h%[101,83,155,117,92,89,123,111,72][region]===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
+    if(h%[281,91,137,304,99,193,81,185,73][region]===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
+    if(h%[193,163,67,107,79,65,131,101,67][region]===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
   }
 }
 function frameFor(kind,walking,elapsed){
@@ -230,44 +235,5 @@ export function loot(ctx,d,tick){
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
 }
-const EQUIPMENT_ICONS={
-  weapon:[[324,129,8,30],[324,159,8,30],[340,129,8,30],[323,10,10,21]],
-  offhand:[[323,10,10,21],[304,416,16,16],[340,129,8,30]],
-  head:[[304,336,16,16],[288,336,16,16],[368,345,16,23]],
-  shoulders:[[323,41,10,22],[304,352,16,16],[368,369,16,23]],
-  robe:[[368,345,16,23],[368,369,16,23],[384,345,16,23]],
-  gloves:[[307,39,10,24],[307,63,10,24],[304,352,16,16]],
-  belt:[[288,408,16,24],[304,416,16,16],[288,432,16,16]],
-  pants:[[368,369,16,23],[384,369,16,23],[368,345,16,23]],
-  boots:[[304,352,16,16],[320,352,16,16],[288,408,16,24]],
-  amulet:[[304,336,16,16],[289,385,6,7],[304,416,16,16]],
-  ring1:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
-  ring2:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
-  charm:[[340,129,8,30],[304,336,16,16],[289,385,6,7]]
-};
-const ICON_RARITY=['#bec3c9','#7daee7','#dbbc63','#d78b55','#88cb91'];
-export function drawItemIcon(canvas,item){
-  const ctx=canvas.getContext('2d');
-  const size=48,rarity=Math.max(0,Math.min(4,item?.rarity||0));
-  canvas.width=size;canvas.height=size;
-  const shade=ICON_RARITY[rarity],grad=ctx.createLinearGradient(0,0,48,48);
-  grad.addColorStop(0,'#34302d');grad.addColorStop(1,'#11161d');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
-  ctx.fillStyle=shade+'1c';ctx.fillRect(4,4,40,40);
-  ctx.strokeStyle=shade;ctx.lineWidth=1.5;ctx.strokeRect(2.5,2.5,43,43);
-  const frames=EQUIPMENT_ICONS[item?.slot]||EQUIPMENT_ICONS.charm;
-  const name=String(item?.name||'未知装备');
-  const code=[...name].reduce((n,c)=>((n*31+c.codePointAt(0))>>>0),7);
-  const frame=frames[code%frames.length];
-  if(ready){
-    ctx.imageSmoothingEnabled=false;
-    const aspect=frame[2]/frame[3],height=38,width=Math.min(34,height*aspect);
-    ctx.drawImage(atlas,...frame,24-width/2,24-height/2,width,height);
-    // High rarity produces an additional warm highlight but keeps item silhouettes legible.
-    if(rarity>=3){ctx.globalCompositeOperation='screen';ctx.fillStyle=shade+'35';ctx.fillRect(6,6,36,36);ctx.globalCompositeOperation='source-over';}
-  }else{
-    ctx.fillStyle=shade;
-    ctx.beginPath();ctx.moveTo(24,8);ctx.lineTo(36,22);ctx.lineTo(25,41);ctx.lineTo(12,22);ctx.closePath();ctx.fill();
-  }
-}
+export function drawItemIcon(canvas,item){return drawEquipmentIcon(canvas,item);}
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}
