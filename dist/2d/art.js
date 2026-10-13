@@ -215,11 +215,17 @@ function spiderEnemy(ctx,e,tick){
   ctx.restore();
 }
 export function loot(ctx,d,tick){
-  const col=['#bcc6d0','#72c2f3','#f5bb69','#d3a4ef'][d.item.rarity];
+  const col=['#bcc6d0','#72c2f3','#f5bb69','#ee9566','#88d8a0'][d.item.rarity]||'#bfc4c5';
   const bob=Math.sin(tick*2.7+d.x*.01)*4;
   gradientSpot(ctx,d.x,d.y,57,col+'67',col+'00');
   ctx.globalAlpha=.44;ctx.fillStyle=col;ctx.fillRect(d.x-2,d.y-68,4,60);ctx.globalAlpha=1;
-  const f=d.item.slot==='weapon'?FRAME.weapon:d.item.slot==='robe'?[368,345,16,23]:[304,336,16,16];
+  const frames={
+    weapon:FRAME.weapon,offhand:[323,10,10,21],head:[304,336,16,16],
+    robe:[368,345,16,23],shoulders:[323,41,10,22],gloves:[307,39,10,24],
+    belt:[288,408,16,24],pants:[368,369,16,23],boots:[304,352,16,16],
+    amulet:[304,336,16,16],ring1:[289,370,13,12],ring2:[289,370,13,12],charm:[340,129,8,30]
+  };
+  const f=frames[d.item.slot]||FRAME.chest;
   const w=d.item.slot==='weapon'?22:36,h=d.item.slot==='weapon'?56:39;
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
