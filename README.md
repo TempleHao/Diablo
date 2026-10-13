@@ -1,7 +1,12 @@
 # 余烬法师 · Ember Mage
 
-> **2D 系统扩展版（v0.3）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 热修试玩版（v0.3.1）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
+
+> **v0.3.1 即时反馈热修**：Boss 首杀必有专属传奇与普通装备，战后不再强制结束；没来得及拾取的 Boss 物品将随旧存档键保存。背包与 13 槽装备加入真实贴图图标，减少双击缩放误操作，五大区域的地面装饰按种子变化。此版本仍是低像素原型，美术距离用户确认的写实暗黑 2.5D 目标很远。
+>
+> [看真实浏览器 Boss 掉宝画面](docs/screenshots/2d-v0.3.1-boss-loot-desktop.jpg) · [看物品贴图背包](docs/screenshots/2d-v0.3.1-item-icons-desktop.jpg) · [手机版实际截图](docs/screenshots/2d-v0.3.1-boss-loot-mobile.jpg)
+
 > **[直接体验 2D 版](https://templehao.github.io/Diablo/2d/)** · [2D 实现与测试说明](docs/2D-IMPLEMENTATION.md) · [2D 自动化检查](https://github.com/TempleHao/Diablo/actions/workflows/check-2d.yml)
 >
 > **v0.3 功能已接入游戏**：13 个装备槽、随机词缀与套装、80 格背包、等级与技能点、7 项战斗技能、5 个区域及更丰富的怪物遭遇。支持旧 2D 角色存档迁移。详见 [完整验收记录](docs/2D-SYSTEMS-V0.3.md)。

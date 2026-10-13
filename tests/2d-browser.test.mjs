@@ -37,7 +37,7 @@ try{
       }));
     });
     page.on('pageerror',e=>errs.push(e.message));
-    const response=await page.goto('http://127.0.0.1:8765/2d/',{waitUntil:'load'});
+    const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
     await page.waitForTimeout(300);
@@ -53,6 +53,25 @@ try{
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
+    const firstBoss=await page.evaluate(()=>window.__ember2dQA.bossTest());
+    assert.equal(firstBoss.state,'playing','boss defeat must not end the game');
+    assert.equal(firstBoss.bossDefeated,true);
+    assert.ok(firstBoss.drops.length>=2,'first boss kill must drop ordinary and exclusive loot');
+    assert.equal(firstBoss.drops.some(d=>d.rarity===3&&d.persistent),true,'guaranteed special legendary');
+    assert.equal(firstBoss.bossKills,1);
+    assert.equal(firstBoss.pending,firstBoss.drops.length);
+    assert.equal(await page.locator('#scrim').isVisible(),false,'no victory modal should block loot pickup');
+    const zoomPrevention=await page.evaluate(()=>{
+      const event=new MouseEvent('dblclick',{bubbles:true,cancelable:true});
+      document.querySelector('#game').dispatchEvent(event);
+      return {prevented:event.defaultPrevented,touch:window.getComputedStyle(document.body).touchAction};
+    });
+    assert.equal(zoomPrevention.prevented,true,'double-tap should be prevented');
+    assert.equal(zoomPrevention.touch,'manipulation');
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const shot=await page.screenshot({type:'jpeg',quality:70});
+      console.log((viewport.isMobile?'BOSS_DROP_MOBILE_BASE64:':'BOSS_DROP_DESKTOP_BASE64:')+shot.toString('base64'));
+    }
     const canvas=page.locator('#game');
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
     await page.keyboard.down('d');await page.waitForTimeout(110);await page.keyboard.up('d');
@@ -66,8 +85,11 @@ try{
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
     assert.equal(await page.locator('.catalog-skill').count(),7);
+    assert.ok(await page.locator('.item-thumbnail').count()>0,'bag should include actual item icon canvases');
+    assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
     await page.locator('.item-detail').first().evaluate(el=>el.click());
+    assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const visual=await page.screenshot({type:'jpeg',quality:62});

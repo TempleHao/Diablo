@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -16,7 +17,7 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, combo=0;
+let armorUntil=0, combo=0, bossDefeated=false;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 for(const [key,meta] of Object.entries(SKILLS)){
@@ -93,7 +94,9 @@ function build() {
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;bossDefeated=false;
+  for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
+    drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   spawnWave(0);
@@ -165,7 +168,8 @@ function inspectItem(item){
   if(!item){panel.textContent='选择一件装备查看随机词缀、品质与属性变化。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
-  panel.append(title,meta);
+  const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
+  panel.append(preview,title,meta);
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
@@ -197,6 +201,7 @@ function renderInventory(){
     const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
     const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
     title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
+    if(item){const icon=document.createElement('canvas');icon.className='equipment-icon';icon.setAttribute('aria-hidden','true');Art.drawItemIcon(icon,item);node.append(icon);}
     node.append(name,title);
     node.onclick=()=>{if(item){inspectItem(item);if(confirm('卸下 '+item.name+'？'))applyEquipmentChange(()=>profile.equipped[slot]=null);}else inspectItem(null);};
     equipment.append(node);
@@ -209,7 +214,9 @@ function renderInventory(){
     const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
     const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
     const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
-    detail.append(title,desc);detail.onclick=()=>inspectItem(item);
+    const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
+    const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
+    detail.append(img,labels);detail.onclick=()=>inspectItem(item);
     const actions=document.createElement('div');actions.className='item-actions';
     const worn=Object.values(profile.equipped).includes(item.id);
     const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
@@ -255,7 +262,7 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'击败灰烬司祭，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
+  ui.progress.textContent=boss?'击败 '+BOSS_POOLS[profile.region].name+'，收集专属战利品':bossDefeated?'首领已击败 · 继续拾取装备 / B 查看背包 / 暂停手动重刷':'徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
@@ -295,10 +302,24 @@ function dealDamage(e,damage,school='physical'){
   const bossDied=e.kind==='boss';const advanced=gainXp(profile,bossDied?170:22);
   profile.gold+=bossDied?150:3+Math.floor(rng()*9);
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
-  if(bossDied||rng()<.42)dropItem(e.x,e.y,bossDied);
+  if(!bossDied&&rng()<.42)dropItem(e.x,e.y,false);
   if(bossDied){
-    boss=null;ui.boss.hidden=true;profile.clears++;profile.region=(profile.region+1)%REGION_DATA.length;persist();
-    announce('炉心重燃，地窟净化完成！',true);showModal('victory');
+    const region=profile.region,previousKills=profile.bossKills[region]||0;
+    const reward=rollBossRewards(rng,profile.level,region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++));
+    profile.bossKills[region]=previousKills+1;
+    profile.essence+=reward.materials;profile.clears++;
+    boss=null;bossDefeated=true;ui.boss.hidden=true;
+    for(const [index,item] of reward.drops.entries()){
+      const angle=index*2.4,rad=60+index*15;
+      const x=e.x+Math.cos(angle)*rad,y=e.y+Math.sin(angle)*rad;
+      const point=walkable(x,y,17,dungeon)?{x,y}:{x:e.x,y:e.y};
+      drops.push({...point,item,age:0,persistent:true});
+      profile.pendingLoot.push({item,region});
+      puff(point.x,point.y,palette.rare[item.rarity],23,5,170);
+    }
+    persist();
+    announce((reward.firstKill?'首杀奖励！':'首领战利品！')+' '+reward.drops.length+' 件装备 · '+reward.materials+' 精华'+(reward.exclusive?' · 专属传奇！':''),true);
+    ui.title.textContent='首领已击败 · 余烬仍在';
   }else{
     kills++;
     if(kills===4||kills===8)spawnWave(kills/4);
@@ -405,6 +426,7 @@ function update(dt){
     if(distance(hero,d)<58){
       if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
+      if(d.persistent)profile.pendingLoot=profile.pendingLoot.filter(p=>p.item.id!==d.item.id);
       puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();
     }
   }
@@ -420,7 +442,7 @@ function update(dt){
   }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,dungeon.seed); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
@@ -442,7 +464,7 @@ function render(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,vw,vh);
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
-  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick);
+  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,dungeon.seed);
   // Painter's order: stonework and props occlude actors when they stand behind them.
   const layers=[];
   for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
@@ -463,6 +485,14 @@ function render(){
     ctx.restore();
   }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
+  // Labels stay above loot until it is physically picked up.
+  ctx.textAlign='center';ctx.font='bold 13px system-ui';
+  for(const drop of drops){
+    if(drop.x<cam.x-120||drop.x>cam.x+vw+120||drop.y<cam.y-120||drop.y>cam.y+vh+120)continue;
+    const label=drop.item.name,y=drop.y-74;
+    ctx.lineWidth=4;ctx.strokeStyle='#090b10ed';ctx.strokeText(label,drop.x,y);
+    ctx.fillStyle=palette.rare[drop.item.rarity];ctx.fillText(label,drop.x,y);
+  }
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
   const vign=ctx.createRadialGradient(vw/2,vh/2,Math.min(vw,vh)*.15,vw/2,vh/2,Math.max(vw,vh)*.75);
@@ -532,4 +562,21 @@ base.addEventListener('pointermove',joyMove);
 function joyEnd(e){if(e.pointerId!==joystick.id)return;joystick.id=null;joystick.x=joystick.y=0;stick.style.transform='';}
 base.addEventListener('pointerup',joyEnd);base.addEventListener('pointercancel',joyEnd);
 window.addEventListener('contextmenu',e=>{if(e.target===canvas)e.preventDefault();});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
+// Dedicated local QA hook: never active on the public GitHub Pages game.
+if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('qa')){
+  window.__ember2dQA={
+    bossTest:()=>{
+      if(state!=='playing')throw new Error('start game first');
+      enemies.length=0;kills=total;
+      const e=spawn('boss',{x:hero.x+180,y:hero.y-20});
+      e.hp=1;dealDamage(e,10000,'fire');
+      return {state,bossDefeated,drops:drops.map(d=>({name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent})),
+        pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
+    }
+  };
+}
 build();state='intro';requestAnimationFrame(loop);

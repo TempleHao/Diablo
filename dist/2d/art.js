@@ -46,13 +46,13 @@ function fixture(ctx,x,y,r=1){
   ctx.fillStyle='#fff3bb';ctx.beginPath();ctx.ellipse(0,-12,2,4*pulse,0,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
-export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0){
+export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   ctx.fillStyle='#0a1015';ctx.fillRect(0,0,worldW,worldH);
   if(!ready)return;
   const S=48, left=Math.max(0,Math.floor(cam.x/S)-1),right=Math.min(Math.ceil(worldW/S),Math.ceil((cam.x+vw)/S)+1);
   const top=Math.max(0,Math.floor(cam.y/S)-1),bottom=Math.min(Math.ceil(worldH/S),Math.ceil((cam.y+vh)/S)+1);
   for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
-    const v=hash(x,y,501),tex=FRAME.floor[v%8];
+    const v=hash(x,y,501 ^ seed ^ ((region+1)*733)),tex=FRAME.floor[(v+region*2)%8];
     sprite(ctx,[tex[0],tex[1],16,16],x*S,y*S,S+1,S+1);
     // Keep pixel-art intact; irregular soot patches and scattered rubble are transparent overlays.
     if(v%15===0){ctx.fillStyle='#090d1180';ctx.fillRect(x*S+7,y*S+7,18,6);}
@@ -128,16 +128,16 @@ export function pillar(ctx,b){
   }
 }
 export function torch(ctx,t){fixture(ctx,t.x,t.y);}
-export function scenery(ctx,cam,vw,vh,worldW,worldH,tick){
+export function scenery(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   if(!ready)return;
   // A few non-interactive set dressing objects, deterministic by tile position.
   const S=48,x0=Math.max(2,Math.floor(cam.x/S)),x1=Math.min(Math.floor(worldW/S)-2,Math.ceil((cam.x+vw)/S));
   const y0=Math.max(3,Math.floor(cam.y/S)),y1=Math.min(Math.floor(worldH/S)-3,Math.ceil((cam.y+vh)/S));
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
-    const h=hash(x,y,933);
-    if(h%137===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
-    if(h%253===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
-    if(h%181===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
+    const h=hash(x,y,933 ^ seed ^ ((region+1)*1193));
+    if(h%[101,83,155,117,92][region]===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
+    if(h%[281,91,137,304,99][region]===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
+    if(h%[193,163,67,107,79][region]===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
   }
 }
 function frameFor(kind,walking,elapsed){
@@ -229,5 +229,45 @@ export function loot(ctx,d,tick){
   const w=d.item.slot==='weapon'?22:36,h=d.item.slot==='weapon'?56:39;
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
+}
+const EQUIPMENT_ICONS={
+  weapon:[[324,129,8,30],[324,159,8,30],[340,129,8,30],[323,10,10,21]],
+  offhand:[[323,10,10,21],[304,416,16,16],[340,129,8,30]],
+  head:[[304,336,16,16],[288,336,16,16],[368,345,16,23]],
+  shoulders:[[323,41,10,22],[304,352,16,16],[368,369,16,23]],
+  robe:[[368,345,16,23],[368,369,16,23],[384,345,16,23]],
+  gloves:[[307,39,10,24],[307,63,10,24],[304,352,16,16]],
+  belt:[[288,408,16,24],[304,416,16,16],[288,432,16,16]],
+  pants:[[368,369,16,23],[384,369,16,23],[368,345,16,23]],
+  boots:[[304,352,16,16],[320,352,16,16],[288,408,16,24]],
+  amulet:[[304,336,16,16],[289,385,6,7],[304,416,16,16]],
+  ring1:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
+  ring2:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
+  charm:[[340,129,8,30],[304,336,16,16],[289,385,6,7]]
+};
+const ICON_RARITY=['#bec3c9','#7daee7','#dbbc63','#d78b55','#88cb91'];
+export function drawItemIcon(canvas,item){
+  const ctx=canvas.getContext('2d');
+  const size=48,rarity=Math.max(0,Math.min(4,item?.rarity||0));
+  canvas.width=size;canvas.height=size;
+  const shade=ICON_RARITY[rarity],grad=ctx.createLinearGradient(0,0,48,48);
+  grad.addColorStop(0,'#34302d');grad.addColorStop(1,'#11161d');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
+  ctx.fillStyle=shade+'1c';ctx.fillRect(4,4,40,40);
+  ctx.strokeStyle=shade;ctx.lineWidth=1.5;ctx.strokeRect(2.5,2.5,43,43);
+  const frames=EQUIPMENT_ICONS[item?.slot]||EQUIPMENT_ICONS.charm;
+  const name=String(item?.name||'未知装备');
+  const code=[...name].reduce((n,c)=>((n*31+c.codePointAt(0))>>>0),7);
+  const frame=frames[code%frames.length];
+  if(ready){
+    ctx.imageSmoothingEnabled=false;
+    const aspect=frame[2]/frame[3],height=38,width=Math.min(34,height*aspect);
+    ctx.drawImage(atlas,...frame,24-width/2,24-height/2,width,height);
+    // High rarity produces an additional warm highlight but keeps item silhouettes legible.
+    if(rarity>=3){ctx.globalCompositeOperation='screen';ctx.fillStyle=shade+'35';ctx.fillRect(6,6,36,36);ctx.globalCompositeOperation='source-over';}
+  }else{
+    ctx.fillStyle=shade;
+    ctx.beginPath();ctx.moveTo(24,8);ctx.lineTo(36,22);ctx.lineTo(25,41);ctx.lineTo(12,22);ctx.closePath();ctx.fill();
+  }
 }
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}
