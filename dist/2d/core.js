@@ -1,4 +1,5 @@
 import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, SKILLS, REGION_DATA } from './systems.js';
+import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
 export const COLS = 40;
@@ -54,7 +55,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0)};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -62,6 +63,12 @@ export function sanitizeSave(raw){
   for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
     const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
+  }
+  p.materials=sanitizeMaterials(raw.materials);
+  p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
+  if(Array.isArray(raw.activeSkills)){
+    const chosen=[...new Set(raw.activeSkills.filter(k=>typeof k==='string'&&Object.hasOwn(SKILLS,k)))].slice(0,7);
+    p.activeSkills=[...chosen,...Object.keys(SKILLS).filter(k=>!chosen.includes(k))].slice(0,7);
   }
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
   if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));

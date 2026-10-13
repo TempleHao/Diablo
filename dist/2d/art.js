@@ -1,3 +1,4 @@
+import {drawMage} from './mage-portrait.js';
 import {drawEquipmentIcon} from './equipment-icons.js';
 /**
  * 余烬纪事 · 2D 美术层
@@ -153,22 +154,8 @@ function frameFor(kind,walking,elapsed){
 function shadow(ctx,x,y,rx,ry,alpha=.65){
   ctx.fillStyle='rgba(0,0,0,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+2,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
-export function hero(ctx,p,tick){
-  const moving= Math.abs(p.walk-prevHeroWalk)>0.0001;prevHeroWalk=p.walk;
-  ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));
-  shadow(ctx,3,9,24,10,.7);
-  gradientSpot(ctx,0,-20,58,'#e5a45423','#d2a04d00');
-  const direction=Math.cos(p.angle),faceLeft=direction<-.25;
-  if(faceLeft)ctx.scale(-1,1);
-  if(ready){
-    const hit=p.invuln>0&&Math.floor(tick*15)%3===0;
-    let source;
-    if(hit)source=FRAME.mageHit;
-    else source=frameFor('mage',moving,tick);
-    sprite(ctx,source,-31,-91,62,109);
-    if(p.cast>0){gradientSpot(ctx,28,-55,27,'#ffcf8ca8','#df672500');}
-  }else{ctx.fillStyle='#526e7d';ctx.fillRect(-16,-46,32,46);}
-  ctx.restore();
+export function hero(ctx,p,tick,gear){
+  drawMage(ctx,p,tick,gear);
   ctx.strokeStyle='#e6bc645c';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(p.x,p.y+9,28,11,0,0,Math.PI*2);ctx.stroke();
 }
 let prevHeroWalk=0;

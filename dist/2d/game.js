@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
@@ -8,7 +9,7 @@ const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
 const skillData = SKILLS;
-const equippedSkills=['fire','nova','shard','armor','meteor','blink','heal'];
+const ACTIVE_LIMIT=7;
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
@@ -18,18 +19,22 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
+let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
-for(const [key,meta] of Object.entries(SKILLS)){
-  const button=document.createElement('button');button.type='button';button.dataset.skill=key;
-  button.className='skill-'+meta.school;
-  const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
-  const label=document.createElement('b');label.textContent=meta.name;
-  const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
-  const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);
-  $('abilitybar').append(button);
+function renderSkillBar(){
+  const bar=$('abilitybar');bar.replaceChildren();
+  for(const key of profile.activeSkills){
+    const meta=SKILLS[key];if(!meta)continue;
+    const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+    button.className='skill-'+meta.school;
+    const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+    const label=document.createElement('b');label.textContent=meta.name;
+    const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
+    const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);bar.append(button);
+  }
 }
+renderSkillBar();
 const regionSelect=$('region-select');
 REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
 regionSelect.value=String(profile.region);
@@ -119,7 +124,7 @@ function build() {
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;bossDefeated=false;portal=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
   $('portal-panel').hidden=true;$('portal-open').hidden=true;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
     drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
@@ -189,13 +194,50 @@ function applyEquipmentChange(operate){
   }
   persist();renderInventory();updateHud();
 }
+function refreshCraftingPanel(){
+  const sel=$('auto-salvage');
+  sel.value=String(profile.autoSalvage);
+  const wallet=$('material-wallet');wallet.replaceChildren();
+  for(const [key,meta] of Object.entries(MATERIALS)){
+    const label=document.createElement('div');
+    label.className='material-token '+key;
+    const name=document.createElement('span');name.textContent=meta.label;
+    const count=document.createElement('strong');count.textContent=String(profile.materials[key]||0);
+    label.append(name,count);wallet.append(label);
+  }
+}
+$('auto-salvage').onchange=()=>{
+  profile.autoSalvage=Number($('auto-salvage').value);
+  persist();renderInventory();
+  announce(profile.autoSalvage<0?'自动分解已关闭':'自动分解已开启：仅自动回收选择的低品质装备',true);
+};
+$('salvage-bag').onclick=()=>{
+  if(profile.autoSalvage<0){announce('请先选择自动分解品质范围',true);return;}
+  const eligible=profile.inventory.filter(i=>i.rarity<=profile.autoSalvage&&!i.favorite&&!i.setId&&!Object.values(profile.equipped).includes(i.id));
+  if(!eligible.length){announce('没有符合自动分解规则的物品',true);return;}
+  if(!confirm('确认分解 '+eligible.length+' 件低品质装备？已装备、已收藏、传奇与套装会保留。'))return;
+  const results=dismantleAll(profile);
+  if(results.some(x=>x.item.id===selectedItemId))selectedItemId=null;
+  persist();renderInventory();
+  announce('批量分解完成 · '+results.length+' 件，结晶已入材料袋',true);
+};
+$('inv-temper').onclick=()=>{
+  if(!selectedItemId||!canTemper(profile,selectedItemId))return;
+  const item=profile.inventory.find(x=>x.id===selectedItemId),cost=temperCost(item);
+  const ok=confirm('花费 '+cost.gold+' 金币 / '+cost.dust+' 粉尘 / '+cost.crystal+' 结晶 / '+cost.core+' 传奇余烬，永久提高 '+item.name+' 的第一条词缀？');
+  if(!ok)return;
+  if(temper(profile,selectedItemId)){
+    persist();renderInventory();announce('装备淬炼成功 · 词缀获得强化',true);
+  }
+};
 function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
-  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';return;}
+  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
   panel.append(preview,title,meta);
+  if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
@@ -235,6 +277,10 @@ function inspectItem(item){
   const wornHere=Object.values(profile.equipped).includes(item.id);
   quick.disabled=false;
   quick.textContent=wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
+  const cost=temperCost(item);
+  $('inv-temper').disabled=!canTemper(profile,item.id);
+  $('inv-temper').textContent=item.tempered?'该装备已淬炼':canTemper(profile,item.id)?'用材料淬炼第一条词缀':'材料不足 / 无可淬炼词缀';
+  $('temper-cost').textContent='淬炼花费：'+cost.gold+' 金币 + '+cost.dust+' 粉尘 + '+cost.crystal+' 结晶 + '+cost.core+' 传奇余烬（每件仅可淬炼一次）';
   quick.onclick=()=>{
     selectedItemId=item.id;
     applyEquipmentChange(()=>{if(wornHere){
@@ -245,6 +291,7 @@ function inspectItem(item){
 $('inv-filter').onchange=()=>renderInventory();
 $('inv-sort').onchange=()=>renderInventory();
 function renderInventory(){
+  refreshCraftingPanel();
   const statsNow=stats(profile),statFields=[
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
@@ -292,9 +339,12 @@ function renderInventory(){
     const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
     use.onclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
-    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn;
-    recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>salvage(profile,item.id));};
-    actions.append(use,recycle);node.append(detail,actions);bag.append(node);
+    const favorite=document.createElement('button');favorite.textContent=item.favorite?'★ 保留':'☆ 收藏';
+    favorite.setAttribute('aria-label',item.favorite?'取消保留 '+item.name:'保护 '+item.name);
+    favorite.onclick=()=>{item.favorite=!item.favorite;persist();renderInventory();};
+    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn||item.favorite;
+    recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>dismantle(profile,item.id));};
+    actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
   }
   inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
@@ -308,7 +358,25 @@ function renderInventory(){
     btn.onclick=()=>{
       if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
     };
-    skillPanel.append(btn);
+    const slot=document.createElement('select');slot.className='skill-slot';
+    slot.setAttribute('aria-label',skill.name+' 装入快捷栏位置');
+    for(let i=0;i<ACTIVE_LIMIT;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+' 号位 · '+SKILLS[profile.activeSkills[i]].name;slot.append(opt);}
+    if(!profile.activeSkills.includes(key)){
+      const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='加入快捷栏…';
+      slot.prepend(placeholder);slot.value='';
+    }else slot.value=String(profile.activeSkills.indexOf(key));
+    slot.disabled=locked;
+    slot.onchange=()=>{
+      if(profile.level<skill.unlocked)return;
+      if(slot.value==='')return;
+      const idx=Number(slot.value),prev=profile.activeSkills.indexOf(key),displaced=profile.activeSkills[idx];
+      profile.activeSkills[idx]=key;
+      if(prev>=0&&prev!==idx)profile.activeSkills[prev]=displaced;
+      persist();renderSkillBar();renderInventory();updateHud();
+      announce(skill.name+' 已加入快捷栏',true);
+    };
+    const cell=document.createElement('div');cell.className='skill-catalog-entry';cell.append(btn,slot);
+    skillPanel.append(cell);
   }
 }
 $('export-save').onclick=()=>{
@@ -352,7 +420,12 @@ function injury(amount){
   if(hero.invuln>0||state!=='playing')return;
   const defense=stats(profile);
   const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
-  hero.hp=Math.max(0,hero.hp-mitigated);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(mitigated),'#ff9990');
+  const absorbed=Math.min(wardHp,mitigated);wardHp-=absorbed;
+  const finalDamage=mitigated-absorbed;
+  if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
+  hero.hp=Math.max(0,hero.hp-finalDamage);hero.invuln=.6;
+  puff(hero.x,hero.y,absorbed?'#85bae9':'#e46455',13,4,145);
+  if(finalDamage)floatText(hero.x,hero.y-30,Math.round(finalDamage),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
 function dealDamage(e,damage,school='physical'){
@@ -407,7 +480,7 @@ function dropItem(x,y,rare=false) {
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
 function cast(skill){
   const rule=SKILLS[skill];
-  if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
+  if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
   if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
   const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
@@ -443,6 +516,35 @@ function cast(skill){
     puff(hero.x,hero.y,'#c8b1fe',21,4,170);
   }
   if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
+  if(skill==='chain'){
+    const candidates=enemies.map(e=>({e,dist:distance(hero,e)})).filter(x=>x.dist<600).sort((a,b)=>a.dist-b.dist);
+    let last={x:hero.x,y:hero.y};
+    const victims=[];
+    for(const {e} of candidates){
+      if(victims.length>=3+Math.floor(rank/3))break;
+      if(distance(last,e)>390)continue;
+      victims.push(e);hazards.push({x:last.x,y:last.y,x2:e.x,y2:e.y,type:'chain',r:0,max:1,life:.22});
+      last={x:e.x,y:e.y};
+    }
+    for(let n=0;n<victims.length;n++)dealDamage(victims[n],bonus.power*(1.2+rank*.12)*Math.pow(.8,n),'arcane');
+    if(!victims.length){announce('附近没有连锁目标');puff(hero.x+dx*55,hero.y+dy*55,'#b29eff',14,4,100);}
+  }
+  if(skill==='storm'){
+    const center=target&&distance(hero,target)<520?target:{x:hero.x+dx*190,y:hero.y+dy*190};
+    hazards.push({x:center.x,y:center.y,r:120,max:120,life:4,kind:'storm',type:'storm',rank,timer:0});
+    announce('冰暴领域已展开',true);
+  }
+  if(skill==='ward'){
+    wardHp=Math.round(24+bonus.hp*(.20+rank*.045));
+    puff(hero.x,hero.y,'#b8d7ff',22,5,130);announce('奥术护盾 · 吸收 '+wardHp+' 伤害',true);
+  }
+  if(skill==='inferno'){
+    for(let n=1;n<=5;n++){
+      const x=hero.x+dx*n*55,y=hero.y+dy*n*55;
+      if(walkable(x,y,10,dungeon))hazards.push({x,y,r:43,max:43,life:4,type:'inferno',rank,timer:0});
+    }
+    announce('烈焰地径已铺开',true);
+  }
   updateHud();
 }
 function movementVector() {
@@ -497,6 +599,10 @@ function update(dt){
   for(const d of [...drops]){
     d.age+=dt;
     if(distance(hero,d)<58){
+      if(!d.persistent&&autoDismantleDrop(profile,d.item)){
+        drops.splice(drops.indexOf(d),1);puff(d.x,d.y,'#b7a3db',12,3,90);
+        announce('自动分解 · '+d.item.name+' → 粉尘/结晶',true);persist();continue;
+      }
       if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
       if(d.persistent)profile.pendingLoot=profile.pendingLoot.filter(p=>p.item.id!==d.item.id);
@@ -511,6 +617,17 @@ function update(dt){
       h.triggered=true;puff(h.x,h.y,'#ff9146',50,8,280);
       for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*(2.8+(h.rank||0)*.36),'fire');
     }
+    if((h.type==='storm'||h.type==='inferno')&&h.life>0){
+      h.timer-=dt;
+      if(h.timer<=0){
+        h.timer=.55;
+        for(const e of [...enemies]){
+          if(distance(e,h)>h.max+e.radius)continue;
+          if(h.type==='storm')e.slow=Math.max(e.slow,1.05);
+          dealDamage(e,stats(profile).power*(h.type==='storm'?.31:.42)*(1+(h.rank||0)*.12),h.type==='storm'?'cold':'fire');
+        }
+      }
+    }
     if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
   }
   updateHud();
@@ -520,7 +637,11 @@ function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
 function enemyDraw(e){ Art.enemy(ctx,e,tick); }
-function heroDraw(){ Art.hero(ctx,hero,tick); }
+function heroDraw(){
+  const worn={};for(const [slot,id] of Object.entries(profile.equipped))worn[slot]=profile.inventory.find(x=>x.id===id)||null;
+  Art.hero(ctx,hero,tick,worn);
+  if(wardHp>0){ctx.strokeStyle='#93cdffb5';ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor='#a2d5ff';ctx.beginPath();ctx.ellipse(hero.x,hero.y-49,32,60,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;}
+}
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
   if(m.kind==='ember'||m.kind==='shard'){
@@ -562,10 +683,19 @@ function render(){
   for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
   for(const h of hazards){
-    ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
-    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':h.type==='meteor'?'#ff663b':'#bf80e8';
-    ctx.shadowColor=h.type==='nova'?'#8acde5':h.type==='meteor'?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
-    ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+    ctx.save();
+    ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:h.type==='chain'?.22:h.type==='meteor'?1:4),0,1)*.78;
+    if(h.type==='chain'){
+      ctx.strokeStyle='#c4a4ff';ctx.shadowColor='#ba9eff';ctx.shadowBlur=20;ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(h.x,h.y-48);ctx.lineTo((h.x+h.x2)/2-14,(h.y+h.y2)/2-53);
+      ctx.lineTo((h.x+h.x2)/2+10,(h.y+h.y2)/2-45);ctx.lineTo(h.x2,h.y2-48);ctx.stroke();
+    }else{
+      const fire=h.type==='meteor'||h.type==='inferno',ice=h.type==='nova'||h.type==='storm';
+      ctx.strokeStyle=ice?'#8ee5ff':fire?'#ff663b':'#bf80e8';
+      ctx.shadowColor=ice?'#8acde5':fire?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
+      ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+      if(h.type==='storm'||h.type==='inferno'){ctx.fillStyle=fire?'#ff6a241e':'#75c8f51c';ctx.fill();}
+    }
     ctx.restore();
   }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
@@ -604,17 +734,16 @@ canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&hero)aimAt
 canvas.addEventListener('pointerdown',e=>{if(state!=='playing'||e.pointerType!=='mouse'||e.button!==0)return;aimAt(e.clientX,e.clientY);pointers.add(e.pointerId);cast('fire');});
 window.addEventListener('pointerup',e=>pointers.delete(e.pointerId));
 window.addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
-for(const button of document.querySelectorAll('[data-skill]')){
-  const skill=button.dataset.skill;
-  button.addEventListener('pointerdown',e=>{
-    e.preventDefault();if(state!=='playing')return;
-    button.setPointerCapture(e.pointerId);
-    if(skill==='fire'){manualAim=null;pointers.add(e.pointerId);}
-    cast(skill);
-  });
-  const release=e=>pointers.delete(e.pointerId);
-  button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);
-}
+$('abilitybar').addEventListener('pointerdown',e=>{
+  const button=e.target.closest('button[data-skill]');
+  if(!button||state!=='playing')return;
+  e.preventDefault();
+  const skill=button.dataset.skill;button.setPointerCapture(e.pointerId);
+  if(skill==='fire'){manualAim=null;pointers.add(e.pointerId);}
+  cast(skill);
+});
+$('abilitybar').addEventListener('pointerup',e=>pointers.delete(e.pointerId));
+$('abilitybar').addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
 window.addEventListener('keydown',e=>{
   const tag=document.activeElement?.tagName;
   if(['INPUT','TEXTAREA'].includes(tag)||e.ctrlKey||e.metaKey||e.altKey)return;
@@ -626,7 +755,7 @@ window.addEventListener('keydown',e=>{
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
-    const byKey={1:'fire',2:'nova',3:'shard',4:'armor',q:'meteor',' ':'blink',e:'heal'};
+    const byKey=Object.fromEntries(profile.activeSkills.map(id=>[SKILLS[id].key==='空格'?' ':SKILLS[id].key.toLowerCase(),id]));
     if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
   }
 });

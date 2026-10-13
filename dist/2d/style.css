@@ -132,3 +132,22 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  .portal-dialog{padding:18px}
 }
 @media(max-width:390px){.inv-bag-column .inventory-items{grid-template-columns:repeat(2,minmax(0,1fr))}.inv-gear-column .equipment-slot b{font-size:9px}}
+
+/* v0.3.3 crafting and hotbar: avoid widening the inventory on compact devices */
+.salvage-settings{display:grid;grid-template-columns:1fr;gap:7px;border:1px solid #615341;background:#22201d;padding:9px;border-radius:4px;margin:9px 0}
+.salvage-settings label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:#dbba8e}
+.salvage-settings select{font-size:11px;max-width:72%;width:auto;min-width:0;color:#e5d1a9;background:#101721;border:1px solid #746044;padding:7px 4px}
+.salvage-settings button,.tempering-action{padding:9px;border:1px solid #9c7450;background:linear-gradient(#43352b,#241d1c);color:#f4d9b4;white-space:normal;line-height:1.4}
+.salvage-settings small{font-size:10px;color:#b6aca0;overflow-wrap:anywhere;line-height:1.5}
+.material-wallet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:9px 0 12px}
+.material-token{display:flex;flex-direction:column;min-width:0;gap:6px;padding:9px 3px;text-align:center;border:1px solid #746047;background:#141b26}
+.material-token span{font-size:10px;color:#c6b4a0;overflow-wrap:anywhere}
+.material-token strong{font-size:17px}
+.material-token.dust strong{color:#c9bcc5}.material-token.crystal strong{color:#80c6ec}.material-token.core strong{color:#f4a568}
+.tempering-action{display:block;width:100%;margin-bottom:7px}
+.tempering-action:disabled{opacity:.46}
+.crafting-tip{font-size:10px;line-height:1.6;color:#b4a998;margin-bottom:9px;overflow-wrap:anywhere}
+.skill-catalog-entry{display:flex;flex-direction:column;min-width:0;border:1px solid #6b574266;background:#121a22}
+.skill-catalog-entry .catalog-skill{flex:1;border:0;padding:9px;min-height:70px}
+.skill-slot{font-size:10px;max-width:100%;width:100%;background:#28272a;color:#eacba3;border:1px solid #81603c;padding:8px 4px}
+@media(max-width:700px){.material-wallet{grid-template-columns:repeat(3,minmax(0,1fr))}.skill-catalog-entry .catalog-skill{min-height:65px}}

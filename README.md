@@ -1,8 +1,12 @@
 # 余烬法师 · Ember Mage
 
-> **2D 试玩版（v0.3.2）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 试玩迭代（v0.3.3）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
 
+> **v0.3.3 开发预览**：清晰的原创 Canvas 法师模型（披风、头盔和法杖配色随装备变化）、新增 4 个可用法术至 11 个、可配置 7 槽技能快捷栏、默认关闭的自动/批量分解、三种分解材料及装备词缀淬炼。已装备、收藏、传奇和套装不会被自动回收。详见 [v0.3.3 验收记录](docs/2D-V0.3.3-ACCEPTANCE.md)。**本版仍属试玩性质，写实暗黑 A 方向的迷宫、场景和怪物尚在重构。**
+>
+> **v0.3.3 Chromium 实机画面**：[PC 新法师与场景](docs/screenshots/2d-v0.3.3-game-desktop.jpg) · [手机实机画面](docs/screenshots/2d-v0.3.3-game-mobile.jpg) · [PC 自动分解与锻造界面](docs/screenshots/2d-v0.3.3-crafting-desktop.jpg) · [手机自动分解界面](docs/screenshots/2d-v0.3.3-crafting-mobile.jpg)。这些是真实的游戏浏览器截图，不是风格概念图。
+>
 > **v0.3.2 Demo 可玩更新**：区域从五张扩展到九张、四位新增独占掉落 Boss、每件装备类型都有匹配图形（法杖/剑/戒指/头盔/盾等），背包重做为左装备/中属性对比/右筛选，Boss 战后出现实际传送阵，可指定下一张或随机目的地，也可留在本层。修复长词缀溢出、减少频繁换装操作。详见 [v0.3.2 清单及限制](docs/2D-V0.3.2-ACCEPTANCE.md)。
 >
 > **真实 Chromium 测试截图（不是概念设计图）**：[PC装备背包](docs/screenshots/2d-v0.3.2-inventory-desktop.jpg) · [手机版背包](docs/screenshots/2d-v0.3.2-inventory-mobile.jpg) · [PC传送阵](docs/screenshots/2d-v0.3.2-portal-desktop.jpg) · [手机版传送阵](docs/screenshots/2d-v0.3.2-portal-mobile.jpg)。
