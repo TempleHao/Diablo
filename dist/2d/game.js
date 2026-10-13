@@ -123,7 +123,7 @@ function build() {
   const seed = 20261013 + profile.clears*19+profile.region*7919;
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
-  hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
+  hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0,moving:false};
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
   $('portal-panel').hidden=true;$('portal-open').hidden=true;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
@@ -594,7 +594,19 @@ function update(dt){
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
-  if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
+  const oldX=hero.x,oldY=hero.y;
+  if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);
+    if(!manualAim)hero.angle=Math.atan2(v.y,v.x);
+  }
+  hero.moving=l>.02&&Math.hypot(hero.x-oldX,hero.y-oldY)>.08;
+  if(hero.moving){
+    const previousStride=hero.walk;hero.walk+=dt*13;
+    // A small timed footstep is a visible animation cue, not a fake input event.
+    if(Math.floor(previousStride/Math.PI)!==Math.floor(hero.walk/Math.PI)){
+      const x=hero.x-Math.cos(hero.angle)*9,y=hero.y-Math.sin(hero.angle)*7;
+      puff(x,y,'#7590b9',4,1.1,32);
+    }
+  }
   if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
   if(pointers.size || keys.has('1'))cast('fire');
   for(const e of [...enemies]){

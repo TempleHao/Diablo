@@ -53,6 +53,25 @@ try{
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
+    const sprite=await page.evaluate(async()=>{
+      const mod=await import('./pixel-mage-demo.js');
+      for(let i=0;i<30&&!mod.status().ready;i++)await new Promise(resolve=>setTimeout(resolve,50));
+      return mod.status();
+    });
+    assert.equal(sprite.ready,true,'demo mage image must load before character draw');
+    assert.equal(sprite.width,88,'reference mage image width differs');
+    assert.equal(sprite.height,120,'reference mage image height differs');
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const idle=await page.screenshot({type:'jpeg',quality:75});
+      console.log((viewport.width===1365?'MAGE_IDLE_DESKTOP_BASE64:':viewport.width===390?'MAGE_IDLE_MOBILE_BASE64:':'MAGE_IDLE_LANDSCAPE_BASE64:')+idle.toString('base64'));
+    }
+    await page.keyboard.down('d');
+    await page.waitForTimeout(240);
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const run=await page.screenshot({type:'jpeg',quality:75});
+      console.log((viewport.width===1365?'MAGE_RUN_DESKTOP_BASE64:':viewport.width===390?'MAGE_RUN_MOBILE_BASE64:':'MAGE_RUN_LANDSCAPE_BASE64:')+run.toString('base64'));
+    }
+    await page.keyboard.up('d');
     const firstBoss=await page.evaluate(()=>window.__ember2dQA.bossTest());
     assert.equal(firstBoss.state,'playing','boss defeat must not end the game');
     assert.equal(firstBoss.bossDefeated,true);
