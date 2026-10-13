@@ -175,7 +175,7 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 .ring-choice label{display:flex;align-items:center;gap:12px;font-size:13px}
 .ring-choice select{flex:1;padding:9px;border:1px solid #8f7956;background:#18202a;color:#f5d6ad;font-size:14px}
 .equipment-slot.is-selected{border-color:#d0a66b;background:#302820}
-@media(max-width:700px){
+@media(max-width:700px), (max-height:550px) and (pointer:coarse){
   #inventory{padding:0;place-items:stretch;backdrop-filter:none;background:#0d131b}
   #inventory .inventory-panel{width:100%;max-width:100%;height:100dvh;max-height:100dvh;min-height:0;display:block;padding:0 12px calc(95px + env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;background:#111820;border:0;scrollbar-width:thin}
   #inventory .panel-head{position:sticky;top:0;z-index:8;padding:12px 0 9px;min-height:64px;background:#111820;border-bottom:1px solid #4f4335}
@@ -221,3 +221,5 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
   .mobile-inv-tabs button{touch-action:manipulation}
 }
 @media(max-width:375px){.mobile-inv-actions{grid-template-columns:minmax(0,1fr) 73px 110px}.mobile-inv-actions button{font-size:12px}.inv-gear-column .equipment{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+@media(max-height:550px) and (pointer:coarse){.topbar{height:50px}.quest{top:54px}.joystick{bottom:45px;width:86px;height:86px}.joystick span{left:25px;top:25px;width:34px;height:34px}.hud{min-height:67px;padding:6px}.orb{width:40px;height:40px}.abilitybar button{height:45px;min-width:40px;width:40px}.abilitybar{gap:3px}.abilitybar .ability-icon{font-size:16px!important}.abilitybar b{font-size:10px}.mobile-inv-actions{padding:5px 12px calc(5px + env(safe-area-inset-bottom))}.mobile-inv-actions button{min-height:39px}.mobile-inv-tabs{padding:4px}.mobile-inv-tabs button{min-height:39px;padding:5px}}
