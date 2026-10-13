@@ -15,7 +15,7 @@
     "branch": null,
     "taskId": null
   },
-  "currentPhase": "F1",
+  "currentPhase": "F2",
   "phases": {
     "F0": {
       "status": "done",
@@ -36,23 +36,31 @@
       ]
     },
     "F1": {
-      "status": "active",
+      "status": "done",
       "gateIds": [
         "G01"
       ],
       "evidence": [
         {
           "kind": "commit",
-          "ref": "7528e10df4dc43e05928b5c800fc5a0ecda90092"
+          "ref": "68feaf5437cb89b921f78683371ab75746a7b67d"
         },
         {
           "kind": "test-run",
-          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38352961125"
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38386923283"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-desktop.jpg"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-mobile.jpg"
         }
       ]
     },
     "F2": {
-      "status": "pending",
+      "status": "active",
       "gateIds": [
         "G02"
       ],
@@ -123,8 +131,25 @@
   },
   "gates": {
     "G01": {
-      "status": "unverified",
-      "evidence": []
+      "status": "pass",
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "68feaf5437cb89b921f78683371ab75746a7b67d"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38386923283"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-desktop.jpg"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-mobile.jpg"
+        }
+      ]
     },
     "G02": {
       "status": "unverified",
@@ -167,8 +192,9 @@
     {
       "id": "P1-001",
       "severity": "P1",
-      "status": "open",
-      "description": "实际地牢地图缺少可探索多房间迷宫及回路"
+      "status": "fixed",
+      "description": "实际地牢地图缺少可探索多房间迷宫及回路",
+      "resolution": "F1 multi-room room graph, actual collision doors, fog and browser movement; see GH Actions run 38386923283"
     },
     {
       "id": "P1-002",
@@ -206,18 +232,21 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F1：继续 feature/2d-maze-topology-f1 / PR #6，把房间-门拓扑转换为真实 Canvas 2D 地图、障碍碰撞与迷雾探索，让 Boss 只有进入 Boss 房才触发；新增至少 100 种种子下玩家路径可达、浏览器操作与手机交互测试。未完成前不能并入 main。",
+  "nextAction": "F2：实现独立安全主城与野外入口、可回城/重返地牢、击杀Boss后的可选下一层与手动重刷；确保迷宫/副本切换与当前2D角色存档兼容，新增浏览器交互测试。优先同步解决 P1-002 的 Boss 专属掉落与重复结算。",
   "lastAttempt": {
     "at": "2026-10-13",
     "phase": "F1",
-    "status": "partial-topology-tested-not-integrated",
+    "status": "passed-topology-and-first-browser-door-transition",
     "verified": {
-      "commit": "7528e10df4dc43e05928b5c800fc5a0ecda90092",
-      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38352961125",
-      "branch": "feature/2d-maze-topology-f1",
-      "pullRequest": "https://github.com/TempleHao/Diablo/pull/6"
+      "commit": "68feaf5437cb89b921f78683371ab75746a7b67d",
+      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38386923283",
+      "screenshots": [
+        "docs/screenshots/2d-f1-maze-desktop.jpg",
+        "docs/screenshots/2d-f1-maze-mobile.jpg"
+      ],
+      "physicalMazeSeeds": 100
     },
-    "caveat": "G01 still unverified: actual interactive dungeon rendering, collision/fog and exploration-to-boss gameplay missing. No mainline release."
+    "caveat": "This is real navigable PIXEL prototype; not A-direction 2.5D art. PR remains Draft; no main/Pages release."
   },
   "candidate": {
     "status": "none",
