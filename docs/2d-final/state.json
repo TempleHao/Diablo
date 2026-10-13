@@ -15,12 +15,25 @@
     "branch": null,
     "taskId": null
   },
-  "currentPhase": "F0",
+  "currentPhase": "F1",
   "phases": {
     "F0": {
-      "status": "pending",
+      "status": "done",
       "gateIds": [],
-      "evidence": []
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "748ef5d5cbe36d7c8c88a0035dfaad388965116e"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38352511685"
+        },
+        {
+          "kind": "report",
+          "ref": "docs/2d-final/BASELINE.md"
+        }
+      ]
     },
     "F1": {
       "status": "pending",
@@ -184,8 +197,17 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F0：完成规则门禁自动审计并核对现有 draft PR #4 的照明实验；接着实现 F1 多房间迷宫拓扑的生成器及连通性测试。",
-  "lastAttempt": null,
+  "nextAction": "F1：新建独立的房间图迷宫模块（入口、支路、死路、至少一个回路、可到达的 Boss 房/出口），先用 100 个固定种子验证可达性与路径多样性；通过后才集成 2D 战斗画布与迷雾。",
+  "lastAttempt": {
+    "at": "2026-10-13",
+    "phase": "F0",
+    "status": "passed-only-baseline-and-audit",
+    "verified": {
+      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38352511685",
+      "commit": "748ef5d5cbe36d7c8c88a0035dfaad388965116e"
+    },
+    "caveat": "No F1-F9 gameplay or A-direction art gate passed; no final game release."
+  },
   "candidate": {
     "status": "none",
     "commit": null,
