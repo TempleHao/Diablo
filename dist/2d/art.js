@@ -20,6 +20,7 @@ const FRAME = {
   mageIdle:[128,164,16,28], mageRun:[192,164,16,28], mageHit:[256,164,16,28],
   wretchIdle:[368,88,16,16], wretchRun:[432,88,16,16],
   archerIdle:[368,153,16,23], archerRun:[432,153,16,23],
+  cultistIdle:[368,225,16,23], cultistRun:[432,225,16,23],
   bruteIdle:[16,380,32,36], bruteRun:[144,380,32,36],
   bossIdle:[16,428,32,36], bossRun:[144,428,32,36],
   torch:[288,336,16,16], weapon:[324,129,8,30], coin:[289,385,6,7],
@@ -45,7 +46,7 @@ function fixture(ctx,x,y,r=1){
   ctx.fillStyle='#fff3bb';ctx.beginPath();ctx.ellipse(0,-12,2,4*pulse,0,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
-export function floor(ctx,cam,vw,vh,worldW,worldH,tick){
+export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0){
   ctx.fillStyle='#0a1015';ctx.fillRect(0,0,worldW,worldH);
   if(!ready)return;
   const S=48, left=Math.max(0,Math.floor(cam.x/S)-1),right=Math.min(Math.ceil(worldW/S),Math.ceil((cam.x+vw)/S)+1);
@@ -58,7 +59,21 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick){
     if(v%21===0)sprite(ctx,FRAME.skull,x*S+12,y*S+12,25,25);
     if(v%9===0){ctx.fillStyle='#10131855';ctx.fillRect(x*S+6,y*S+3,6,17);}
   }
-  ctx.fillStyle='#10151b52';ctx.fillRect(cam.x,cam.y,vw,vh);
+  const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c'];
+  ctx.fillStyle=tints[region]||tints[0];ctx.fillRect(cam.x,cam.y,vw,vh);
+  // One visual identity per region: gates, ritual stains, cave fractures, or corrupted ground.
+  const S2=96;
+  for(let y=Math.floor(cam.y/S2);y<=Math.ceil((cam.y+vh)/S2);y++)
+    for(let x=Math.floor(cam.x/S2);x<=Math.ceil((cam.x+vw)/S2);x++){
+      const v=hash(x,y,1213+region*101),ox=x*S2,oy=y*S2;
+      if(region===2&&v%13===0){
+        ctx.strokeStyle='#832c2466';ctx.lineWidth=3;ctx.beginPath();ctx.arc(ox+44,oy+40,26,0,Math.PI*2);ctx.stroke();
+        for(let n=0;n<5;n++){const a=n*2*Math.PI/5;ctx.beginPath();ctx.moveTo(ox+44,oy+40);ctx.lineTo(ox+44+Math.cos(a)*25,oy+40+Math.sin(a)*25);ctx.stroke();}
+      }
+      if(region===3&&v%8===0){ctx.strokeStyle='#7398a35c';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(ox+12,oy+72);ctx.lineTo(ox+44,oy+28);ctx.lineTo(ox+69,oy+46);ctx.stroke();}
+      if(region===4&&v%11===0){ctx.fillStyle='#6c3d7844';ctx.beginPath();ctx.arc(ox+31,oy+65,20,0,Math.PI*2);ctx.fill();}
+      if(region===1&&v%9===0){ctx.fillStyle='#151a1acc';ctx.fillRect(ox+20,oy+15,62,9);ctx.strokeStyle='#8d785866';ctx.strokeRect(ox+20,oy+15,62,9);}
+    }
   // Carved northern ritual circle, deliberately placed beneath characters.
   const cx=worldW/2,cy=5.7*72;
   gradientSpot(ctx,cx,cy,170,'#bb422743','#6c362200');
@@ -153,9 +168,11 @@ export function hero(ctx,p,tick){
 }
 let prevHeroWalk=0;
 export function enemy(ctx,e,tick){
+  if(e.kind==='spider'){spiderEnemy(ctx,e,tick);return;}
   const cfg=e.kind==='boss'?{type:'boss',width:136,height:154,off:-123}
     :e.kind==='brute'?{type:'brute',width:113,height:127,off:-100}
     :e.kind==='archer'?{type:'archer',width:64,height:93,off:-76}
+    :e.kind==='cultist'?{type:'cultist',width:66,height:94,off:-76}
     :{type:'wretch',width:59,height:59,off:-47};
   ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
   if(e.kind==='boss')gradientSpot(ctx,0,-45,117,'#a64d8950','#983b8600');
@@ -179,12 +196,36 @@ export function enemy(ctx,e,tick){
   prevEnemyPos.set(e.id,{x:e.x,y:e.y});
 }
 const prevEnemyPos=new Map();
+function spiderEnemy(ctx,e,tick){
+  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
+  const step=Math.sin(tick*17+e.phase)*7;
+  ctx.fillStyle='#05070bb9';ctx.beginPath();ctx.ellipse(0,13,37,13,0,0,Math.PI*2);ctx.fill();
+  ctx.lineWidth=5;ctx.strokeStyle='#483747';
+  for(const side of [-1,1])for(let leg=0;leg<4;leg++){
+    const angle=(leg-1.5)*.33, reach=22+leg*4;
+    const x0=side*11,y0=-12+leg*4;
+    ctx.beginPath();ctx.moveTo(x0,y0);
+    ctx.lineTo(side*reach,-23+leg*7+step*(leg%2?1:-1));
+    ctx.lineTo(side*(reach+20),-4+leg*9);ctx.stroke();
+  }
+  ctx.fillStyle='#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#202127';ctx.beginPath();ctx.ellipse(0,-26,13,14,0,0,Math.PI*2);ctx.fill();
+  for(const x of [-8,8]){ctx.fillStyle='#fc613d';ctx.beginPath();ctx.arc(x,-31,3,0,Math.PI*2);ctx.fill();}
+  if(e.hp<e.maxHp){ctx.fillStyle='#160e12';ctx.fillRect(-25,-54,50,5);ctx.fillStyle='#e06e62';ctx.fillRect(-25,-54,50*Math.max(0,e.hp/e.maxHp),5);}
+  ctx.restore();
+}
 export function loot(ctx,d,tick){
-  const col=['#bcc6d0','#72c2f3','#f5bb69','#d3a4ef'][d.item.rarity];
+  const col=['#bcc6d0','#72c2f3','#f5bb69','#ee9566','#88d8a0'][d.item.rarity]||'#bfc4c5';
   const bob=Math.sin(tick*2.7+d.x*.01)*4;
   gradientSpot(ctx,d.x,d.y,57,col+'67',col+'00');
   ctx.globalAlpha=.44;ctx.fillStyle=col;ctx.fillRect(d.x-2,d.y-68,4,60);ctx.globalAlpha=1;
-  const f=d.item.slot==='weapon'?FRAME.weapon:d.item.slot==='robe'?[368,345,16,23]:[304,336,16,16];
+  const frames={
+    weapon:FRAME.weapon,offhand:[323,10,10,21],head:[304,336,16,16],
+    robe:[368,345,16,23],shoulders:[323,41,10,22],gloves:[307,39,10,24],
+    belt:[288,408,16,24],pants:[368,369,16,23],boots:[304,352,16,16],
+    amulet:[304,336,16,16],ring1:[289,370,13,12],ring2:[289,370,13,12],charm:[340,129,8,30]
+  };
+  const f=frames[d.item.slot]||FRAME.chest;
   const w=d.item.slot==='weapon'?22:36,h=d.item.slot==='weapon'?56:39;
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();

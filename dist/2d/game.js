@@ -1,22 +1,46 @@
 import * as Art from './art.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage } from './core.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
-const skillData = { fire: {cooldown:.25}, ice:{cooldown:5}, blink:{cooldown:3.6}, heal:{cooldown:14} };
+const skillData = SKILLS;
+const equippedSkills=['fire','nova','shard','armor','meteor','blink','heal'];
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
 let kills = 0, total = 12, boss = null, frameIndex = 0, nextId = 1, manualAim = null, messageTimes = new Map();
-const enemyWaves = [
-  ['wretch','wretch','archer','wretch'],
-  ['brute','archer','wretch','wretch'],
-  ['brute','archer','wretch','brute']
-];
-const cooldowns = {fire:0,ice:0,blink:0,heal:0};
-const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#d9a0f0'] };
+const enemyWaves=(region)=> {
+  const types=REGION_DATA[region].types;
+  return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
+};
+const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
+let armorUntil=0, combo=0;
+const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
+for(const [key,meta] of Object.entries(SKILLS)){
+  const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+  button.className='skill-'+meta.school;
+  const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+  const label=document.createElement('b');label.textContent=meta.name;
+  const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
+  const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);
+  $('abilitybar').append(button);
+}
+const regionSelect=$('region-select');
+REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
+regionSelect.value=String(profile.region);
+regionSelect.addEventListener('change',()=>{
+  const next=Number(regionSelect.value);
+  if(next===profile.region)return;
+  if(state==='playing'&&!confirm('切换区域将重新开始当前远征。角色装备与进度不会丢失，继续吗？')){
+    regionSelect.value=String(profile.region);return;
+  }
+  profile.region=next;build();persist();if(state==='victory'||state==='death')state='intro';
+  announce('已进入 '+REGION_DATA[next].name,true);
+});
+
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
 window.addEventListener('resize', resize); resize();
@@ -51,7 +75,7 @@ function encounterPoint(i) {
   return randomPoint();
 }
 function spawnWave(index){
-  const group=enemyWaves[index]||[];
+  const group=enemyWaves(profile.region)[index]||[];
   group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
   if(index>0)announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
 }
@@ -65,25 +89,26 @@ function findBossPoint(){
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
-  const seed = 20261013 + profile.clears*19;
-  rng=mulberry32(seed); dungeon=makeDungeon(seed);
+  const seed = 20261013 + profile.clears*19+profile.region*7919;
+  rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;
+  $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   spawnWave(0);
   ui.boss.hidden=true;
-  ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
 }
 function spawn(kind,location=null) {
   const p=location||randomPoint();
   const run=profile.clears, lv=profile.level;
-  const b=kind==='boss', brute=kind==='brute', archer=kind==='archer';
-  const maxHp=(b?550:brute?95:archer?50:64)*(1+run*.22+Math.max(0,lv-1)*.055);
-  const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:130,
+  const b=kind==='boss', brute=kind==='brute', archer=['archer','cultist'].includes(kind);
+  const maxHp=(b?550:brute?95:archer?50:kind==='spider'?42:64)*(1+run*.22+Math.max(0,lv-1)*.055);
+  const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:kind==='spider'?172:130,
     radius:b?39:brute?24:17,attack:rng()*1.5,slow:0,phase:rng()*6.28,blink:0,windup:0};
-  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，失名者已经苏醒！',true);}
+  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，灰烬司祭已苏醒！',true);}
   return e;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
@@ -104,7 +129,7 @@ function showModal(kind) {
     main.textContent='重新整备 →';main.onclick=begin;
   } else if(kind==='help') {
     title.innerHTML='操作<span>指南</span>';lead.textContent='移动、瞄准、拾取，开始你的远征。';
-    paragraphs[1].textContent='电脑 WASD / 方向键移动，鼠标瞄准，长按左键或数字 1 连发；2 霜环，空格闪现，3 药水，B 打开行囊。手机用左侧摇杆与右侧技能键。靠近光柱自动拾取装备。';
+    paragraphs[1].textContent='WASD 移动，鼠标瞄准，左键或数字 1 余烬箭；2 霜环、3 冰晶箭、4 冰甲、Q 陨火、空格闪现、E 恢复药剂。B 打开 13 槽装备与词缀背包。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
     main.textContent='返回游戏 →';main.onclick=()=>{if(previousState==='intro'){location.reload();return;}if(['victory','death'].includes(previousState)){showModal(previousState);return;}if(previousState==='paused'){showModal('pause');return;}hideModal();state='playing';}; 
   } else {
     title.innerHTML='旅程<span>暂停</span>';lead.textContent='火种不灭，旅途未完。';
@@ -126,30 +151,86 @@ $('btn-inventory').onclick=showInventory;
 function closeInventory(){$('inventory').hidden=true;clearInput();}
 $('inv-close').onclick=closeInventory;
 $('inventory').addEventListener('pointerdown',e=>{if(e.target===$('inventory'))closeInventory();});
-function renderInventory(){
-  const s=stats(profile);
-  $('character-stats').innerHTML='<span>等级 <strong>'+profile.level+'</strong></span><span>法术攻击 <strong>'+s.power+'</strong></span><span>生命 <strong>'+s.hp+'</strong></span><span>法力 <strong>'+s.mana+'</strong></span><span>已净化 <strong>'+profile.clears+'</strong></span>';
-  const equipment=$('equipment');equipment.replaceChildren();
-  for(const [slot,name] of [['weapon','武器'],['robe','法袍'],['charm','护符']]){
-    const el=document.createElement('div');el.className='slot';
-    const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
-    const a=document.createElement('small'),b=document.createElement('b');a.textContent=name;b.textContent=item?.name||'尚未装备';if(item)b.classList.add('rarity-'+item.rarity);el.append(a,b);equipment.append(el);
+function applyEquipmentChange(operate){
+  const old=stats(profile);operate();const now=stats(profile);
+  if(hero){
+    hero.maxHp=now.hp;hero.maxMana=now.mana;
+    hero.hp=clamp(hero.hp+now.hp-old.hp,1,now.hp);
+    hero.mana=clamp(hero.mana+now.mana-old.mana,0,now.mana);
   }
-  $('bag-count').textContent=profile.inventory.length+' / 30';
+  persist();renderInventory();updateHud();
+}
+function inspectItem(item){
+  const panel=$('item-inspect');panel.replaceChildren();
+  if(!item){panel.textContent='选择一件装备查看随机词缀、品质与属性变化。';return;}
+  const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
+  const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
+  panel.append(title,meta);
+  const list=document.createElement('ul');
+  for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
+  if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
+  panel.append(list);
+  if(item.setId){
+    const set=SETS[item.setId],count=Object.values(profile.equipped).map(id=>profile.inventory.find(i=>i.id===id)).filter(i=>i?.setId===item.setId).length;
+    const p=document.createElement('p');p.className='set-description';p.textContent=set.name+'（已装备 '+count+'/3） · 2 件：'+set.two+' · 3 件：'+set.three;panel.append(p);
+  }
+  const target=item.slot.startsWith('ring')?(profile.equipped.ring1?'ring2':'ring1'):item.slot;
+  const worn=profile.inventory.find(i=>i.id===profile.equipped[target]);
+  const delta=Math.round(itemScore(item)-itemScore(worn||{power:0,hp:0,mana:0,armor:0,affixes:[]}));
+  const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
+  compare.textContent='相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 评分变化 '+(delta>0?'+':'')+delta;
+  panel.append(compare);
+}
+function renderInventory(){
+  const statsNow=stats(profile),statFields=[
+    ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
+    ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
+    ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
+    ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
+    ['未分配技能点',profile.skillPoints],['已净化',profile.clears]
+  ];
+  const char=$('character-stats');char.replaceChildren();
+  for(const [k,v] of statFields){const node=document.createElement('span');const b=document.createElement('strong');node.textContent=k+' ';b.textContent=v;node.append(b);char.append(node);}
+  const equipment=$('equipment');equipment.replaceChildren();
+  for(const [slot,label,glyph] of SLOTS){
+    const node=document.createElement('button');node.type='button';node.className='slot equipment-slot';
+    const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
+    const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
+    title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
+    node.append(name,title);
+    node.onclick=()=>{if(item){inspectItem(item);if(confirm('卸下 '+item.name+'？'))applyEquipmentChange(()=>profile.equipped[slot]=null);}else inspectItem(null);};
+    equipment.append(node);
+  }
+  $('bag-count').textContent=profile.inventory.length+' / '+MAX_ITEMS;
   const bag=$('inventory-items');bag.replaceChildren();
-  if(!profile.inventory.length){const p=document.createElement('p');p.className='empty';p.textContent='行囊空空。击败怪物，靠近掉落的光芒即可拾取。';bag.append(p);}
-  for(const item of [...profile.inventory].sort((a,b)=>b.rarity-a.rarity||b.power-a.power)){
-    const el=document.createElement('div');el.className='item';
-    const detail=document.createElement('div'),name=document.createElement('strong'),info=document.createElement('small');
-    name.className='rarity-'+item.rarity;name.textContent=item.name;
-    info.textContent=[item.power?'攻击 +'+item.power:'',item.hp?'生命 +'+item.hp:'',item.mana?'法力 +'+item.mana:''].filter(Boolean).join(' · ');detail.append(name,info);
+  if(!profile.inventory.length){const p=document.createElement('p');p.className='empty';p.textContent='行囊空空。击败怪物并靠近掉落光柱，可获得随机装备和词缀。';bag.append(p);}
+  for(const item of [...profile.inventory].sort((a,b)=>b.rarity-a.rarity||b.ilvl-a.ilvl)){
+    const node=document.createElement('div');node.className='item';
+    const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
+    const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
+    const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
+    detail.append(title,desc);detail.onclick=()=>inspectItem(item);
     const actions=document.createElement('div');actions.className='item-actions';
-    const use=document.createElement('button');const worn=profile.equipped[item.slot]===item.id;
-    use.textContent=worn?'已装备':'装备';use.disabled=worn;
-    use.onclick=()=>{const old=stats(profile);equip(profile,item.id);const now=stats(profile);if(hero){hero.maxHp=now.hp;hero.maxMana=now.mana;hero.hp=clamp(hero.hp+now.hp-old.hp,1,now.hp);hero.mana=clamp(hero.mana+now.mana-old.mana,0,now.mana);}persist();renderInventory();};
+    const worn=Object.values(profile.equipped).includes(item.id);
+    const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
+    use.onclick=()=>applyEquipmentChange(()=>equip(profile,item.id,(item.slot.startsWith('ring')&&!profile.equipped.ring1)?'ring1':item.slot.startsWith('ring')&&!profile.equipped.ring2?'ring2':null));
     const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn;
-    recycle.onclick=()=>{salvage(profile,item.id);persist();renderInventory();};
-    actions.append(use,recycle);el.append(detail,actions);bag.append(el);
+    recycle.onclick=()=>applyEquipmentChange(()=>salvage(profile,item.id));
+    actions.append(use,recycle);node.append(detail,actions);bag.append(node);
+  }
+  inspectItem(null);
+  const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
+  for(const [key,skill] of Object.entries(SKILLS)){
+    const btn=document.createElement('button');btn.type='button';
+    const rank=profile.skillRanks[key]||0,locked=profile.level<skill.unlocked;
+    btn.className='catalog-skill '+(locked?'unavailable':'');
+    btn.textContent=skill.icon+' '+skill.name+' · 等级 '+rank+'/8 · '+skill.desc+
+      (locked?'（'+skill.unlocked+' 级解锁）':profile.skillPoints>0&&rank<8?' · 点击升级':'');
+    btn.disabled=locked||profile.skillPoints<=0||rank>=8;
+    btn.onclick=()=>{
+      if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
+    };
+    skillPanel.append(btn);
   }
 }
 $('export-save').onclick=()=>{
@@ -162,7 +243,7 @@ $('save-file').onchange=async e=>{
   if(file.size>500000){alert('文件过大，无法导入。');return;}
   try{
     const raw=JSON.parse(await file.text());
-    if(raw?.version!==1 || !Array.isArray(raw.inventory)){alert('存档版本或结构不兼容。');return;}
+    if(![1,2].includes(raw?.version) || !Array.isArray(raw.inventory)){alert('存档版本或结构不兼容。');return;}
     const candidate=sanitizeSave(raw);
     if(!confirm('确认导入并覆盖当前 2D 角色？此操作无法撤销，建议先导出原存档。'))return;
     profile=candidate;persist();build();state='playing';closeInventory();announce('角色存档已导入');
@@ -174,12 +255,13 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'击败失名者，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
+  ui.progress.textContent=boss?'击败灰烬司祭，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
     const ratio=clamp(cooldowns[key]/rule.cooldown,0,1);
-    el.querySelector('i').style.height=(ratio*100)+'%';el.setAttribute('aria-label',el.querySelector('b').textContent+(ratio>0?' 冷却 '+cooldowns[key].toFixed(1)+' 秒':' 可用'));
+    if(!el)continue;
+    el.querySelector('i').style.height=(ratio*100)+'%';el.classList.toggle('locked',profile.level<rule.unlocked);el.setAttribute('aria-label',rule.name+(profile.level<rule.unlocked?' '+rule.unlocked+' 级解锁':ratio>0?' 冷却 '+cooldowns[key].toFixed(1)+' 秒':' 可用'));
   }
 }
 function puff(x,y,color,count=9,radius=3,speed=150){
@@ -190,11 +272,23 @@ function puff(x,y,color,count=9,radius=3,speed=150){
 function floatText(x,y,value,color='#f1ca90'){texts.push({x,y,text:String(value),color,life:.85});if(texts.length>50)texts.shift();}
 function injury(amount){
   if(hero.invuln>0||state!=='playing')return;
-  hero.hp=Math.max(0,hero.hp-amount);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(amount),'#ff9990');
+  const defense=stats(profile);
+  const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
+  hero.hp=Math.max(0,hero.hp-mitigated);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(mitigated),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
-function dealDamage(e,damage){
-  e.hp-=damage;floatText(e.x,e.y-35,Math.round(damage));puff(e.x,e.y,e.kind==='boss'?'#c88ae2':'#eaa161',6,3);
+function dealDamage(e,damage,school='physical'){
+  if(!enemies.includes(e))return;
+  const bonus=stats(profile);
+  const bonusDamage=school==='fire'?bonus.fire:school==='cold'?bonus.cold:0;
+  damage*=1+bonusDamage/100;
+  if(school==='fire')damage*=1+bonus.skillFire*.09;
+  if(school==='cold')damage*=1+bonus.skillCold*.09;
+  const crit=rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
+  if(school==='fire'&&bonus.sets.dragonflame>=3&&++combo%3===0)damage*=1.45;
+  damage=Math.max(1,Math.round(damage));
+  if(bonus.lifesteal)hero.hp=Math.min(hero.maxHp,hero.hp+bonus.lifesteal);
+  e.hp-=damage;floatText(e.x,e.y-35,(crit?'✦ ':'')+damage,crit?'#ffe29b':'#f1ca90');puff(e.x,e.y,e.kind==='boss'?'#c88ae2':'#eaa161',6,3);
   if(e.hp>0)return;
   const i=enemies.indexOf(e);if(i>=0)enemies.splice(i,1);
   puff(e.x,e.y,e.kind==='boss'?'#e89bff':'#e8904b',22,7,240);
@@ -203,7 +297,7 @@ function dealDamage(e,damage){
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
   if(bossDied||rng()<.42)dropItem(e.x,e.y,bossDied);
   if(bossDied){
-    boss=null;ui.boss.hidden=true;profile.clears++;persist();
+    boss=null;ui.boss.hidden=true;profile.clears++;profile.region=(profile.region+1)%REGION_DATA.length;persist();
     announce('炉心重燃，地窟净化完成！',true);showModal('victory');
   }else{
     kills++;
@@ -213,43 +307,49 @@ function dealDamage(e,damage){
   }
 }
 function dropItem(x,y,rare=false) {
-  const item=createItem(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++);
-  if(rare){item.rarity=Math.max(item.rarity,2);item.name=({'weapon':'余烬权杖','robe':'烬纹长袍','charm':'炉心秘印'})[item.slot];}
+  const item=makeLoot(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++,{boss:rare});
+  if(rare&&item.rarity<2){item.rarity=2;item.name='司祭战利品 · '+item.name;}
   drops.push({x,y,item,age:0});floatText(x,y-38,item.name,palette.rare[item.rarity]);
 }
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
 function cast(skill){
-  if(state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0)return;
-  if(skill==='fire'){
-    let dx=Math.cos(hero.angle),dy=Math.sin(hero.angle);
-    if(manualAim && distance(hero,manualAim)>20){
-      const a=Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x);dx=Math.cos(a);dy=Math.sin(a);
-    }else{const e=nearest();if(e){const a=Math.atan2(e.y-hero.y,e.x-hero.x);dx=Math.cos(a);dy=Math.sin(a);}}
-    hero.angle=Math.atan2(dy,dx);hero.cast=.2;cooldowns.fire=.25;
-    missiles.push({x:hero.x+dx*24,y:hero.y+dy*24,vx:dx*680,vy:dy*680,life:1.1,kind:'ember',damage:stats(profile).power});
-    puff(hero.x+dx*27,hero.y+dy*27,'#fdb073',4,2,90);
+  const rule=SKILLS[skill];
+  if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
+  if(hero.mana<rule.mana){announce('法力不足');return;}
+  if(skill==='heal'&&hero.hp>=hero.maxHp)return;
+  const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
+  hero.mana-=rule.mana;
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02));
+  hero.cast=.3;
+  const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
+    Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
+    Math.atan2(target.y-hero.y,target.x-hero.x):hero.angle;
+  const dx=Math.cos(angle),dy=Math.sin(angle);hero.angle=angle;
+  if(skill==='fire'||skill==='shard'){
+    const frost=skill==='shard',speed=frost?570:680;
+    missiles.push({x:hero.x+dx*25,y:hero.y+dy*25,vx:dx*speed,vy:dy*speed,life:frost?1.2:1.1,
+      kind:frost?'shard':'ember',damage:bonus.power*(frost?.82:1)*(1+rank*.13),hits:0,hitIds:new Set()});
+    puff(hero.x+dx*27,hero.y+dy*27,frost?'#9bdcf2':'#ffad6e',6,3,100);
   }
-  if(skill==='ice'){
-    if(hero.mana<30){announce('法力不足');return;}
-    hero.mana-=30;cooldowns.ice=5;hero.cast=.35;
-    hazards.push({x:hero.x,y:hero.y,r:0,max:190,life:.45,type:'nova'});
-    for(const e of [...enemies])if(distance(hero,e)<190){e.slow=3;dealDamage(e,stats(profile).power*1.65);}
-    puff(hero.x,hero.y,'#8de4ff',27,4,270);
+  if(skill==='nova'){
+    hazards.push({x:hero.x,y:hero.y,r:0,max:196,life:.45,type:'nova'});
+    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,bonus.power*(1.3+rank*.18),'cold');}
+    puff(hero.x,hero.y,'#91deff',27,4,270);
+  }
+  if(skill==='armor'){armorUntil=tick+7+rank*.5;announce('冰甲已激活',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);}
+  if(skill==='meteor'){
+    const dest=target||{x:hero.x+dx*220,y:hero.y+dy*220};
+    hazards.push({x:dest.x,y:dest.y,r:0,max:125,life:1.0,type:'meteor',triggered:false,rank});
+    announce('陨火坠落！',true);
   }
   if(skill==='blink'){
-    if(hero.mana<20){announce('法力不足');return;}
-    hero.mana-=20;cooldowns.blink=3.6;hero.invuln=.4;
-    const vector=movementVector(), m=Math.hypot(vector.x,vector.y);
-    const dx=m>.05?vector.x/m:Math.cos(hero.angle),dy=m>.05?vector.y/m:Math.sin(hero.angle);
-    puff(hero.x,hero.y,'#a995ff',22,4,170);
-    for(let t=0;t<18;t++)moveWithCollision(hero,dx*950,dy*950,1/60,dungeon,hero.radius);
-    puff(hero.x,hero.y,'#c1adff',22,4,170);
+    const v=movementVector(),mag=Math.hypot(v.x,v.y);
+    const bx=mag>.05?v.x/mag:dx,by=mag>.05?v.y/mag:dy;
+    hero.invuln=.4;puff(hero.x,hero.y,'#aa97ec',21,4,170);
+    for(let t=0;t<18;t++)moveWithCollision(hero,bx*(950+rank*85),by*(950+rank*85),1/60,dungeon,hero.radius);
+    puff(hero.x,hero.y,'#c8b1fe',21,4,170);
   }
-  if(skill==='heal'){
-    if(hero.hp>=hero.maxHp)return;
-    hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*.48);cooldowns.heal=14;
-    puff(hero.x,hero.y,'#a6e4aa',22,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');
-  }
+  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
   updateHud();
 }
 function movementVector() {
@@ -260,7 +360,7 @@ function movementVector() {
 function update(dt){
   tick+=dt;
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
-  hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*7);
+  hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
   if(pointers.size || keys.has('1'))cast('fire');
@@ -268,7 +368,7 @@ function update(dt){
     e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);
     const dx=hero.x-e.x,dy=hero.y-e.y,d=Math.max(1,Math.hypot(dx,dy));
     const speed=e.speed*(e.slow? .38:1);
-    const isRanged=e.kind==='archer', isBoss=e.kind==='boss';
+    const isRanged=['archer','cultist'].includes(e.kind), isBoss=e.kind==='boss';
     if(d>(isRanged?310:isBoss?72:34)){
       const vx=dx/d*speed,vy=dy/d*speed;
       moveWithCollision(e,vx,vy,dt,dungeon,e.radius);
@@ -276,37 +376,51 @@ function update(dt){
       if(d>250&&e.kind==='boss'&&Math.abs(e.x-WIDTH/2)>800){e.x=clamp(e.x,hero.x-700,hero.x+700);}
     }else if(isRanged&&d<230)moveWithCollision(e,-dx/d*speed*.5,-dy/d*speed*.5,dt,dungeon,e.radius);
     if(e.attack<=0){
-      if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
+      if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:e.kind==='cultist'?'void':'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
       else if(isBoss&&d<520){
         const a=Math.atan2(dy,dx);
-        for(let k=-2;k<=2;k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
+        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce('灰烬司祭进入第二阶段！',true);}
+        for(let k=e.enraged?-3:-2;k<=(e.enraged?3:2);k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
         hazards.push({x:e.x,y:e.y,r:0,max:90,life:.6,type:'void'});e.attack=2.3;
-      }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:1.0;}
+      }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:e.kind==='spider'?6+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:e.kind==='spider'?.72:1.0;}
       else if(isBoss&&d<90){injury(19+profile.clears*3);e.attack=1.35;}
     }
   }
   for(const m of [...missiles]){
     m.x+=m.vx*dt;m.y+=m.vy*dt;m.life-=dt;
     if(m.life<=0||!walkable(m.x,m.y,7,dungeon)){missiles.splice(missiles.indexOf(m),1);continue;}
-    if(m.kind==='ember'){
-      const e=enemies.find(q=>distance(q,m)<q.radius+11);
-      if(e){dealDamage(e,m.damage);puff(m.x,m.y,'#ffba6e',10,3);missiles.splice(missiles.indexOf(m),1);}
+    if(m.kind==='ember'||m.kind==='shard'){
+      const e=enemies.find(q=>!m.hitIds?.has(q.id)&&distance(q,m)<q.radius+11);
+      if(e){
+        dealDamage(e,m.damage,m.kind==='shard'?'cold':'fire');
+        if(m.kind==='shard')e.slow=Math.max(e.slow,1.5);
+        puff(m.x,m.y,m.kind==='shard'?'#b4e9ff':'#ffba6e',10,3);
+        m.hitIds?.add(e.id);m.hits=(m.hits||0)+1;
+        if(m.kind==='ember'||m.hits>=2)missiles.splice(missiles.indexOf(m),1);
+      }
     }else if(distance(hero,m)<hero.radius+9){injury(m.damage);puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(missiles.indexOf(m),1);}
   }
   for(const d of [...drops]){
     d.age+=dt;
     if(distance(hero,d)<58){
-      if(profile.inventory.length>=30){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
+      if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
       puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();
     }
   }
   for(const p of [...particles]){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=1-dt*2;p.vy*=1-dt*2;p.life-=dt;if(p.life<=0)particles.splice(particles.indexOf(p),1);}
   for(const f of [...texts]){f.y-=dt*36;f.life-=dt;if(f.life<=0)texts.splice(texts.indexOf(f),1);}
-  for(const h of [...hazards]){h.life-=dt;h.r+=(h.max-h.r)*dt*13;if(h.life<=0)hazards.splice(hazards.indexOf(h),1);}
+  for(const h of [...hazards]){
+    h.life-=dt;h.r+=(h.max-h.r)*dt*13;
+    if(h.type==='meteor'&&!h.triggered&&h.life<.25){
+      h.triggered=true;puff(h.x,h.y,'#ff9146',50,8,280);
+      for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*(2.8+(h.rank||0)*.36),'fire');
+    }
+    if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
+  }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
@@ -314,8 +428,9 @@ function enemyDraw(e){ Art.enemy(ctx,e,tick); }
 function heroDraw(){ Art.hero(ctx,hero,tick); }
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
-  if(m.kind==='ember'){
-    const g=ctx.createRadialGradient(0,0,2,0,0,25);g.addColorStop(0,'#fff3c9');g.addColorStop(.3,'#ffb65a');g.addColorStop(1,'#ef5f1800');
+  if(m.kind==='ember'||m.kind==='shard'){
+    const ice=m.kind==='shard';
+    const g=ctx.createRadialGradient(0,0,2,0,0,25);g.addColorStop(0,'#f6f5ff');g.addColorStop(.3,ice?'#8de2fc':'#ffb65a');g.addColorStop(1,ice?'#2d6d9c00':'#ef5f1800');
     ellipse(-12,0,25,13,'#e65d1840');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,25,0,7);ctx.fill();ellipse(0,0,7,5,'#ffead2');
   }else{ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');ellipse(-8,0,12,4,'#8c66b388');}
   ctx.restore();
@@ -342,8 +457,8 @@ function render(){
   for(const m of missiles)missileDraw(m);
   for(const h of hazards){
     ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
-    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':'#bf80e8';
-    ctx.shadowColor=h.type==='nova'?'#8acde5':'#9e77c7';ctx.shadowBlur=15;
+    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':h.type==='meteor'?'#ff663b':'#bf80e8';
+    ctx.shadowColor=h.type==='nova'?'#8acde5':h.type==='meteor'?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
     ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   }
@@ -395,7 +510,10 @@ window.addEventListener('keydown',e=>{
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
-  if(!e.repeat){if(k==='1'){manualAim=null;cast('fire');}if(k==='2')cast('ice');if(k==='3')cast('heal');if(k===' ')cast('blink');}
+  if(!e.repeat){
+    const byKey={1:'fire',2:'nova',3:'shard',4:'armor',q:'meteor',' ':'blink',e:'heal'};
+    if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
+  }
 });
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
 window.addEventListener('blur',clearInput);
