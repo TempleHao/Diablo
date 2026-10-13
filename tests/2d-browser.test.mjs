@@ -48,7 +48,7 @@ try{
       return art.artStatus();
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
-    assert.equal(await page.locator('#region-select option').count(),5,'all five regions present');
+    assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
@@ -59,6 +59,7 @@ try{
     assert.ok(firstBoss.drops.length>=2,'first boss kill must drop ordinary and exclusive loot');
     assert.equal(firstBoss.drops.some(d=>d.rarity===3&&d.persistent),true,'guaranteed special legendary');
     assert.equal(firstBoss.bossKills,1);
+    assert.equal(await page.locator('#portal-open').isVisible(),true,'boss portal must appear');
     assert.equal(firstBoss.pending,firstBoss.drops.length);
     assert.equal(await page.locator('#scrim').isVisible(),false,'no victory modal should block loot pickup');
     const zoomPrevention=await page.evaluate(()=>{
@@ -91,6 +92,12 @@ try{
     await page.locator('.item-detail').first().evaluate(el=>el.click());
     assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
+    assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
+    await page.selectOption('#inv-filter','accessory');
+    assert.ok((await page.locator('.item-thumbnail').count())>=1,'accessory filter must retain jewelry');
+    await page.selectOption('#inv-filter','all');
+    const overflow=await page.locator('.inv-workspace').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
+    assert.ok(overflow.scroll<=overflow.client+3,'inventory must not overflow horizontally: '+JSON.stringify(overflow));
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const visual=await page.screenshot({type:'jpeg',quality:62});
       console.log((viewport.isMobile?'INVENTORY_MOBILE_BASE64:':'INVENTORY_DESKTOP_BASE64:')+visual.toString('base64'));
@@ -100,6 +107,13 @@ try{
     await page.click('#btn-pause');
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
+    await page.click('#portal-open');
+    assert.equal(await page.locator('#portal-panel').isVisible(),true);
+    assert.equal(await page.locator('#portal-destination option').count(),9);
+    await page.selectOption('#portal-destination','1');
+    await page.click('#portal-next');
+    assert.equal(await page.locator('#portal-panel').isVisible(),false);
+    assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
     await page.waitForTimeout(230);
