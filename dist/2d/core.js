@@ -55,7 +55,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -66,6 +66,10 @@ export function sanitizeSave(raw){
   }
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
+  if(Array.isArray(raw.activeSkills)){
+    const chosen=[...new Set(raw.activeSkills.filter(k=>typeof k==='string'&&Object.hasOwn(SKILLS,k)))].slice(0,7);
+    p.activeSkills=[...chosen,...Object.keys(SKILLS).filter(k=>!chosen.includes(k))].slice(0,7);
+  }
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
   if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
   if(Array.isArray(raw.regionVisits))p.regionVisits=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.regionVisits[i])?Math.floor(raw.regionVisits[i]):0,0,1000000));
