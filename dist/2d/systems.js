@@ -47,7 +47,11 @@ export const SKILLS={
   armor:{name:'冰甲',key:'4',school:'cold',icon:'◆',mana:24,cooldown:14,unlocked:2,desc:'短时间减免受到的伤害'},
   meteor:{name:'陨火',key:'q',school:'fire',icon:'☄',mana:42,cooldown:8,unlocked:3,desc:'在敌群位置引爆陨火范围伤害'},
   blink:{name:'闪现',key:'空格',school:'arcane',icon:'ϟ',mana:20,cooldown:3.6,unlocked:1,desc:'短距离位移，并短暂无敌'},
-  heal:{name:'恢复药剂',key:'e',school:'arcane',icon:'✚',mana:0,cooldown:14,unlocked:1,desc:'恢复 48% 最大生命'}
+  heal:{name:'恢复药剂',key:'e',school:'arcane',icon:'✚',mana:0,cooldown:14,unlocked:1,desc:'恢复 48% 最大生命'},
+  chain:{name:'连锁闪电',key:'5',school:'arcane',icon:'Ϟ',mana:20,cooldown:2.2,unlocked:4,desc:'在最多 3 个敌人间跳跃；强化后跳跃更多'},
+  storm:{name:'冰暴领域',key:'6',school:'cold',icon:'❅',mana:34,cooldown:9,unlocked:6,desc:'持续四秒的冰暴领域；冻结减速并持续造成伤害'},
+  ward:{name:'奥术护盾',key:'z',school:'arcane',icon:'⬡',mana:28,cooldown:16,unlocked:8,desc:'生成吸收伤害的护盾，技能等级提高容量'},
+  inferno:{name:'烈焰地径',key:'x',school:'fire',icon:'♨',mana:30,cooldown:7,unlocked:10,desc:'面前铺开灼烧火线，持续四秒使接近的敌人受伤'}
 };
 export const REGION_DATA=[
   {id:'entrance',name:'断昼前庭',label:'破败石厅',color:'#d48d55',types:['wretch','archer','wretch','brute']},
@@ -77,7 +81,8 @@ export function normalizeItem(item) {
   return {
     id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,60),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
-    armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId
+    armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
+    favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
 export function getSlotForItem(item,target){
