@@ -19,6 +19,28 @@ const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, combo=0;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
+for(const [key,meta] of Object.entries(SKILLS)){
+  const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+  button.className='skill-'+meta.school;
+  const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+  const label=document.createElement('b');label.textContent=meta.name;
+  const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
+  const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);
+  $('abilitybar').append(button);
+}
+const regionSelect=$('region-select');
+REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
+regionSelect.value=String(profile.region);
+regionSelect.addEventListener('change',()=>{
+  const next=Number(regionSelect.value);
+  if(next===profile.region)return;
+  if(state==='playing'&&!confirm('切换区域将重新开始当前远征。角色装备与进度不会丢失，继续吗？')){
+    regionSelect.value=String(profile.region);return;
+  }
+  profile.region=next;build();persist();if(state==='victory'||state==='death')state='intro';
+  announce('已进入 '+REGION_DATA[next].name,true);
+});
+
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
 window.addEventListener('resize', resize); resize();
@@ -76,7 +98,7 @@ function build() {
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   spawnWave(0);
   ui.boss.hidden=true;
-  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
 }
 function spawn(kind,location=null) {
@@ -107,7 +129,7 @@ function showModal(kind) {
     main.textContent='重新整备 →';main.onclick=begin;
   } else if(kind==='help') {
     title.innerHTML='操作<span>指南</span>';lead.textContent='移动、瞄准、拾取，开始你的远征。';
-    paragraphs[1].textContent='电脑 WASD / 方向键移动，鼠标瞄准，长按左键或数字 1 连发；2 霜环，空格闪现，3 药水，B 打开行囊。手机用左侧摇杆与右侧技能键。靠近光柱自动拾取装备。';
+    paragraphs[1].textContent='WASD 移动，鼠标瞄准，左键或数字 1 余烬箭；2 霜环、3 冰晶箭、4 冰甲、Q 陨火、空格闪现、E 恢复药剂。B 打开 13 槽装备与词缀背包。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
     main.textContent='返回游戏 →';main.onclick=()=>{if(previousState==='intro'){location.reload();return;}if(['victory','death'].includes(previousState)){showModal(previousState);return;}if(previousState==='paused'){showModal('pause');return;}hideModal();state='playing';}; 
   } else {
     title.innerHTML='旅程<span>暂停</span>';lead.textContent='火种不灭，旅途未完。';
@@ -482,7 +504,10 @@ window.addEventListener('keydown',e=>{
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
-  if(!e.repeat){if(k==='1'){manualAim=null;cast('fire');}if(k==='2')cast('ice');if(k==='3')cast('heal');if(k===' ')cast('blink');}
+  if(!e.repeat){
+    const byKey={1:'fire',2:'nova',3:'shard',4:'armor',q:'meteor',' ':'blink',e:'heal'};
+    if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
+  }
 });
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
 window.addEventListener('blur',clearInput);
