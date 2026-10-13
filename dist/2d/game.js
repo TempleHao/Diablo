@@ -734,11 +734,32 @@ function heroDraw(){
 }
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
-  if(m.kind==='ember'||m.kind==='shard'){
-    const ice=m.kind==='shard';
-    const g=ctx.createRadialGradient(0,0,2,0,0,25);g.addColorStop(0,'#f6f5ff');g.addColorStop(.3,ice?'#8de2fc':'#ffb65a');g.addColorStop(1,ice?'#2d6d9c00':'#ef5f1800');
-    ellipse(-12,0,25,13,'#e65d1840');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,25,0,7);ctx.fill();ellipse(0,0,7,5,'#ffead2');
-  }else{ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');ellipse(-8,0,12,4,'#8c66b388');}
+  const ice=m.kind==='shard',fire=m.kind==='ember';
+  if(ice||fire){
+    const edge=ice?'#60c0f1':'#f65a22',center=ice?'#d6ffff':'#ffe6a0';
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    const tail=ctx.createLinearGradient(-52,0,14,0);
+    tail.addColorStop(0,edge+'00');tail.addColorStop(.4,edge+'75');tail.addColorStop(1,center);
+    ctx.fillStyle=tail;ctx.beginPath();ctx.moveTo(-53,-7);ctx.lineTo(5,-12);ctx.lineTo(14,0);ctx.lineTo(5,12);ctx.lineTo(-53,7);ctx.fill();
+    ctx.shadowColor=edge;ctx.shadowBlur=21;
+    if(ice){
+      ctx.fillStyle='#b6faff';ctx.beginPath();ctx.moveTo(17,0);ctx.lineTo(-5,-10);ctx.lineTo(-15,0);ctx.lineTo(-5,10);ctx.fill();
+      ctx.strokeStyle='#efffff';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(-11,0);ctx.lineTo(15,0);ctx.stroke();
+      for(const j of [-1,1]){ctx.fillStyle='#87cffe';ctx.fillRect(-22,j*9,4,4);}
+    }else{
+      for(let i=0;i<4;i++){
+        const yy=Math.sin(tick*13+i*1.4)*6;
+        ctx.fillStyle=i%2?'#ffad38':'#e84b21';
+        ctx.beginPath();ctx.ellipse(-16-i*8,yy,5+i,2.5,0,0,Math.PI*2);ctx.fill();
+      }
+      ctx.fillStyle='#fff7bc';ctx.beginPath();ctx.ellipse(8,0,8,5,0,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  }else{
+    ctx.save();ctx.globalCompositeOperation='lighter';ctx.shadowColor='#ae76f9';ctx.shadowBlur=18;
+    ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');
+    ellipse(-8,0,12,4,'#8c66b388');ctx.restore();
+  }
   ctx.restore();
 }
 function drawPortal(p){
