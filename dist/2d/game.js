@@ -361,10 +361,14 @@ function renderInventory(){
     const slot=document.createElement('select');slot.className='skill-slot';
     slot.setAttribute('aria-label',skill.name+' 装入快捷栏位置');
     for(let i=0;i<ACTIVE_LIMIT;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+' 号位 · '+SKILLS[profile.activeSkills[i]].name;slot.append(opt);}
-    slot.value=String(Math.max(0,profile.activeSkills.indexOf(key)));
+    if(!profile.activeSkills.includes(key)){
+      const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='加入快捷栏…';
+      slot.prepend(placeholder);slot.value='';
+    }else slot.value=String(profile.activeSkills.indexOf(key));
     slot.disabled=locked;
     slot.onchange=()=>{
       if(profile.level<skill.unlocked)return;
+      if(slot.value==='')return;
       const idx=Number(slot.value),prev=profile.activeSkills.indexOf(key),displaced=profile.activeSkills[idx];
       profile.activeSkills[idx]=key;
       if(prev>=0&&prev!==idx)profile.activeSkills[prev]=displaced;
