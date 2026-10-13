@@ -64,3 +64,19 @@
  .joystick{bottom:162px}
 }
 @media(max-width:420px){.top-actions button{padding:5px 6px}.brand b{font-size:15px}.brand small{display:none}.region-picker select{max-width:70px}.hud{padding-right:8px}.abilitybar{grid-template-columns:repeat(4,42px)}.abilitybar button{width:42px;min-width:42px}.minimap{display:none}}
+
+/* Mobile game must never trigger double-tap page magnification. User panning
+   inside the inventory is preserved; no inaccessible viewport maximum-scale. */
+html,body,#game,.topbar,.hud,.joystick,.abilitybar,.scrim,.panel-wrap,
+button,select,a,canvas {touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#game,.joystick,.joystick * {touch-action:none;user-select:none;-webkit-user-select:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.equipment-slot{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.equipment-icon{width:37px;height:37px;flex:none;image-rendering:pixelated;filter:drop-shadow(0 1px 4px #0009)}
+.item-detail{display:flex;align-items:center;gap:9px}
+.item-thumbnail{width:45px;height:45px;flex-shrink:0;image-rendering:pixelated;border-radius:2px}
+.item-labels{display:flex;flex-direction:column;min-width:0;text-align:left}
+.item-labels strong{overflow-wrap:anywhere}
+.item-preview{width:64px;height:64px;image-rendering:pixelated;float:left;margin:1px 15px 12px 0}
+.item-inspect:after{content:"";display:block;clear:both}
+@media(max-width:760px){.equipment-icon{width:32px;height:32px}.item-thumbnail{width:40px;height:40px}.item-preview{width:52px;height:52px}}
