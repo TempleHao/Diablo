@@ -61,6 +61,7 @@ const validId=x=>typeof x==='string'&&x.length>0&&x.length<=100;
 export function normalizeItem(item) {
   if(!item||typeof item!=='object'||!validId(item.id)||!SLOT_IDS.includes(item.slot))return null;
   if(typeof item.name!=='string'||item.name.length>64)return null;
+  if(['power','hp','mana','armor','value'].some(k=>!Number.isFinite(item[k]??0)))return null;
   const rarity=Number.isInteger(item.rarity)?Math.max(0,Math.min(4,item.rarity)):0;
   const seen=new Set(),affixes=[];
   if(Array.isArray(item.affixes))for(const entry of item.affixes.slice(0,12)){
@@ -115,7 +116,7 @@ export function equipmentBonus(profile) {
   for(const slot of SLOT_IDS){
     const item=itemById.get(profile.equipped[slot]);
     if(!item||getSlotForItem(item,slot)!==slot)continue;
-    for(const key of ['power','hp','mana','armor'])extra[key]=(extra[key]||0)+item[key];
+    for(const key of ['power','hp','mana','armor'])extra[key]=(extra[key]||0)+(item[key]||0);
     for(const affix of item.affixes||[])extra[affix.key]=(extra[affix.key]||0)+affix.value;
     if(item.setId)totals[item.setId]=(totals[item.setId]||0)+1;
   }
