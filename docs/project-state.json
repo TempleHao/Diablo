@@ -26,8 +26,8 @@
     "substep": "D1-cloth-surface-artifact",
     "trigger": "continuation",
     "startedAt": "2026-10-13T03:22:28Z",
-    "heartbeatAt": "2026-10-13T03:44:06Z",
-    "leaseExpiresAt": "2026-10-13T05:44:06.000Z"
+    "heartbeatAt": "2026-10-13T03:53:06Z",
+    "leaseExpiresAt": "2026-10-13T05:53:06.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
@@ -35,30 +35,31 @@
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
   "resumeBranch": "checkpoint/art-02-d1",
-  "resumeCommit": "95695f7f5bada52840e84bb0bf62c20589d6d0de",
-  "nextAction": "Resume ART-02 D1 source checkpoint: finalize isolated cloth NormalUV/high-to-low bake and zero overlap/coverage gate, preserve disclosed source coat-layer coherence fix (original20.38mm→6.000096mm). Verify L0/L1 budgets, shader UV1, poses and actual native pictures before publish. Independent2D stays untouched; ART-02 art acceptance pending.",
+  "resumeCommit": "cbb5cf2274df22fca22ed0fd39242a2d1a1cd035",
+  "nextAction": "Continue checkpoint ART-02 D1: diagnose true normalMap removal/TBN and UV1 per-triangle determinant, improve cloth normal chart density/projection, preserve original baseUV. Fixed source shell proof saved; rejected candidates not published. Then actual native L0/L1 visuals and game checks.",
   "lastAttempt": {
     "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
     "taskId": "ART-02",
     "substep": "D1-cloth-surface-artifact",
     "startedAt": "2026-10-13T03:22:28Z",
     "status": "running",
-    "phase": "source-shell-repair-verified-budget-uv-bake-gates-in-progress",
-    "checkpointCommit": "95695f7f5bada52840e84bb0bf62c20589d6d0de",
+    "phase": "new-dual-uv-candidate-rejected-native-material-and-bake-diagnostics",
+    "checkpointCommit": "cbb5cf2274df22fca22ed0fd39242a2d1a1cd035",
     "validation": {
       "sourceGeneration": "actual fresh coherent source958e42... / 45710tris163bones22packedImages",
       "sourceComparison": "215 parts source geometry/UV/outer-other weights/rig/actions unchanged;84 layer samples max6.000096mm versus20.38097mm original",
       "nativeBaseline": "36 viewer/6 studio ablations; original normal not proven black-spot cause",
       "portableSurfaceQuick": "actual6 images passed",
-      "finalModels": "not exported; L0 surface5.977mm passes but UV overlap gate rejected first atlas; candidate repair ongoing",
-      "deployment": "existing release unchanged"
+      "finalModels": "scratch L0/L1 geometric gates pass5.977/13.952mm; candidate held for native chest/sleeve spots and low-density/reverse normals; no publication",
+      "deployment": "existing release unchanged",
+      "nativeCandidate": "actual6 views: UV1/baseUV0 compatibility pass; NEW chest/sleeve black spots normalScale0 remains; gray/base-only no prominent spots. Root cause pending"
     }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-13T03:44:06Z",
+  "lastUpdatedAt": "2026-10-13T03:53:06Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
     "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
@@ -76,8 +77,8 @@
   },
   "lastWorkBranch": {
     "name": "checkpoint/art-02-d1",
-    "commit": "95695f7f5bada52840e84bb0bf62c20589d6d0de",
-    "status": "source-repair-verified-final-assets-pending"
+    "commit": "cbb5cf2274df22fca22ed0fd39242a2d1a1cd035",
+    "status": "source-shell-verified-candidate-visual-regression-rejected"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
