@@ -107,7 +107,9 @@ try{
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
     assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
     assert.equal(await page.locator('.material-token').count(),3,'all salvage material wallets must render');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
     await page.selectOption('#auto-salvage','1');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="compare"]').click();
     assert.equal(await page.inputValue('#auto-salvage'),'1');
     const beforeTemper=await page.locator('#item-inspect').innerText();
     const temperReady=await page.locator('#inv-temper').isEnabled();
