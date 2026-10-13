@@ -6,6 +6,30 @@
  */
 const mage=typeof Image==='undefined'?null:new Image();
 let ready=false,failed=false;
+export const SKIN_LABELS=Object.freeze({arcane:'奥术 · 星辉蓝',flame:'烈焰 · 赤红',light:'圣辉 · 象牙白',shadow:'暗影 · 紫晶',nature:'自然 · 翠绿'});
+const skinCanvases=new Map();
+function skinCanvas(skin){
+  if(!ready||!mage)return null;
+  if(!SKIN_LABELS[skin])skin='arcane';
+  if(skin==='arcane')return mage;
+  if(skinCanvases.has(skin))return skinCanvases.get(skin);
+  const canvas=document.createElement('canvas');canvas.width=mage.naturalWidth;canvas.height=mage.naturalHeight;
+  const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(mage,0,0);
+  const image=context.getImageData(0,0,canvas.width,canvas.height),a=image.data;
+  for(let i=0;i<a.length;i+=4){
+    const [r,g,b]=[a[i],a[i+1],a[i+2]];
+    if(a[i+3]<12)continue;
+    const blue=(b>r*1.16&&b>g*1.05&&b>56),highlight=(b>110&&b>r*1.07&&g>70);
+    if(!blue)continue;
+    if(skin==='flame'){a[i]=Math.min(255,Math.round(b*.88+25));a[i+1]=Math.round(g*.51);a[i+2]=Math.round(r*.55);}
+    if(skin==='light'){const gray=Math.round(r*.16+g*.34+b*.5);a[i]=Math.min(255,gray+50);a[i+1]=Math.min(255,gray+47);a[i+2]=Math.min(255,gray+40);}
+    if(skin==='shadow'){a[i]=Math.round(b*.7);a[i+1]=Math.round(g*.5);a[i+2]=Math.min(255,Math.round(b*.88+15));}
+    if(skin==='nature'){a[i]=Math.round(r*.64);a[i+1]=Math.min(255,Math.round(b*.8+13));a[i+2]=Math.round(g*.66);}
+    if(highlight&&skin==='flame'){a[i]=Math.min(255,a[i]+20);a[i+1]=Math.min(255,a[i+1]+10);}
+  }
+  context.putImageData(image,0,0);skinCanvases.set(skin,canvas);return canvas;
+}
+
 if(mage){
   mage.decoding='async';
   mage.addEventListener('load',()=>{ready=true;});
@@ -30,7 +54,7 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
     if(fallback)fallback(ctx,actor,tick,gear,scale);
     return 'fallback';
   }
-  const pose=animationPose(actor,tick);
+  const pose=animationPose(actor,tick),picture=skinCanvas(actor.skin||'arcane');
   ctx.save();ctx.translate(actor.x,actor.y);ctx.scale(scale,scale);
   ctx.fillStyle='#04071099';ctx.beginPath();ctx.ellipse(0,4,29,8,0,0,Math.PI*2);ctx.fill();
   // Readable orientation from existing angle; back view is a temporary mirror,
@@ -46,11 +70,11 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
     if(pose.moving){
       // Real, separately transformed lower-body layer: alternating foot travel,
       // not simply translating an unchanging still picture.
-      ctx.drawImage(mage,0,0,imageW,bottom,dx-imageW/2,dy-imageH+3,imageW,bottom);
+      ctx.drawImage(picture,0,0,imageW,bottom,dx-imageW/2,dy-imageH+3,imageW,bottom);
       ctx.save();ctx.translate(pose.stride*1.8,Math.abs(pose.stride)*-.65);
-      ctx.drawImage(mage,0,bottom,imageW,33,dx-imageW/2,dy-imageH+3+bottom,imageW,33);
+      ctx.drawImage(picture,0,bottom,imageW,33,dx-imageW/2,dy-imageH+3+bottom,imageW,33);
       ctx.restore();
-    }else ctx.drawImage(mage,0,0,imageW,imageH,dx-imageW/2,dy-imageH+3,imageW,imageH);
+    }else ctx.drawImage(picture,0,0,imageW,imageH,dx-imageW/2,dy-imageH+3,imageW,imageH);
     ctx.restore();
   };
   // Rapid caster lean + short-lived trail, independent of the world collider.
