@@ -14,28 +14,30 @@ export function mulberry32(seed) {
   let s = seed >>> 0;
   return () => { s += 0x6D2B79F5; let t = Math.imul(s ^ (s >>> 15), 1 | s); t ^= t + Math.imul(t ^ (t >>> 7), 61 | t); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
-export function makeDungeon(seed = 2026) {
+export function makeDungeon(seed = 2026, region = 0) {
   const rng = mulberry32(seed), blocks = [], torches = [];
+  const chapter=clamp(Math.floor(region),0,4);
+  const density=[.38,.49,.31,.43,.54][chapter];
   for (let y = 2; y < ROWS - 2; y += 2) {
     for (let x = 2; x < COLS - 2; x += 2) {
       // 中央行进轴线、出生区和 BOSS 场地始终可走。
       if (Math.abs(x - COLS / 2) < 4 || Math.hypot(x - COLS / 2, y - ROWS * .76) < 6) continue;
       if (Math.hypot(x - COLS / 2, y - 7) < 5) continue;
-      if (rng() < .44) {
+      if (rng() < density) {
         // 将少量散点石柱组织成断裂墙面，形成有方向感的地牢空间。
-        const brokenWall = rng() < .27;
+        const brokenWall = rng() < [.24,.47,.14,.22,.39][chapter];
         const w = brokenWall ? (rng() < .5 ? 111 : 146) : rng() < .24 ? 57 : 38;
         const h = brokenWall ? 33 : rng() < .27 ? 56 : 38;
         blocks.push({ x: x * TILE - w / 2, y: y * TILE - h / 2, w, h,
           kind: brokenWall ? 'wall' : 'pillar', variant: Math.floor(rng() * 3) });
-        if (rng() < .24) torches.push({ x: x * TILE + 24, y: y * TILE - 24 });
+        if (rng() < [.36,.17,.47,.11,.23][chapter]) torches.push({ x: x * TILE + 24, y: y * TILE - 24 });
       }
     }
   }
   for (let y = 4; y < ROWS - 3; y += 6) {
     torches.push({ x: 3 * TILE, y: y * TILE }, { x: (COLS - 3) * TILE, y: y * TILE });
   }
-  return { blocks, torches, seed };
+  return { blocks, torches, seed, region:chapter };
 }
 export function hitsRect(x, y, radius, box) {
   const cx = clamp(x, box.x, box.x + box.w), cy = clamp(y, box.y, box.y + box.h);
