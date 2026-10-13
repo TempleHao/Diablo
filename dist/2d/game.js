@@ -1,21 +1,23 @@
 import * as Art from './art.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
-const skillData = { fire: {cooldown:.25}, ice:{cooldown:5}, blink:{cooldown:3.6}, heal:{cooldown:14} };
+const skillData = SKILLS;
+const equippedSkills=['fire','nova','shard','armor','meteor','blink','heal'];
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
 let kills = 0, total = 12, boss = null, frameIndex = 0, nextId = 1, manualAim = null, messageTimes = new Map();
-const enemyWaves = [
-  ['wretch','wretch','archer','wretch'],
-  ['brute','archer','wretch','wretch'],
-  ['brute','archer','wretch','brute']
-];
-const cooldowns = {fire:0,ice:0,blink:0,heal:0};
-const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#d9a0f0'] };
+const enemyWaves=(region)=> {
+  const types=REGION_DATA[region].types;
+  return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
+};
+const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
+let armorUntil=0, combo=0;
+const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
@@ -51,7 +53,7 @@ function encounterPoint(i) {
   return randomPoint();
 }
 function spawnWave(index){
-  const group=enemyWaves[index]||[];
+  const group=enemyWaves(profile.region)[index]||[];
   group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
   if(index>0)announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
 }
@@ -65,25 +67,26 @@ function findBossPoint(){
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
-  const seed = 20261013 + profile.clears*19;
-  rng=mulberry32(seed); dungeon=makeDungeon(seed);
+  const seed = 20261013 + profile.clears*19+profile.region*7919;
+  rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;
+  $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   spawnWave(0);
   ui.boss.hidden=true;
-  ui.title.textContent='净化灰烬边境';ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
   updateHud();
 }
 function spawn(kind,location=null) {
   const p=location||randomPoint();
   const run=profile.clears, lv=profile.level;
-  const b=kind==='boss', brute=kind==='brute', archer=kind==='archer';
-  const maxHp=(b?550:brute?95:archer?50:64)*(1+run*.22+Math.max(0,lv-1)*.055);
-  const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:130,
+  const b=kind==='boss', brute=kind==='brute', archer=['archer','cultist'].includes(kind);
+  const maxHp=(b?550:brute?95:archer?50:kind==='spider'?42:64)*(1+run*.22+Math.max(0,lv-1)*.055);
+  const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:kind==='spider'?172:130,
     radius:b?39:brute?24:17,attack:rng()*1.5,slow:0,phase:rng()*6.28,blink:0,windup:0};
-  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，失名者已经苏醒！',true);}
+  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，灰烬司祭已苏醒！',true);}
   return e;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
@@ -174,12 +177,13 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'击败失名者，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
+  ui.progress.textContent=boss?'击败灰烬司祭，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
     const ratio=clamp(cooldowns[key]/rule.cooldown,0,1);
-    el.querySelector('i').style.height=(ratio*100)+'%';el.setAttribute('aria-label',el.querySelector('b').textContent+(ratio>0?' 冷却 '+cooldowns[key].toFixed(1)+' 秒':' 可用'));
+    if(!el)continue;
+    el.querySelector('i').style.height=(ratio*100)+'%';el.classList.toggle('locked',profile.level<rule.unlocked);el.setAttribute('aria-label',rule.name+(profile.level<rule.unlocked?' '+rule.unlocked+' 级解锁':ratio>0?' 冷却 '+cooldowns[key].toFixed(1)+' 秒':' 可用'));
   }
 }
 function puff(x,y,color,count=9,radius=3,speed=150){
