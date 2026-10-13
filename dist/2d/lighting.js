@@ -35,7 +35,8 @@ function colored(ctx,x,y,r,color){
 export function drawAtmosphere(ctx,{w,h,cam,hero,torches=[],missiles=[],enemies=[],tick,region=0}){
   if(!hero||!Number.isFinite(w)||!Number.isFinite(h)||w<1||h<1)return;
   ensure(w,h);
-  const darkness=[.54,.63,.46,.67,.59][region]??.56;
+  // Preserve terrain silhouettes on small displays; darkness should add depth, not hide navigation.
+  const darkness=[.35,.43,.31,.46,.39][region]??.39;
   mask.setTransform(1,0,0,1,0,0);
   mask.clearRect(0,0,lightCanvas.width,lightCanvas.height);
   mask.fillStyle='rgba(7,10,19,'+darkness+')';
