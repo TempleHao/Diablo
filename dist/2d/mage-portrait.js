@@ -66,7 +66,7 @@ export function drawMage(ctx,actor,time,gear={}){
   // Hood has a sharper crown and narrower facial opening (no oversized elderly face).
   shape([[-15,-76],[-17,-91],[-12,-105],[0,-111],[12,-105],[17,-91],[15,-76],
       [9,-73],[-9,-73]],
-    fade([[0,'#444850'],[.5,'#292e38'],[1,'#181d25']], '#11141c',1.6);
+    fade([[0,'#444850'],[.5,'#292e38'],[1,'#181d25']]), '#11141c',1.6);
   shape([[-11,-93],[-5,-102],[3,-103],[12,-94],[10,-79],[-9,-79]],
     '#1a2028','#0a1118',1.2);
   // Suggest a masked face with two narrow highlights, leaving the face mysterious.
