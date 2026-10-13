@@ -1,8 +1,14 @@
 # 余烬法师 · Ember Mage
 
-> **2D 热修试玩版（v0.3.1）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 试玩版（v0.3.2）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
 
+> **v0.3.2 Demo 可玩更新**：区域从五张扩展到九张、四位新增独占掉落 Boss、每件装备类型都有匹配图形（法杖/剑/戒指/头盔/盾等），背包重做为左装备/中属性对比/右筛选，Boss 战后出现实际传送阵，可指定下一张或随机目的地，也可留在本层。修复长词缀溢出、减少频繁换装操作。详见 [v0.3.2 清单及限制](docs/2D-V0.3.2-ACCEPTANCE.md)。
+>
+> **真实 Chromium 测试截图（不是概念设计图）**：[PC装备背包](docs/screenshots/2d-v0.3.2-inventory-desktop.jpg) · [手机版背包](docs/screenshots/2d-v0.3.2-inventory-mobile.jpg) · [PC传送阵](docs/screenshots/2d-v0.3.2-portal-desktop.jpg) · [手机版传送阵](docs/screenshots/2d-v0.3.2-portal-mobile.jpg)。
+>
+> **仍未达成 A 方向写实 2.5D 最终视觉**：这次增加的是正确类别的原创矢量装备图标及实际操作体验；九个地图仍共享原型图块，真正的多房间迷宫仍在 PR #6 分支推进。
+>
 > **v0.3.1 即时反馈热修**：Boss 首杀必有专属传奇与普通装备，战后不再强制结束；没来得及拾取的 Boss 物品将随旧存档键保存。背包与 13 槽装备加入真实贴图图标，减少双击缩放误操作，五大区域的地面装饰按种子变化。此版本仍是低像素原型，美术距离用户确认的写实暗黑 2.5D 目标很远。
 >
 > [看真实浏览器 Boss 掉宝画面](docs/screenshots/2d-v0.3.1-boss-loot-desktop.jpg) · [看物品贴图背包](docs/screenshots/2d-v0.3.1-item-icons-desktop.jpg) · [手机版实际截图](docs/screenshots/2d-v0.3.1-boss-loot-mobile.jpg)
