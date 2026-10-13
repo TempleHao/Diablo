@@ -4,7 +4,7 @@
   "track": "Ember Chronicles 2D A-direction final",
   "state": "development",
   "baseline": {
-    "game": "v0.3.3 main (4b6a20c) + F1 maze integration candidate, not A-direction final",
+    "game": "v0.3.4 main (840c902f) + F1 maze integration candidate; A-direction visual remains unaccepted",
     "confirmed": "not A-direction final",
     "existing3D": "separate/unchanged",
     "reference": "user-supplied five A-direction target pictures; conceptual, not gameplay"
@@ -84,7 +84,7 @@
       "evidence": []
     },
     "F4": {
-      "status": "pending",
+      "status": "active",
       "gateIds": [
         "G05"
       ],
@@ -245,28 +245,30 @@
       "id": "P1-008",
       "severity": "P1",
       "status": "open",
-      "description": "Original 2.5D masonry asset authored but renderer integration blocked; no new gameplay screenshot or visual acceptance."
+      "description": "Original CC0 masonry floors and raised walls are now rendered in playable maze; actual desktop/mobile screenshots committed. Still not A-direction realistic 2.5D and lacks unified character/monster art; keep P1 open."
     }
   ],
   "deltaTop3": [
-    "写实斜俯视地图与角色素材未实装，实际还是卡通像素",
-    "迷宫、主城、野外与不自动重置的持续玩法未实装",
-    "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
+    "石砌墙体虽已实装，整体仍是正交网格贴图，缺少统一斜俯视透视与高品质场景层次",
+    "角色仍是粉紫色卡通/过渡图，怪物与 Boss 缺少同一世界观的多方向写实动作",
+    "手机 Boss 战角色/文字/按钮密集，主城野外与可见换装依然不足"
   ],
-  "nextAction": "On isolated 2D branch, safely integrate original dist/2d/masonry-art.js into maze-world.js with two-pass floor/wall draw after write access is restored; then run 100-seed, real Chromium PC/portrait/landscape and audit, collect actual game screenshots; reconcile main v0.3.4 UI without overwriting saves or 3D.",
+  "nextAction": "Review actual masonry PC/mobile screenshots, add renderer regression assertions (test write previously blocked), reconcile v0.3.4 main UI safely into draft maze branch without 3D/save overwrite, then produce unified licensed angled character/enemy assets and 844x390 real screenshot.",
   "lastAttempt": {
     "at": "2026-10-14",
     "phase": "F4",
-    "status": "partial-unintegrated-art-write-blocked",
+    "status": "masonry-integrated-browser-ci-success-screenshots-committed",
     "verified": {
       "main": "840c902f394305dba808588d3926d4e29de79375",
       "mainCI": "https://github.com/TempleHao/Diablo/actions/runs/38434303596",
       "pages": "https://github.com/TempleHao/Diablo/actions/runs/38434303361",
-      "artAssetCommit": "8aa6266baf8e3a4bcf73c3e2a0c79f6b436aa1ac",
+      "codeCommit": "678118728eb60472ba42bf3558cb0518936109df",
+      "screenshotsCommit": "55edd6f6838ad4086357756fadc88e8f8986c373",
+      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38448918091",
       "branch": "feature/2d-maze-topology-f1"
     },
-    "blocker": "Source update_file for dist/2d/maze-world.js rejected by OpenAI safety checks. Newly authored CC0 masonry module exists but is NOT imported or rendered; no new real-game screenshot or art gate. Do not claim visual upgrade. V8 deterministic/fallback smoke passed; full CI pending.",
-    "caveat": "PR #6 remains draft and is behind main v0.3.4; keep 3D and saves untouched."
+    "blocker": "Additional dedicated masonry regression test write was rejected by safety checks. Existing full Node rules and Chromium 1365x768/390x844 smoke passed; no 844x390 screenshot yet. Visual gate G05 remains unverified.",
+    "caveat": "Screenshots are from actual Chromium game on draft development branch; NOT deployed main, NOT final A-direction art. Do not merge PR #6 until compatibility with main v0.3.4 and visual gates pass."
   },
   "candidate": {
     "status": "none",
@@ -283,10 +285,20 @@
     "pagesRun": null,
     "rollbackCommit": null
   },
-  "updatedAt": "2026-10-13",
+  "updatedAt": "2026-10-14",
   "lastWritePermissionProbe": {
     "at": "2026-10-13",
     "purpose": "Explicit user authorization; verify isolated 2D branch write access",
     "status": "write-check-pending"
+  },
+  "lastVisualEvidence": {
+    "kind": "real-game-chromium",
+    "branch": "feature/2d-maze-topology-f1",
+    "codeCommit": "678118728eb60472ba42bf3558cb0518936109df",
+    "ci": "https://github.com/TempleHao/Diablo/actions/runs/38448918091",
+    "desktop": "docs/screenshots/2d-f4-masonry-boss-desktop-20261014.jpg",
+    "mobile": "docs/screenshots/2d-f4-masonry-boss-mobile-20261014.jpg",
+    "screenshotsCommit": "55edd6f6838ad4086357756fadc88e8f8986c373",
+    "status": "partial-real-visual-progress-not-final"
   }
 }
