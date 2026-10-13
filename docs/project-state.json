@@ -3,7 +3,7 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.3.0-preview.2",
   "designVersion": "1.0",
-  "status": "ready",
+  "status": "running",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "ART-02",
@@ -20,7 +20,15 @@
     "jobId": 114943347491,
     "conclusion": "success"
   },
-  "activeRun": null,
+  "activeRun": {
+    "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "taskId": "ART-02",
+    "substep": "D1-cloth-surface-artifact",
+    "trigger": "continuation",
+    "startedAt": "2026-10-13T03:22:28Z",
+    "heartbeatAt": "2026-10-13T03:22:28Z",
+    "leaseExpiresAt": "2026-10-13T05:22:28.000Z"
+  },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
@@ -28,8 +36,48 @@
   },
   "resumeBranch": null,
   "resumeCommit": null,
-  "nextAction": "ART-02 D (same in_progress package): from latest main, repair cloth-tail normal/atlas/decimation black spots/fold lines, then scalp/hair integration, face UV/skin roughness and garment cut/tension/high-to-low normal bake/position wear. Save per bounded step and compare actual native close-up/gameplay. Commercial/user art acceptance remains unmet; do not jump to ART-03 or D1-02.",
+  "nextAction": "ART-02 D1: reproduce and repair cloth-tail normal/atlas/decimation black spots/fold lines on latest main; inspect real UV/tangent/shell/weight overlap, save source checkpoint early, verify final L0/L1 native shots and motion/skin/budget regressions before integration. Leave independent dist/2d and its systems untouched; face/scalp/cloth production polish remains later ART-02 work.",
   "lastAttempt": {
+    "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "taskId": "ART-02",
+    "substep": "D1-cloth-surface-artifact",
+    "startedAt": "2026-10-13T03:22:28Z",
+    "status": "running",
+    "phase": "inspect-actual-cloth-normal-atlas-decimation-defect"
+  },
+  "blocked": null,
+  "automationTitle": "余烬纪事断点续做",
+  "requestedRetryIntervalHours": 5,
+  "quotaState": "unknown-no-query-tool",
+  "lastUpdatedAt": "2026-10-13T03:22:28Z",
+  "validationLimitations": [
+    "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
+    "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
+    "Real Android/iOS FPS, GPU memory, thermals/battery and user research untested; 2048 atlas/persistent preview not low-memory proof",
+    "Purpose-selected L0/L1 only; no automatic distance-based LOD or independent facial/toe animation",
+    "Live github.io browser regression blocked by network policy; Pages result must be checked separately",
+    "Standalone portable 23 path-config copy not independently rerun; actual frozen HTTP game23 passed, saved lifecycle6/poses30 independently run"
+  ],
+  "automation": {
+    "title": "余烬纪事断点续做",
+    "isEnabled": true,
+    "schedule": "BEGIN:VEVENT\nDTSTART:20261012T021910Z\nRRULE:FREQ=HOURLY;INTERVAL=5\nEND:VEVENT",
+    "timezone": "Asia/Shanghai",
+    "configuredAt": "2026-10-11T21:19:10.848248+00:00"
+  },
+  "lastWorkBranch": {
+    "name": "checkpoint/art-02",
+    "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
+    "status": "validated-partial-integrated"
+  },
+  "userFeedback": {
+    "recordedAt": "2026-10-12T05:14:55Z",
+    "priority": "art-before-D1-02",
+    "currentArt": "0.3.0 preview delivered; quality not user-accepted",
+    "request": "Rebuild character and full scene environment toward realistic dark fantasy quality comparable to Diablo II Resurrected / Diablo IV. Existing rigid small-game primitive modeling is unacceptable.",
+    "targetAcceptance": "D2R/D4-level art quality not met; continue concrete character/environment refinement before D1-02"
+  },
+  "previousAttempt": {
     "runId": "auto-ART-02-20261012172128-73c3b1d8",
     "taskId": "ART-02",
     "startedAt": "2026-10-12T17:21:28Z",
@@ -74,73 +122,6 @@
     },
     "publishedFiles": "51 changed deliverable files match verified local snapshot by Git blob SHA"
   },
-  "blocked": null,
-  "automationTitle": "余烬纪事断点续做",
-  "requestedRetryIntervalHours": 5,
-  "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-12T18:09:03Z",
-  "validationLimitations": [
-    "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
-    "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
-    "Real Android/iOS FPS, GPU memory, thermals/battery and user research untested; 2048 atlas/persistent preview not low-memory proof",
-    "Purpose-selected L0/L1 only; no automatic distance-based LOD or independent facial/toe animation",
-    "Live github.io browser regression blocked by network policy; Pages result must be checked separately",
-    "Standalone portable 23 path-config copy not independently rerun; actual frozen HTTP game23 passed, saved lifecycle6/poses30 independently run"
-  ],
-  "automation": {
-    "title": "余烬纪事断点续做",
-    "isEnabled": true,
-    "schedule": "BEGIN:VEVENT\nDTSTART:20261012T021910Z\nRRULE:FREQ=HOURLY;INTERVAL=5\nEND:VEVENT",
-    "timezone": "Asia/Shanghai",
-    "configuredAt": "2026-10-11T21:19:10.848248+00:00"
-  },
-  "lastWorkBranch": {
-    "name": "checkpoint/art-02",
-    "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-    "status": "validated-partial-integrated"
-  },
-  "userFeedback": {
-    "recordedAt": "2026-10-12T05:14:55Z",
-    "priority": "art-before-D1-02",
-    "currentArt": "0.3.0 preview delivered; quality not user-accepted",
-    "request": "Rebuild character and full scene environment toward realistic dark fantasy quality comparable to Diablo II Resurrected / Diablo IV. Existing rigid small-game primitive modeling is unacceptable.",
-    "targetAcceptance": "D2R/D4-level art quality not met; continue concrete character/environment refinement before D1-02"
-  },
-  "previousAttempt": {
-    "runId": "resume-ART-01-20261012123442-6fcb5de2",
-    "taskId": "ART-01",
-    "startedAt": "2026-10-12T12:34:42Z",
-    "status": "done",
-    "phase": "preview-validated-and-published",
-    "baseCheckpoint": "2d173faa58fbd39e48f86163e06b4df512098db7",
-    "checkpointCommit": "099dc20d47e02546c74e16813dde15f2a3c61243",
-    "validation": {
-      "saveTests": {
-        "passed": 61,
-        "failed": 0
-      },
-      "browserChecks": {
-        "passed": 23,
-        "failed": 0
-      },
-      "sourceFiles": 26,
-      "model": "40966 triangles / 163 bones / 9 materials / 20 embedded images; binary SHA matches generator statistics",
-      "unverified": [
-        "Real-device performance / thermals / battery / GPU memory",
-        "Live github.io URL browser regression: network blocked",
-        "Commercial D2R/D4 art quality; existing monster placeholders remain"
-      ],
-      "publishedFiles": "114 source/runtime/evidence files match local verified files; two obsolete generated studio images removed during final documentation cleanup"
-    },
-    "finishedAt": "2026-10-12T13:06:03Z",
-    "codeCommit": "41a9e7361804dd88edba148734b218747cd2146f",
-    "deployment": {
-      "commit": "41a9e7361804dd88edba148734b218747cd2146f",
-      "runId": 38252648722,
-      "jobId": 114822611976,
-      "conclusion": "success"
-    }
-  },
   "completedWorkPackages": {
     "ART-01": "First playable realistic-direction art slice delivered; D2R/D4 commercial art target is not accepted or complete"
   },
@@ -170,5 +151,11 @@
         "conclusion": "success"
       }
     }
+  },
+  "repositoryObservation": {
+    "headBeforeRun": "9295516533409736b4806a8cdac021d66ef2e35e",
+    "parallel2DRelease": "README records independent 2D v0.3 under /2d; retain these unrelated updates",
+    "threeDVersion": "0.3.0-preview.2",
+    "observedAt": "2026-10-13T03:22:28Z"
   }
 }
