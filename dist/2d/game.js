@@ -49,11 +49,11 @@ for(const {index,name} of destinationOptions(profile.region).destinations){
 }
 function openPortalMenu(){
   if(!bossDefeated||!portal||state!=='playing')return false;
-  clearInput();$('portal-panel').hidden=false;
+  clearInput();$('portal-panel').hidden=false;$('portal-open').hidden=true;
   $('portal-destination').value=String(destinationOptions(profile.region).next);
   return true;
 }
-function closePortalMenu(){$('portal-panel').hidden=true;clearInput();}
+function closePortalMenu(){$('portal-panel').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
 function travelTo(region){
   if(!bossDefeated||!validateDestination(region))return false;
   closePortalMenu();profile.region=region;
@@ -137,7 +137,7 @@ function spawn(kind,location=null) {
   const maxHp=(b?550:brute?95:archer?50:kind==='spider'?42:64)*(1+run*.22+Math.max(0,lv-1)*.055);
   const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:kind==='spider'?172:130,
     radius:b?39:brute?24:17,attack:rng()*1.5,slow:0,phase:rng()*6.28,blink:0,windup:0};
-  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，灰烬司祭已苏醒！',true);}
+  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;ui.boss.querySelector('span').textContent=BOSS_POOLS[profile.region].name;announce('地窟深处，'+BOSS_POOLS[profile.region].name+'已苏醒！',true);}
   return e;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
@@ -174,10 +174,10 @@ $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
 function showInventory() {
   if(state==='intro'||state==='victory'||state==='death'||!$('portal-panel').hidden)return;
-  $('inventory').hidden=false;clearInput();renderInventory();
+  $('inventory').hidden=false;$('portal-open').hidden=true;clearInput();renderInventory();
 }
 $('btn-inventory').onclick=showInventory;
-function closeInventory(){$('inventory').hidden=true;clearInput();}
+function closeInventory(){$('inventory').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
 $('inv-close').onclick=closeInventory;
 $('inventory').addEventListener('pointerdown',e=>{if(e.target===$('inventory'))closeInventory();});
 function applyEquipmentChange(operate){
@@ -473,7 +473,7 @@ function update(dt){
       if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:e.kind==='cultist'?'void':'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
       else if(isBoss&&d<520){
         const a=Math.atan2(dy,dx);
-        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce('灰烬司祭进入第二阶段！',true);}
+        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce(BOSS_POOLS[profile.region].name+'进入第二阶段！',true);}
         for(let k=e.enraged?-3:-2;k<=(e.enraged?3:2);k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
         hazards.push({x:e.x,y:e.y,r:0,max:90,life:.6,type:'void'});e.attack=2.3;
       }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:e.kind==='spider'?6+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:e.kind==='spider'?.72:1.0;}
@@ -623,7 +623,6 @@ window.addEventListener('keydown',e=>{
   if(k==='escape'){if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
   if(k==='t'){openPortalMenu();return;}
-  if(k==='escape'&&!$('portal-panel').hidden){closePortalMenu();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
