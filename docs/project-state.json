@@ -3,7 +3,7 @@
   "project": "TempleHao/Diablo",
   "gameVersion": "0.3.0-preview.2",
   "designVersion": "1.0",
-  "status": "running",
+  "status": "ready",
   "currentMilestone": "D1",
   "targetMilestone": "D3-complete-single-player",
   "nextTaskId": "ART-02",
@@ -13,22 +13,15 @@
     "D1-01",
     "ART-01"
   ],
-  "lastCompletedWorkCommit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
+  "lastCompletedWorkCommit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
   "lastKnownSuccessfulDeployment": {
-    "commit": "69b3fe3e1a93888461f68303c3fc68dee5dab432",
-    "runId": 38288739602,
-    "jobId": 114943347491,
-    "conclusion": "success"
+    "commit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
+    "runId": 38370746712,
+    "jobId": 115206835345,
+    "conclusion": "success",
+    "scope": "Source-only integration; entire dist remains the prior published game assets"
   },
-  "activeRun": {
-    "runId": "auto-ART-02-D1-source-20261013082918-bbb4f48c",
-    "taskId": "ART-02",
-    "substep": "D1-source-shell-verified-subset",
-    "trigger": "continuation-expired-lease-recovery",
-    "startedAt": "2026-10-13T08:29:18Z",
-    "heartbeatAt": "2026-10-13T08:39:19Z",
-    "leaseExpiresAt": "2026-10-13T10:39:19.000Z"
-  },
+  "activeRun": null,
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
@@ -36,22 +29,22 @@
   },
   "resumeBranch": "checkpoint/art-02-d1",
   "resumeCommit": "6866c15537e38f40860335c07827cad823f4320d",
-  "nextAction": "After source-only Pages verification, close this bounded subset and release lease. Next ART-02 D1 normal step: implement triangle/filter texel footprints + matching high base/duplicate/rim isolated projection before evaluating3072float-normal candidate. Export guardFalse is intentional, not a finished repair. Actual newasset game/poses/lifecycle/quality gates and2048mobilefallback remain pending.",
+  "nextAction": "Resume checkpoint/art-02-d1@6866c15537e38f40860335c07827cad823f4320d for ONE bounded ART-02 D1-normal step, preserving latestmain updates. Source generator/receipt and215part84sample comparison alreadydone inmain@eddb595c13e73866e7907cfba2a2d63785ba3fa3. First implement actualUVtriangle/filter texel footprints and matching highbase/duplicate/rim isolation; do not toggle NORMAL_FOOTPRINT_VALIDATED to bypass validation. Rebuild source with --source-only (new machine hashes recorded anew), use tracked originalshell diagnostic andbaseline b78 provenance. Then limited cloth bake+actualPNG positive vector/coverage/overlap gates+native mapped-pixel controls before full final LOD or game tests. 3072normal mobilebudget/2048fallback and overallART-02 acceptance unresolved.",
   "lastAttempt": {
     "runId": "auto-ART-02-D1-source-20261013082918-bbb4f48c",
     "taskId": "ART-02",
     "substep": "D1-cloth-surface-artifact",
     "startedAt": "2026-10-13T08:29:18Z",
-    "status": "running",
-    "phase": "source-subset-integrated-pages-pending",
+    "status": "partial-validated-source-integrated",
+    "phase": "source-subset-verified-pages-success-normal-experiment-checkpoint",
     "checkpointCommit": "6866c15537e38f40860335c07827cad823f4320d",
     "validation": {
       "sourceGeneration": "Fresh accurately named source d02212.../generatorf7bdbc...;45710tris163sourcebones22packedimages; source-only dist unchanged",
       "sourceComparison": "215parts source geometry/UV/baseLayer+otherWeights/restbones/Fcurve keyframe data invariant;42times×2tails84samples max6.000096mm vs20.380971mm; comprehensive NLA/handle metadata not claimed",
       "nativeBaseline": "36 viewer/6 studio ablations; original normal not proven black-spot cause",
       "portableSurfaceQuick": "actual6 images passed",
-      "finalModels": "scratch L0/L1 geometric gates pass5.977/13.952mm; candidate held for native chest/sleeve spots and low-density/reverse normals; no publication",
-      "deployment": "pending Pages verification for source-only integration; entiredist unchanged",
+      "finalModels": "Rejected2048normalcandidate001c/215f notpublished;3072float-normal experiment static-only exportguardFalse, true texelfootprint/high-layerprojection missing",
+      "deployment": "Actual Pages asset check/upload/deploy and workflow allsuccess; dist unchanged",
       "nativeCandidate": "Actual normal/zero/none/flat and raycast3: spots sample PNG128,128,0; UV0 invariant and finite; none/flat resolve sampled spots. Candidate rejected.",
       "exportedByteGate": "Frozen rejected L0/L1 real checker expected failure: L0linen239354 reverse PNG pixels, Pillow agrees; actual embedded hash equalsreport. Fixed15%occupancy/zero-reverse/.85..1.02 vectors gates",
       "saveTests": {
@@ -62,7 +55,7 @@
         "passed": 23,
         "failed": 0
       },
-      "sourceLayerNaming": "Independent actual source review: first block is Solidify base layer; tail+1 physical outer layer changes. Rename provenance, preserve copy logic, regenerate receipt before source-only integration.",
+      "sourceLayerNaming": "Accurate original/base vs duplicate layer labels frozen and actually rebuilt; physical outside not retained on both panels. Only matching duplicate layer weights changed.",
       "fullProjectCheck": {
         "passed": true,
         "saveTests": 61,
@@ -70,22 +63,34 @@
         "independent2DAuditTests": 9,
         "sourceFilesVerified": 26,
         "publishedGLBs": "original e7e16b/79db8b; no new models"
-      }
+      },
+      "publishedFiles": "10 source/state/doc paths Gitblob-verified;20 checkpointpaths Gitblob-verified; all dist, independent2D/workflows/roadmap/scripts/tests unchanged"
     },
-    "priorRunId": "auto-ART-02-D1-20261013032228-df3abdbf"
+    "priorRunId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "finishedAt": "2026-10-13T08:40:58Z",
+    "codeCommit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
+    "deployment": {
+      "commit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
+      "runId": 38370746712,
+      "jobId": 115206835345,
+      "conclusion": "success",
+      "scope": "Source-only integration; entire dist remains the prior published game assets"
+    }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-13T08:39:19Z",
+  "lastUpdatedAt": "2026-10-13T08:40:58Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
-    "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
-    "Real Android/iOS FPS, GPU memory, thermals/battery and user research untested; 2048 atlas/persistent preview not low-memory proof",
-    "Purpose-selected L0/L1 only; no automatic distance-based LOD or independent facial/toe animation",
-    "Live github.io browser regression blocked by network policy; Pages result must be checked separately",
-    "Standalone portable 23 path-config copy not independently rerun; actual frozen HTTP game23 passed, saved lifecycle6/poses30 independently run"
+    "Published preview2 cloth-tail artifacts and prior sampled L1Walk58.132mm error remain; source-weight repair has not replaced gameGLBs",
+    "Rejected normalcandidate has true native reverse-Z black spots; latest3072normal proposal andfilter/high-layerprojection are unverified, exportguard intentionallyFalse",
+    "3072normal theoreticalRGBA8+mip~48MiB is an estimate; mobilebudget/2048fallback notverified",
+    "Real Android/iOS FPS, GPUmemory, thermals/battery anduserresearch untested",
+    "Purpose-selected L0/L1 only; no automatic distance LOD or independentfacial/toeanimation",
+    "Live github.io browser access blocked by networkpolicy; actual Pages success checked separately",
+    "No new asset complete game/lifecycle/poses test claimed this round; source-only full npmcheck and original-art diagnostics are distinct"
   ],
   "automation": {
     "title": "余烬纪事断点续做",
@@ -97,7 +102,8 @@
   "lastWorkBranch": {
     "name": "checkpoint/art-02-d1",
     "commit": "6866c15537e38f40860335c07827cad823f4320d",
-    "status": "verified-source-subset-only-normal-experiment-unvalidated"
+    "status": "source-subset-integrated-normal-experiment-unvalidated",
+    "sourceIntegratedCommit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
@@ -160,10 +166,12 @@
       "completedSubsteps": [
         "A: first hair/cloth/grip/Cast refinement",
         "B: real PBR atlas/60-bone rig/L0-L1 budgets",
-        "C: lazy close-up/persistent context/native functional regression"
+        "C: lazy close-up/persistent context/native functional regression",
+        "D1-source: coherent Solidify base/duplicate-layer weights, source-only receipt and215part/84sample proof; gameGLBs unchanged"
       ],
       "remainingSubsteps": [
-        "D: cloth normal/atlas/decimation artifacts, scalp/hair/face UV/skin and garment high-to-low surface polish",
+        "D1-normal: true texel/filter footprint coverage and matching high base/duplicate/rim projection; actual PNG and native visual verification; final new LOD gameplay regression",
+        "D: scalp/hair/face UV/skin and garment sculpt/wear",
         "User commercial-art acceptance"
       ],
       "verifiedPreviewVersion": "0.3.0-preview.2",
@@ -178,6 +186,20 @@
         "runId": 38288739602,
         "jobId": 114943347491,
         "conclusion": "success"
+      },
+      "sourceSubstep": {
+        "id": "ART-02-D1-source",
+        "status": "done",
+        "commit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
+        "checkpoint": "6866c15537e38f40860335c07827cad823f4320d",
+        "deployment": {
+          "commit": "eddb595c13e73866e7907cfba2a2d63785ba3fa3",
+          "runId": 38370746712,
+          "jobId": 115206835345,
+          "conclusion": "success",
+          "scope": "Source-only integration; entire dist remains the prior published game assets"
+        },
+        "runtimeAssetsChanged": false
       }
     }
   },
@@ -199,5 +221,6 @@
     "needsUserAction": false,
     "checkpoint": "6866c15537e38f40860335c07827cad823f4320d",
     "reason": "Rejected2048normal candidate has actual reverse-Z PNG texels and native black triangles; latest3072normal proposal unexecuted, footprint/high-layerprojection missing; no published newart"
-  }
+  },
+  "lastPublished3DAssetCommit": "69b3fe3e1a93888461f68303c3fc68dee5dab432"
 }
