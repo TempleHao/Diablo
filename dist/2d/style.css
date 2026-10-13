@@ -223,3 +223,11 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 @media(max-width:375px){.mobile-inv-actions{grid-template-columns:minmax(0,1fr) 73px 110px}.mobile-inv-actions button{font-size:12px}.inv-gear-column .equipment{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 @media(max-height:550px) and (pointer:coarse){.topbar{height:50px}.quest{top:54px}.joystick{bottom:45px;width:86px;height:86px}.joystick span{left:25px;top:25px;width:34px;height:34px}.hud{min-height:67px;padding:6px}.orb{width:40px;height:40px}.abilitybar button{height:45px;min-width:40px;width:40px}.abilitybar{gap:3px}.abilitybar .ability-icon{font-size:16px!important}.abilitybar b{font-size:10px}.mobile-inv-actions{padding:5px 12px calc(5px + env(safe-area-inset-bottom))}.mobile-inv-actions button{min-height:39px}.mobile-inv-tabs{padding:4px}.mobile-inv-tabs button{min-height:39px;padding:5px}}
+
+
+/* v0.3.6 five mage silhouettes: same class, palette-swapped appearance preview */
+.skin-choice{display:flex;flex-direction:column;align-items:flex-start;gap:7px;margin:12px auto;padding:9px 10px;max-width:310px;border:1px solid #8e764d88;background:#17212a99;color:#e1c494;font-size:12px}
+.skin-choice span{font-size:12px}
+.skin-choice select{min-height:43px;width:100%;border:1px solid #9e7d52;border-radius:2px;background:linear-gradient(#313844,#10171d);color:#f1d9ab;font-size:14px;padding:7px 10px}
+.inv-gear-column .skin-choice{max-width:none;margin:9px 0 5px}
+@media(max-width:700px){.skin-choice{max-width:100%;width:100%}.skin-choice select{font-size:15px}}
