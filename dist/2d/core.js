@@ -1,3 +1,4 @@
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem } from './systems.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
 export const COLS = 40;
@@ -50,78 +51,50 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(nx, entity.y, radius, dungeon)) entity.x = nx;
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
-export function freshSave() {
-  return { version: 1, level: 1, xp: 0, gold: 0, essence: 0, clears: 0, inventory: [], equipped: { weapon: null, robe: null, charm: null } };
+export function freshSave(){
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,region:0};
 }
-const validItem = i => i && typeof i.id === 'string' && i.id.length < 100 && ['weapon','robe','charm'].includes(i.slot) &&
-  typeof i.name === 'string' && i.name.length <= 64 && Number.isFinite(i.power) && Number.isFinite(i.hp) &&
-  Number.isFinite(i.mana) && [0,1,2,3].includes(i.rarity);
-export function sanitizeSave(raw) {
-  const p = freshSave();
-  if (!raw || raw.version !== 1 || typeof raw !== 'object') return p;
-  for (const key of ['level','xp','gold','essence','clears']) {
-    const max = key === 'level' ? 60 : 100000000;
-    p[key] = clamp(Math.floor(Number(raw[key]) || 0), key === 'level' ? 1 : 0, max);
+export function sanitizeSave(raw){
+  const p=freshSave();
+  if(!raw||typeof raw!=='object'||![1,2].includes(raw.version))return p;
+  for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
+    const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?4:100000000;
+    p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
-  if (Array.isArray(raw.inventory)) {
-    const ids = new Set();
-    p.inventory = raw.inventory.filter(i => validItem(i) && !ids.has(i.id) && ids.add(i.id)).slice(0, 30)
-      .map(i => ({ id: i.id, slot: i.slot, name: i.name, rarity: i.rarity,
-        power: clamp(Math.floor(i.power), 0, 9999), hp: clamp(Math.floor(i.hp), 0, 9999),
-        mana: clamp(Math.floor(i.mana), 0, 9999), value: clamp(Math.floor(i.value || 0), 0, 99999) }));
+  if(Array.isArray(raw.inventory)){
+    const ids=new Set();
+    for(const value of raw.inventory.slice(0,MAX_ITEMS*5)){
+      const item=normalizeItem(value);
+      if(item&&!ids.has(item.id)){ids.add(item.id);p.inventory.push(item);}
+      if(p.inventory.length>=MAX_ITEMS)break;
+    }
   }
-  for (const slot of ['weapon','robe','charm']) {
-    const id = raw.equipped?.[slot];
-    if (p.inventory.some(i => i.id === id && i.slot === slot)) p.equipped[slot] = id;
+  const used=new Set();
+  for(const slot of SLOT_IDS){
+    const id=raw.equipped?.[slot];
+    const item=p.inventory.find(i=>i.id===id);
+    if(item&&getSlotForItem(item,slot)===slot&&!used.has(id)){p.equipped[slot]=id;used.add(id);}
   }
   return p;
 }
-export function stats(p) {
-  let power = 17 + p.level * 3, hp = 105 + (p.level - 1) * 13, mana = 100;
-  for (const id of Object.values(p.equipped)) {
-    const i = p.inventory.find(item => item.id === id);
-    if (i) { power += i.power; hp += i.hp; mana += i.mana; }
-  }
-  return { power, hp, mana };
+export function stats(p){return calculateStats(p);}
+export function expRequired(level){return level*45+15;}
+export function gainXp(p,amount){
+  p.xp+=Math.max(0,Math.floor(amount));let advanced=0;
+  while(p.level<60&&p.xp>=expRequired(p.level)){p.xp-=expRequired(p.level);p.level++;advanced++;p.skillPoints=(p.skillPoints||0)+1;}
+  if(p.level===60)p.xp=0;return advanced;
 }
-export function expRequired(level) { return level * 45 + 15; }
-export function gainXp(p, amount) {
-  p.xp += Math.max(0, Math.floor(amount));
-  let advanced = 0;
-  while (p.level < 60 && p.xp >= expRequired(p.level)) {
-    p.xp -= expRequired(p.level);
-    p.level++; advanced++;
-  }
-  if (p.level === 60) p.xp = 0;
-  return advanced;
+export function createItem(rng,level,id){return makeLoot(rng,level,id);}
+export function equip(p,id,target=null){
+  const item=p.inventory.find(i=>i.id===id);if(!item)return false;
+  const slot=getSlotForItem(item,target);if(!slot)return false;
+  for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
+  p.equipped[slot]=id;return true;
 }
-export function createItem(rng, level, id) {
-  const rarity = rng() < .035 ? 3 : rng() < .15 ? 2 : rng() < .48 ? 1 : 0;
-  const slot = ['weapon','robe','charm'][Math.floor(rng() * 3)];
-  const names = {
-    weapon: ['焦木法杖','寒潮长杖','余烬权杖','断昼星杖'],
-    robe: ['行旅布袍','旧日秘袍','烬纹长袍','星坠法衣'],
-    charm: ['风化护符','霜石坠饰','炉心秘印','断昼徽记']
-  };
-  const bonus = rarity + 1, n = Math.max(1, level);
-  return {
-    id, slot, rarity, name: names[slot][rarity],
-    power: slot === 'weapon' ? Math.round((4 + n * 2.2) * bonus * (.8 + rng() * .5)) : slot === 'charm' ? Math.round(bonus * (1 + n * .42)) : 0,
-    hp: slot === 'robe' ? Math.round((11 + n * 3) * bonus * (.8 + rng() * .4)) : 0,
-    mana: slot === 'charm' ? Math.round((5 + n) * bonus) : 0,
-    value: 4 + n * 2 + rarity * 7
-  };
-}
-export function equip(p, id) {
-  const item = p.inventory.find(i => i.id === id);
-  if (!item) return false;
-  p.equipped[item.slot] = item.id; return true;
-}
-export function salvage(p, id) {
-  if (Object.values(p.equipped).includes(id)) return false;
-  const index = p.inventory.findIndex(i => i.id === id);
-  if (index < 0) return false;
-  p.essence += 1 + p.inventory[index].rarity * 2;
-  p.inventory.splice(index, 1);
-  return true;
+export function salvage(p,id){
+  if(Object.values(p.equipped).includes(id))return false;
+  const index=p.inventory.findIndex(i=>i.id===id);
+  if(index<0)return false;
+  p.essence+=1+p.inventory[index].rarity*2;
+  p.inventory.splice(index,1);return true;
 }
