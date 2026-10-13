@@ -703,6 +703,25 @@ ground.data.materials.append(ground_mat)
 bpy.ops.object.camera_add(location=(2.1,-4.5,2.45));camera=bpy.context.object;camera.name='Studio evidence camera';camera.data.lens=66;camera.rotation_euler=(Vector((0,0,1.04))-camera.location).to_track_quat('-Z','Y').to_euler();scene.camera=camera
 scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=False;scene.render.resolution_x=900;scene.render.resolution_y=1100;scene.render.resolution_percentage=100
 scene.view_settings.view_transform='AgX'
+if '--source-only' in sys.argv:
+    # Rebuild the editable upstream rig without touching a published GLB or
+    # statistics. Packed images keep the frozen source independent of caches.
+    bpy.ops.file.pack_all()
+    source_blend=out/'ash-archivist.blend'
+    bpy.ops.wm.save_as_mainfile(filepath=str(source_blend))
+    source_receipt={
+        'mode':'source-only',
+        'generatorSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        'sourceBlendSha256':hashlib.sha256(source_blend.read_bytes()).hexdigest(),
+        'triangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o,_,_ in parts),
+        'bones':len(rig.data.bones),
+        'clips':['Idle','Walk','Cast'],
+        'packedImages':sum(bool(i.packed_file) for i in bpy.data.images),
+        'publishedAssetsTouched':False
+    }
+    (out/'source-build-receipt.json').write_text(json.dumps(source_receipt,indent=2)+'\n')
+    print('ASH_ARCHIVIST_SOURCE_READY',json.dumps(source_receipt),flush=True)
+    sys.exit(0)
 scene.render.image_settings.file_format='PNG';scene.render.filepath=str(out/'character-studio.png')
 bpy.ops.render.render(write_still=True)
 camera.location=(.75,-2.30,1.87);camera.rotation_euler=(Vector((0,-.03,1.74))-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.lens=92
