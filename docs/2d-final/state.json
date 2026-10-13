@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "project": "TempleHao/Diablo",
+  "track": "Ember Chronicles 2D A-direction final",
+  "state": "development",
+  "baseline": {
+    "game": "2D v0.3 pixel-prototype",
+    "confirmed": "not A-direction final",
+    "existing3D": "separate/unchanged",
+    "reference": "user-supplied five A-direction target pictures; conceptual, not gameplay"
+  },
+  "autonomousRun": {
+    "owner": null,
+    "leaseExpiresAt": null,
+    "branch": null,
+    "taskId": null
+  },
+  "currentPhase": "F1",
+  "phases": {
+    "F0": {
+      "status": "done",
+      "gateIds": [],
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "748ef5d5cbe36d7c8c88a0035dfaad388965116e"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38352511685"
+        },
+        {
+          "kind": "report",
+          "ref": "docs/2d-final/BASELINE.md"
+        }
+      ]
+    },
+    "F1": {
+      "status": "pending",
+      "gateIds": [
+        "G01"
+      ],
+      "evidence": []
+    },
+    "F2": {
+      "status": "pending",
+      "gateIds": [
+        "G02"
+      ],
+      "evidence": []
+    },
+    "F3": {
+      "status": "pending",
+      "gateIds": [
+        "G03",
+        "G04"
+      ],
+      "evidence": []
+    },
+    "F4": {
+      "status": "pending",
+      "gateIds": [
+        "G05"
+      ],
+      "evidence": []
+    },
+    "F5": {
+      "status": "pending",
+      "gateIds": [
+        "G06"
+      ],
+      "evidence": []
+    },
+    "F6": {
+      "status": "pending",
+      "gateIds": [
+        "G07",
+        "G08"
+      ],
+      "evidence": []
+    },
+    "F7": {
+      "status": "pending",
+      "gateIds": [
+        "G02",
+        "G03",
+        "G04",
+        "G07"
+      ],
+      "evidence": []
+    },
+    "F8": {
+      "status": "pending",
+      "gateIds": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09"
+      ],
+      "evidence": []
+    },
+    "F9": {
+      "status": "pending",
+      "gateIds": [
+        "G10"
+      ],
+      "evidence": []
+    }
+  },
+  "gates": {
+    "G01": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G02": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G03": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G04": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G05": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G06": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G07": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G08": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G09": {
+      "status": "unverified",
+      "evidence": []
+    },
+    "G10": {
+      "status": "unverified",
+      "evidence": []
+    }
+  },
+  "defects": [
+    {
+      "id": "P1-001",
+      "severity": "P1",
+      "status": "open",
+      "description": "实际地牢地图缺少可探索多房间迷宫及回路"
+    },
+    {
+      "id": "P1-002",
+      "severity": "P1",
+      "status": "open",
+      "description": "Boss 无专属掉落/首杀机制，通关后自动重置"
+    },
+    {
+      "id": "P1-003",
+      "severity": "P1",
+      "status": "open",
+      "description": "角色/怪物仍为卡通像素素材，远未接近 A 向 2.5D 写实参考"
+    },
+    {
+      "id": "P1-004",
+      "severity": "P1",
+      "status": "open",
+      "description": "缺少主城/野外连续游戏空间与持续冒险循环"
+    },
+    {
+      "id": "P1-005",
+      "severity": "P1",
+      "status": "open",
+      "description": "装备纸娃娃没有四个可见装备外观图层，PC/手机 UI 效果不足"
+    },
+    {
+      "id": "P1-006",
+      "severity": "P1",
+      "status": "open",
+      "description": "怪物缺少足够差异化行为和可识别前摇"
+    }
+  ],
+  "deltaTop3": [
+    "写实斜俯视地图与角色素材未实装，实际还是卡通像素",
+    "迷宫、主城、野外与不自动重置的持续玩法未实装",
+    "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
+  ],
+  "nextAction": "F1：新建独立的房间图迷宫模块（入口、支路、死路、至少一个回路、可到达的 Boss 房/出口），先用 100 个固定种子验证可达性与路径多样性；通过后才集成 2D 战斗画布与迷雾。",
+  "lastAttempt": {
+    "at": "2026-10-13",
+    "phase": "F0",
+    "status": "passed-only-baseline-and-audit",
+    "verified": {
+      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38352511685",
+      "commit": "748ef5d5cbe36d7c8c88a0035dfaad388965116e"
+    },
+    "caveat": "No F1-F9 gameplay or A-direction art gate passed; no final game release."
+  },
+  "candidate": {
+    "status": "none",
+    "commit": null,
+    "ci": null,
+    "pcScreenshot": null,
+    "mobileScreenshot": null,
+    "artDirectionAccepted": false,
+    "userAccepted": false
+  },
+  "release": {
+    "status": "not-final",
+    "commit": null,
+    "pagesRun": null,
+    "rollbackCommit": null
+  },
+  "updatedAt": "2026-10-13"
+}

@@ -1,0 +1,29 @@
+name: Final 2D truthfulness gate
+on:
+  push:
+    branches: [main, docs/2d-final-roadmap-autogates]
+    paths:
+      - 'docs/2d-final/**'
+      - 'scripts/audit-2d-final.mjs'
+      - 'tests/2d-final-audit.test.mjs'
+      - '.github/workflows/2d-final-audit.yml'
+  pull_request:
+    paths:
+      - 'docs/2d-final/**'
+      - 'scripts/audit-2d-final.mjs'
+      - 'tests/2d-final-audit.test.mjs'
+      - '.github/workflows/2d-final-audit.yml'
+permissions:
+  contents: read
+jobs:
+  validate-status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run adversarial audit tests
+        run: node --test tests/2d-final-audit.test.mjs
+      - name: Reject unsupported milestone or release claims
+        run: node scripts/audit-2d-final.mjs
