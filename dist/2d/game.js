@@ -168,7 +168,8 @@ function inspectItem(item){
   if(!item){panel.textContent='选择一件装备查看随机词缀、品质与属性变化。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
-  panel.append(title,meta);
+  const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
+  panel.append(preview,title,meta);
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
@@ -200,6 +201,7 @@ function renderInventory(){
     const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
     const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
     title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
+    if(item){const icon=document.createElement('canvas');icon.className='equipment-icon';icon.setAttribute('aria-hidden','true');Art.drawItemIcon(icon,item);node.append(icon);}
     node.append(name,title);
     node.onclick=()=>{if(item){inspectItem(item);if(confirm('卸下 '+item.name+'？'))applyEquipmentChange(()=>profile.equipped[slot]=null);}else inspectItem(null);};
     equipment.append(node);
@@ -212,7 +214,9 @@ function renderInventory(){
     const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
     const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
     const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
-    detail.append(title,desc);detail.onclick=()=>inspectItem(item);
+    const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
+    const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
+    detail.append(img,labels);detail.onclick=()=>inspectItem(item);
     const actions=document.createElement('div');actions.className='item-actions';
     const worn=Object.values(profile.equipped).includes(item.id);
     const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
