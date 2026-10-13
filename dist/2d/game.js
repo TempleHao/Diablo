@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import {createMazeWorld, roomAt, roomCenter, enterRoom, drawMazeWalls, drawExplorationFog} from './maze-world.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -16,7 +17,8 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, combo=0;
+let armorUntil=0, combo=0, currentRoom=null, enteredRooms=new Set(), bossDefeated=false;
+const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 for(const [key,meta] of Object.entries(SKILLS)){
@@ -52,53 +54,58 @@ function announce(message, urgent=false) {
   while(ui.log.childElementCount>4)ui.log.lastElementChild.remove();
   window.setTimeout(()=>line.remove(),4300);
 }
-function randomPoint(minDist=260) {
-  for(let n=0;n<450;n++){
-    const x=150+rng()*(WIDTH-300), y=150+rng()*(HEIGHT-300);
-    if(distance({x,y},hero)<minDist || !walkable(x,y,28,dungeon))continue;
+function randomPoint(minDist=260){
+  for(let n=0;n<250;n++){
+    const sample=dungeon.roomSpawns[Math.floor(rng()*dungeon.roomSpawns.length)];
+    if(sample.roomId===dungeon.layout.entrance||sample.roomId===dungeon.layout.boss)continue;
+    const x=sample.x+(rng()-.5)*190,y=sample.y+(rng()-.5)*190;
+    if(distance({x,y},hero)<minDist||!walkable(x,y,28,dungeon))continue;
     return {x,y};
   }
-  return {x:WIDTH/2,y:HEIGHT*.2};
+  const sample=dungeon.roomSpawns.find(p=>p.roomId!==dungeon.layout.entrance)||dungeon.roomSpawns[0];
+  return {x:sample.x,y:sample.y};
 }
-function encounterPoint(i) {
-  // Near the starting chamber so the first screen includes an actual encounter.
-  const angles=[-0.45,-2.75,-1.35,-2.15];
-  const distanceFromHero=[330,320,370,415];
-  const a=angles[i%angles.length],radius=distanceFromHero[i%distanceFromHero.length];
-  const candidate={x:hero.x+Math.cos(a)*radius,y:hero.y+Math.sin(a)*radius};
-  if(walkable(candidate.x,candidate.y,28,dungeon))return candidate;
-  for(let n=0;n<96;n++) {
-    const angle=rng()*Math.PI*2,dist=255+rng()*250;
-    const p={x:hero.x+Math.cos(angle)*dist,y:hero.y+Math.sin(angle)*dist};
-    if(walkable(p.x,p.y,28,dungeon))return p;
+function enterChamber(id){
+  if(id===null||id===currentRoom)return;
+  currentRoom=id;enterRoom(dungeon,id);
+  const chamber=dungeon.layout.rooms.find(r=>r.id===id);
+  if(!chamber)return;
+  ui.progress.textContent='已探索 '+dungeon.explored.length+' / '+dungeon.layout.rooms.length+' 间房 · 寻找灰烬司祭';
+  if(enteredRooms.has(id))return;
+  enteredRooms.add(id);
+  if(chamber.type==='entrance')return;
+  const c=roomCenter(dungeon,id);
+  if(chamber.type==='boss'){
+    if(!bossDefeated)spawn('boss',{x:c.x,y:c.y-55});
+    return;
   }
-  return randomPoint();
-}
-function spawnWave(index){
-  const group=enemyWaves(profile.region)[index]||[];
-  group.forEach((kind,i)=>spawn(kind,encounterPoint((i+index)%4)));
-  if(index>0)announce('第 '+(index+1)+' 波 · '+['地窟徘徊者','空潮增援','最后的守卫'][index],true);
-}
-function findBossPoint(){
-  // A short, reachable walk down the central aisle instead of spawning inside masonry.
-  for(const delta of [310,390,240,-280,460]){
-    const p={x:hero.x,y:clamp(hero.y-delta,TILE*3,HEIGHT-TILE*3)};
-    if(walkable(p.x,p.y,45,dungeon))return p;
+  if(chamber.type==='treasure'){
+    dropItem(c.x+46,c.y-20,true);
+    announce('发现封存的战利品密室',true);
   }
-  return {x:WIDTH/2,y:TILE*5.7};
+  const types=REGION_DATA[profile.region].types;
+  const count=chamber.type==='elite'?3:chamber.type==='treasure'?1:2+Math.floor(rng()*2);
+  for(let n=0;n<count;n++){
+    const kind=chamber.type==='elite'&&n===0?'brute':types[Math.floor(rng()*types.length)];
+    const candidate={x:c.x+(n%2?-90:90),y:c.y+(Math.floor(n/2)?75:-75)};
+    const point=walkable(candidate.x,candidate.y,32,dungeon)?candidate:{x:c.x,y:c.y};
+    const e=spawn(kind,point);
+    if(chamber.type==='elite'&&n===0){e.maxHp*=1.7;e.hp=e.maxHp;e.speed*=1.12;e.elite=true;}
+  }
+  if(chamber.type==='elite')announce('精英密室 · 警惕重型守卫',true);
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
   const seed = 20261013 + profile.clears*19+profile.region*7919;
-  rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
+  rng=mulberry32(seed); dungeon=createMazeWorld(seed,profile.region);
   const s=stats(profile);
-  hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;
+  hero={x:dungeon.start.x,y:dungeon.start.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;currentRoom=null;enteredRooms=new Set();bossDefeated=false;
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
-  spawnWave(0);
+  enterChamber(dungeon.layout.entrance);
   ui.boss.hidden=true;
-  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 12 名徘徊者以唤醒失名者';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='探索 '+dungeon.layout.rooms.length+' 间房 · 找到通往司祭圣所的路径';
   updateHud();
 }
 function spawn(kind,location=null) {
@@ -111,7 +118,7 @@ function spawn(kind,location=null) {
   enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，灰烬司祭已苏醒！',true);}
   return e;
 }
-function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
+function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('探索真正的地牢 · 每扇门后都有新的危险',true); }
 function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
@@ -255,7 +262,7 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'击败灰烬司祭，夺回余烬炉心': '徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
+  ui.progress.textContent=boss?'首领圣所 · 击败灰烬司祭':bossDefeated?'司祭已倒下 · 可以继续探索，或手动重新远征':'迷宫已探索 '+dungeon.explored.length+'/'+dungeon.layout.rooms.length+' 房 · 寻找首领与战利品';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
@@ -297,12 +304,13 @@ function dealDamage(e,damage,school='physical'){
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
   if(bossDied||rng()<.42)dropItem(e.x,e.y,bossDied);
   if(bossDied){
-    boss=null;ui.boss.hidden=true;profile.clears++;profile.region=(profile.region+1)%REGION_DATA.length;persist();
-    announce('炉心重燃，地窟净化完成！',true);showModal('victory');
+    boss=null;bossDefeated=true;ui.boss.hidden=true;profile.clears++;persist();
+    dropItem(e.x+32,e.y+20,true);
+    announce('灰烬司祭已倒下！战利品仍在这里；继续探索，或暂停菜单手动重刷。',true);
   }else{
     kills++;
-    if(kills===4||kills===8)spawnWave(kills/4);
-    if(kills>=total&&!boss)spawn('boss',findBossPoint());
+    // Rooms themselves own encounters; no global kill counter that spawns the boss.
+    
     persist();
   }
 }
@@ -363,6 +371,7 @@ function update(dt){
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
+  enterChamber(roomAt(dungeon,hero.x,hero.y));
   if(pointers.size || keys.has('1'))cast('fire');
   for(const e of [...enemies]){
     e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);
@@ -373,7 +382,7 @@ function update(dt){
       const vx=dx/d*speed,vy=dy/d*speed;
       moveWithCollision(e,vx,vy,dt,dungeon,e.radius);
       // 避免随机石柱导致怪物长期卡住。
-      if(d>250&&e.kind==='boss'&&Math.abs(e.x-WIDTH/2)>800){e.x=clamp(e.x,hero.x-700,hero.x+700);}
+      if(d>250&&e.kind==='boss'&&Math.abs(e.x-worldWidth()/2)>800){/* boss remains in its chamber */}
     }else if(isRanged&&d<230)moveWithCollision(e,-dx/d*speed*.5,-dy/d*speed*.5,dt,dungeon,e.radius);
     if(e.attack<=0){
       if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:e.kind==='cultist'?'void':'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
@@ -420,7 +429,7 @@ function update(dt){
   }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick,profile.region); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
@@ -437,12 +446,13 @@ function missileDraw(m){
 }
 function render(){
   if(!hero){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#121b22';ctx.fillRect(0,0,vw,vh);return;}
-  cam.x=clamp(hero.x-vw/2,0,Math.max(0,WIDTH-vw));
-  cam.y=clamp(hero.y-vh/2,0,Math.max(0,HEIGHT-vh));
+  cam.x=clamp(hero.x-vw/2,0,Math.max(0,worldWidth()-vw));
+  cam.y=clamp(hero.y-vh/2,0,Math.max(0,worldHeight()-vh));
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,vw,vh);
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
-  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick);
+  drawMazeWalls(ctx,dungeon,cam,vw,vh);
+  Art.scenery(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick);
   // Painter's order: stonework and props occlude actors when they stand behind them.
   const layers=[];
   for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
@@ -463,6 +473,7 @@ function render(){
     ctx.restore();
   }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
+  drawExplorationFog(ctx,dungeon,cam,vw,vh);
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
   const vign=ctx.createRadialGradient(vw/2,vh/2,Math.min(vw,vh)*.15,vw/2,vh/2,Math.max(vw,vh)*.75);
@@ -470,12 +481,24 @@ function render(){
   if(++frameIndex%5===0)drawMinimap();
 }
 function drawMinimap(){
-  const w=150,h=112;minimap.clearRect(0,0,w,h);minimap.fillStyle='#101921';minimap.fillRect(0,0,w,h);
-  const sx=w/WIDTH,sy=h/HEIGHT;minimap.fillStyle='#58636a';
-  for(const b of dungeon.blocks)minimap.fillRect(b.x*sx,b.y*sy,Math.max(1,b.w*sx),Math.max(1,b.h*sy));
-  for(const e of enemies){minimap.fillStyle=e.kind==='boss'?'#ef8ec7':'#bb695e';minimap.fillRect(e.x*sx-1,e.y*sy-1,e.kind==='boss'?5:3,e.kind==='boss'?5:3);}
-  minimap.fillStyle='#fff2a9';minimap.beginPath();minimap.arc(hero.x*sx,hero.y*sy,3,0,7);minimap.fill();
-  minimap.strokeStyle='#bd9457';minimap.strokeRect(cam.x*sx,cam.y*sy,vw*sx,vh*sy);
+  const w=150,h=112;
+  minimap.clearRect(0,0,w,h);minimap.fillStyle='#090d16';minimap.fillRect(0,0,w,h);
+  const cells=dungeon.layout.rooms,known=new Set(dungeon.explored),near=new Set(dungeon.visible);
+  const fx=w/worldWidth(),fy=h/worldHeight(),step=dungeon.cellSize*8;
+  for(const edge of dungeon.layout.edges){
+    if(!known.has(edge.a)&&!known.has(edge.b))continue;
+    const a=roomCenter(dungeon,edge.a),b=roomCenter(dungeon,edge.b);
+    minimap.strokeStyle='#908273';minimap.lineWidth=3;minimap.beginPath();minimap.moveTo(a.x*fx,a.y*fy);minimap.lineTo(b.x*fx,b.y*fy);minimap.stroke();
+  }
+  for(const room of cells){
+    if(!known.has(room.id)&&!near.has(room.id))continue;
+    const x=(room.x*step+48)*fx,y=(room.y*step+48)*fy;
+    minimap.fillStyle=room.id===dungeon.layout.boss&&known.has(room.id)?'#985e66':known.has(room.id)?'#a09078':'#363e46';
+    minimap.fillRect(x,y,step*fx*.75,step*fy*.75);
+  }
+  for(const e of enemies)if(known.has(roomAt(dungeon,e.x,e.y))){minimap.fillStyle=e.kind==='boss'?'#ef8ec7':'#bb695e';minimap.fillRect(e.x*fx-1.5,e.y*fy-1.5,3,3);}
+  minimap.fillStyle='#fff2a9';minimap.beginPath();minimap.arc(hero.x*fx,hero.y*fy,3,0,7);minimap.fill();
+  minimap.strokeStyle='#b28c59';minimap.strokeRect(cam.x*fx,cam.y*fy,vw*fx,vh*fy);
 }
 function loop(now){
   const dt=Math.min(.04,(now-last)/1000 || .016);last=now;
