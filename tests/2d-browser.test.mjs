@@ -93,6 +93,7 @@ try{
     assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
     assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
+    assert.equal(await page.locator('#portal-open').isVisible(),false,'portal button must not cover the inventory');
     await page.selectOption('#inv-filter','accessory');
     assert.ok((await page.locator('.item-thumbnail').count())>=1,'accessory filter must retain jewelry');
     await page.selectOption('#inv-filter','all');
@@ -109,6 +110,10 @@ try{
     await page.click('#modal-primary');
     await page.click('#portal-open');
     assert.equal(await page.locator('#portal-panel').isVisible(),true);
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const portalImage=await page.screenshot({type:'jpeg',quality:68});
+      console.log((viewport.isMobile?'PORTAL_MOBILE_BASE64:':'PORTAL_DESKTOP_BASE64:')+portalImage.toString('base64'));
+    }
     assert.equal(await page.locator('#portal-destination option').count(),9);
     await page.selectOption('#portal-destination','1');
     await page.click('#portal-next');
