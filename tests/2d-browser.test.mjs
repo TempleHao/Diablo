@@ -14,7 +14,7 @@ try{
   }
   if(!browser)throw new Error('Chromium missing/unavailable: '+launchError?.message);
   await sleep(750);
-  for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true}]){
+  for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true},{width:844,height:390,isMobile:true,hasTouch:true}]){
     const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},isMobile:viewport.isMobile,hasTouch:!!viewport.hasTouch,deviceScaleFactor:1});
     const page=await context.newPage(),errs=[];
     // Dedicated visual regression character: no fixture is shipped in the game itself.
@@ -92,6 +92,17 @@ try{
     assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
     await page.locator('.item-detail').first().evaluate(el=>el.click());
+    if(viewport.isMobile){
+      assert.equal(await page.locator('#inventory').getAttribute('data-mobile-view'),'compare','select item should open comparison directly');
+      assert.equal(await page.locator('#mobile-equip').isEnabled(),true,'mobile one-tap wear must be available');
+      assert.equal(await page.locator('.compare-gear').count(),2,'side-by-side current and candidate previews');
+      assert.equal(await page.locator('.compare-gear strong').count(),2);
+      assert.equal(await page.locator('.mobile-inv-tabs button.is-active').innerText(),'装备对比');
+      if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+        const compareShot=await page.screenshot({type:'jpeg',quality:73});
+        console.log((viewport.width===390?'COMPARE_MOBILE_BASE64:':'COMPARE_LANDSCAPE_BASE64:')+compareShot.toString('base64'));
+      }
+    }
     assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
     assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
@@ -107,10 +118,22 @@ try{
     assert.equal(await page.locator('button[data-skill="storm"]').count(),1);
     assert.equal(await page.locator('[data-skill]').count(),7);
     assert.equal(await page.locator('#portal-open').isVisible(),false,'portal button must not cover the inventory');
+    if(viewport.isMobile){
+      await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
+      assert.equal(await page.locator('#inventory').getAttribute('data-mobile-view'),'bag');
+    }
     await page.selectOption('#inv-filter','accessory');
     assert.ok((await page.locator('.item-thumbnail').count())>=1,'accessory filter must retain jewelry');
     await page.selectOption('#inv-filter','all');
     const overflow=await page.locator('.inv-workspace').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
+    if(viewport.isMobile){
+      const viewportOverflow=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:window.innerWidth}));
+      assert.ok(viewportOverflow.scroll<=viewportOverflow.width+2,'mobile document horizontal overflow: '+JSON.stringify(viewportOverflow));
+      await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
+      assert.equal(await page.locator('#inventory').getAttribute('data-mobile-view'),'gear');
+      assert.equal(await page.locator('.equipment-slot:visible').count(),13);
+      await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
+    }
     assert.ok(overflow.scroll<=overflow.client+3,'inventory must not overflow horizontally: '+JSON.stringify(overflow));
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const visual=await page.screenshot({type:'jpeg',quality:62});
@@ -119,6 +142,21 @@ try{
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const craftShot=await page.screenshot({type:'jpeg',quality:69});
       console.log((viewport.isMobile?'CRAFT_MOBILE_BASE64:':'CRAFT_DESKTOP_BASE64:')+craftShot.toString('base64'));
+    }
+    if(viewport.isMobile){
+      await page.locator('.item-detail').filter({hasText:'冻土秘银指环'}).click();
+      assert.equal(await page.locator('#ring-choice').isVisible(),true,'mobile must choose which ring to replace');
+      await page.selectOption('#ring-target','ring1');
+      const now=await page.locator('#compare-pair').innerText();
+      assert.ok(now.includes('冻土秘银指环'),'ring comparison must show equipped jewelry');
+      await page.selectOption('#ring-target','ring2');
+      assert.ok((await page.locator('#compare-pair').innerText()).includes('空槽位'),'second ring empty slot should show in comparison');
+      const selectedBefore=await page.locator('#mobile-item-name').innerText();
+      await page.click('#mobile-equip');
+      assert.equal((await page.locator('#mobile-item-name').innerText()),selectedBefore,'selection stays after equipping');
+      assert.equal(await page.locator('#mobile-equip').innerText(),'卸下装备');
+      await page.click('#mobile-back-to-bag');
+      assert.equal(await page.locator('#inventory').getAttribute('data-mobile-view'),'bag');
     }
     await page.click('#inv-close');
     assert.equal(await page.locator('#inventory').isVisible(),false);
