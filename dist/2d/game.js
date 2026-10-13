@@ -875,6 +875,8 @@ document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
 // Dedicated local QA hook: never active on the public GitHub Pages game.
 if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('qa')){
   window.__ember2dQA={
+    encounterInfo:()=>({kills,total,alive:enemies.length,elite:enemies.filter(e=>e.elite).length,waves:WAVE_COUNT,skin:profile.heroSkin,effects:vfx.length}),
+    castPreview:(key)=>{if(!SKILLS[key])throw new Error('invalid skill');hero.mana=1000;cooldowns[key]=0;cast(key);return {count:vfx.length,skill:key};},
     bossTest:()=>{
       if(state!=='playing')throw new Error('start game first');
       enemies.length=0;kills=total;
