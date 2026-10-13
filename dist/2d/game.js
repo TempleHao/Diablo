@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import {BOSS_POOLS,rollBossRewards} from './boss-loot.js';
 import {createMazeWorld, roomAt, roomCenter, enterRoom, drawMazeWalls, drawExplorationFog} from './maze-world.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
@@ -115,7 +116,7 @@ function spawn(kind,location=null) {
   const maxHp=(b?550:brute?95:archer?50:kind==='spider'?42:64)*(1+run*.22+Math.max(0,lv-1)*.055);
   const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:kind==='spider'?172:130,
     radius:b?39:brute?24:17,attack:rng()*1.5,slow:0,phase:rng()*6.28,blink:0,windup:0};
-  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，灰烬司祭已苏醒！',true);}
+  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，'+BOSS_POOLS[profile.region].name+'已苏醒！',true);}
   return e;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('探索真正的地牢 · 每扇门后都有新的危险',true); }
@@ -262,7 +263,7 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'首领圣所 · 击败灰烬司祭':bossDefeated?'司祭已倒下 · 可以继续探索，或手动重新远征':'迷宫已探索 '+dungeon.explored.length+'/'+dungeon.layout.rooms.length+' 房 · 寻找首领与战利品';
+  ui.progress.textContent=boss?'首领圣所 · 击败'+BOSS_POOLS[profile.region].name:bossDefeated?'司祭已倒下 · 可以继续探索，或手动重新远征':'迷宫已探索 '+dungeon.explored.length+'/'+dungeon.layout.rooms.length+' 房 · 寻找首领与战利品';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
@@ -302,11 +303,22 @@ function dealDamage(e,damage,school='physical'){
   const bossDied=e.kind==='boss';const advanced=gainXp(profile,bossDied?170:22);
   profile.gold+=bossDied?150:3+Math.floor(rng()*9);
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
-  if(bossDied||rng()<.42)dropItem(e.x,e.y,bossDied);
+  if(!bossDied&&rng()<.42)dropItem(e.x,e.y,false);
   if(bossDied){
+    const previous=profile.bossKills?.[profile.region]||0;
+    const loot=rollBossRewards(rng,profile.level,profile.region,previous,
+      ()=>'ember2d-boss-'+Date.now()+'-'+nextId++);
+    profile.bossKills=profile.bossKills||{};
+    profile.bossKills[profile.region]=previous+1;
+    profile.essence+=loot.materials;
+    for(const [index,item] of loot.drops.entries()){
+      const px=e.x+index*56,py=e.y+index*22;
+      drops.push({x:px,y:py,item,age:0});
+      floatText(px,py-46,item.name,palette.rare[item.rarity]);
+    }
     boss=null;bossDefeated=true;ui.boss.hidden=true;profile.clears++;persist();
-    dropItem(e.x+32,e.y+20,true);
-    announce('灰烬司祭已倒下！战利品仍在这里；继续探索，或暂停菜单手动重刷。',true);
+    announce(loot.boss+'已被击败！'+(loot.firstKill?'首杀专属传奇掉落！':'获得区域首领战利品。')+
+      ' +'+loot.materials+'精华；可继续探索或手动重刷。',true);
   }else{
     kills++;
     // Rooms themselves own encounters; no global kill counter that spawns the boss.
