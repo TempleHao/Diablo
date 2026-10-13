@@ -23,7 +23,7 @@ try{
         id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId
       });
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
-        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},
+        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
         inventory:[
           item('staff','weapon','余烬裁决长杖',3,[{key:'power',value:28},{key:'fire',value:13},{key:'crit',value:5}],55),
           item('helmet','head','龙焰冠冕',4,[{key:'resistFire',value:12}],0,8,24,'dragonflame'),
@@ -85,7 +85,9 @@ try{
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
-    assert.equal(await page.locator('.catalog-skill').count(),7);
+    assert.equal(await page.locator('.catalog-skill').count(),11,'expanded spell catalogue should show all eleven skills');
+    assert.equal(await page.locator('[data-skill]').count(),7,'only seven loadout slots visible on mobile');
+    assert.equal(await page.locator('.skill-slot').count(),11,'skills may be assigned to the action bar');
     assert.ok(await page.locator('.item-thumbnail').count()>0,'bag should include actual item icon canvases');
     assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
@@ -93,6 +95,17 @@ try{
     assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
     assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
+    assert.equal(await page.locator('.material-token').count(),3,'all salvage material wallets must render');
+    await page.selectOption('#auto-salvage','1');
+    assert.equal(await page.inputValue('#auto-salvage'),'1');
+    const beforeTemper=await page.locator('#item-inspect').innerText();
+    const temperReady=await page.locator('#inv-temper').isEnabled();
+    assert.equal(typeof temperReady,'boolean');
+    assert.ok((await page.locator('#temper-cost').innerText()).includes('淬炼花费'));
+    const spellRow=page.locator('.skill-catalog-entry').filter({hasText:'冰暴领域'});
+    await spellRow.locator('select').selectOption('0');
+    assert.equal(await page.locator('button[data-skill="storm"]').count(),1);
+    assert.equal(await page.locator('[data-skill]').count(),7);
     assert.equal(await page.locator('#portal-open').isVisible(),false,'portal button must not cover the inventory');
     await page.selectOption('#inv-filter','accessory');
     assert.ok((await page.locator('.item-thumbnail').count())>=1,'accessory filter must retain jewelry');
@@ -103,8 +116,14 @@ try{
       const visual=await page.screenshot({type:'jpeg',quality:62});
       console.log((viewport.isMobile?'INVENTORY_MOBILE_BASE64:':'INVENTORY_DESKTOP_BASE64:')+visual.toString('base64'));
     }
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const craftShot=await page.screenshot({type:'jpeg',quality:69});
+      console.log((viewport.isMobile?'CRAFT_MOBILE_BASE64:':'CRAFT_DESKTOP_BASE64:')+craftShot.toString('base64'));
+    }
     await page.click('#inv-close');
     assert.equal(await page.locator('#inventory').isVisible(),false);
+    await page.keyboard.press('6');
+    await page.waitForTimeout(150);
     await page.click('#btn-pause');
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
