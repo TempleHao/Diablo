@@ -442,7 +442,7 @@ function update(dt){
   }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,dungeon.seed); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
@@ -464,7 +464,7 @@ function render(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,vw,vh);
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
-  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick);
+  Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,dungeon.seed);
   // Painter's order: stonework and props occlude actors when they stand behind them.
   const layers=[];
   for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
