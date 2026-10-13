@@ -21,35 +21,56 @@
     "conclusion": "success"
   },
   "activeRun": {
-    "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "runId": "auto-ART-02-D1-source-20261013082918-bbb4f48c",
     "taskId": "ART-02",
-    "substep": "D1-cloth-surface-artifact",
-    "trigger": "continuation",
-    "startedAt": "2026-10-13T03:22:28Z",
-    "heartbeatAt": "2026-10-13T03:22:28Z",
-    "leaseExpiresAt": "2026-10-13T05:22:28.000Z"
+    "substep": "D1-source-shell-verified-subset",
+    "trigger": "continuation-expired-lease-recovery",
+    "startedAt": "2026-10-13T08:29:18Z",
+    "heartbeatAt": "2026-10-13T08:29:18Z",
+    "leaseExpiresAt": "2026-10-13T10:29:18.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
-  "resumeBranch": null,
-  "resumeCommit": null,
-  "nextAction": "ART-02 D1: reproduce and repair cloth-tail normal/atlas/decimation black spots/fold lines on latest main; inspect real UV/tangent/shell/weight overlap, save source checkpoint early, verify final L0/L1 native shots and motion/skin/budget regressions before integration. Leave independent dist/2d and its systems untouched; face/scalp/cloth production polish remains later ART-02 work.",
+  "resumeBranch": "checkpoint/art-02-d1",
+  "resumeCommit": "70bacc7f8e1d53fe87764872a4e4f5c7f9f4bd60",
+  "nextAction": "Finish bounded verified source-shell subset: accurate base/duplicate layer naming, fresh actual source receipt+84-sample comparison, selective main integration preserving latest2D roadmap. Experimental normal/budget/GLBs remain checkpoint and unpublished; full normal chart/bake candidate still unverified.",
   "lastAttempt": {
-    "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "runId": "auto-ART-02-D1-source-20261013082918-bbb4f48c",
     "taskId": "ART-02",
     "substep": "D1-cloth-surface-artifact",
-    "startedAt": "2026-10-13T03:22:28Z",
+    "startedAt": "2026-10-13T08:29:18Z",
     "status": "running",
-    "phase": "inspect-actual-cloth-normal-atlas-decimation-defect"
+    "phase": "restored-checkpoint-source-layer-naming-reviewed-regeneration-pending",
+    "checkpointCommit": "70bacc7f8e1d53fe87764872a4e4f5c7f9f4bd60",
+    "validation": {
+      "sourceGeneration": "actual fresh coherent source958e42... / 45710tris163bones22packedImages",
+      "sourceComparison": "215 parts source geometry/UV/outer-other weights/rig/actions unchanged;84 layer samples max6.000096mm versus20.38097mm original",
+      "nativeBaseline": "36 viewer/6 studio ablations; original normal not proven black-spot cause",
+      "portableSurfaceQuick": "actual6 images passed",
+      "finalModels": "scratch L0/L1 geometric gates pass5.977/13.952mm; candidate held for native chest/sleeve spots and low-density/reverse normals; no publication",
+      "deployment": "existing release unchanged",
+      "nativeCandidate": "Actual normal/zero/none/flat and raycast3: spots sample PNG128,128,0; UV0 invariant and finite; none/flat resolve sampled spots. Candidate rejected.",
+      "exportedByteGate": "Frozen rejected L0/L1 real checker expected failure: L0linen239354 reverse PNG pixels, Pillow agrees; actual embedded hash equalsreport. Fixed15%occupancy/zero-reverse/.85..1.02 vectors gates",
+      "saveTests": {
+        "passed": 61,
+        "failed": 0
+      },
+      "independent2DUnitTests": {
+        "passed": 23,
+        "failed": 0
+      },
+      "sourceLayerNaming": "Independent actual source review: first block is Solidify base layer; tail+1 physical outer layer changes. Rename provenance, preserve copy logic, regenerate receipt before source-only integration."
+    },
+    "priorRunId": "auto-ART-02-D1-20261013032228-df3abdbf"
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-13T03:22:28Z",
+  "lastUpdatedAt": "2026-10-13T08:29:18Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
     "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
@@ -66,9 +87,9 @@
     "configuredAt": "2026-10-11T21:19:10.848248+00:00"
   },
   "lastWorkBranch": {
-    "name": "checkpoint/art-02",
-    "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-    "status": "validated-partial-integrated"
+    "name": "checkpoint/art-02-d1",
+    "commit": "70bacc7f8e1d53fe87764872a4e4f5c7f9f4bd60",
+    "status": "source-shell-verified-candidate-visual-regression-rejected"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
@@ -157,5 +178,12 @@
     "parallel2DRelease": "README records independent 2D v0.3 under /2d; retain these unrelated updates",
     "threeDVersion": "0.3.0-preview.2",
     "observedAt": "2026-10-13T03:22:28Z"
+  },
+  "leaseRecovery": {
+    "previousRunId": "auto-ART-02-D1-20261013032228-df3abdbf",
+    "expiredAt": "2026-10-13T05:59:07.000Z",
+    "lastSavedCheckpoint": "70bacc7f8e1d53fe87764872a4e4f5c7f9f4bd60",
+    "observedAt": "2026-10-13T08:29:18Z",
+    "reason": "Prior lease expired; latest main has unrelated 2D roadmap updates, preserved. No observed quota error and no quota-query interface."
   }
 }

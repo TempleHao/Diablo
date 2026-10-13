@@ -20,7 +20,8 @@ function readNormalPng(bytes){
     }else if(type==='IDAT')data.push(chunk);
     offset+=length+12;
   }
-  assert.equal(width,2048);assert.equal(height,2048);
+  assert.ok(width===2048||width===3072,'Unexpected experimental normal atlas size');
+  assert.equal(height,width,'Normal atlas must be square');
   const stride=width*channels,raw=inflateSync(Buffer.concat(data)),pixels=Buffer.alloc(stride*height);
   assert.equal(raw.length,(stride+1)*height);
   const paeth=(a,b,c)=>{const p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);return pa<=pb&&pa<=pc?a:pb<=pc?b:c;};
@@ -170,6 +171,7 @@ for(const lod of ['L0','L1']){
   const normal=report.lods[lod].clothNormal;
   assert.equal(normal.texCoord,1);assert.equal(normal.uvLayer,'NormalUV');assert.match(normal.sha256,/^[a-f0-9]{64}$/);
   assert.equal(normal.sha256,(lod==='L0'?detail:combat).normalImageSha256,'Embedded normal image differs from bake evidence');
+  assert.equal(normal.atlasSizePixels??2048,(lod==='L0'?detail:combat).normalPng.width,'Normal image dimensions differ from bake report');
   assert.ok(normal.parts.length>0,'Missing isolated high-to-low bake evidence');
   const tiles=Object.values(normal.uvTiles);
   assert.ok(tiles.length>0,'Missing normal UV occupancy evidence');
@@ -177,6 +179,8 @@ for(const lod of ['L0','L1']){
   for(const tile of tiles){
     const [left,bottom,width,height]=tile.rectanglePixels;
     const png=(lod==='L0'?detail:combat).normalPng;
+    assert.ok(Number.isInteger(left)&&Number.isInteger(bottom)&&Number.isInteger(width)&&Number.isInteger(height));
+    assert.ok(width>0&&height>0&&left>=0&&bottom>=0&&left+width<=png.width&&bottom+height<=png.height,'Normal tile outside actual image');
     // Include margins and background: tiny triangles and texture filtering can
     // sample texels outside the pixel-center interior mask used by the baker.
     let backwardBytes=0,invalidLengths=0;

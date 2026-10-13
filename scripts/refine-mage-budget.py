@@ -2,6 +2,8 @@
 
 blender -b raw-ash-archivist.blend --python scripts/refine-mage-budget.py -- /project
 Run only after the full source rig has had its authored rest pose applied.
+Unpublished normal experiment: release export is disabled until filter-footprint
+coverage and matched shell-role projection are implemented and validated.
 The project has not selected a license for its original code and artwork.
 """
 import bpy
@@ -34,6 +36,8 @@ OUT = ROOT / 'assets-source/ash-archivist'
 OUT.mkdir(parents=True, exist_ok=True)
 (ROOT / 'dist/models').mkdir(parents=True, exist_ok=True)
 SCENE = bpy.context.scene
+NORMAL_SIZE = 3072
+NORMAL_FOOTPRINT_VALIDATED = False
 RIG = bpy.data.objects.get('AshArchivistRig')
 assert RIG and RIG.type == 'ARMATURE', 'Open the fully authored raw character .blend first'
 PARTS = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent == RIG]
@@ -59,8 +63,9 @@ if ARGS.baseline_shell_report:
         'sourceBlendSha256':ARGS.baseline_source_sha256,
         'diagnosticFile':evidence_file.name, 'diagnosticSha256':hashlib.sha256(evidence_file.read_bytes()).hexdigest(),
         'originalPairSeparationMaxMeters':max(s['pairedShellSeparationMaxMeters'] for s in baseline_samples),
-        'intentionalChange':'Source generator now shares corresponding tail-layer weights; original outside weighting is retained',
+        'intentionalChange':'Source generator now shares corresponding tail-layer weights; original/base-layer weighting is retained',
         'samples':baseline_samples}
+    REPORT['sourceShellBaseline']['legacyLayerLabels'] = 'The legacy outside/inside fields denote first/second Solidify vertex blocks; first is physical inside for the +1 tail.'
 
 
 def triangles(obj):
@@ -127,9 +132,9 @@ for source in TAILS:
     count = len(copy.data.vertices)//2
     assert count*2 == len(copy.data.vertices)
     for i in range(count):
-        outside_weights = [(g.group,g.weight) for g in copy.data.vertices[i].groups]
+        base_weights = [(g.group,g.weight) for g in copy.data.vertices[i].groups]
         for group in list(copy.data.vertices[i+count].groups): copy.vertex_groups[group.group].remove([i+count])
-        for group,weight in outside_weights: copy.vertex_groups[group].add([i+count],weight,'REPLACE')
+        for group,weight in base_weights: copy.vertex_groups[group].add([i+count],weight,'REPLACE')
 shell_correction = []
 for clip, frame in TAIL_FRAMES:
     pose(clip, frame)
@@ -142,22 +147,22 @@ for clip, frame in TAIL_FRAMES:
         shell_correction.append({'part':source.name,'clip':clip,'frame':frame,
             'originalShellPairSeparationMaxMeters':float(np.linalg.norm(original[:count]-original[count:],axis=1).max()),
             'sharedWeightShellPairSeparationMaxMeters':float(np.linalg.norm(shared[:count]-shared[count:],axis=1).max()),
-            'intentionalInnerVertexCorrectionMaxMeters':float(np.linalg.norm(shared[count:]-original[count:],axis=1).max()),
-            'outsideVertexChangeMaxMeters':float(np.linalg.norm(shared[:count]-original[:count],axis=1).max())})
+            'intentionalDuplicateLayerVertexCorrectionMaxMeters':float(np.linalg.norm(shared[count:]-original[count:],axis=1).max()),
+            'baseLayerVertexChangeMaxMeters':float(np.linalg.norm(shared[:count]-original[:count],axis=1).max())})
 for copy in shared_tails.values(): bpy.data.objects.remove(copy,do_unlink=True)
 REPORT['tailShellWeightCorrection'] = {
-    'method':'Retain authored outside weights; share those weights with corresponding inside vertices',
+    'method':'Retain authored Solidify base-layer weights; share them with corresponding duplicate-layer vertices',
     'reason':'Independent nearest-three-bone selection gives opposing layers different bone sets despite only 6mm separation',
     'inputBlendUnmodified':True,
-    'referenceDisclosure':'Tail fidelity gate uses this explicit corrected high reference; frozen-original deformation differences are separately measured',
+    'referenceDisclosure':'Tail fidelity gate uses an explicit coherent-layer high reference; frozen-original deformation differences are separately measured',
     'originalShellPairSeparationMaxMeters':max(s['originalShellPairSeparationMaxMeters'] for s in shell_correction),
     'sharedWeightShellPairSeparationMaxMeters':max(s['sharedWeightShellPairSeparationMaxMeters'] for s in shell_correction),
-    'intentionalInnerVertexCorrectionMaxMeters':max(s['intentionalInnerVertexCorrectionMaxMeters'] for s in shell_correction),
-    'outsideVertexChangeMaxMeters':max(s['outsideVertexChangeMaxMeters'] for s in shell_correction),
+    'intentionalDuplicateLayerVertexCorrectionMaxMeters':max(s['intentionalDuplicateLayerVertexCorrectionMaxMeters'] for s in shell_correction),
+    'baseLayerVertexChangeMaxMeters':max(s['baseLayerVertexChangeMaxMeters'] for s in shell_correction),
     'samples':shell_correction}
-assert REPORT['tailShellWeightCorrection']['outsideVertexChangeMaxMeters'] < 1e-7
+assert REPORT['tailShellWeightCorrection']['baseLayerVertexChangeMaxMeters'] < 1e-7
 assert REPORT['tailShellWeightCorrection']['sharedWeightShellPairSeparationMaxMeters'] < .006001
-REPORT['tailShellWeightCorrection']['sourceWasAlreadyCoherent'] = REPORT['tailShellWeightCorrection']['intentionalInnerVertexCorrectionMaxMeters'] < 1e-7
+REPORT['tailShellWeightCorrection']['sourceWasAlreadyCoherent'] = REPORT['tailShellWeightCorrection']['intentionalDuplicateLayerVertexCorrectionMaxMeters'] < 1e-7
 assert ARGS.allow_incoherent_source or REPORT['tailShellWeightCorrection']['sourceWasAlreadyCoherent'], \
     'Rebuild the source with corresponding tail-layer weights before producing release budgets'
 
@@ -329,6 +334,8 @@ for obj in PARTS:
 CLOTH_HIGH = {}
 for obj in PARTS:
     material_names = {obj.data.materials[p.material_index].name for p in obj.data.polygons}
+    assert len(material_names) == 1, 'Normal layout requires a source material identity per part'
+    obj['budgetSourceMaterial'] = next(iter(material_names))
     if material_names <= {'Weathered charcoal linen', 'Oxblood wool'}:
         assert len(material_names) == 1
         obj['budgetClothMaterial'] = next(iter(material_names))
@@ -368,8 +375,8 @@ for mat in MATERIALS:
     targets[mat.name] = nodes.new('ShaderNodeTexImage')
 
 
-def image(name, noncolor=False):
-    img = bpy.data.images.new('Ash atlas '+name, width=2048, height=2048, alpha=True)
+def image(name, noncolor=False, resolution=2048, float_buffer=False):
+    img = bpy.data.images.new('Ash atlas '+name, width=resolution, height=resolution, alpha=True,float_buffer=float_buffer)
     img.colorspace_settings.name = 'Non-Color' if noncolor else 'sRGB'
     img.file_format = 'PNG'; img.filepath_raw = str(OUT / ('atlas-'+name+'.png'))
     IMAGES[name] = img
@@ -490,6 +497,16 @@ REPORT['atlas'] = {'method': 'Cycles emission channel and tangent normal bake; s
                    'normalMethod': 'LOD-specific final-triangle cloth high-to-low bake; other surfaces retain their authored atlas normal',
                    'normalScope': sorted(CLOTH_HIGH),
                    'unchangedMapUv': 'AtlasUV retains authored face, hair-card and other base/ORM/emission resolution'}
+NORMAL_TILES = {'Skin pores': [0,0,1024,1024],
+                'Original swept grey black hair MASK': [0,1024,1024,1024],
+                'Weathered charcoal linen': [1024,0,1024,1024],
+                'Oxblood wool': [1024,1024,1024,1024]}
+remaining = [name for name in ATLAS if name not in NORMAL_TILES]
+assert len(remaining) <= 6
+for index,name in enumerate(remaining): NORMAL_TILES[name] = [2048+512*(index%2),512*(index//2),512,512]
+REPORT['atlas']['normalAtlasResolution'] = NORMAL_SIZE
+REPORT['atlas']['normalSourceMaterialRectanglesPixels'] = NORMAL_TILES
+REPORT['atlas']['normalMemoryChange'] = '3072-square normal keeps face/hair 1024-square and other authored slots 512-square; approximately 26.7 MiB extra RGBA8 mip storage versus 2048-square. No device memory/frame-rate claim.'
 
 
 def is_body(obj): return 'face neck and articulated hands' in obj.name
@@ -528,26 +545,26 @@ def normalize_weights(obj):
 
 
 def reduce_tail(obj, ratio):
-    """Collapse the authored outside only, then reproduce the thin shell.
+    """Collapse Solidify's original/base layer, then reproduce the thin shell.
 
     Source strip/Solidify topology has corresponding vertex halves. Verify that
     assumption rather than silently treating a different source as a strip.
     """
     count = len(obj.data.vertices)//2
     assert len(obj.data.vertices) == count*2
-    outside = [p for p in obj.data.polygons if all(i < count for i in p.vertices)]
-    inside = [p for p in obj.data.polygons if all(i >= count for i in p.vertices)]
-    assert len(outside) == len(inside) == 384, 'Tail source shell topology changed'
+    base_faces = [p for p in obj.data.polygons if all(i < count for i in p.vertices)]
+    duplicate_faces = [p for p in obj.data.polygons if all(i >= count for i in p.vertices)]
+    assert len(base_faces) == len(duplicate_faces) == 384, 'Tail source shell topology changed'
     bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
     bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.index >= count], context='VERTS')
     bm.to_mesh(obj.data); bm.free(); obj.data.update()
     bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
     border = {v.index for e in bm.edges if e.is_boundary for v in e.verts}
     bm.free()
-    protect = obj.vertex_groups.new(name='Budget tail border protection')
+    protect = obj.vertex_groups.new(name='Budget base-layer tail border protection')
     protection_weights = {vertex:1.0 for vertex in border}
     # Mark high skin-weight gradients as well as the opening and hem. The group
-    # is only a collapse cost and is removed before normal skin normalization.
+    # is only a collapse cost and is removed before skin normalization.
     bone_groups = {g.index for g in obj.vertex_groups if g.name in KEEP}
     skin = [{g.group:g.weight for g in v.groups if g.group in bone_groups} for v in obj.data.vertices]
     for edge in obj.data.edges:
@@ -557,9 +574,9 @@ def reduce_tail(obj, ratio):
             for vertex in (a,b):
                 protection_weights[vertex] = max(protection_weights.get(vertex,0), min(1,gradient*2))
     for vertex,weight in protection_weights.items(): protect.add([vertex],weight,'REPLACE')
-    # The temporary group must not participate in the runtime skin weights.
+    # The temporary group must not participate in runtime skin weights. The base layer is physical inside for the +1 tail; these labels describe Solidify vertex order.
     active(obj)
-    dec = obj.modifiers.new('Outside-only weighted tail collapse', 'DECIMATE')
+    dec = obj.modifiers.new('Base-layer-only weighted tail collapse', 'DECIMATE')
     dec.ratio = ratio; dec.use_collapse_triangulate = True
     protection_name = protect.name
     dec.vertex_group = protection_name; dec.invert_vertex_group = True; dec.vertex_group_factor = 1
@@ -574,9 +591,9 @@ def reduce_tail(obj, ratio):
     bpy.ops.object.modifier_apply(modifier=shell.name)
     obj.data.update()
     obj.data.set_sharp_from_angle(angle=math.radians(60))
-    return {'method': 'outside-only collapse, boundary and skin-gradient costs, final corresponding shell',
-            'outsideRatio': ratio, 'protectedOutsideVertices': len(border), 'thicknessMeters': .006,
-            'shellWeights': 'Solidify duplicates final outside weights to corresponding inside/rim vertices'}
+    return {'method': 'base-layer-only collapse, boundary and skin-gradient costs, final corresponding shell',
+            'baseLayerRatio': ratio, 'protectedBaseLayerVertices': len(border), 'thicknessMeters': .006,
+            'shellWeights': 'Solidify duplicates final base-layer weights to corresponding duplicate-layer/rim vertices'}
 
 
 def finalize_triangles(obj):
@@ -605,7 +622,7 @@ def uv_raster_evidence(objects, rectangle, strict=True):
         uv = obj.data.uv_layers['NormalUV']
         for polygon in obj.data.polygons:
             face_index = len(face_labels); face_labels.append((obj.name,polygon.index))
-            a,b,c = [np.array(uv.data[i].uv)*2048-np.array((x,y)) for i in polygon.loop_indices]
+            a,b,c = [np.array(uv.data[i].uv)*NORMAL_SIZE-np.array((x,y)) for i in polygon.loop_indices]
             ab,ac = b-a,c-a
             determinant = ab[0]*ac[1]-ab[1]*ac[0]
             areas.append(abs(float(determinant))*.5)
@@ -656,7 +673,7 @@ def repair_projected_uv(group, rectangle):
         by_name = {obj.name:obj for obj in group}
         for obj in group:
             for loop in obj.data.uv_layers['NormalUV'].data:
-                loop.uv = ((loop.uv.x*2048-x-16)/(width-32),(loop.uv.y*2048-y-16)/(height-32))
+                loop.uv = ((loop.uv.x*NORMAL_SIZE-x-16)/(width-32),(loop.uv.y*NORMAL_SIZE-y-16)/(height-32))
         for index,(name,face) in enumerate(sorted(collisions)):
             obj = by_name[name]; separated.add((name,face))
             for loop_index in obj.data.polygons[face].loop_indices:
@@ -670,7 +687,7 @@ def repair_projected_uv(group, rectangle):
         bpy.ops.object.mode_set(mode='OBJECT')
         for obj in group:
             for loop in obj.data.uv_layers['NormalUV'].data:
-                loop.uv = ((x+16+loop.uv.x*(width-32))/2048,(y+16+loop.uv.y*(height-32))/2048)
+                loop.uv = ((x+16+loop.uv.x*(width-32))/NORMAL_SIZE,(y+16+loop.uv.y*(height-32))/NORMAL_SIZE)
     return uv_raster_evidence(group,rectangle,strict=True)
 
 
@@ -704,27 +721,37 @@ def unwrap_cloth(group, rectangle):
     bpy.ops.object.mode_set(mode='OBJECT')
     for obj in group:
         for loop in obj.data.uv_layers['NormalUV'].data:
-            loop.uv = ((x+16+loop.uv.x*(width-32))/2048,(y+16+loop.uv.y*(height-32))/2048)
+            loop.uv = ((x+16+loop.uv.x*(width-32))/NORMAL_SIZE,(y+16+loop.uv.y*(height-32))/NORMAL_SIZE)
     return repair_projected_uv(group,rectangle)
 
 
 def cloth_normal(lod, objects):
     # Preserve face/hair and all unaffected normal pixels. Only cloth rectangles
     # are repacked; base, ORM, emission and every AtlasUV coordinate stay intact.
-    result = image('normal-'+lod.lower(), True)
-    pixels = np.asarray(normal.pixels[:], dtype=np.float32).reshape(2048,2048,4)
+    result = image('normal-'+lod.lower(), True, resolution=NORMAL_SIZE,float_buffer=True)
+    source_pixels = np.asarray(normal.pixels[:],dtype=np.float32).reshape(2048,2048,4)
+    pixels = np.empty((NORMAL_SIZE,NORMAL_SIZE,4),dtype=np.float32);pixels[:] = (.5,.5,1,1)
+    for material_name,destination in NORMAL_TILES.items():
+        if material_name in ('Weathered charcoal linen','Oxblood wool'): continue
+        sx,sy,sw,sh = ATLAS[material_name]['rectanglePixels'];x,y,width,height=destination
+        assert (sw,sh)==(width,height), 'Unchanged normal source must retain physical texel resolution'
+        pixels[y:y+height,x:x+width] = source_pixels[sy:sy+sh,sx:sx+sw]
     groups = {}
     atlas_before = {obj.name: np.array([tuple(loop.uv) for loop in obj.data.uv_layers['AtlasUV'].data]) for obj in objects}
     for obj in objects:
         layer = obj.data.uv_layers.new(name='NormalUV', do_init=False)
         atlas = obj.data.uv_layers['AtlasUV']
-        for i in range(len(layer.data)): layer.data[i].uv = atlas.data[i].uv
+        material_name = obj['budgetSourceMaterial']
+        sx,sy,sw,sh = ATLAS[material_name]['rectanglePixels'];x,y,width,height=NORMAL_TILES[material_name]
+        for i in range(len(layer.data)):
+            source = np.array(atlas.data[i].uv)*2048
+            layer.data[i].uv = ((x+(source[0]-sx)*width/sw)/NORMAL_SIZE,(y+(source[1]-sy)*height/sh)/NORMAL_SIZE)
         if obj.get('budgetClothMaterial'):
             groups.setdefault(obj['budgetClothMaterial'], []).append(obj)
     evidence = {}
     coverage_masks = {}
     for material_name, group in groups.items():
-        x,y,width,height = ATLAS[material_name]['rectanglePixels']
+        x,y,width,height = NORMAL_TILES[material_name]
         # A sentinel distinguishes an untouched texel from a legitimate neutral
         # baked normal. It is replaced only after coverage validation succeeds.
         pixels[y:y+height,x:x+width] = (.5,.5,0,1)
@@ -733,6 +760,7 @@ def cloth_normal(lod, objects):
                                   'unwrap':'AtlasUV discontinuity, orientation and 60-degree feature seams; Angle Based charts with equal surface texel density',
                                   'bakeMarginPixels':3, 'islandMarginPixels':8,
                                   **raster}
+        assert raster['coveredInteriorPixels'] >= width*height*.15, 'Cloth chart coverage below the fixed 15% readability threshold'
     result.pixels.foreach_set(pixels.ravel())
     target_nodes = {}
     for mat in (OPAQUE,MASK):
@@ -767,7 +795,7 @@ def cloth_normal(lod, objects):
         assert [layer.name for layer in obj.data.uv_layers] == ['AtlasUV','NormalUV']
         assert np.array_equal(atlas_before[obj.name], np.array([tuple(loop.uv) for loop in obj.data.uv_layers['AtlasUV'].data]))
     values = np.asarray(result.pixels[:],dtype=np.float32).reshape(-1,4)
-    value_image = values.reshape(2048,2048,4)
+    value_image = values.reshape(NORMAL_SIZE,NORMAL_SIZE,4)
     for material_name,mask in coverage_masks.items():
         x,y,width,height = evidence[material_name]['rectanglePixels']
         encoded = value_image[y:y+height,x:x+width][mask,:3]
@@ -786,10 +814,28 @@ def cloth_normal(lod, objects):
         tile = value_image[y:y+height,x:x+width]
         background = np.all(abs(tile[:,:,:3]-np.array((.5,.5,0))) < 1e-6,axis=2)
         tile[background] = (.5,.5,1,1)
+        tile_vectors = tile[:,:,:3]*2-1
+        tile_lengths = np.linalg.norm(tile_vectors,axis=2)
+        evidence[material_name]['wholeTileBackwardNormalPixels'] = int(np.count_nonzero(tile_vectors[:,:,2]<-.01))
+        evidence[material_name]['wholeTileNormalLengthMin'] = float(tile_lengths.min())
+        evidence[material_name]['wholeTileNormalLengthMax'] = float(tile_lengths.max())
+        assert evidence[material_name]['wholeTileBackwardNormalPixels'] == 0, 'Backward normal remains in the cloth tile'
+        assert tile_lengths.min() >= .85 and tile_lengths.max() <= 1.02, 'Cloth tile normal length outside 0.85..1.02'
+    # Pixel-center raster alone missed subpixel triangles and filter borders in
+    # the rejected 2048 candidate. Do not export until the replacement footprint
+    # coverage and corresponding high-shell-side projection have actual evidence.
+    assert NORMAL_FOOTPRINT_VALIDATED, 'Normal filter-footprint and matched shell-role projection are unfinished; experimental export is disabled'
     result.pixels.foreach_set(values.ravel())
     result.save(); result.pack()
     file = Path(result.filepath_raw)
     return {'method':'selected authored high to final triangulated low; one source object per cloth bake',
+            'atlasSizePixels':[NORMAL_SIZE,NORMAL_SIZE],
+            'estimatedRGBA8Bytes':NORMAL_SIZE*NORMAL_SIZE*4,
+            'estimatedRGBA8MipBytes':sum(max(1,NORMAL_SIZE>>level)**2*4 for level in range(NORMAL_SIZE.bit_length())),
+            'memoryEvidence':'Theoretical uncompressed RGBA8 allocation, not observed device memory',
+            'preservedSourceTilePixels':{'face':1024,'hairCards':1024,'otherAuthoredMaterials':512},
+            'mobileBudgetPassed':False,
+            'fallbackStatus':'2048 normal re-bake and compressed/alternate LOD texture route have not been implemented or validated',
             'uvLayer':'NormalUV', 'texCoord':1, 'uvTiles':evidence, 'parts':bake_parts,
             'cageExtrusionMeters':.016, 'maxRayDistanceMeters':.032,
             'useClear':False, 'file':file.name, 'bytes':file.stat().st_size,
@@ -825,10 +871,10 @@ def tail_errors(objects, limit):
                 'finalShellPairSeparationMaxMeters':float(np.linalg.norm(low_coords[:len(low_coords)//2]-low_coords[len(low_coords)//2:],axis=1).max()),
                 'bidirectionalMaxMeters':float(worst),
                 'sourceWorstVertexIndex':source_worst_index,
-                'sourceWorstVertexLayer':'outside' if source_worst_index < len(coords)//2 else 'inside',
+                'sourceWorstVertexLayer':'baseLayer' if source_worst_index < len(coords)//2 else 'duplicateLayer',
                 'sourceWorstVertexPosition':coords[source_worst_index].tolist(),
                 'lowWorstVertexIndex':low_worst_index,
-                'lowWorstVertexLayer':'outside' if low_worst_index < len(low_coords)//2 else 'inside',
+                'lowWorstVertexLayer':'baseLayer' if low_worst_index < len(low_coords)//2 else 'duplicateLayer',
                 'lowWorstVertexPosition':low_coords[low_worst_index].tolist(),
                 'sourceToLowRmsMeters':float(np.sqrt(np.mean(np.square(forwards)))),
                 'lowToSourceRmsMeters':float(np.sqrt(np.mean(np.square(backwards))))})
@@ -838,7 +884,7 @@ def tail_errors(objects, limit):
     assert worst['bidirectionalMaxMeters'] <= limit, 'Tail surface gate missed: '+json.dumps(worst)
     assert max(s['finalShellPairSeparationMaxMeters'] for s in samples) < .006001
     return {'method':'all source and final low vertices against the opposite deformed triangle surface',
-            'reference':'Explicit corresponding-layer shared-weight high reference; original outside weights and rest geometry retained',
+            'reference':'Explicit corresponding-layer shared-weight high reference; original/base-layer weights and rest geometry retained',
             'walkCoverage':'every integer authored frame', 'limitMeters':limit,
             'frozenOriginalSourceToLowMaxMeters':max(s['frozenOriginalSourceToLowMaxMeters'] for s in samples),
             'finalShellPairSeparationMaxMeters':max(s['finalShellPairSeparationMaxMeters'] for s in samples),

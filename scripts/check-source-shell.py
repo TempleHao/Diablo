@@ -17,7 +17,6 @@ def collect(path):
     bpy.ops.wm.open_mainfile(filepath=str(path))
     rig = bpy.data.objects['AshArchivistRig']
     parts = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent == rig]
-    names = {g.index:g.name for o in parts for g in o.vertex_groups}
     snapshots = {}
     for obj in parts:
         groups = {g.index:g.name for g in obj.vertex_groups}
@@ -53,7 +52,7 @@ def collect(path):
 before, old_animation, old_bones, old_samples = collect(baseline)
 after, new_animation, new_bones, new_samples = collect(current)
 assert before.keys() == after.keys()
-assert old_animation == new_animation, 'Source actions changed outside the coat skin correction'
+assert old_animation == new_animation, 'Source F-curve keyframe data changed outside the coat skin correction'
 assert old_bones.keys() == new_bones.keys()
 bone_error = max(float(abs(old_bones[n]-new_bones[n]).max()) for n in old_bones)
 assert bone_error < 1e-8, 'Source rest rig changed'
@@ -68,7 +67,7 @@ for name,a in before.items():
     limit = len(a['weights'])//2 if name.startswith('Split coat tail ') else len(a['weights'])
     weight_error = max((abs(x.get(k,0)-y.get(k,0)) for x,y in zip(a['weights'][:limit],b['weights'][:limit])
                         for k in x.keys()|y.keys()),default=0)
-    assert weight_error < 1e-7, 'Outer coat or other source weights changed: '+name
+    assert weight_error < 1e-7, 'Original/base coat layer or other source weights changed: '+name
     if name.startswith('Split coat tail '):
         count = len(b['weights'])//2
         paired_error = max(abs(x.get(k,0)-y.get(k,0)) for x,y in zip(b['weights'][:count],b['weights'][count:]) for k in x.keys()|y.keys())
@@ -80,8 +79,9 @@ worst_new = max(new_samples,key=lambda s:s['maxLayerDistanceMeters'])
 assert worst_new['maxLayerDistanceMeters'] <= .006001, 'Corrected source shell still expands beyond 6 mm'
 report = {'baselineBlendSha256':hashlib.sha256(baseline.read_bytes()).hexdigest(),
           'currentBlendSha256':hashlib.sha256(current.read_bytes()).hexdigest(),
-          'parts':part_reports,'restBoneMatrixMaxDifference':bone_error,'sourceAnimationsUnchanged':True,
-          'sourceGeometryUvOuterAndOtherWeightsUnchanged':True,
+          'parts':part_reports,'restBoneMatrixMaxDifference':bone_error,'sourceAnimationKeyframeDataUnchanged':True,
+          'sourceGeometryUvBaseLayerAndOtherWeightsUnchanged':True,
+          'retainedLayer':'Solidify first/original vertex block; this is not the physical outside of both panels',
           'originalWorstLayerSample':worst_old,'correctedWorstLayerSample':worst_new,
           'originalLayerSamples':old_samples,'correctedLayerSamples':new_samples,
           'limitations':['Source-layer deformation validation is separate from final LOD render and commercial art acceptance']}

@@ -1,6 +1,6 @@
 {
   "baselineBlendSha256": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
-  "currentBlendSha256": "958e42d3864cf7a71fc2728f3329d59f875e377e2ec93e5598ec83774eadd70c",
+  "currentBlendSha256": "d02212c51ab4c1f130789f28e0c884a2d37d3dffa4045ca8fe6c45d7c06dd64b",
   "parts": [
     {
       "part": "Bent bronze focus cage",
@@ -1724,8 +1724,9 @@
     }
   ],
   "restBoneMatrixMaxDifference": 0.0,
-  "sourceAnimationsUnchanged": true,
-  "sourceGeometryUvOuterAndOtherWeightsUnchanged": true,
+  "sourceAnimationKeyframeDataUnchanged": true,
+  "sourceGeometryUvBaseLayerAndOtherWeightsUnchanged": true,
+  "retainedLayer": "Solidify first/original vertex block; this is not the physical outside of both panels",
   "originalWorstLayerSample": {
     "part": "Split coat tail 1",
     "clip": "Walk",

@@ -187,7 +187,7 @@ def strip(name, rows, material, bone=None):
     uv=[[(j/(width-1),k/(len(rows)-1)),((j+1)/(width-1),k/(len(rows)-1)),((j+1)/(width-1),(k+1)/(len(rows)-1)),(j/(width-1),(k+1)/(len(rows)-1))] for k in range(len(rows)-1) for j in range(width-1)]
     obj=make_mesh(name,verts,faces,material,uv,rigid=bone)
     if name.startswith('Split coat tail '):
-        # Solidify keeps corresponding front/back vertices in the two halves.
+        # Solidify keeps original/duplicate vertices in corresponding halves.
         # Record provenance so skinning can keep this physical layer coherent.
         obj['shellBaseVertexCount']=len(obj.data.vertices)
     sol=obj.modifiers.new('Cloth and leather thickness','SOLIDIFY');sol.thickness=.006
@@ -614,16 +614,16 @@ for obj,original,rigid in parts:
         assert len(obj.data.vertices)==count*2,'Unexpected coat-tail shell vertex order'
         changed=0;max_l1=0
         for i in range(count):
-            outside={g.group:g.weight for g in obj.data.vertices[i].groups}
-            inside={g.group:g.weight for g in obj.data.vertices[i+count].groups}
-            difference=sum(abs(outside.get(k,0)-inside.get(k,0)) for k in outside.keys()|inside.keys())
+            base_layer={g.group:g.weight for g in obj.data.vertices[i].groups}
+            duplicate_layer={g.group:g.weight for g in obj.data.vertices[i+count].groups}
+            difference=sum(abs(base_layer.get(k,0)-duplicate_layer.get(k,0)) for k in base_layer.keys()|duplicate_layer.keys())
             changed+=difference>1e-7;max_l1=max(max_l1,difference)
-            for k in inside:obj.vertex_groups[k].remove([i+count])
-            for k,weight in outside.items():obj.vertex_groups[k].add([i+count],weight,'REPLACE')
+            for k in duplicate_layer:obj.vertex_groups[k].remove([i+count])
+            for k,weight in base_layer.items():obj.vertex_groups[k].add([i+count],weight,'REPLACE')
         obj['coherentShellWeights']=True
         shell_weight_receipt.append({'part':obj.name,'pairedVertices':count,'changedPairs':changed,
-            'originalWeightL1DifferenceMax':max_l1,'outerWeightsChanged':False,
-            'method':'Inner layer uses the corresponding outer-layer weights before rest-pose baking'})
+            'originalWeightL1DifferenceMax':max_l1,'baseLayerWeightsChanged':False,
+            'method':'Solidify duplicate layer uses the corresponding original/base-layer weights before rest-pose baking; the first vertex block is not necessarily the physical outside on both panels'})
     mod=obj.modifiers.new('Smooth anatomical skinning','ARMATURE');mod.object=rig
 
 # Relax the A-pose into a natural resting stance and bake it as the rest pose.
