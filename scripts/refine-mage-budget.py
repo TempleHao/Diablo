@@ -5,6 +5,8 @@ Run only after the full source rig has had its authored rest pose applied.
 The project has not selected a license for its original code and artwork.
 """
 import bpy
+import bmesh
+import argparse
 import hashlib
 import json
 import math
@@ -16,7 +18,14 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-ROOT = Path(sys.argv[sys.argv.index('--') + 1]).resolve()
+cli = argparse.ArgumentParser(description=__doc__)
+cli.add_argument('project')
+cli.add_argument('--tail-ratio-l0', type=float, default=.70)
+cli.add_argument('--tail-ratio-l1', type=float, default=.32)
+cli.add_argument('--tail-error-l0', type=float, default=.012)
+cli.add_argument('--tail-error-l1', type=float, default=.025)
+ARGS = cli.parse_args(sys.argv[sys.argv.index('--') + 1:])
+ROOT = Path(ARGS.project).resolve()
 OUT = ROOT / 'assets-source/ash-archivist'
 OUT.mkdir(parents=True, exist_ok=True)
 (ROOT / 'dist/models').mkdir(parents=True, exist_ok=True)
@@ -27,7 +36,7 @@ PARTS = [o for o in bpy.data.objects if o.type == 'MESH' and o.parent == RIG]
 FOCUS = bpy.data.objects.get('face_focus')
 assert PARTS and FOCUS
 SOURCE_FILE = bpy.data.filepath
-REPORT = {'schema': 1, 'inputBlend': Path(SOURCE_FILE).name,
+REPORT = {'schema': 2, 'inputBlend': Path(SOURCE_FILE).name,
           'sourceBlendSha256': hashlib.sha256(Path(SOURCE_FILE).read_bytes()).hexdigest(),
           'sourceTriangles': sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in PARTS),
           'sourceBones': len(RIG.data.bones), 'atlasResolution': 2048,
@@ -83,6 +92,18 @@ for clip, frame in SAMPLES:
     REFERENCE[(clip, frame)] = {'parts': {o.name: points(o) for o in PARTS},
                                 'focus': np.array(FOCUS.matrix_world),
                                 'staff': np.array(RIG.pose.bones['wrist.R'].matrix)}
+
+# Tail validation uses every source vertex and both distance directions. The
+# former every-third-vertex, five-frame screen missed large Walk creases.
+TAILS = [o for o in PARTS if o.name.startswith('Split coat tail ')]
+assert len(TAILS) == 2
+TAIL_FRAMES = [('Walk', frame) for frame in range(int(CLIPS['Walk'].frame_range.x),
+                                               int(CLIPS['Walk'].frame_range.y)+1)]
+TAIL_FRAMES += [(clip, frame) for clip, frame in SAMPLES if clip != 'Walk']
+TAIL_REFERENCE = {}
+for clip, frame in TAIL_FRAMES:
+    pose(clip, frame)
+    TAIL_REFERENCE[(clip, frame)] = {o.name: points(o) for o in TAILS}
 
 KEEP = {'root', 'spine01', 'spine02', 'spine03', 'spine04', 'spine05', 'neck01', 'head'}
 for side in ('L', 'R'):
@@ -247,6 +268,19 @@ for obj in PARTS:
     for modifier in list(obj.modifiers):
         if modifier.type != 'ARMATURE':
             active(obj); bpy.ops.object.modifier_apply(modifier=modifier.name)
+# Preserve the authored high surface and its SourceUV shader sampling. The
+# runtime material replacement below must not become the high bake source.
+CLOTH_HIGH = {}
+for obj in PARTS:
+    material_names = {obj.data.materials[p.material_index].name for p in obj.data.polygons}
+    if material_names <= {'Weathered charcoal linen', 'Oxblood wool'}:
+        assert len(material_names) == 1
+        obj['budgetClothMaterial'] = next(iter(material_names))
+        high = obj.copy(); high.data = obj.data.copy(); high.name = 'Normal high '+obj.name
+        bpy.context.collection.objects.link(high)
+        for modifier in list(high.modifiers): high.modifiers.remove(modifier)
+        high.data.set_sharp_from_angle(angle=math.radians(60))
+        CLOTH_HIGH[obj.name] = high
 # Baking the union avoids one bake per material/object. The source rig and
 # objects remain available until geometry reduction has been checked.
 duplicates = []
@@ -359,13 +393,15 @@ def atlas_material(name, mask):
     for channel in ('basecolor', 'normal', 'orm', 'emission'):
         node = nodes.new('ShaderNodeTexImage'); node.image = IMAGES[channel]
         node.extension = 'EXTEND'
+        uv = nodes.new('ShaderNodeUVMap'); uv.uv_map = 'NormalUV' if channel == 'normal' else 'AtlasUV'
+        links.new(uv.outputs['UV'], node.inputs['Vector'])
         if channel == 'basecolor':
             links.new(node.outputs['Color'], p.inputs['Base Color'])
             if mask:
                 threshold = nodes.new('ShaderNodeMath'); threshold.operation = 'GREATER_THAN'; threshold.inputs[1].default_value = .5
                 links.new(node.outputs['Alpha'], threshold.inputs[0]); links.new(threshold.outputs[0], p.inputs['Alpha'])
         elif channel == 'normal':
-            n = nodes.new('ShaderNodeNormalMap'); n.uv_map = 'AtlasUV'; n.inputs['Strength'].default_value = 1
+            n = nodes.new('ShaderNodeNormalMap'); n.uv_map = 'NormalUV'; n.inputs['Strength'].default_value = 1
             links.new(node.outputs['Color'], n.inputs['Color']); links.new(n.outputs['Normal'], p.inputs['Normal'])
         elif channel == 'orm':
             split = nodes.new('ShaderNodeSeparateColor')
@@ -393,7 +429,11 @@ REPORT['atlas'] = {'method': 'Cycles emission channel and tangent normal bake; s
                    'maps': ['basecolor RGBA', 'tangent normal RGB', 'ORM roughness G metallic B', 'emission RGB'],
                    'mapEvidence': MAP_EVIDENCE,
                    'repeatHandling': 'Entire original UV range baked, positive affine transform, no wrapped polygon or cross-tile UV',
-                   'sourceNormalStrengthBaked': True}
+                   'sourceNormalStrengthBaked': True,
+                   'textureUv': {'basecolor': 0, 'orm': 0, 'emission': 0, 'normal': 1},
+                   'normalMethod': 'LOD-specific final-triangle cloth high-to-low bake; other surfaces retain their authored atlas normal',
+                   'normalScope': sorted(CLOTH_HIGH),
+                   'unchangedMapUv': 'AtlasUV retains authored face, hair-card and other base/ORM/emission resolution'}
 
 
 def is_body(obj): return 'face neck and articulated hands' in obj.name
@@ -404,23 +444,248 @@ def protected(obj):
         'scalp', 'hair', 'strand', 'forelock', 'sideburn', 'brow', 'focus', 'ash staff'))
 
 
-def reduce(obj, ratio):
+def reduce(obj, ratio, protection=None):
     if ratio >= .999 or triangles(obj) < 100: return
     active(obj)
     dec = obj.modifiers.new('Geometric budget collapse', 'DECIMATE')
     dec.ratio = max(.06, ratio); dec.use_collapse_triangulate = True
+    if protection:
+        dec.vertex_group = protection
+        dec.vertex_group_factor = 12
     while obj.modifiers.find(dec.name) > 0:
         bpy.ops.object.modifier_move_up(modifier=dec.name)
     bpy.ops.object.modifier_apply(modifier=dec.name)
     # Collapse can interpolate two original four-weight vertices into more
     # influences. Make the intended runtime skin explicit before measuring it.
+    normalize_weights(obj)
+
+
+def normalize_weights(obj):
+    retained = {g.index for g in obj.vertex_groups if g.name in KEEP}
     for vertex in obj.data.vertices:
-        chosen = sorted(((g.group, g.weight) for g in vertex.groups), key=lambda g: -g[1])[:4]
+        chosen = sorted(((g.group, g.weight) for g in vertex.groups if g.group in retained), key=lambda g: -g[1])[:4]
         total = sum(weight for group, weight in chosen)
         assert total > 0
         old_groups = [g.group for g in vertex.groups]
         for group in old_groups: obj.vertex_groups[group].remove([vertex.index])
         for group, weight in chosen: obj.vertex_groups[group].add([vertex.index], weight/total, 'REPLACE')
+
+
+def reduce_tail(obj, ratio):
+    """Collapse the authored outside only, then reproduce the thin shell.
+
+    Source strip/Solidify topology has corresponding vertex halves. Verify that
+    assumption rather than silently treating a different source as a strip.
+    """
+    count = len(obj.data.vertices)//2
+    assert len(obj.data.vertices) == count*2
+    outside = [p for p in obj.data.polygons if all(i < count for i in p.vertices)]
+    inside = [p for p in obj.data.polygons if all(i >= count for i in p.vertices)]
+    assert len(outside) == len(inside) == 384, 'Tail source shell topology changed'
+    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if v.index >= count], context='VERTS')
+    bm.to_mesh(obj.data); bm.free(); obj.data.update()
+    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
+    border = {v.index for e in bm.edges if e.is_boundary for v in e.verts}
+    bm.free()
+    protect = obj.vertex_groups.new(name='Budget tail border protection')
+    protect.add(sorted(border), 1, 'REPLACE')
+    # Mark high skin-weight gradients as well as the opening and hem. The group
+    # is only a collapse cost and is removed before normal skin normalization.
+    bone_groups = {g.index for g in obj.vertex_groups if g.name in KEEP}
+    skin = [{g.group:g.weight for g in v.groups if g.group in bone_groups} for v in obj.data.vertices]
+    for edge in obj.data.edges:
+        a, b = edge.vertices
+        gradient = sum(abs(skin[a].get(i, 0)-skin[b].get(i, 0)) for i in skin[a].keys()|skin[b].keys())
+        if gradient > .16: protect.add([a,b], min(1, gradient*2), 'REPLACE')
+    # The temporary group must not participate in the runtime skin weights.
+    active(obj)
+    dec = obj.modifiers.new('Outside-only weighted tail collapse', 'DECIMATE')
+    dec.ratio = ratio; dec.use_collapse_triangulate = True
+    protection_name = protect.name
+    dec.vertex_group = protection_name; dec.invert_vertex_group = True; dec.vertex_group_factor = 1
+    while obj.modifiers.find(dec.name) > 0: bpy.ops.object.modifier_move_up(modifier=dec.name)
+    bpy.ops.object.modifier_apply(modifier=dec.name)
+    remaining_protection = obj.vertex_groups.get(protection_name)
+    if remaining_protection: obj.vertex_groups.remove(remaining_protection)
+    normalize_weights(obj)
+    shell = obj.modifiers.new('Final corresponding 6mm tail shell', 'SOLIDIFY')
+    shell.thickness = .006; shell.offset = -1; shell.use_even_offset = True
+    while obj.modifiers.find(shell.name) > 0: bpy.ops.object.modifier_move_up(modifier=shell.name)
+    bpy.ops.object.modifier_apply(modifier=shell.name)
+    obj.data.update()
+    obj.data.set_sharp_from_angle(angle=math.radians(60))
+    return {'method': 'outside-only collapse, boundary and skin-gradient costs, final corresponding shell',
+            'outsideRatio': ratio, 'protectedOutsideVertices': len(border), 'thicknessMeters': .006,
+            'shellWeights': 'Solidify duplicates final outside weights to corresponding inside/rim vertices'}
+
+
+def finalize_triangles(obj):
+    active(obj)
+    tri = obj.modifiers.new('Frozen bake and export triangles', 'TRIANGULATE')
+    tri.quad_method = 'FIXED'; tri.ngon_method = 'BEAUTY'; tri.keep_custom_normals = True
+    while obj.modifiers.find(tri.name) > 0: bpy.ops.object.modifier_move_up(modifier=tri.name)
+    bpy.ops.object.modifier_apply(modifier=tri.name)
+    assert all(len(p.vertices) == 3 for p in obj.data.polygons)
+
+
+def uv_raster_evidence(objects, rectangle):
+    """Verify triangle interiors at the actual tile pixel centers.
+
+    This is a finite raster check, not a mathematical all-resolution claim.
+    Smart Project packs the selected shells together before the affine tile
+    placement; the raster check catches object-wise layouts accidentally stacked.
+    """
+    x, y, width, height = rectangle
+    coverage = np.zeros((height, width), dtype=np.uint16)
+    areas = []
+    for obj in objects:
+        uv = obj.data.uv_layers['NormalUV']
+        for polygon in obj.data.polygons:
+            a,b,c = [np.array(uv.data[i].uv)*2048-np.array((x,y)) for i in polygon.loop_indices]
+            ab,ac = b-a,c-a
+            determinant = ab[0]*ac[1]-ab[1]*ac[0]
+            areas.append(abs(float(determinant))*.5)
+            if abs(determinant) < 1e-10: continue
+            low=np.maximum(0,np.floor(np.minimum(np.minimum(a,b),c)).astype(int))
+            high=np.minimum((width-1,height-1),np.floor(np.maximum(np.maximum(a,b),c)).astype(int))
+            if np.any(high < low): continue
+            xx,yy=np.meshgrid(np.arange(low[0],high[0]+1)+.5,np.arange(low[1],high[1]+1)+.5)
+            dx,dy=xx-a[0],yy-a[1]
+            u=(dx*ac[1]-dy*ac[0])/determinant
+            v=(ab[0]*dy-ab[1]*dx)/determinant
+            interior=(u>1e-5)&(v>1e-5)&(u+v<1-1e-5)
+            coverage[low[1]:high[1]+1,low[0]:high[0]+1] += interior
+    result={'triangles':len(areas),'minimumTriangleAreaPixels':min(areas),
+            'coveredInteriorPixels':int(np.count_nonzero(coverage)),
+            'overlappingInteriorPixels':int(np.count_nonzero(coverage>1)),
+            'verification':'triangle interiors sampled at original 512px tile pixel centers'}
+    assert result['minimumTriangleAreaPixels'] > 1e-7, 'Degenerate normal UV triangle'
+    assert result['overlappingInteriorPixels'] == 0, 'Overlapping final cloth NormalUV interiors'
+    return result, coverage > 0
+
+
+def cloth_normal(lod, objects):
+    # Preserve face/hair and all unaffected normal pixels. Only cloth rectangles
+    # are repacked; base, ORM, emission and every AtlasUV coordinate stay intact.
+    result = image('normal-'+lod.lower(), True)
+    pixels = np.asarray(normal.pixels[:], dtype=np.float32).reshape(2048,2048,4)
+    groups = {}
+    atlas_before = {obj.name: np.array([tuple(loop.uv) for loop in obj.data.uv_layers['AtlasUV'].data]) for obj in objects}
+    for obj in objects:
+        layer = obj.data.uv_layers.new(name='NormalUV', do_init=False)
+        atlas = obj.data.uv_layers['AtlasUV']
+        for i in range(len(layer.data)): layer.data[i].uv = atlas.data[i].uv
+        if obj.get('budgetClothMaterial'):
+            groups.setdefault(obj['budgetClothMaterial'], []).append(obj)
+    evidence = {}
+    coverage_masks = {}
+    for material_name, group in groups.items():
+        x,y,width,height = ATLAS[material_name]['rectanglePixels']
+        pixels[y:y+height,x:x+width] = (.5,.5,1,1)
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in group:
+            obj.select_set(True); obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
+        bpy.context.view_layer.objects.active = group[0]
+        bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=.018,
+                                 area_weight=0, correct_aspect=False, scale_to_bounds=True)
+        bpy.ops.uv.pack_islands(rotate=True, margin_method='FRACTION', margin=8/(width-32), shape_method='CONCAVE')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for obj in group:
+            for loop in obj.data.uv_layers['NormalUV'].data:
+                loop.uv = ((x+16+loop.uv.x*(width-32))/2048,
+                           (y+16+loop.uv.y*(height-32))/2048)
+        raster,coverage_masks[material_name] = uv_raster_evidence(group, [x,y,width,height])
+        evidence[material_name] = {'rectanglePixels':[x,y,width,height], 'partCount':len(group),
+                                  'unwrap':'all final low cloth parts and shell sides packed together',
+                                  'bakeMarginPixels':3, 'islandMarginPixels':8,
+                                  **raster}
+    result.pixels.foreach_set(pixels.ravel())
+    target_nodes = {}
+    for mat in (OPAQUE,MASK):
+        target = mat.node_tree.nodes.new('ShaderNodeTexImage'); target.image = result
+        mat.node_tree.nodes.active = target; target_nodes[mat.name] = target
+    SCENE.render.bake.use_clear = False
+    SCENE.render.bake.use_selected_to_active = True
+    SCENE.render.bake.normal_space = 'TANGENT'
+    SCENE.render.bake.normal_r = 'POS_X'; SCENE.render.bake.normal_g = 'POS_Y'; SCENE.render.bake.normal_b = 'POS_Z'
+    SCENE.render.bake.margin = 3
+    SCENE.render.bake.cage_extrusion = .016
+    SCENE.render.bake.max_ray_distance = .032
+    bake_parts = []
+    for obj in objects:
+        if not obj.get('budgetClothMaterial'): continue
+        high = CLOTH_HIGH[obj['source_part']]
+        active(obj); high.select_set(True)
+        obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
+        bpy.ops.object.bake(type='NORMAL', uv_layer='NormalUV', use_selected_to_active=True)
+        bake_parts.append({'part':obj['source_part'], 'sourceTriangles':triangles(high),
+                           'finalTriangles':triangles(obj), 'selectedSourceObjects':1})
+        print('BUDGET_CLOTH_NORMAL', lod, obj['source_part'], flush=True)
+    for mat in (OPAQUE,MASK):
+        mat.node_tree.nodes.remove(target_nodes[mat.name])
+        for node in mat.node_tree.nodes:
+            if node.type == 'TEX_IMAGE' and node.image == normal: node.image = result
+            elif node.type == 'TEX_IMAGE' and node.image and node.image.name.startswith('Ash atlas normal-'):
+                node.image = result
+    for obj in objects:
+        obj.data.uv_layers.active = obj.data.uv_layers['AtlasUV']
+        obj.data.uv_layers['AtlasUV'].active_render = True
+        assert [layer.name for layer in obj.data.uv_layers] == ['AtlasUV','NormalUV']
+        assert np.array_equal(atlas_before[obj.name], np.array([tuple(loop.uv) for loop in obj.data.uv_layers['AtlasUV'].data]))
+    result.save(); result.pack()
+    file = Path(result.filepath_raw)
+    values = np.asarray(result.pixels[:],dtype=np.float32).reshape(-1,4)
+    value_image = values.reshape(2048,2048,4)
+    for material_name,mask in coverage_masks.items():
+        x,y,width,height = evidence[material_name]['rectanglePixels']
+        encoded = value_image[y:y+height,x:x+width][mask,:3]
+        vectors = encoded*2-1
+        lengths = np.linalg.norm(vectors,axis=1)
+        holes = np.count_nonzero(np.max(encoded,axis=1) < .01)
+        evidence[material_name]['bakedInteriorPixels'] = len(encoded)
+        evidence[material_name]['blackHolePixels'] = int(holes)
+        evidence[material_name]['backwardNormalPixels'] = int(np.count_nonzero(vectors[:,2] < -.01))
+        evidence[material_name]['encodedNormalLengthMin'] = float(lengths.min())
+        evidence[material_name]['encodedNormalLengthMax'] = float(lengths.max())
+        assert holes == 0, 'Unprojected black normal pixels in cloth interiors'
+    return {'method':'selected authored high to final triangulated low; one source object per cloth bake',
+            'uvLayer':'NormalUV', 'texCoord':1, 'uvTiles':evidence, 'parts':bake_parts,
+            'cageExtrusionMeters':.016, 'maxRayDistanceMeters':.032,
+            'useClear':False, 'file':file.name, 'bytes':file.stat().st_size,
+            'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),
+            'channelMinLinear':values.min(axis=0).tolist(), 'channelMaxLinear':values.max(axis=0).tolist(),
+            'limitations':['Part isolation does not itself prove absence of same-part shell ray crossover',
+                           'Cycles tangent bake and Three derivative tangent reconstruction require native render inspection']}
+
+
+def tail_errors(objects, limit):
+    samples = []
+    tails = {o['source_part']:o for o in objects if o['source_part'].startswith('Split coat tail ')}
+    for clip, frame in TAIL_FRAMES:
+        pose(clip, frame)
+        for source in TAILS:
+            obj = tails[source.name]
+            coords = TAIL_REFERENCE[(clip,frame)][source.name]
+            bvh = tree(obj)
+            forwards = [bvh.find_nearest(Vector(p))[3] for p in coords]
+            source_bvh = BVHTree.FromPolygons([Vector(p) for p in coords],
+                [tuple(p.vertices) for p in source.data.polygons], all_triangles=False)
+            backwards = [source_bvh.find_nearest(Vector(p))[3] for p in points(obj)]
+            worst = max(max(forwards),max(backwards))
+            samples.append({'part':source.name,'clip':clip,'frame':frame,
+                'sourceVertexSamples':len(forwards),'lowVertexSamples':len(backwards),
+                'sourceToLowMaxMeters':float(max(forwards)), 'lowToSourceMaxMeters':float(max(backwards)),
+                'bidirectionalMaxMeters':float(worst),
+                'sourceToLowRmsMeters':float(np.sqrt(np.mean(np.square(forwards)))),
+                'lowToSourceRmsMeters':float(np.sqrt(np.mean(np.square(backwards))))})
+    worst = max(samples,key=lambda row:row['bidirectionalMaxMeters'])
+    print('BUDGET_TAIL_SURFACE', json.dumps(worst), flush=True)
+    assert worst['bidirectionalMaxMeters'] <= limit, 'Tail surface gate missed: '+json.dumps(worst)
+    return {'method':'all source and final low vertices against the opposite deformed triangle surface',
+            'walkCoverage':'every integer authored frame', 'limitMeters':limit,
+            'maxMeters':worst['bidirectionalMaxMeters'], 'worstSample':worst,'samples':samples}
 
 
 def tree(obj):
@@ -435,21 +700,25 @@ def tree(obj):
 LODS = {}
 for lod, target in (('L0', 34500), ('L1', 14750)):
     objects = []
+    tail_methods = {}
     for source in PARTS:
         obj = source.copy(); obj.data = source.data.copy(); obj.name = lod+' '+source.name
         bpy.context.collection.objects.link(obj); objects.append(obj)
+        if source in TAILS:
+            tail_methods[source.name] = reduce_tail(obj, ARGS.tail_ratio_l0 if lod == 'L0' else ARGS.tail_ratio_l1)
         if lod == 'L1':
             if is_body(source): reduce(obj, .46)
             elif is_eye(source): reduce(obj, .40)
-    fixed = sum(triangles(o) for o, s in zip(objects, PARTS) if is_body(s) or protected(s) or is_eye(s) or triangles(o) < 100)
-    flexible = sum(triangles(o) for o, s in zip(objects, PARTS) if not (is_body(s) or protected(s) or is_eye(s)) and triangles(o) >= 100)
+    fixed = sum(triangles(o) for o, s in zip(objects, PARTS) if s in TAILS or is_body(s) or protected(s) or is_eye(s) or triangles(o) < 100)
+    flexible = sum(triangles(o) for o, s in zip(objects, PARTS) if not (s in TAILS or is_body(s) or protected(s) or is_eye(s)) and triangles(o) >= 100)
     ratio = min(1, (target-fixed)/max(1, flexible))
     assert ratio > .06, 'Protected geometry leaves no viable clothing budget'
     reduction = []
     for obj, source in zip(objects, PARTS):
         before = triangles(source)
-        if not (is_body(source) or protected(source) or is_eye(source)):
+        if not (source in TAILS or is_body(source) or protected(source) or is_eye(source)):
             reduce(obj, ratio)
+        finalize_triangles(obj)
         reduction.append({'part': source.name, 'sourceTriangles': before, 'triangles': triangles(obj)})
     surface_errors = []
     for clip, frame in SAMPLES:
@@ -477,8 +746,15 @@ for lod, target in (('L0', 34500), ('L1', 14750)):
     assert max(r['maxBoundsMeters'] for r in surface_errors) < .005, 'LOD changes grounding or silhouette bounds by more than 5 mm'
     unchanged_error = max(d['maxMeters'] for r in surface_errors for d in r['details'].values() if d['unchangedGeometry'])
     assert unchanged_error < .0005, 'Protected hair, brow, staff or focus geometry changed'
+    measured_tails = tail_errors(objects, ARGS.tail_error_l0 if lod == 'L0' else ARGS.tail_error_l1)
+    RIG.animation_data.action = None
+    for bone in RIG.pose.bones: bone.matrix_basis.identity()
+    SCENE.frame_set(1); bpy.context.view_layer.update()
+    normal_evidence = cloth_normal(lod, objects)
     LODS[lod] = {'triangles': total, 'parts': reduction, 'samples': surface_errors,
-                 'sampledBodySurfaceErrorMaxMeters': body_error}
+                 'sampledBodySurfaceErrorMaxMeters': body_error,
+                 'tailReduction':tail_methods, 'tailSurface':measured_tails,
+                 'clothNormal':normal_evidence, 'flexibleCollapseRatio':ratio}
     bpy.ops.object.select_all(action='DESELECT')
     for obj in objects: obj.select_set(True)
     bpy.context.view_layer.objects.active = objects[0]
@@ -500,19 +776,25 @@ for lod, target in (('L0', 34500), ('L1', 14750)):
     asset = ROOT / 'dist/models' / filename
     bpy.ops.export_scene.gltf(filepath=str(asset), export_format='GLB', use_selection=True,
         export_animations=True, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
-        export_skins=True, export_apply=False, export_image_format='AUTO')
+        export_skins=True, export_apply=False, export_tangents=False, export_image_format='AUTO')
     # The emitted GLB is the authority for actual joints/materials/images/tris.
     raw = asset.read_bytes(); json_length = int.from_bytes(raw[12:16], 'little')
     gltf = json.loads(raw[20:20+json_length])
     actual_triangles = sum(gltf['accessors'][p['indices']]['count']//3 for m in gltf['meshes'] for p in m['primitives'])
     actual_joints = max(len(s['joints']) for s in gltf['skins'])
-    assert actual_triangles == total and actual_joints == 60 and len(gltf['materials']) == 2
+    assert actual_triangles == total and actual_joints == 60 and len(gltf['materials']) == 2 and len(gltf['images']) == 4
+    primitives = [p for mesh in gltf['meshes'] for p in mesh['primitives']]
+    assert all('TEXCOORD_0' in p['attributes'] and 'TEXCOORD_1' in p['attributes'] and 'TANGENT' not in p['attributes'] for p in primitives)
     assert {m.get('alphaMode', 'OPAQUE') for m in gltf['materials']} == {'OPAQUE', 'MASK'}
     assert all(m.get('alphaCutoff', .5) == .5 for m in gltf['materials'] if m.get('alphaMode') == 'MASK')
     for material in gltf['materials']:
         assert material['pbrMetallicRoughness'].get('baseColorTexture')
         assert material['pbrMetallicRoughness'].get('metallicRoughnessTexture')
         assert material.get('normalTexture') and material.get('emissiveTexture')
+        assert material['normalTexture'].get('texCoord',0) == 1
+        assert material['pbrMetallicRoughness']['baseColorTexture'].get('texCoord',0) == 0
+        assert material['pbrMetallicRoughness']['metallicRoughnessTexture'].get('texCoord',0) == 0
+        assert material['emissiveTexture'].get('texCoord',0) == 0
     assert {a['name'] for a in gltf['animations']} == {'Idle', 'Walk', 'Cast'}
     assert any(n.get('name') == 'face_focus' for n in gltf['nodes'])
     stats = {'name': 'Ash Archivist / 灰烬典籍守望者', 'lod': lod,
@@ -521,6 +803,9 @@ for lod, target in (('L0', 34500), ('L1', 14750)):
         'glbBytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest(),
         'clips': ['Idle', 'Walk', 'Cast'], 'heightMeters': 1.91, 'baseLicense': 'CC0 1.0',
         'textures': 'Actual baked PBR atlases: original authored/procedural maps and CC0 MakeHuman eyes/skin',
+        'textureUv':REPORT['atlas']['textureUv'],
+        'normalBake':'LOD-specific isolated authored cloth high-to-final-low; original normal elsewhere',
+        'tailSurfaceErrorMaxMeters':measured_tails['maxMeters'],
         'limitations': REPORT['limitations']}
     LODS[lod]['actualExport'] = stats
     (OUT / ('statistics.json' if lod == 'L0' else 'combat-statistics.json')).write_text(json.dumps(stats, ensure_ascii=False, indent=2)+'\n')

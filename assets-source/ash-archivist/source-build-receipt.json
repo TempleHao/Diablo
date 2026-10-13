@@ -1,0 +1,14 @@
+{
+  "mode": "source-only",
+  "generatorSha256": "b255e064a4d5c7aabff0fb716f16fb07df13cde0bd15dceec95f2cb9e5e5de9c",
+  "sourceBlendSha256": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+  "triangles": 45710,
+  "bones": 163,
+  "clips": [
+    "Idle",
+    "Walk",
+    "Cast"
+  ],
+  "packedImages": 22,
+  "publishedAssetsTouched": false
+}
