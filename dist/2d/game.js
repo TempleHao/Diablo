@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
@@ -8,7 +9,7 @@ const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
 const skillData = SKILLS;
-const equippedSkills=['fire','nova','shard','armor','meteor','blink','heal'];
+const ACTIVE_LIMIT=7;
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
@@ -21,15 +22,19 @@ const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
-for(const [key,meta] of Object.entries(SKILLS)){
-  const button=document.createElement('button');button.type='button';button.dataset.skill=key;
-  button.className='skill-'+meta.school;
-  const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
-  const label=document.createElement('b');label.textContent=meta.name;
-  const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
-  const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);
-  $('abilitybar').append(button);
+function renderSkillBar(){
+  const bar=$('abilitybar');bar.replaceChildren();
+  for(const key of profile.activeSkills){
+    const meta=SKILLS[key];if(!meta)continue;
+    const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+    button.className='skill-'+meta.school;
+    const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+    const label=document.createElement('b');label.textContent=meta.name;
+    const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
+    const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);bar.append(button);
+  }
 }
+renderSkillBar();
 const regionSelect=$('region-select');
 REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
 regionSelect.value=String(profile.region);
@@ -189,13 +194,50 @@ function applyEquipmentChange(operate){
   }
   persist();renderInventory();updateHud();
 }
+function refreshCraftingPanel(){
+  const sel=$('auto-salvage');
+  sel.value=String(profile.autoSalvage);
+  const wallet=$('material-wallet');wallet.replaceChildren();
+  for(const [key,meta] of Object.entries(MATERIALS)){
+    const label=document.createElement('div');
+    label.className='material-token '+key;
+    const name=document.createElement('span');name.textContent=meta.label;
+    const count=document.createElement('strong');count.textContent=String(profile.materials[key]||0);
+    label.append(name,count);wallet.append(label);
+  }
+}
+$('auto-salvage').onchange=()=>{
+  profile.autoSalvage=Number($('auto-salvage').value);
+  persist();renderInventory();
+  announce(profile.autoSalvage<0?'自动分解已关闭':'自动分解已开启：仅自动回收选择的低品质装备',true);
+};
+$('salvage-bag').onclick=()=>{
+  if(profile.autoSalvage<0){announce('请先选择自动分解品质范围',true);return;}
+  const eligible=profile.inventory.filter(i=>i.rarity<=profile.autoSalvage&&!i.favorite&&!i.setId&&!Object.values(profile.equipped).includes(i.id));
+  if(!eligible.length){announce('没有符合自动分解规则的物品',true);return;}
+  if(!confirm('确认分解 '+eligible.length+' 件低品质装备？已装备、已收藏、传奇与套装会保留。'))return;
+  const results=dismantleAll(profile);
+  if(results.some(x=>x.item.id===selectedItemId))selectedItemId=null;
+  persist();renderInventory();
+  announce('批量分解完成 · '+results.length+' 件，结晶已入材料袋',true);
+};
+$('inv-temper').onclick=()=>{
+  if(!selectedItemId||!canTemper(profile,selectedItemId))return;
+  const item=profile.inventory.find(x=>x.id===selectedItemId),cost=temperCost(item);
+  const ok=confirm('花费 '+cost.gold+' 金币 / '+cost.dust+' 粉尘 / '+cost.crystal+' 结晶 / '+cost.core+' 传奇余烬，永久提高 '+item.name+' 的第一条词缀？');
+  if(!ok)return;
+  if(temper(profile,selectedItemId)){
+    persist();renderInventory();announce('装备淬炼成功 · 词缀获得强化',true);
+  }
+};
 function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
-  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';return;}
+  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
   panel.append(preview,title,meta);
+  if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
@@ -235,6 +277,10 @@ function inspectItem(item){
   const wornHere=Object.values(profile.equipped).includes(item.id);
   quick.disabled=false;
   quick.textContent=wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
+  const cost=temperCost(item);
+  $('inv-temper').disabled=!canTemper(profile,item.id);
+  $('inv-temper').textContent=item.tempered?'该装备已淬炼':canTemper(profile,item.id)?'用材料淬炼第一条词缀':'材料不足 / 无可淬炼词缀';
+  $('temper-cost').textContent='淬炼花费：'+cost.gold+' 金币 + '+cost.dust+' 粉尘 + '+cost.crystal+' 结晶 + '+cost.core+' 传奇余烬（每件仅可淬炼一次）';
   quick.onclick=()=>{
     selectedItemId=item.id;
     applyEquipmentChange(()=>{if(wornHere){
@@ -245,6 +291,7 @@ function inspectItem(item){
 $('inv-filter').onchange=()=>renderInventory();
 $('inv-sort').onchange=()=>renderInventory();
 function renderInventory(){
+  refreshCraftingPanel();
   const statsNow=stats(profile),statFields=[
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
@@ -292,9 +339,12 @@ function renderInventory(){
     const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
     use.onclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
-    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn;
-    recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>salvage(profile,item.id));};
-    actions.append(use,recycle);node.append(detail,actions);bag.append(node);
+    const favorite=document.createElement('button');favorite.textContent=item.favorite?'★ 保留':'☆ 收藏';
+    favorite.setAttribute('aria-label',item.favorite?'取消保留 '+item.name:'保护 '+item.name);
+    favorite.onclick=()=>{item.favorite=!item.favorite;persist();renderInventory();};
+    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn||item.favorite;
+    recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>dismantle(profile,item.id));};
+    actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
   }
   inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
@@ -308,7 +358,21 @@ function renderInventory(){
     btn.onclick=()=>{
       if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
     };
-    skillPanel.append(btn);
+    const slot=document.createElement('select');slot.className='skill-slot';
+    slot.setAttribute('aria-label',skill.name+' 装入快捷栏位置');
+    for(let i=0;i<ACTIVE_LIMIT;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+' 号位 · '+SKILLS[profile.activeSkills[i]].name;slot.append(opt);}
+    slot.value=String(Math.max(0,profile.activeSkills.indexOf(key)));
+    slot.disabled=locked;
+    slot.onchange=()=>{
+      if(profile.level<skill.unlocked)return;
+      const idx=Number(slot.value),prev=profile.activeSkills.indexOf(key),displaced=profile.activeSkills[idx];
+      profile.activeSkills[idx]=key;
+      if(prev>=0&&prev!==idx)profile.activeSkills[prev]=displaced;
+      persist();renderSkillBar();renderInventory();updateHud();
+      announce(skill.name+' 已加入快捷栏',true);
+    };
+    const cell=document.createElement('div');cell.className='skill-catalog-entry';cell.append(btn,slot);
+    skillPanel.append(cell);
   }
 }
 $('export-save').onclick=()=>{
