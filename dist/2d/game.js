@@ -310,7 +310,7 @@ function inspectItem(item){
     panel.append(grid);
   }
   const quick=$('inv-quick-equip');
-  const wornHere=Object.values(profile.equipped).includes(item.id);
+  const wornHere=profile.equipped[target]===item.id;
   quick.disabled=false;
   quick.textContent=wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
   $('mobile-equip').textContent=wornHere?'卸下装备':'穿戴 / 替换';
