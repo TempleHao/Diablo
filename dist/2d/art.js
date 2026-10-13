@@ -1,4 +1,5 @@
 import {drawMage} from './mage-portrait.js';
+import {drawAnimatedPixelMage} from './pixel-mage-demo.js';
 import {drawEquipmentIcon} from './equipment-icons.js';
 /**
  * 余烬纪事 · 2D 美术层
@@ -155,10 +156,13 @@ function shadow(ctx,x,y,rx,ry,alpha=.65){
   ctx.fillStyle='rgba(0,0,0,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+2,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
 export function hero(ctx,p,tick,gear,scale=.65){
-  ctx.save();ctx.translate(p.x,p.y);ctx.scale(scale,scale);
-  drawMage(ctx,{...p,x:0,y:0},tick,gear);
-  ctx.strokeStyle='#977a5148';ctx.lineWidth=1.6;ctx.beginPath();
-  ctx.ellipse(0,7,25,8,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+  // v0.3.5 TEST ONLY: switch to animated pixel sprite.
+  // Preserve the old vector fallback if image loading fails.
+  return drawAnimatedPixelMage(ctx,p,tick,gear,scale,(c,actor,time,worn,k)=>{
+    c.save();c.translate(actor.x,actor.y);c.scale(k,k);
+    drawMage(c,{...actor,x:0,y:0},time,worn);
+    c.restore();
+  });
 }
 let prevHeroWalk=0;
 export function enemy(ctx,e,tick,scale=.72){
