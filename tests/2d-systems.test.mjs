@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes} from '../dist/2d/systems.js';
-import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats} from '../dist/2d/core.js';
+import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats,upgradeSkill} from '../dist/2d/core.js';
 const i=(id,slot,affixes=[],setId=null)=>normalizeItem({id,slot,name:'测试装备',rarity:setId?4:2,ilvl:12,power:0,hp:0,mana:0,armor:0,affixes,setId});
 test('full paper doll includes 13 separate body and accessory slots',()=>{
   assert.equal(SLOTS.length,13);
@@ -63,4 +63,22 @@ test('declared skills include seven usable skills and two damage schools',()=>{
   assert.ok(Object.values(SKILLS).some(x=>x.school==='fire'));
   assert.ok(Object.values(SKILLS).some(x=>x.school==='cold'));
   assert.ok(Object.values(SKILLS).every(x=>x.unlocked>=1&&x.cooldown>0));
+});
+
+test('skill points can be invested and survive reload without duplication',()=>{
+  const p=sanitizeSave({version:1,level:7,inventory:[],equipped:{}});
+  assert.equal(p.skillPoints,6);
+  assert.equal(upgradeSkill(p,'meteor'),true);
+  assert.equal(upgradeSkill(p,'fire'),true);
+  assert.equal(p.skillPoints,4);
+  const copy=sanitizeSave(JSON.parse(JSON.stringify(p)));
+  assert.equal(copy.skillPoints,4);assert.equal(copy.skillRanks.meteor,1);assert.equal(copy.skillRanks.fire,1);
+});
+test('skill upgrade respects rank cap, unlock and available points',()=>{
+  const p=freshSave();
+  assert.equal(upgradeSkill(p,'meteor'),false);
+  assert.equal(upgradeSkill(p,'fire'),false);
+  const q=sanitizeSave({version:2,level:60,skillRanks:{fire:999,meteor:999,blink:999},inventory:[]});
+  assert.equal(q.skillRanks.fire,8);assert.equal(q.skillRanks.meteor,8);
+  assert.ok(q.skillPoints>=0);
 });
