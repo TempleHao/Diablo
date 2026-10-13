@@ -1,4 +1,5 @@
 import * as Art from './art.js';
+import { drawAtmosphere } from './lighting.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -464,6 +465,7 @@ function render(){
   }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
+  drawAtmosphere(ctx,{w:vw,h:vh,cam,hero,torches:dungeon.torches,missiles,enemies,tick,region:profile.region});
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
   const vign=ctx.createRadialGradient(vw/2,vh/2,Math.min(vw,vh)*.15,vw/2,vh/2,Math.max(vw,vh)*.75);
   vign.addColorStop(0,'#080c1100');vign.addColorStop(1,'#04050988');ctx.fillStyle=vign;ctx.fillRect(0,0,vw,vh);
