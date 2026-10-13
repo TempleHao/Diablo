@@ -1,4 +1,4 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, SKILLS } from './systems.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
 export const COLS = 40;
@@ -54,7 +54,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,region:0};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -71,6 +71,15 @@ export function sanitizeSave(raw){
       if(p.inventory.length>=MAX_ITEMS)break;
     }
   }
+  let pointsSpent=0;
+  if(raw.skillRanks&&typeof raw.skillRanks==='object'){
+    for(const key of Object.keys(SKILLS)){
+      const candidate=Math.min(8,Math.max(0,Math.floor(Number(raw.skillRanks[key])||0)));
+      const permitted=Math.min(candidate,Math.max(0,p.level-1-pointsSpent));
+      if(permitted&&p.level>=SKILLS[key].unlocked){p.skillRanks[key]=permitted;pointsSpent+=permitted;}
+    }
+  }
+  p.skillPoints=Math.max(0,p.level-1-pointsSpent);
   const used=new Set();
   for(const slot of SLOT_IDS){
     const id=raw.equipped?.[slot];
@@ -92,6 +101,12 @@ export function equip(p,id,target=null){
   const slot=getSlotForItem(item,target);if(!slot)return false;
   for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
   p.equipped[slot]=id;return true;
+}
+export function upgradeSkill(p,key){
+  if(!Object.hasOwn(SKILLS,key)||p.level<SKILLS[key].unlocked||p.skillPoints<1)return false;
+  const rank=p.skillRanks[key]||0;
+  if(rank>=8)return false;
+  p.skillRanks[key]=rank+1;p.skillPoints--;return true;
 }
 export function salvage(p,id){
   if(Object.values(p.equipped).includes(id))return false;
