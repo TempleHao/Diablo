@@ -115,9 +115,11 @@ try{
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
     assert.equal(await page.inputValue('#mage-skin-inventory'),'flame','equipment appearance must sync with start screen');
     await page.selectOption('#mage-skin-inventory','shadow');
     assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'shadow');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
     assert.equal(await page.locator('.catalog-skill').count(),11,'expanded spell catalogue should show all eleven skills');
     assert.equal(await page.locator('[data-skill]').count(),7,'only seven loadout slots visible on mobile');
     assert.equal(await page.locator('.skill-slot').count(),11,'skills may be assigned to the action bar');
