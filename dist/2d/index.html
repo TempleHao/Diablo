@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 技能与锻造预览 v0.3.3</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 移动端与美术优化 v0.3.4</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -38,6 +38,11 @@
 <div id="inventory" class="panel-wrap" hidden>
   <section class="inventory-panel" role="dialog" aria-modal="true" aria-labelledby="inv-heading">
     <div class="panel-head"><div><span class="eyebrow">持灯者 / 装备与成长</span><h2 id="inv-heading">旅人的行囊</h2></div><button type="button" id="inv-close" class="icon-button">✕</button></div>
+    <nav class="mobile-inv-tabs" id="mobile-inv-tabs" aria-label="移动端行囊页面">
+      <button type="button" data-view="bag" class="is-active" aria-pressed="true">背包</button>
+      <button type="button" data-view="compare" aria-pressed="false">装备对比</button>
+      <button type="button" data-view="gear" aria-pressed="false">已穿装备</button>
+    </nav>
     <div class="inv-workspace">
       <section class="inv-gear-column" aria-label="角色装备">
         <div class="paper-doll-head"><strong>角色装备 · 13 槽</strong><small>点击装备槽查看当前物品</small></div>
@@ -45,6 +50,8 @@
       </section>
       <section class="inv-details-column" aria-label="装备属性与对比">
         <div class="panel-subhead"><strong>装备详情与对比</strong><span>点选后可直接穿戴</span></div>
+        <div id="ring-choice" class="ring-choice" hidden><label>替换戒指位置 <select id="ring-target" aria-label="选择需要替换的戒指"><option value="ring1">戒指 I</option><option value="ring2">戒指 II</option></select></label></div>
+        <div id="compare-pair" class="compare-pair" aria-live="polite"></div>
         <div id="item-inspect" class="item-inspect">选择装备查看随机词缀与属性变化。</div>
         <button id="inv-quick-equip" type="button" class="primary quick-equip" disabled>选择装备后点击穿戴</button>
         <button id="inv-temper" type="button" class="tempering-action" disabled>选择有词缀的装备后可使用材料淬炼</button>
@@ -91,6 +98,11 @@
     <div class="panel-subhead"><strong>技能图鉴</strong><span>随角色等级解锁</span></div>
     <div id="skill-catalog" class="skill-catalog"></div>
     <small class="fineprint">技能 11 项：新增连锁闪电、冰暴领域、奥术护盾、烈焰地径。高级技能依角色等级解锁。</small>
+    <div class="mobile-inv-actions" id="mobile-inv-actions">
+      <div class="mobile-selection"><small>当前选中</small><strong id="mobile-item-name">点选背包中的装备</strong></div>
+      <button type="button" id="mobile-back-to-bag">返回背包</button>
+      <button type="button" id="mobile-equip" class="primary" disabled>穿戴装备</button>
+    </div>
     <div class="save-buttons"><button id="export-save" type="button">导出角色存档</button><button id="import-save" type="button">导入存档</button><input type="file" id="save-file" accept=".json,application/json" hidden></div>
     <small class="fineprint">背包物品可装备、对比、分解。支持旧 v0.1 / v0.2 存档迁移；数据保存在当前浏览器，推荐定期导出备份。</small>
   </section>
