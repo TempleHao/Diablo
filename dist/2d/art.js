@@ -230,4 +230,44 @@ export function loot(ctx,d,tick){
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
 }
+const EQUIPMENT_ICONS={
+  weapon:[[324,129,8,30],[324,159,8,30],[340,129,8,30],[323,10,10,21]],
+  offhand:[[323,10,10,21],[304,416,16,16],[340,129,8,30]],
+  head:[[304,336,16,16],[288,336,16,16],[368,345,16,23]],
+  shoulders:[[323,41,10,22],[304,352,16,16],[368,369,16,23]],
+  robe:[[368,345,16,23],[368,369,16,23],[384,345,16,23]],
+  gloves:[[307,39,10,24],[307,63,10,24],[304,352,16,16]],
+  belt:[[288,408,16,24],[304,416,16,16],[288,432,16,16]],
+  pants:[[368,369,16,23],[384,369,16,23],[368,345,16,23]],
+  boots:[[304,352,16,16],[320,352,16,16],[288,408,16,24]],
+  amulet:[[304,336,16,16],[289,385,6,7],[304,416,16,16]],
+  ring1:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
+  ring2:[[289,370,13,12],[289,385,6,7],[304,336,16,16]],
+  charm:[[340,129,8,30],[304,336,16,16],[289,385,6,7]]
+};
+const ICON_RARITY=['#bec3c9','#7daee7','#dbbc63','#d78b55','#88cb91'];
+export function drawItemIcon(canvas,item){
+  const ctx=canvas.getContext('2d');
+  const size=48,rarity=Math.max(0,Math.min(4,item?.rarity||0));
+  canvas.width=size;canvas.height=size;
+  const shade=ICON_RARITY[rarity],grad=ctx.createLinearGradient(0,0,48,48);
+  grad.addColorStop(0,'#34302d');grad.addColorStop(1,'#11161d');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
+  ctx.fillStyle=shade+'1c';ctx.fillRect(4,4,40,40);
+  ctx.strokeStyle=shade;ctx.lineWidth=1.5;ctx.strokeRect(2.5,2.5,43,43);
+  const frames=EQUIPMENT_ICONS[item?.slot]||EQUIPMENT_ICONS.charm;
+  const name=String(item?.name||'未知装备');
+  const code=[...name].reduce((n,c)=>((n*31+c.codePointAt(0))>>>0),7);
+  const frame=frames[code%frames.length];
+  if(ready){
+    ctx.imageSmoothingEnabled=false;
+    const aspect=frame[2]/frame[3],height=38,width=Math.min(34,height*aspect);
+    ctx.drawImage(atlas,...frame,24-width/2,24-height/2,width,height);
+    // High rarity produces an additional warm highlight but keeps item silhouettes legible.
+    if(rarity>=3){ctx.globalCompositeOperation='screen';ctx.fillStyle=shade+'35';ctx.fillRect(6,6,36,36);ctx.globalCompositeOperation='source-over';}
+  }else{
+    ctx.fillStyle=shade;
+    ctx.beginPath();ctx.moveTo(24,8);ctx.lineTo(36,22);ctx.lineTo(25,41);ctx.lineTo(12,22);ctx.closePath();ctx.fill();
+  }
+}
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}
