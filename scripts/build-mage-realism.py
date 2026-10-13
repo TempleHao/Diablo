@@ -186,6 +186,10 @@ def strip(name, rows, material, bone=None):
         for j in range(width-1): faces.append((k*width+j,k*width+j+1,(k+1)*width+j+1,(k+1)*width+j))
     uv=[[(j/(width-1),k/(len(rows)-1)),((j+1)/(width-1),k/(len(rows)-1)),((j+1)/(width-1),(k+1)/(len(rows)-1)),(j/(width-1),(k+1)/(len(rows)-1))] for k in range(len(rows)-1) for j in range(width-1)]
     obj=make_mesh(name,verts,faces,material,uv,rigid=bone)
+    if name.startswith('Split coat tail '):
+        # Solidify keeps original/duplicate vertices in corresponding halves.
+        # Record provenance so skinning can keep this physical layer coherent.
+        obj['shellBaseVertexCount']=len(obj.data.vertices)
     sol=obj.modifiers.new('Cloth and leather thickness','SOLIDIFY');sol.thickness=.006
     bpy.context.view_layer.objects.active=obj;bpy.ops.object.modifier_apply(modifier=sol.name)
     return obj
@@ -593,6 +597,7 @@ def segment_weights(v):
         candidates.append((dist,n))
     candidates=sorted(candidates)[:3];total=sum(math.exp(-d*26) for d,n in candidates)
     return [(n,math.exp(-d*26)/total) for d,n in candidates]
+shell_weight_receipt=[]
 for obj,original,rigid in parts:
     obj.parent=rig
     groups_by_name={}
@@ -604,6 +609,21 @@ for obj,original,rigid in parts:
         for name,w in ws:
             if name not in groups_by_name:groups_by_name[name]=obj.vertex_groups.new(name=name)
             groups_by_name[name].add([v.index],w/total,'REPLACE')
+    if obj.get('shellBaseVertexCount'):
+        count=int(obj['shellBaseVertexCount'])
+        assert len(obj.data.vertices)==count*2,'Unexpected coat-tail shell vertex order'
+        changed=0;max_l1=0
+        for i in range(count):
+            base_layer={g.group:g.weight for g in obj.data.vertices[i].groups}
+            duplicate_layer={g.group:g.weight for g in obj.data.vertices[i+count].groups}
+            difference=sum(abs(base_layer.get(k,0)-duplicate_layer.get(k,0)) for k in base_layer.keys()|duplicate_layer.keys())
+            changed+=difference>1e-7;max_l1=max(max_l1,difference)
+            for k in duplicate_layer:obj.vertex_groups[k].remove([i+count])
+            for k,weight in base_layer.items():obj.vertex_groups[k].add([i+count],weight,'REPLACE')
+        obj['coherentShellWeights']=True
+        shell_weight_receipt.append({'part':obj.name,'pairedVertices':count,'changedPairs':changed,
+            'originalWeightL1DifferenceMax':max_l1,'baseLayerWeightsChanged':False,
+            'method':'Solidify duplicate layer uses the corresponding original/base-layer weights before rest-pose baking; the first vertex block is not necessarily the physical outside on both panels'})
     mod=obj.modifiers.new('Smooth anatomical skinning','ARMATURE');mod.object=rig
 
 # Relax the A-pose into a natural resting stance and bake it as the rest pose.
@@ -703,6 +723,26 @@ ground.data.materials.append(ground_mat)
 bpy.ops.object.camera_add(location=(2.1,-4.5,2.45));camera=bpy.context.object;camera.name='Studio evidence camera';camera.data.lens=66;camera.rotation_euler=(Vector((0,0,1.04))-camera.location).to_track_quat('-Z','Y').to_euler();scene.camera=camera
 scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=False;scene.render.resolution_x=900;scene.render.resolution_y=1100;scene.render.resolution_percentage=100
 scene.view_settings.view_transform='AgX'
+if '--source-only' in sys.argv:
+    # Rebuild the editable upstream rig without touching a published GLB or
+    # statistics. Packed images keep the frozen source independent of caches.
+    bpy.ops.file.pack_all()
+    source_blend=out/'ash-archivist.blend'
+    bpy.ops.wm.save_as_mainfile(filepath=str(source_blend))
+    source_receipt={
+        'mode':'source-only',
+        'generatorSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        'sourceBlendSha256':hashlib.sha256(source_blend.read_bytes()).hexdigest(),
+        'triangles':sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o,_,_ in parts),
+        'bones':len(rig.data.bones),
+        'clips':['Idle','Walk','Cast'],
+        'packedImages':sum(bool(i.packed_file) for i in bpy.data.images),
+        'coherentCoatTailWeights':shell_weight_receipt,
+        'publishedAssetsTouched':False
+    }
+    (out/'source-build-receipt.json').write_text(json.dumps(source_receipt,indent=2)+'\n')
+    print('ASH_ARCHIVIST_SOURCE_READY',json.dumps(source_receipt),flush=True)
+    sys.exit(0)
 scene.render.image_settings.file_format='PNG';scene.render.filepath=str(out/'character-studio.png')
 bpy.ops.render.render(write_still=True)
 camera.location=(.75,-2.30,1.87);camera.rotation_euler=(Vector((0,-.03,1.74))-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.lens=92

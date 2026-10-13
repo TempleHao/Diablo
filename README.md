@@ -71,6 +71,8 @@ npm run check
 
 ## 模型源文件
 
+2026-10-13已单独修复源模型布尾两层的权重关系，并增加`--source-only`制作模式；42时点×两片的84组真实动画层采样通过。当前发布GLB仍为0.3.0-preview.2，新法线候选尚未通过视觉检查，续做分支为`checkpoint/art-02-d1`。实际范围与恢复方法见[源模型修正记录](docs/VALIDATION-ART-02-D1-SOURCE.md)。
+
 进入游戏使用 `dist/models/ember-mage-combat.glb`（14,713三角面/3,852,640字节）；人物查看才按需加载 `ember-mage-realism.glb`（34,451三角面/4,676,752字节）。两者均60骨骼、2材质/2 primitives、4张嵌入PBR图集，包含相同Idle/Walk/Cast与面部取景挂点。人体、形变、骨架/眼睛和系统皮肤采用已登记的MakeHuman CC0图形资源；服装、装备与生成管线为本项目制作，不把第三方基底称为从零原创。来源清单见 [human-base](assets-source/human-base/README.md)。
 
 已在Blender **4.3.2**生成候选：
