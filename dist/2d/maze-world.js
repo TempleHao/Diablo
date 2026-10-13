@@ -5,6 +5,7 @@
  */
 import { generateMaze, discoverAround } from './maze.js';
 import { mulberry32 } from './core.js';
+import {drawMasonryCell,masonryVariant} from './masonry-art.js';
 export const CELL = 48, STRIDE = 8;
 const XY=(world,x,y)=>y*world.cols+x;
 export function createMazeWorld(seed,region=0){
@@ -77,17 +78,21 @@ export function drawMazeWalls(ctx,world,cam,vw,vh){
   const {cols,rows,floorMask}=world;
   const x0=Math.max(0,Math.floor(cam.x/CELL)-2),x1=Math.min(cols-1,Math.ceil((cam.x+vw)/CELL)+2);
   const y0=Math.max(0,Math.floor(cam.y/CELL)-2),y1=Math.min(rows-1,Math.ceil((cam.y+vh)/CELL)+2);
+  // Paint traversable masonry first. This pass replaces the old flat/pixel floor
+  // only inside the generated maze mask, preserving physical door apertures.
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    if(!floorMask[y*cols+x])continue;
+    drawMasonryCell(ctx,x*CELL,y*CELL,'floor',masonryVariant(x,y,world.seed));
+  }
+  // Then paint raised, directional wall faces over the floor. Two passes keep
+  // seams stable when the camera moves and never change collision topology.
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
     if(floorMask[y*cols+x])continue;
     const px=x*CELL,py=y*CELL;
     const adj=(x>0&&floorMask[y*cols+x-1])||(x+1<cols&&floorMask[y*cols+x+1])||
       (y>0&&floorMask[(y-1)*cols+x])||(y+1<rows&&floorMask[(y+1)*cols+x]);
-    ctx.fillStyle=adj?'#303238':'#05080e';ctx.fillRect(px,py,CELL+1,CELL+1);
-    if(adj){
-      ctx.fillStyle='#69655a';ctx.fillRect(px+2,py+2,CELL-4,5);
-      ctx.strokeStyle='#13171d';ctx.lineWidth=2;ctx.strokeRect(px+2,py+7,CELL-4,CELL-10);
-      if((x+y)%2===0){ctx.strokeStyle='#454448';ctx.beginPath();ctx.moveTo(px+CELL/2,py+10);ctx.lineTo(px+CELL/2,py+CELL-4);ctx.stroke();}
-    }
+    if(adj)drawMasonryCell(ctx,px,py,'wall',masonryVariant(x,y,world.seed));
+    else {ctx.fillStyle='#05080e';ctx.fillRect(px,py,CELL+1,CELL+1);}
   }
   // Room boundaries are architectural gameplay walls rather than scattered boulders.
   for(const room of world.layout.rooms){
