@@ -572,7 +572,7 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
     bossTest:()=>{
       if(state!=='playing')throw new Error('start game first');
       enemies.length=0;kills=total;
-      const e=spawn('boss',{x:hero.x+100,y:hero.y-20});
+      const e=spawn('boss',{x:hero.x+180,y:hero.y-20});
       e.hp=1;dealDamage(e,10000,'fire');
       return {state,bossDefeated,drops:drops.map(d=>({name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent})),
         pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
