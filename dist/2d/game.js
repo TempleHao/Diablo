@@ -177,7 +177,7 @@ function onPause(){ if(!$('inventory').hidden)return; if(state==='playing')showM
 $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
-const mobileMode=()=>window.matchMedia('(max-width:700px)').matches;
+const mobileMode=()=>window.matchMedia('(max-width:700px), (max-height:550px) and (pointer:coarse)').matches;
 function setMobileInventoryView(view){
   if(!['bag','gear','compare'].includes(view))return;
   $('inventory').dataset.mobileView=view;
@@ -673,8 +673,8 @@ function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,d
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
-const characterScale=()=>vw<=700?.55:.67;
-const monsterScale=()=>vw<=700?.59:.74;
+const characterScale=()=>mobileMode()?.54:.65;
+const monsterScale=()=>mobileMode()?.57:.70;
 function enemyDraw(e){ Art.enemy(ctx,e,tick,monsterScale()*(e.kind==='boss'?1.08:1)); }
 function heroDraw(){
   const worn={};for(const [slot,id] of Object.entries(profile.equipped))worn[slot]=profile.inventory.find(x=>x.id===id)||null;
