@@ -56,6 +56,11 @@ try{
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
     await page.keyboard.down('d');await page.waitForTimeout(110);await page.keyboard.up('d');
     await page.keyboard.press('2');
+    await page.keyboard.press('3');
+    await page.keyboard.press('4');
+    await page.keyboard.press('q');
+    await page.waitForTimeout(960);
+    assert.ok(Number(await page.locator('#mana-num').innerText())<100,'spell mana should really be consumed');
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
