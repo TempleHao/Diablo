@@ -1,4 +1,4 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, SKILLS } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, SKILLS, REGION_DATA } from './systems.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
 export const COLS = 40;
@@ -16,8 +16,8 @@ export function mulberry32(seed) {
 }
 export function makeDungeon(seed = 2026, region = 0) {
   const rng = mulberry32(seed), blocks = [], torches = [];
-  const chapter=clamp(Math.floor(region),0,4);
-  const density=[.38,.49,.31,.43,.54][chapter];
+  const chapter=clamp(Math.floor(region),0,REGION_DATA.length-1);
+  const density=[.38,.49,.31,.43,.54,.42,.33,.45,.57][chapter];
   for (let y = 2; y < ROWS - 2; y += 2) {
     for (let x = 2; x < COLS - 2; x += 2) {
       // 中央行进轴线、出生区和 BOSS 场地始终可走。
@@ -25,12 +25,12 @@ export function makeDungeon(seed = 2026, region = 0) {
       if (Math.hypot(x - COLS / 2, y - 7) < 5) continue;
       if (rng() < density) {
         // 将少量散点石柱组织成断裂墙面，形成有方向感的地牢空间。
-        const brokenWall = rng() < [.24,.47,.14,.22,.39][chapter];
+        const brokenWall = rng() < [.24,.47,.14,.22,.39,.52,.18,.33,.56][chapter];
         const w = brokenWall ? (rng() < .5 ? 111 : 146) : rng() < .24 ? 57 : 38;
         const h = brokenWall ? 33 : rng() < .27 ? 56 : 38;
         blocks.push({ x: x * TILE - w / 2, y: y * TILE - h / 2, w, h,
           kind: brokenWall ? 'wall' : 'pillar', variant: Math.floor(rng() * 3) });
-        if (rng() < [.36,.17,.47,.11,.23][chapter]) torches.push({ x: x * TILE + 24, y: y * TILE - 24 });
+        if (rng() < [.36,.17,.47,.11,.23,.12,.32,.13,.45][chapter]) torches.push({ x: x * TILE + 24, y: y * TILE - 24 });
       }
     }
   }
@@ -54,21 +54,22 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:[0,0,0,0,0],pendingLoot:[]};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0)};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
   if(!raw||typeof raw!=='object'||![1,2].includes(raw.version))return p;
   for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
-    const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?4:100000000;
+    const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
-  if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:5},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
+  if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
+  if(Array.isArray(raw.regionVisits))p.regionVisits=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.regionVisits[i])?Math.floor(raw.regionVisits[i]):0,0,1000000));
   const pendingIds=new Set();
   if(Array.isArray(raw.pendingLoot))for(const entry of raw.pendingLoot.slice(0,MAX_ITEMS*2)){
     const item=normalizeItem(entry?.item);
-    if(!item||pendingIds.has(item.id)||!Number.isInteger(entry?.region)||entry.region<0||entry.region>4)continue;
+    if(!item||pendingIds.has(item.id)||!Number.isInteger(entry?.region)||entry.region<0||entry.region>=REGION_DATA.length)continue;
     pendingIds.add(item.id);
     if(p.pendingLoot.length<MAX_ITEMS)p.pendingLoot.push({item,region:entry.region});
   }

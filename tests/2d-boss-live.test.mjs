@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mulberry32,freshSave,sanitizeSave} from '../dist/2d/core.js';
 import {BOSS_POOLS,rollBossRewards} from '../dist/2d/boss-loot.js';
 test('every regional boss first kill guarantees a collectible exclusive legendary',()=>{
- for(let region=0;region<5;region++){
+ for(let region=0;region<BOSS_POOLS.length;region++){
    let n=0;const loot=rollBossRewards(mulberry32(800+region),12,region,0,()=>String(region)+'-'+(++n));
    assert.equal(loot.firstKill,true);
    assert.equal(loot.exclusive,true);
@@ -44,5 +44,6 @@ test('pending loot cannot be forged from malformed IDs or unrelated invalid regi
  {item:{id:'invalid',slot:'weapon',name:'坏奖励',rarity:3,ilvl:5,power:0,hp:0,mana:0,armor:0,affixes:[]},region:999}
  ],bossKills:[2,3,-100,Infinity]});
  assert.equal(p.pendingLoot.length,1);
- assert.deepEqual(p.bossKills,[2,3,0,0,0]);
+ assert.equal(p.bossKills.length,BOSS_POOLS.length);
+ assert.deepEqual(p.bossKills.slice(0,5),[2,3,0,0,0]);
 });
