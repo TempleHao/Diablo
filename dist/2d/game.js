@@ -414,7 +414,7 @@ function update(dt){
   }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
@@ -451,8 +451,8 @@ function render(){
   for(const m of missiles)missileDraw(m);
   for(const h of hazards){
     ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
-    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':'#bf80e8';
-    ctx.shadowColor=h.type==='nova'?'#8acde5':'#9e77c7';ctx.shadowBlur=15;
+    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':h.type==='meteor'?'#ff663b':'#bf80e8';
+    ctx.shadowColor=h.type==='nova'?'#8acde5':h.type==='meteor'?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
     ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   }
