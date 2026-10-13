@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 系统扩展 v0.3</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 技能与锻造预览 v0.3.3</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -29,25 +29,84 @@
     <h1>余烬<span>纪事</span></h1>
     <p class="lead">断昼之后，最后的火种在黑暗里微微颤动。</p>
     <p>你是灰烬边境的持灯者。深入地窟，击败徘徊的空潮仆从，夺回失落的炉心。装备与成长将随每一次远征保留。</p>
-    <div class="features"><span>✧ 五大区域</span><span>✧ 13 槽装备与词缀</span><span>✧ 七项技能</span></div>
+    <div class="features"><span>✧ 九张探索地图</span><span>✧ 13 槽装备与词缀</span><span>✧ 十一项技能</span></div>
     <button class="primary" id="modal-primary" type="button">进入灰烬地窟 <span>→</span></button>
     <button class="subtle" id="modal-secondary" type="button" hidden>继续游戏</button>
-    <small class="fineprint">免费单人原型 · 不使用原版暗黑破坏神素材 · 建议桌面或手机横屏</small>
+    <small class="fineprint">单人试玩原型 · Boss 可掉专属装备 · 点击行囊查看物品图片 · 写实 2.5D 仍在开发</small>
   </section>
 </div>
 <div id="inventory" class="panel-wrap" hidden>
   <section class="inventory-panel" role="dialog" aria-modal="true" aria-labelledby="inv-heading">
     <div class="panel-head"><div><span class="eyebrow">持灯者 / 装备与成长</span><h2 id="inv-heading">旅人的行囊</h2></div><button type="button" id="inv-close" class="icon-button">✕</button></div>
-    <div class="character-stats" id="character-stats"></div>
-    <div class="paper-doll-head"><strong>全身装备 · 13 槽位</strong><small>装备加成作用于实际战斗</small></div>
-    <div class="equipment" id="equipment"></div>
-    <div id="item-inspect" class="item-inspect">选择装备查看词缀。</div>
-    <div class="panel-subhead"><strong>背包</strong><span id="bag-count">0 / 30</span></div>
-    <div class="inventory-items" id="inventory-items"></div>
+    <div class="inv-workspace">
+      <section class="inv-gear-column" aria-label="角色装备">
+        <div class="paper-doll-head"><strong>角色装备 · 13 槽</strong><small>点击装备槽查看当前物品</small></div>
+        <div class="equipment" id="equipment"></div>
+      </section>
+      <section class="inv-details-column" aria-label="装备属性与对比">
+        <div class="panel-subhead"><strong>装备详情与对比</strong><span>点选后可直接穿戴</span></div>
+        <div id="item-inspect" class="item-inspect">选择装备查看随机词缀与属性变化。</div>
+        <button id="inv-quick-equip" type="button" class="primary quick-equip" disabled>选择装备后点击穿戴</button>
+        <button id="inv-temper" type="button" class="tempering-action" disabled>选择有词缀的装备后可使用材料淬炼</button>
+        <div id="temper-cost" class="crafting-tip"></div>
+        <div class="panel-subhead"><strong>角色属性</strong></div>
+        <div class="character-stats" id="character-stats"></div>
+      </section>
+      <section class="inv-bag-column" aria-label="可筛选的背包">
+        <div class="panel-subhead"><strong>背包</strong><span id="bag-count">0 / 80</span></div>
+        <div class="salvage-settings">
+          <label>自动分解
+            <select id="auto-salvage" aria-label="自动分解品质上限">
+              <option value="-1">关闭（默认）</option>
+              <option value="0">普通装备</option>
+              <option value="1">普通 + 魔法</option>
+              <option value="2">普通 + 魔法 + 稀有</option>
+            </select>
+          </label>
+          <button id="salvage-bag" type="button">一键分解符合规则装备</button>
+          <small>已装备、收藏、传奇及套装永久受保护；关闭时全部保留。</small>
+        </div>
+        <div class="material-wallet" id="material-wallet" aria-live="polite"></div>
+        <div class="bag-controls">
+          <label>类别
+            <select id="inv-filter" aria-label="背包装备类别">
+              <option value="all">全部</option>
+              <option value="weapon">武器 / 副手</option>
+              <option value="armor">防具</option>
+              <option value="accessory">饰品</option>
+            </select>
+          </label>
+          <label>排序
+            <select id="inv-sort" aria-label="背包排序">
+              <option value="rarity">品质优先</option>
+              <option value="score">装备评分</option>
+              <option value="level">物品等级</option>
+            </select>
+          </label>
+        </div>
+        <div class="inventory-items" id="inventory-items"></div>
+        <small class="fineprint">单击查看与对比，双击直接装备；手机点选后按“穿戴”。</small>
+      </section>
+    </div>
     <div class="panel-subhead"><strong>技能图鉴</strong><span>随角色等级解锁</span></div>
     <div id="skill-catalog" class="skill-catalog"></div>
+    <small class="fineprint">技能 11 项：新增连锁闪电、冰暴领域、奥术护盾、烈焰地径。高级技能依角色等级解锁。</small>
     <div class="save-buttons"><button id="export-save" type="button">导出角色存档</button><button id="import-save" type="button">导入存档</button><input type="file" id="save-file" accept=".json,application/json" hidden></div>
     <small class="fineprint">背包物品可装备、对比、分解。支持旧 v0.1 / v0.2 存档迁移；数据保存在当前浏览器，推荐定期导出备份。</small>
+  </section>
+</div>
+<button id="portal-open" class="portal-open" type="button" hidden>✦ 传送阵已开启 · 选择下一地图 <kbd>T</kbd></button>
+<div id="portal-panel" class="panel-wrap portal-wrap" hidden>
+  <section class="portal-dialog" role="dialog" aria-modal="true" aria-labelledby="portal-heading">
+    <span class="eyebrow">首领已击败 · 传送阵开启</span>
+    <h2 id="portal-heading">踏入下一段黑暗</h2>
+    <p>战利品不会因为选择传送而消失，未拾取的 Boss 装备会保存。你也可以留在本层继续探索。</p>
+    <label>选择目的地 <select id="portal-destination" aria-label="下一张地图"></select></label>
+    <div class="portal-actions">
+      <button id="portal-next" type="button" class="primary">进入指定地图</button>
+      <button id="portal-random" type="button">随机远征</button>
+      <button id="portal-stay" type="button">继续探索本层</button>
+    </div>
   </section>
 </div>
 <script type="module" src="./game.js"></script>

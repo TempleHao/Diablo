@@ -1,6 +1,8 @@
 import * as Art from './art.js';
-import {BOSS_POOLS,rollBossRewards} from './boss-loot.js';
-import {createMazeWorld, roomAt, roomCenter, enterRoom, drawMazeWalls, drawExplorationFog} from './maze-world.js';
+import {createMazeWorld,roomAt,roomCenter,enterRoom,drawMazeWalls,drawExplorationFog} from './maze-world.js';
+import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
+import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
+import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -8,7 +10,7 @@ const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
 const skillData = SKILLS;
-const equippedSkills=['fire','nova','shard','armor','meteor','blink','heal'];
+const ACTIVE_LIMIT=7;
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], state = 'intro', tick = 0, last = 0;
@@ -18,19 +20,24 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, combo=0, currentRoom=null, enteredRooms=new Set(), bossDefeated=false;
+let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
+let currentRoom=null,enteredRooms=new Set();
 const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
-for(const [key,meta] of Object.entries(SKILLS)){
-  const button=document.createElement('button');button.type='button';button.dataset.skill=key;
-  button.className='skill-'+meta.school;
-  const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
-  const label=document.createElement('b');label.textContent=meta.name;
-  const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
-  const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);
-  $('abilitybar').append(button);
+function renderSkillBar(){
+  const bar=$('abilitybar');bar.replaceChildren();
+  for(const key of profile.activeSkills){
+    const meta=SKILLS[key];if(!meta)continue;
+    const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+    button.className='skill-'+meta.school;
+    const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+    const label=document.createElement('b');label.textContent=meta.name;
+    const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
+    const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);bar.append(button);
+  }
 }
+renderSkillBar();
 const regionSelect=$('region-select');
 REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
 regionSelect.value=String(profile.region);
@@ -43,6 +50,30 @@ regionSelect.addEventListener('change',()=>{
   profile.region=next;build();persist();if(state==='victory'||state==='death')state='intro';
   announce('已进入 '+REGION_DATA[next].name,true);
 });
+
+const portalOptions=$('portal-destination');
+for(const {index,name} of destinationOptions(profile.region).destinations){
+  const option=document.createElement('option');option.value=String(index);option.textContent=name;portalOptions.append(option);
+}
+function openPortalMenu(){
+  if(!bossDefeated||!portal||state!=='playing')return false;
+  clearInput();$('portal-panel').hidden=false;$('portal-open').hidden=true;
+  $('portal-destination').value=String(destinationOptions(profile.region).next);
+  return true;
+}
+function closePortalMenu(){$('portal-panel').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
+function travelTo(region){
+  if(!bossDefeated||!validateDestination(region))return false;
+  closePortalMenu();profile.region=region;
+  profile.regionVisits[region]=(profile.regionVisits[region]||0)+1;
+  build();persist();announce('传送抵达 '+REGION_DATA[region].name+' · 新的远征开始',true);
+  return true;
+}
+$('portal-open').onclick=openPortalMenu;
+$('portal-stay').onclick=closePortalMenu;
+$('portal-next').onclick=()=>travelTo(Number($('portal-destination').value));
+$('portal-random').onclick=()=>travelTo(pickRandomDestination(rng,profile.region));
+$('portal-panel').addEventListener('pointerdown',e=>{if(e.target===$('portal-panel'))closePortalMenu();});
 
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
@@ -97,16 +128,25 @@ function enterChamber(id){
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
-  const seed = 20261013 + profile.clears*19+profile.region*7919;
-  rng=mulberry32(seed); dungeon=createMazeWorld(seed,profile.region);
+  const seed=20261013+profile.clears*19+profile.region*7919;
+  rng=mulberry32(seed);dungeon=createMazeWorld(seed,profile.region);
   const s=stats(profile);
-  hero={x:dungeon.start.x,y:dungeon.start.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;currentRoom=null;enteredRooms=new Set();bossDefeated=false;
+  hero={x:dungeon.start.x,y:dungeon.start.y,radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
+  armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;currentRoom=null;enteredRooms=new Set();
+  $('portal-panel').hidden=true;$('portal-open').hidden=true;
+  for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region){
+    const x=dungeon.start.x+(i%3-1)*38,y=dungeon.start.y-45-Math.floor(i/3)*36;
+    const pos=walkable(x,y,17,dungeon)?{x,y}:dungeon.start;
+    drops.push({...pos,item:pending.item,age:0,persistent:true});
+  }
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   enterChamber(dungeon.layout.entrance);
   ui.boss.hidden=true;
-  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='探索 '+dungeon.layout.rooms.length+' 间房 · 找到通往司祭圣所的路径';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;
+  $('map-label').textContent=REGION_DATA[profile.region].label;
+  ui.progress.textContent='探索 '+dungeon.layout.rooms.length+' 间房 · 寻找首领圣所';
   updateHud();
 }
 function spawn(kind,location=null) {
@@ -116,10 +156,10 @@ function spawn(kind,location=null) {
   const maxHp=(b?550:brute?95:archer?50:kind==='spider'?42:64)*(1+run*.22+Math.max(0,lv-1)*.055);
   const e={id:nextId++,x:p.x,y:p.y,kind,hp:maxHp,maxHp,speed:b?105:brute?84:archer?112:kind==='spider'?172:130,
     radius:b?39:brute?24:17,attack:rng()*1.5,slow:0,phase:rng()*6.28,blink:0,windup:0};
-  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;announce('地窟深处，'+BOSS_POOLS[profile.region].name+'已苏醒！',true);}
+  enemies.push(e); if(b){boss=e;ui.boss.hidden=false;ui.boss.querySelector('span').textContent=BOSS_POOLS[profile.region].name;announce('地窟深处，'+BOSS_POOLS[profile.region].name+'已苏醒！',true);}
   return e;
 }
-function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('探索真正的地牢 · 每扇门后都有新的危险',true); }
+function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
 function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
@@ -152,11 +192,11 @@ $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
 function showInventory() {
-  if(state==='intro'||state==='victory'||state==='death')return;
-  $('inventory').hidden=false;clearInput();renderInventory();
+  if(state==='intro'||state==='victory'||state==='death'||!$('portal-panel').hidden)return;
+  $('inventory').hidden=false;$('portal-open').hidden=true;clearInput();renderInventory();
 }
 $('btn-inventory').onclick=showInventory;
-function closeInventory(){$('inventory').hidden=true;clearInput();}
+function closeInventory(){$('inventory').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
 $('inv-close').onclick=closeInventory;
 $('inventory').addEventListener('pointerdown',e=>{if(e.target===$('inventory'))closeInventory();});
 function applyEquipmentChange(operate){
@@ -168,12 +208,50 @@ function applyEquipmentChange(operate){
   }
   persist();renderInventory();updateHud();
 }
+function refreshCraftingPanel(){
+  const sel=$('auto-salvage');
+  sel.value=String(profile.autoSalvage);
+  const wallet=$('material-wallet');wallet.replaceChildren();
+  for(const [key,meta] of Object.entries(MATERIALS)){
+    const label=document.createElement('div');
+    label.className='material-token '+key;
+    const name=document.createElement('span');name.textContent=meta.label;
+    const count=document.createElement('strong');count.textContent=String(profile.materials[key]||0);
+    label.append(name,count);wallet.append(label);
+  }
+}
+$('auto-salvage').onchange=()=>{
+  profile.autoSalvage=Number($('auto-salvage').value);
+  persist();renderInventory();
+  announce(profile.autoSalvage<0?'自动分解已关闭':'自动分解已开启：仅自动回收选择的低品质装备',true);
+};
+$('salvage-bag').onclick=()=>{
+  if(profile.autoSalvage<0){announce('请先选择自动分解品质范围',true);return;}
+  const eligible=profile.inventory.filter(i=>i.rarity<=profile.autoSalvage&&!i.favorite&&!i.setId&&!Object.values(profile.equipped).includes(i.id));
+  if(!eligible.length){announce('没有符合自动分解规则的物品',true);return;}
+  if(!confirm('确认分解 '+eligible.length+' 件低品质装备？已装备、已收藏、传奇与套装会保留。'))return;
+  const results=dismantleAll(profile);
+  if(results.some(x=>x.item.id===selectedItemId))selectedItemId=null;
+  persist();renderInventory();
+  announce('批量分解完成 · '+results.length+' 件，结晶已入材料袋',true);
+};
+$('inv-temper').onclick=()=>{
+  if(!selectedItemId||!canTemper(profile,selectedItemId))return;
+  const item=profile.inventory.find(x=>x.id===selectedItemId),cost=temperCost(item);
+  const ok=confirm('花费 '+cost.gold+' 金币 / '+cost.dust+' 粉尘 / '+cost.crystal+' 结晶 / '+cost.core+' 传奇余烬，永久提高 '+item.name+' 的第一条词缀？');
+  if(!ok)return;
+  if(temper(profile,selectedItemId)){
+    persist();renderInventory();announce('装备淬炼成功 · 词缀获得强化',true);
+  }
+};
 function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
-  if(!item){panel.textContent='选择一件装备查看随机词缀、品质与属性变化。';return;}
+  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
-  panel.append(title,meta);
+  const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
+  panel.append(preview,title,meta);
+  if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
@@ -188,8 +266,46 @@ function inspectItem(item){
   const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
   compare.textContent='相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 评分变化 '+(delta>0?'+':'')+delta;
   panel.append(compare);
+  if(worn&&worn.id!==item.id){
+    const current=document.createElement('p');current.className='current-gear';
+    current.textContent='目前装备：'+worn.name;panel.append(current);
+  }
+  // Show REAL character stat changes, not an ungrounded gear-score alone.
+  const alternative={...profile,equipped:{...profile.equipped}};
+  equip(alternative,item.id,target);
+  const before=stats(profile),after=stats(alternative);
+  const keys=[['power','法术强度'],['hp','生命'],['mana','法力'],['armor','护甲'],['crit','暴击率'],['haste','施法速度'],['fire','火焰增伤'],['cold','冰霜增伤']];
+  const differences=keys.filter(([key])=>before[key]!==after[key]);
+  if(differences.length){
+    const heading=document.createElement('h4');heading.textContent='穿戴后属性变化';panel.append(heading);
+    const grid=document.createElement('div');grid.className='stat-diff-grid';
+    for(const [key,label] of differences){
+      const d=after[key]-before[key],line=document.createElement('span');
+      line.className=d>=0?'score-up':'score-down';
+      line.textContent=label+' '+(d>0?'+':'')+d+(key==='crit'||key==='haste'||key==='fire'||key==='cold'?'%':'');
+      grid.append(line);
+    }
+    panel.append(grid);
+  }
+  const quick=$('inv-quick-equip');
+  const wornHere=Object.values(profile.equipped).includes(item.id);
+  quick.disabled=false;
+  quick.textContent=wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
+  const cost=temperCost(item);
+  $('inv-temper').disabled=!canTemper(profile,item.id);
+  $('inv-temper').textContent=item.tempered?'该装备已淬炼':canTemper(profile,item.id)?'用材料淬炼第一条词缀':'材料不足 / 无可淬炼词缀';
+  $('temper-cost').textContent='淬炼花费：'+cost.gold+' 金币 + '+cost.dust+' 粉尘 + '+cost.crystal+' 结晶 + '+cost.core+' 传奇余烬（每件仅可淬炼一次）';
+  quick.onclick=()=>{
+    selectedItemId=item.id;
+    applyEquipmentChange(()=>{if(wornHere){
+      for(const slot of SLOT_IDS)if(profile.equipped[slot]===item.id)profile.equipped[slot]=null;
+    }else equip(profile,item.id,target);});
+  };
 }
+$('inv-filter').onchange=()=>renderInventory();
+$('inv-sort').onchange=()=>renderInventory();
 function renderInventory(){
+  refreshCraftingPanel();
   const statsNow=stats(profile),statFields=[
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
@@ -205,28 +321,46 @@ function renderInventory(){
     const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
     const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
     title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
+    if(item){const icon=document.createElement('canvas');icon.className='equipment-icon';icon.setAttribute('aria-hidden','true');Art.drawItemIcon(icon,item);node.append(icon);}
     node.append(name,title);
-    node.onclick=()=>{if(item){inspectItem(item);if(confirm('卸下 '+item.name+'？'))applyEquipmentChange(()=>profile.equipped[slot]=null);}else inspectItem(null);};
+    node.onclick=()=>{selectedItemId=item?.id||null;inspectItem(item);};
+    node.ondblclick=()=>{if(item){selectedItemId=item.id;applyEquipmentChange(()=>profile.equipped[slot]=null);}};
     equipment.append(node);
   }
   $('bag-count').textContent=profile.inventory.length+' / '+MAX_ITEMS;
   const bag=$('inventory-items');bag.replaceChildren();
   if(!profile.inventory.length){const p=document.createElement('p');p.className='empty';p.textContent='行囊空空。击败怪物并靠近掉落光柱，可获得随机装备和词缀。';bag.append(p);}
-  for(const item of [...profile.inventory].sort((a,b)=>b.rarity-a.rarity||b.ilvl-a.ilvl)){
-    const node=document.createElement('div');node.className='item';
+  const category=$('inv-filter').value,sort=$('inv-sort').value;
+  const visible=profile.inventory.filter(item=>category==='all'||
+    (category==='weapon'&&['weapon','offhand'].includes(item.slot))||
+    (category==='armor'&&['head','shoulders','robe','gloves','belt','pants','boots'].includes(item.slot))||
+    (category==='accessory'&&['amulet','ring1','ring2','charm'].includes(item.slot)));
+  visible.sort(sort==='score'?(a,b)=>itemScore(b)-itemScore(a):
+    sort==='level'?(a,b)=>b.ilvl-a.ilvl:(a,b)=>0);
+  if(sort==='rarity')visible.sort((a,b)=>b.rarity-a.rarity||b.ilvl-a.ilvl);
+  for(const item of visible){
+    const node=document.createElement('div');node.className='item'+(selectedItemId===item.id?' is-selected':'');
     const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
     const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
     const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
-    detail.append(title,desc);detail.onclick=()=>inspectItem(item);
+    const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
+    const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
+    detail.append(img,labels);detail.onclick=()=>{selectedItemId=item.id;renderInventory();};
+    detail.ondblclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
+      item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const actions=document.createElement('div');actions.className='item-actions';
     const worn=Object.values(profile.equipped).includes(item.id);
     const use=document.createElement('button');use.textContent=worn?'已装备':'装备';use.disabled=worn;
-    use.onclick=()=>applyEquipmentChange(()=>equip(profile,item.id,(item.slot.startsWith('ring')&&!profile.equipped.ring1)?'ring1':item.slot.startsWith('ring')&&!profile.equipped.ring2?'ring2':null));
-    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn;
-    recycle.onclick=()=>applyEquipmentChange(()=>salvage(profile,item.id));
-    actions.append(use,recycle);node.append(detail,actions);bag.append(node);
+    use.onclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
+      item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
+    const favorite=document.createElement('button');favorite.textContent=item.favorite?'★ 保留':'☆ 收藏';
+    favorite.setAttribute('aria-label',item.favorite?'取消保留 '+item.name:'保护 '+item.name);
+    favorite.onclick=()=>{item.favorite=!item.favorite;persist();renderInventory();};
+    const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn||item.favorite;
+    recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>dismantle(profile,item.id));};
+    actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
   }
-  inspectItem(null);
+  inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
   for(const [key,skill] of Object.entries(SKILLS)){
     const btn=document.createElement('button');btn.type='button';
@@ -238,7 +372,25 @@ function renderInventory(){
     btn.onclick=()=>{
       if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
     };
-    skillPanel.append(btn);
+    const slot=document.createElement('select');slot.className='skill-slot';
+    slot.setAttribute('aria-label',skill.name+' 装入快捷栏位置');
+    for(let i=0;i<ACTIVE_LIMIT;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+' 号位 · '+SKILLS[profile.activeSkills[i]].name;slot.append(opt);}
+    if(!profile.activeSkills.includes(key)){
+      const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='加入快捷栏…';
+      slot.prepend(placeholder);slot.value='';
+    }else slot.value=String(profile.activeSkills.indexOf(key));
+    slot.disabled=locked;
+    slot.onchange=()=>{
+      if(profile.level<skill.unlocked)return;
+      if(slot.value==='')return;
+      const idx=Number(slot.value),prev=profile.activeSkills.indexOf(key),displaced=profile.activeSkills[idx];
+      profile.activeSkills[idx]=key;
+      if(prev>=0&&prev!==idx)profile.activeSkills[prev]=displaced;
+      persist();renderSkillBar();renderInventory();updateHud();
+      announce(skill.name+' 已加入快捷栏',true);
+    };
+    const cell=document.createElement('div');cell.className='skill-catalog-entry';cell.append(btn,slot);
+    skillPanel.append(cell);
   }
 }
 $('export-save').onclick=()=>{
@@ -263,7 +415,7 @@ function updateHud(){
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
-  ui.progress.textContent=boss?'首领圣所 · 击败'+BOSS_POOLS[profile.region].name:bossDefeated?'司祭已倒下 · 可以继续探索，或手动重新远征':'迷宫已探索 '+dungeon.explored.length+'/'+dungeon.layout.rooms.length+' 房 · 寻找首领与战利品';
+  ui.progress.textContent=boss?'击败 '+BOSS_POOLS[profile.region].name+'，收集专属战利品':bossDefeated?'首领已击败 · 继续拾取装备 / B 查看背包 / 暂停手动重刷':'已探索 '+dungeon.explored.length+'/'+dungeon.layout.rooms.length+' 房 · 寻找首领圣所';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');
@@ -282,7 +434,12 @@ function injury(amount){
   if(hero.invuln>0||state!=='playing')return;
   const defense=stats(profile);
   const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
-  hero.hp=Math.max(0,hero.hp-mitigated);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(mitigated),'#ff9990');
+  const absorbed=Math.min(wardHp,mitigated);wardHp-=absorbed;
+  const finalDamage=mitigated-absorbed;
+  if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
+  hero.hp=Math.max(0,hero.hp-finalDamage);hero.invuln=.6;
+  puff(hero.x,hero.y,absorbed?'#85bae9':'#e46455',13,4,145);
+  if(finalDamage)floatText(hero.x,hero.y-30,Math.round(finalDamage),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
 function dealDamage(e,damage,school='physical'){
@@ -305,24 +462,26 @@ function dealDamage(e,damage,school='physical'){
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
   if(!bossDied&&rng()<.42)dropItem(e.x,e.y,false);
   if(bossDied){
-    const previous=profile.bossKills?.[profile.region]||0;
-    const loot=rollBossRewards(rng,profile.level,profile.region,previous,
-      ()=>'ember2d-boss-'+Date.now()+'-'+nextId++);
-    profile.bossKills=profile.bossKills||{};
-    profile.bossKills[profile.region]=previous+1;
-    profile.essence+=loot.materials;
-    for(const [index,item] of loot.drops.entries()){
-      const px=e.x+index*56,py=e.y+index*22;
-      drops.push({x:px,y:py,item,age:0});
-      floatText(px,py-46,item.name,palette.rare[item.rarity]);
+    const region=profile.region,previousKills=profile.bossKills[region]||0;
+    const reward=rollBossRewards(rng,profile.level,region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++));
+    profile.bossKills[region]=previousKills+1;
+    profile.essence+=reward.materials;profile.clears++;
+    boss=null;bossDefeated=true;portal={x:e.x,y:e.y};ui.boss.hidden=true;$('portal-open').hidden=false;
+    for(const [index,item] of reward.drops.entries()){
+      const angle=index*2.4,rad=60+index*15;
+      const x=e.x+Math.cos(angle)*rad,y=e.y+Math.sin(angle)*rad;
+      const point=walkable(x,y,17,dungeon)?{x,y}:{x:e.x,y:e.y};
+      drops.push({...point,item,age:0,persistent:true});
+      profile.pendingLoot.push({item,region});
+      puff(point.x,point.y,palette.rare[item.rarity],23,5,170);
     }
-    boss=null;bossDefeated=true;ui.boss.hidden=true;profile.clears++;persist();
-    announce(loot.boss+'已被击败！'+(loot.firstKill?'首杀专属传奇掉落！':'获得区域首领战利品。')+
-      ' +'+loot.materials+'精华；可继续探索或手动重刷。',true);
+    persist();
+    announce((reward.firstKill?'首杀奖励！':'首领战利品！')+' '+reward.drops.length+' 件装备 · '+reward.materials+' 精华'+(reward.exclusive?' · 专属传奇！':''),true);
+    ui.title.textContent='首领已击败 · 传送阵已开启';
+    ui.progress.textContent='专属奖励已掉落 · 传送阵可选择下一图或随机远征';
   }else{
     kills++;
-    // Rooms themselves own encounters; no global kill counter that spawns the boss.
-    
+    // Boss and encounters are triggered by room exploration, not kill quota.
     persist();
   }
 }
@@ -334,7 +493,7 @@ function dropItem(x,y,rare=false) {
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
 function cast(skill){
   const rule=SKILLS[skill];
-  if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
+  if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
   if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
   const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
@@ -370,6 +529,35 @@ function cast(skill){
     puff(hero.x,hero.y,'#c8b1fe',21,4,170);
   }
   if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
+  if(skill==='chain'){
+    const candidates=enemies.map(e=>({e,dist:distance(hero,e)})).filter(x=>x.dist<600).sort((a,b)=>a.dist-b.dist);
+    let last={x:hero.x,y:hero.y};
+    const victims=[];
+    for(const {e} of candidates){
+      if(victims.length>=3+Math.floor(rank/3))break;
+      if(distance(last,e)>390)continue;
+      victims.push(e);hazards.push({x:last.x,y:last.y,x2:e.x,y2:e.y,type:'chain',r:0,max:1,life:.22});
+      last={x:e.x,y:e.y};
+    }
+    for(let n=0;n<victims.length;n++)dealDamage(victims[n],bonus.power*(1.2+rank*.12)*Math.pow(.8,n),'arcane');
+    if(!victims.length){announce('附近没有连锁目标');puff(hero.x+dx*55,hero.y+dy*55,'#b29eff',14,4,100);}
+  }
+  if(skill==='storm'){
+    const center=target&&distance(hero,target)<520?target:{x:hero.x+dx*190,y:hero.y+dy*190};
+    hazards.push({x:center.x,y:center.y,r:120,max:120,life:4,kind:'storm',type:'storm',rank,timer:0});
+    announce('冰暴领域已展开',true);
+  }
+  if(skill==='ward'){
+    wardHp=Math.round(24+bonus.hp*(.20+rank*.045));
+    puff(hero.x,hero.y,'#b8d7ff',22,5,130);announce('奥术护盾 · 吸收 '+wardHp+' 伤害',true);
+  }
+  if(skill==='inferno'){
+    for(let n=1;n<=5;n++){
+      const x=hero.x+dx*n*55,y=hero.y+dy*n*55;
+      if(walkable(x,y,10,dungeon))hazards.push({x,y,r:43,max:43,life:4,type:'inferno',rank,timer:0});
+    }
+    announce('烈焰地径已铺开',true);
+  }
   updateHud();
 }
 function movementVector() {
@@ -384,6 +572,7 @@ function update(dt){
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
   enterChamber(roomAt(dungeon,hero.x,hero.y));
+  if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
   if(pointers.size || keys.has('1'))cast('fire');
   for(const e of [...enemies]){
     e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);
@@ -394,13 +583,13 @@ function update(dt){
       const vx=dx/d*speed,vy=dy/d*speed;
       moveWithCollision(e,vx,vy,dt,dungeon,e.radius);
       // 避免随机石柱导致怪物长期卡住。
-      if(d>250&&e.kind==='boss'&&Math.abs(e.x-worldWidth()/2)>800){/* boss remains in its chamber */}
+      if(d>250&&e.kind==='boss'&&Math.abs(e.x-WIDTH/2)>800){e.x=clamp(e.x,hero.x-700,hero.x+700);}
     }else if(isRanged&&d<230)moveWithCollision(e,-dx/d*speed*.5,-dy/d*speed*.5,dt,dungeon,e.radius);
     if(e.attack<=0){
       if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:e.kind==='cultist'?'void':'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
       else if(isBoss&&d<520){
         const a=Math.atan2(dy,dx);
-        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce('灰烬司祭进入第二阶段！',true);}
+        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce(BOSS_POOLS[profile.region].name+'进入第二阶段！',true);}
         for(let k=e.enraged?-3:-2;k<=(e.enraged?3:2);k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
         hazards.push({x:e.x,y:e.y,r:0,max:90,life:.6,type:'void'});e.attack=2.3;
       }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:e.kind==='spider'?6+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:e.kind==='spider'?.72:1.0;}
@@ -424,8 +613,13 @@ function update(dt){
   for(const d of [...drops]){
     d.age+=dt;
     if(distance(hero,d)<58){
+      if(!d.persistent&&autoDismantleDrop(profile,d.item)){
+        drops.splice(drops.indexOf(d),1);puff(d.x,d.y,'#b7a3db',12,3,90);
+        announce('自动分解 · '+d.item.name+' → 粉尘/结晶',true);persist();continue;
+      }
       if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
+      if(d.persistent)profile.pendingLoot=profile.pendingLoot.filter(p=>p.item.id!==d.item.id);
       puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();
     }
   }
@@ -437,16 +631,31 @@ function update(dt){
       h.triggered=true;puff(h.x,h.y,'#ff9146',50,8,280);
       for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*(2.8+(h.rank||0)*.36),'fire');
     }
+    if((h.type==='storm'||h.type==='inferno')&&h.life>0){
+      h.timer-=dt;
+      if(h.timer<=0){
+        h.timer=.55;
+        for(const e of [...enemies]){
+          if(distance(e,h)>h.max+e.radius)continue;
+          if(h.type==='storm')e.slow=Math.max(e.slow,1.05);
+          dealDamage(e,stats(profile).power*(h.type==='storm'?.31:.42)*(1+(h.rank||0)*.12),h.type==='storm'?'cold':'fire');
+        }
+      }
+    }
     if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
   }
   updateHud();
 }
-function floorDraw(){ Art.floor(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick,profile.region); }
+function floorDraw(){ Art.floor(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick,profile.region,dungeon.seed); }
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
 function enemyDraw(e){ Art.enemy(ctx,e,tick); }
-function heroDraw(){ Art.hero(ctx,hero,tick); }
+function heroDraw(){
+  const worn={};for(const [slot,id] of Object.entries(profile.equipped))worn[slot]=profile.inventory.find(x=>x.id===id)||null;
+  Art.hero(ctx,hero,tick,worn);
+  if(wardHp>0){ctx.strokeStyle='#93cdffb5';ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor='#a2d5ff';ctx.beginPath();ctx.ellipse(hero.x,hero.y-49,32,60,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;}
+}
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
   if(m.kind==='ember'||m.kind==='shard'){
@@ -456,6 +665,16 @@ function missileDraw(m){
   }else{ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');ellipse(-8,0,12,4,'#8c66b388');}
   ctx.restore();
 }
+function drawPortal(p){
+  const pulse=Math.sin(tick*2.7)*4;
+  ctx.save();ctx.translate(p.x,p.y);
+  ctx.shadowBlur=22;ctx.shadowColor='#8bc4f4';
+  ctx.strokeStyle='#85bceaaa';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,8,78+pulse,31+pulse/3,0,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#f2c88bd5';ctx.lineWidth=2;
+  for(let n=0;n<8;n++){const a=n*Math.PI/4+tick*.14;ctx.beginPath();ctx.moveTo(Math.cos(a)*56,8+Math.sin(a)*23);ctx.lineTo(Math.cos(a)*70,8+Math.sin(a)*29);ctx.stroke();}
+  ctx.fillStyle='#70bdf132';ctx.beginPath();ctx.ellipse(0,7,64,23,0,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;ctx.textAlign='center';ctx.font='bold 16px system-ui';ctx.strokeStyle='#07111ce8';ctx.lineWidth=4;ctx.strokeText('✦ 地图传送阵 ✦',0,-65);ctx.fillStyle='#f4d19b';ctx.fillText('✦ 地图传送阵 ✦',0,-65);ctx.restore();
+}
 function render(){
   if(!hero){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#121b22';ctx.fillRect(0,0,vw,vh);return;}
   cam.x=clamp(hero.x-vw/2,0,Math.max(0,worldWidth()-vw));
@@ -464,7 +683,7 @@ function render(){
   ctx.save();ctx.translate(-cam.x,-cam.y);
   floorDraw();
   drawMazeWalls(ctx,dungeon,cam,vw,vh);
-  Art.scenery(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick);
+  Art.scenery(ctx,cam,vw,vh,worldWidth(),worldHeight(),tick,profile.region,dungeon.seed);
   // Painter's order: stonework and props occlude actors when they stand behind them.
   const layers=[];
   for(const b of dungeon.blocks)if(b.x+b.w>cam.x-160&&b.x<cam.x+vw+160&&b.y+b.h>cam.y-150&&b.y<cam.y+vh+160)
@@ -472,20 +691,38 @@ function render(){
   for(const t of dungeon.torches)if(t.x>cam.x-160&&t.x<cam.x+vw+160&&t.y>cam.y-160&&t.y<cam.y+vh+160)
     layers.push({y:t.y+13,render:()=>torchDraw(t)});
   for(const d of drops)layers.push({y:d.y+7,render:()=>Art.loot(ctx,d,tick)});
+  if(portal)layers.push({y:portal.y+12,render:()=>drawPortal(portal)});
   for(const e of enemies)layers.push({y:e.y+10,render:()=>enemyDraw(e)});
   layers.push({y:hero.y+10,render:heroDraw});
   layers.sort((a,b)=>a.y-b.y);
   for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
   for(const h of hazards){
-    ctx.save();ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:.6),0,1)*.78;
-    ctx.strokeStyle=h.type==='nova'?'#8ee5ff':h.type==='meteor'?'#ff663b':'#bf80e8';
-    ctx.shadowColor=h.type==='nova'?'#8acde5':h.type==='meteor'?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
-    ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+    ctx.save();
+    ctx.globalAlpha=clamp(h.life/(h.type==='nova'?.45:h.type==='chain'?.22:h.type==='meteor'?1:4),0,1)*.78;
+    if(h.type==='chain'){
+      ctx.strokeStyle='#c4a4ff';ctx.shadowColor='#ba9eff';ctx.shadowBlur=20;ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(h.x,h.y-48);ctx.lineTo((h.x+h.x2)/2-14,(h.y+h.y2)/2-53);
+      ctx.lineTo((h.x+h.x2)/2+10,(h.y+h.y2)/2-45);ctx.lineTo(h.x2,h.y2-48);ctx.stroke();
+    }else{
+      const fire=h.type==='meteor'||h.type==='inferno',ice=h.type==='nova'||h.type==='storm';
+      ctx.strokeStyle=ice?'#8ee5ff':fire?'#ff663b':'#bf80e8';
+      ctx.shadowColor=ice?'#8acde5':fire?'#e17c37':'#9e77c7';ctx.shadowBlur=15;
+      ctx.lineWidth=h.type==='nova'?5:4;ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.stroke();
+      if(h.type==='storm'||h.type==='inferno'){ctx.fillStyle=fire?'#ff6a241e':'#75c8f51c';ctx.fill();}
+    }
     ctx.restore();
   }
   for(const p of particles){ctx.globalAlpha=clamp(p.life/p.max,0,1);ellipse(p.x,p.y,p.size,p.size,p.color);}ctx.globalAlpha=1;
   drawExplorationFog(ctx,dungeon,cam,vw,vh);
+  // Labels stay above loot until it is physically picked up.
+  ctx.textAlign='center';ctx.font='bold 13px system-ui';
+  for(const drop of drops){
+    if(drop.x<cam.x-120||drop.x>cam.x+vw+120||drop.y<cam.y-120||drop.y>cam.y+vh+120)continue;
+    const label=drop.item.name,y=drop.y-74;
+    ctx.lineWidth=4;ctx.strokeStyle='#090b10ed';ctx.strokeText(label,drop.x,y);
+    ctx.fillStyle=palette.rare[drop.item.rarity];ctx.fillText(label,drop.x,y);
+  }
   ctx.font='bold 15px system-ui';ctx.textAlign='center';for(const f of texts){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#000b';ctx.fillText(f.text,f.x+1,f.y+2);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);}ctx.globalAlpha=1;ctx.restore();
   // 环境暗角在 Canvas 内绘制，移动端同样清晰。
   const vign=ctx.createRadialGradient(vw/2,vh/2,Math.min(vw,vh)*.15,vw/2,vh/2,Math.max(vw,vh)*.75);
@@ -514,7 +751,7 @@ function drawMinimap(){
 }
 function loop(now){
   const dt=Math.min(.04,(now-last)/1000 || .016);last=now;
-  if(state==='playing'&&$('inventory').hidden)update(dt);
+  if(state==='playing'&&$('inventory').hidden&&$('portal-panel').hidden)update(dt);
   render();requestAnimationFrame(loop);
 }
 function aimAt(clientX,clientY) {
@@ -525,28 +762,28 @@ canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&hero)aimAt
 canvas.addEventListener('pointerdown',e=>{if(state!=='playing'||e.pointerType!=='mouse'||e.button!==0)return;aimAt(e.clientX,e.clientY);pointers.add(e.pointerId);cast('fire');});
 window.addEventListener('pointerup',e=>pointers.delete(e.pointerId));
 window.addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
-for(const button of document.querySelectorAll('[data-skill]')){
-  const skill=button.dataset.skill;
-  button.addEventListener('pointerdown',e=>{
-    e.preventDefault();if(state!=='playing')return;
-    button.setPointerCapture(e.pointerId);
-    if(skill==='fire'){manualAim=null;pointers.add(e.pointerId);}
-    cast(skill);
-  });
-  const release=e=>pointers.delete(e.pointerId);
-  button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);
-}
+$('abilitybar').addEventListener('pointerdown',e=>{
+  const button=e.target.closest('button[data-skill]');
+  if(!button||state!=='playing')return;
+  e.preventDefault();
+  const skill=button.dataset.skill;button.setPointerCapture(e.pointerId);
+  if(skill==='fire'){manualAim=null;pointers.add(e.pointerId);}
+  cast(skill);
+});
+$('abilitybar').addEventListener('pointerup',e=>pointers.delete(e.pointerId));
+$('abilitybar').addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
 window.addEventListener('keydown',e=>{
   const tag=document.activeElement?.tagName;
   if(['INPUT','TEXTAREA'].includes(tag)||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
-  if(k==='escape'){if(!$('inventory').hidden)closeInventory();else onPause();return;}
+  if(k==='escape'){if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
+  if(k==='t'){openPortalMenu();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
-    const byKey={1:'fire',2:'nova',3:'shard',4:'armor',q:'meteor',' ':'blink',e:'heal'};
+    const byKey=Object.fromEntries(profile.activeSkills.map(id=>[SKILLS[id].key==='空格'?' ':SKILLS[id].key.toLowerCase(),id]));
     if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
   }
 });
@@ -567,4 +804,25 @@ base.addEventListener('pointermove',joyMove);
 function joyEnd(e){if(e.pointerId!==joystick.id)return;joystick.id=null;joystick.x=joystick.y=0;stick.style.transform='';}
 base.addEventListener('pointerup',joyEnd);base.addEventListener('pointercancel',joyEnd);
 window.addEventListener('contextmenu',e=>{if(e.target===canvas)e.preventDefault();});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
+// Dedicated local QA hook: never active on the public GitHub Pages game.
+if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('qa')){
+  window.__ember2dQA={
+    mazeInfo:()=>({rooms:dungeon.layout.rooms.length,explored:dungeon.explored.length,bossRoom:dungeon.layout.boss,hasMask:!!dungeon.floorMask}),
+    bossTest:()=>{
+      if(state!=='playing')throw new Error('start game first');
+      enemies.length=0;
+      const bossRoom=dungeon.layout.boss,c=roomCenter(dungeon,bossRoom);
+      hero.x=c.x;hero.y=c.y;currentRoom=null;enteredRooms.delete(bossRoom);
+      enterChamber(bossRoom);
+      const e=boss;if(!e)throw new Error('boss chamber did not spawn its guardian');
+      e.hp=1;dealDamage(e,10000,'fire');
+      return {state,bossDefeated,drops:drops.map(d=>({name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent})),
+        pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
+    }
+  };
+}
 build();state='intro';requestAnimationFrame(loop);

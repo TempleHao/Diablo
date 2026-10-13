@@ -1,7 +1,22 @@
 # 余烬法师 · Ember Mage
 
-> **2D 系统扩展版（v0.3）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 试玩迭代（v0.3.3）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
+
+> **v0.3.3 开发预览**：清晰的原创 Canvas 法师模型（披风、头盔和法杖配色随装备变化）、新增 4 个可用法术至 11 个、可配置 7 槽技能快捷栏、默认关闭的自动/批量分解、三种分解材料及装备词缀淬炼。已装备、收藏、传奇和套装不会被自动回收。详见 [v0.3.3 验收记录](docs/2D-V0.3.3-ACCEPTANCE.md)。**本版仍属试玩性质，写实暗黑 A 方向的迷宫、场景和怪物尚在重构。**
+>
+> **v0.3.3 Chromium 实机画面**：[PC 新法师与场景](docs/screenshots/2d-v0.3.3-game-desktop.jpg) · [手机实机画面](docs/screenshots/2d-v0.3.3-game-mobile.jpg) · [PC 自动分解与锻造界面](docs/screenshots/2d-v0.3.3-crafting-desktop.jpg) · [手机自动分解界面](docs/screenshots/2d-v0.3.3-crafting-mobile.jpg)。这些是真实的游戏浏览器截图，不是风格概念图。
+>
+> **v0.3.2 Demo 可玩更新**：区域从五张扩展到九张、四位新增独占掉落 Boss、每件装备类型都有匹配图形（法杖/剑/戒指/头盔/盾等），背包重做为左装备/中属性对比/右筛选，Boss 战后出现实际传送阵，可指定下一张或随机目的地，也可留在本层。修复长词缀溢出、减少频繁换装操作。详见 [v0.3.2 清单及限制](docs/2D-V0.3.2-ACCEPTANCE.md)。
+>
+> **真实 Chromium 测试截图（不是概念设计图）**：[PC装备背包](docs/screenshots/2d-v0.3.2-inventory-desktop.jpg) · [手机版背包](docs/screenshots/2d-v0.3.2-inventory-mobile.jpg) · [PC传送阵](docs/screenshots/2d-v0.3.2-portal-desktop.jpg) · [手机版传送阵](docs/screenshots/2d-v0.3.2-portal-mobile.jpg)。
+>
+> **仍未达成 A 方向写实 2.5D 最终视觉**：这次增加的是正确类别的原创矢量装备图标及实际操作体验；九个地图仍共享原型图块，真正的多房间迷宫仍在 PR #6 分支推进。
+>
+> **v0.3.1 即时反馈热修**：Boss 首杀必有专属传奇与普通装备，战后不再强制结束；没来得及拾取的 Boss 物品将随旧存档键保存。背包与 13 槽装备加入真实贴图图标，减少双击缩放误操作，五大区域的地面装饰按种子变化。此版本仍是低像素原型，美术距离用户确认的写实暗黑 2.5D 目标很远。
+>
+> [看真实浏览器 Boss 掉宝画面](docs/screenshots/2d-v0.3.1-boss-loot-desktop.jpg) · [看物品贴图背包](docs/screenshots/2d-v0.3.1-item-icons-desktop.jpg) · [手机版实际截图](docs/screenshots/2d-v0.3.1-boss-loot-mobile.jpg)
+
 > **[直接体验 2D 版](https://templehao.github.io/Diablo/2d/)** · [2D 实现与测试说明](docs/2D-IMPLEMENTATION.md) · [2D 自动化检查](https://github.com/TempleHao/Diablo/actions/workflows/check-2d.yml)
 >
 > **v0.3 功能已接入游戏**：13 个装备槽、随机词缀与套装、80 格背包、等级与技能点、7 项战斗技能、5 个区域及更丰富的怪物遭遇。支持旧 2D 角色存档迁移。详见 [完整验收记录](docs/2D-SYSTEMS-V0.3.md)。
@@ -71,6 +86,8 @@ npm run check
 
 ## 模型源文件
 
+2026-10-13已单独修复源模型布尾两层的权重关系，并增加`--source-only`制作模式；42时点×两片的84组真实动画层采样通过。当前发布GLB仍为0.3.0-preview.2，新法线候选尚未通过视觉检查，续做分支为`checkpoint/art-02-d1`。实际范围与恢复方法见[源模型修正记录](docs/VALIDATION-ART-02-D1-SOURCE.md)。
+
 进入游戏使用 `dist/models/ember-mage-combat.glb`（14,713三角面/3,852,640字节）；人物查看才按需加载 `ember-mage-realism.glb`（34,451三角面/4,676,752字节）。两者均60骨骼、2材质/2 primitives、4张嵌入PBR图集，包含相同Idle/Walk/Cast与面部取景挂点。人体、形变、骨架/眼睛和系统皮肤采用已登记的MakeHuman CC0图形资源；服装、装备与生成管线为本项目制作，不把第三方基底称为从零原创。来源清单见 [human-base](assets-source/human-base/README.md)。
 
 已在Blender **4.3.2**生成候选：
@@ -110,3 +127,8 @@ Chromium 桌面与手机视口检查覆盖模型加载、三段骨骼动画、�
 0.3.0美术预览另通过23项桌面/触屏视口交互回归，新GLB与26项来源哈希检查；实际范围见[ART-01验证记录](docs/VALIDATION-ART-01.md)。可选 `npm run check:art-browser` 需要Playwright Core及Chromium。照片/截图与真机性能、美术品质验收分别记录。
 
 0.3.0-preview.2另通过61项存档测试、23项完整游戏浏览器回归、最新6项资源生命周期/取景专项及30次原生动作采样。实际范围和软件渲染限制见[ART-02验证记录](docs/VALIDATION-ART-02.md)；技术通过不表示美术验收通过。
+
+
+### 2D 多房间迷宫集成候选（Draft PR #6）
+
+以 main v0.3.3 的十一技能、七槽技能栏、材料锻造、Boss 战利品与传送阵为基线，集成 F1 真实多房间迷宫、碰撞门道与探索迷雾。仅独立开发分支验证，不是线上发布或 A 向写实美术验收。

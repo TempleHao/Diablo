@@ -4,7 +4,7 @@
   "track": "Ember Chronicles 2D A-direction final",
   "state": "development",
   "baseline": {
-    "game": "2D v0.3 pixel-prototype",
+    "game": "v0.3.3 main (4b6a20c) + F1 maze integration candidate, not A-direction final",
     "confirmed": "not A-direction final",
     "existing3D": "separate/unchanged",
     "reference": "user-supplied five A-direction target pictures; conceptual, not gameplay"
@@ -247,18 +247,16 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F2: Retry approved source-code write on isolated branch to persist pendingLoot and bossKills after Boss kill, restore loot on page reload, and remove picked-up loot atomically; add old-save migration and Chromium PC/mobile boss flow tests. Resolve main drift without touching 3D or force-merging.",
+  "nextAction": "Run v0.3.3+maze rules, 100 seeds, Boss/portal/save, Chromium PC/mobile and audit; commit actual screenshots, fix regressions. Keep PR Draft until F8 and user confirmation.",
   "lastAttempt": {
-    "at": "2026-10-13",
+    "at": "2026-10-14",
     "phase": "F2",
-    "status": "blocked-code-write",
+    "status": "integrated-code-awaiting-ci-and-visual-evidence",
     "verified": {
-      "branchHeadBeforeAttempt": "ee02f969aba7e785cefa13f0b479460ca168b4a4",
-      "mainHead": "0abae7ee52dd620b8b97b1743f7c87e7765e2b31",
-      "pr": 6
+      "mainBaseline": "4b6a20c89d22d80be60938dc94fd239f1a4d4e19",
+      "sourcePR": 6
     },
-    "blocker": "GitHub update_file attempt for dist/2d/core.js returned: This tool call was blocked by OpenAI's safety checks. No game-code commit, new CI run or new Chromium screenshots.",
-    "caveat": "The branch is behind main, and PR #6 is not mergeable. Do not force merge or treat main's v0.3.1 as A-direction final."
+    "caveat": "Branch integrates v0.3.3 and maze; requires fresh CI, browser screenshots and visual review."
   },
   "candidate": {
     "status": "none",

@@ -56,10 +56,10 @@ test('all regions generate deterministic playable yet distinct dungeons',()=>{
     assert.deepEqual(a,b);assert.equal(walkable(START.x,START.y,17,a),true);
     signatures.add(JSON.stringify(a.blocks));
   }
-  assert.equal(signatures.size,5);
+  assert.equal(signatures.size,REGION_DATA.length);
 });
 test('declared skills include seven usable skills and two damage schools',()=>{
-  assert.equal(Object.keys(SKILLS).length,7);
+  assert.equal(Object.keys(SKILLS).length,11);
   assert.ok(Object.values(SKILLS).some(x=>x.school==='fire'));
   assert.ok(Object.values(SKILLS).some(x=>x.school==='cold'));
   assert.ok(Object.values(SKILLS).every(x=>x.unlocked>=1&&x.cooldown>0));

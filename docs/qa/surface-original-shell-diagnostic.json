@@ -1,0 +1,176 @@
+[
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 1,
+    "pairedShellSeparationMaxMeters": 0.0060000449628030625,
+    "mean": 0.005999999285905746,
+    "index": 264,
+    "outsideWeights": {
+      "upperleg02.R": 0.614547,
+      "lowerleg01.R": 0.381318,
+      "upperleg01.R": 0.004135
+    },
+    "insideWeights": {
+      "upperleg02.R": 0.618894,
+      "lowerleg01.R": 0.377149,
+      "upperleg01.R": 0.003956
+    },
+    "pair325Distance": 0.00600000718961912,
+    "pair325OutsideWeights": {
+      "lowerleg01.R": 0.509072,
+      "upperleg02.R": 0.419913,
+      "lowerleg02.R": 0.071015
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.R": 0.511996,
+      "upperleg02.R": 0.418292,
+      "lowerleg02.R": 0.069711
+    }
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 1,
+    "pairedShellSeparationMaxMeters": 0.006000040454459999,
+    "mean": 0.005999999157664452,
+    "index": 186,
+    "outsideWeights": {
+      "upperleg02.L": 0.867784,
+      "upperleg01.L": 0.079699,
+      "lowerleg01.L": 0.052517
+    },
+    "insideWeights": {
+      "upperleg02.L": 0.861179,
+      "upperleg01.L": 0.083077,
+      "lowerleg01.L": 0.055744
+    },
+    "pair325Distance": 0.00600000303721623,
+    "pair325OutsideWeights": {
+      "lowerleg01.L": 0.48614,
+      "upperleg02.L": 0.458119,
+      "lowerleg01.R": 0.055741
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.L": 0.487684,
+      "upperleg02.L": 0.4606,
+      "lowerleg02.L": 0.051716
+    }
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 9,
+    "pairedShellSeparationMaxMeters": 0.00778804834613777,
+    "mean": 0.006000973250530242,
+    "index": 424,
+    "outsideWeights": {
+      "lowerleg01.R": 0.470142,
+      "lowerleg02.R": 0.449478,
+      "lowerleg01.L": 0.08038
+    },
+    "insideWeights": {
+      "lowerleg01.R": 0.473474,
+      "lowerleg02.R": 0.452739,
+      "lowerleg01.L": 0.073787
+    },
+    "pair325Distance": 0.005951189240500787,
+    "pair325OutsideWeights": {
+      "lowerleg01.R": 0.509072,
+      "upperleg02.R": 0.419913,
+      "lowerleg02.R": 0.071015
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.R": 0.511996,
+      "upperleg02.R": 0.418292,
+      "lowerleg02.R": 0.069711
+    }
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 9,
+    "pairedShellSeparationMaxMeters": 0.020380970987958585,
+    "mean": 0.0060313471699995755,
+    "index": 248,
+    "outsideWeights": {
+      "upperleg02.L": 0.701546,
+      "lowerleg01.L": 0.226916,
+      "upperleg02.R": 0.071539
+    },
+    "insideWeights": {
+      "upperleg02.L": 0.701552,
+      "lowerleg01.L": 0.229479,
+      "upperleg01.L": 0.068968
+    },
+    "pair325Distance": 0.012296676695069965,
+    "pair325OutsideWeights": {
+      "lowerleg01.L": 0.48614,
+      "upperleg02.L": 0.458119,
+      "lowerleg01.R": 0.055741
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.L": 0.487684,
+      "upperleg02.L": 0.4606,
+      "lowerleg02.L": 0.051716
+    }
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 25,
+    "pairedShellSeparationMaxMeters": 0.008204819246071434,
+    "mean": 0.005970163916837708,
+    "index": 271,
+    "outsideWeights": {
+      "upperleg02.R": 0.57661,
+      "lowerleg01.R": 0.412009,
+      "upperleg01.R": 0.011381
+    },
+    "insideWeights": {
+      "upperleg02.R": 0.577592,
+      "lowerleg01.R": 0.411239,
+      "upperleg02.L": 0.011169
+    },
+    "pair325Distance": 0.006000028672249014,
+    "pair325OutsideWeights": {
+      "lowerleg01.R": 0.509072,
+      "upperleg02.R": 0.419913,
+      "lowerleg02.R": 0.071015
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.R": 0.511996,
+      "upperleg02.R": 0.418292,
+      "lowerleg02.R": 0.069711
+    }
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 25,
+    "pairedShellSeparationMaxMeters": 0.020014453513352043,
+    "mean": 0.006054803897349219,
+    "index": 325,
+    "outsideWeights": {
+      "lowerleg01.L": 0.48614,
+      "upperleg02.L": 0.458119,
+      "lowerleg01.R": 0.055741
+    },
+    "insideWeights": {
+      "lowerleg01.L": 0.487684,
+      "upperleg02.L": 0.4606,
+      "lowerleg02.L": 0.051716
+    },
+    "pair325Distance": 0.020014453513352043,
+    "pair325OutsideWeights": {
+      "lowerleg01.L": 0.48614,
+      "upperleg02.L": 0.458119,
+      "lowerleg01.R": 0.055741
+    },
+    "pair750InsideWeights": {
+      "lowerleg01.L": 0.487684,
+      "upperleg02.L": 0.4606,
+      "lowerleg02.L": 0.051716
+    }
+  }
+]

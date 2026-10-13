@@ -9,14 +9,14 @@ export const SLOT_IDS=SLOTS.map(x=>x[0]);
 export const MAX_ITEMS=80;
 export const RARITIES=['普通','魔法','稀有','传奇','套装'];
 export const BASES={
-  head:['旧皮兜帽','夜行头冠','灰烬面罩'],shoulders:['旅者披肩','铜棘护肩','监牢铁肩'],
-  robe:['行旅布袍','锁链法衣','刻印重甲'],gloves:['粗革手套','幽影指套','烬纹手甲'],
-  belt:['破旧皮带','符文腰封','守卫束带'],pants:['褐布护腿','疾行裹腿','守誓腿甲'],
-  boots:['磨损长靴','暗影足具','灰烬战靴'],
-  weapon:['焦木法杖','灼魂魔杖','仪式秘杖','白骨长剑'],
-  offhand:['裂纹秘典','黑铁圆盾','古旧法器'],amulet:['石制护符','霜痕吊坠','断昼徽章'],
-  ring1:['无名铜戒','烬火戒指','银色指环'],ring2:['无名铜戒','烬火戒指','银色指环'],
-  charm:['破碎圣印','先知之眼','炉心遗物']
+  head:['旧皮兜帽','夜行头冠','灰烬面罩','凋零战盔','圣痕面甲','寒铁王冠'],shoulders:['旅者披肩','铜棘护肩','监牢铁肩','守夜肩甲','风暴披肩','兽骨护肩'],
+  robe:['行旅布袍','锁链法衣','刻印重甲','暗纹战袍','铁壁胸铠','秘银护胸'],gloves:['粗革手套','幽影指套','烬纹手甲','符咒护手','骑士护腕','蚀骨指套'],
+  belt:['破旧皮带','符文腰封','守卫束带','猎魔腰带','锁环革带','隐秘腰封'],pants:['褐布护腿','疾行裹腿','守誓腿甲','夜行腿铠','魂铁长裤','荆刺护腿'],
+  boots:['磨损长靴','暗影足具','灰烬战靴','铁制战靴','秘银行靴','雾隐短靴'],
+  weapon:['焦木法杖','灼魂魔杖','仪式秘杖','白骨长剑','凶魂匕首','远古战剑','月蚀法杖','缚魂魔杖','誓约长剑','碎星仪杖'],
+  offhand:['裂纹秘典','黑铁圆盾','古旧法器','灾厄魔典','骑士之盾','镶金法典'],amulet:['石制护符','霜痕吊坠','断昼徽章','荆棘项链','曜石护符','月银吊坠'],
+  ring1:['无名铜戒','烬火戒指','银色指环','誓火宝戒','寒玉戒','骸骨法戒'],ring2:['无名铜戒','烬火戒指','银色指环','誓火宝戒','寒玉戒','骸骨法戒'],
+  charm:['破碎圣印','先知之眼','炉心遗物','黑曜宝珠','永燃符石','噩梦刻印']
 };
 export const AFFIXES={
   power:{name:'法术强度',min:2,max:11,slots:['weapon','offhand','amulet','ring1','ring2','charm','gloves']},
@@ -47,14 +47,22 @@ export const SKILLS={
   armor:{name:'冰甲',key:'4',school:'cold',icon:'◆',mana:24,cooldown:14,unlocked:2,desc:'短时间减免受到的伤害'},
   meteor:{name:'陨火',key:'q',school:'fire',icon:'☄',mana:42,cooldown:8,unlocked:3,desc:'在敌群位置引爆陨火范围伤害'},
   blink:{name:'闪现',key:'空格',school:'arcane',icon:'ϟ',mana:20,cooldown:3.6,unlocked:1,desc:'短距离位移，并短暂无敌'},
-  heal:{name:'恢复药剂',key:'e',school:'arcane',icon:'✚',mana:0,cooldown:14,unlocked:1,desc:'恢复 48% 最大生命'}
+  heal:{name:'恢复药剂',key:'e',school:'arcane',icon:'✚',mana:0,cooldown:14,unlocked:1,desc:'恢复 48% 最大生命'},
+  chain:{name:'连锁闪电',key:'5',school:'arcane',icon:'Ϟ',mana:20,cooldown:2.2,unlocked:4,desc:'在最多 3 个敌人间跳跃；强化后跳跃更多'},
+  storm:{name:'冰暴领域',key:'6',school:'cold',icon:'❅',mana:34,cooldown:9,unlocked:6,desc:'持续四秒的冰暴领域；冻结减速并持续造成伤害'},
+  ward:{name:'奥术护盾',key:'z',school:'arcane',icon:'⬡',mana:28,cooldown:16,unlocked:8,desc:'生成吸收伤害的护盾，技能等级提高容量'},
+  inferno:{name:'烈焰地径',key:'x',school:'fire',icon:'♨',mana:30,cooldown:7,unlocked:10,desc:'面前铺开灼烧火线，持续四秒使接近的敌人受伤'}
 };
 export const REGION_DATA=[
   {id:'entrance',name:'断昼前庭',label:'破败石厅',color:'#d48d55',types:['wretch','archer','wretch','brute']},
   {id:'prison',name:'遗弃监牢',label:'铁栏与锁链',color:'#b9a37b',types:['archer','wretch','brute','cultist']},
   {id:'ritual',name:'余烬祭坛',label:'血色符文',color:'#c95540',types:['cultist','archer','spider','brute']},
   {id:'cavern',name:'渊底裂隙',label:'地下洞窟',color:'#719ca8',types:['spider','spider','wretch','brute']},
-  {id:'sanctum',name:'失名者圣所',label:'燃尽的炉心',color:'#98618d',types:['cultist','brute','spider','archer']}
+  {id:'sanctum',name:'失名者圣所',label:'燃尽的炉心',color:'#98618d',types:['cultist','brute','spider','archer']},
+  {id:'tomb',name:'古墓甬道',label:'幽暗墓穴',color:'#8a918c',types:['wretch','archer','cultist','spider']},
+  {id:'courtyard',name:'腐化庭院',label:'枯萎圣树',color:'#72885a',types:['spider','brute','wretch','cultist']},
+  {id:'crypt',name:'寒霜陵寝',label:'永冻石棺',color:'#73a5be',types:['archer','cultist','spider','brute']},
+  {id:'obsidian',name:'黑曜王座',label:'火与黑曜石',color:'#c57550',types:['brute','cultist','brute','archer']}
 ];
 const safeNum=(x,max=9999)=>Math.max(0,Math.min(max,Math.floor(Number.isFinite(x)?x:0)));
 const validId=x=>typeof x==='string'&&x.length>0&&x.length<=100;
@@ -73,7 +81,8 @@ export function normalizeItem(item) {
   return {
     id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,60),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
-    armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId
+    armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
+    favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
 export function getSlotForItem(item,target){

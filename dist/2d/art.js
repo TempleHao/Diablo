@@ -1,3 +1,5 @@
+import {drawMage} from './mage-portrait.js';
+import {drawEquipmentIcon} from './equipment-icons.js';
 /**
  * 余烬纪事 · 2D 美术层
  * Sprite art: 0x72 DungeonTileset II v1.7 (CC0 1.0).
@@ -46,20 +48,20 @@ function fixture(ctx,x,y,r=1){
   ctx.fillStyle='#fff3bb';ctx.beginPath();ctx.ellipse(0,-12,2,4*pulse,0,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
-export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0){
+export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   ctx.fillStyle='#0a1015';ctx.fillRect(0,0,worldW,worldH);
   if(!ready)return;
   const S=48, left=Math.max(0,Math.floor(cam.x/S)-1),right=Math.min(Math.ceil(worldW/S),Math.ceil((cam.x+vw)/S)+1);
   const top=Math.max(0,Math.floor(cam.y/S)-1),bottom=Math.min(Math.ceil(worldH/S),Math.ceil((cam.y+vh)/S)+1);
   for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
-    const v=hash(x,y,501),tex=FRAME.floor[v%8];
+    const v=hash(x,y,501 ^ seed ^ ((region+1)*733)),tex=FRAME.floor[(v+region*2)%8];
     sprite(ctx,[tex[0],tex[1],16,16],x*S,y*S,S+1,S+1);
     // Keep pixel-art intact; irregular soot patches and scattered rubble are transparent overlays.
     if(v%15===0){ctx.fillStyle='#090d1180';ctx.fillRect(x*S+7,y*S+7,18,6);}
     if(v%21===0)sprite(ctx,FRAME.skull,x*S+12,y*S+12,25,25);
     if(v%9===0){ctx.fillStyle='#10131855';ctx.fillRect(x*S+6,y*S+3,6,17);}
   }
-  const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c'];
+  const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c','#1c232b52','#24381e4b','#13324850','#401a104f'];
   ctx.fillStyle=tints[region]||tints[0];ctx.fillRect(cam.x,cam.y,vw,vh);
   // One visual identity per region: gates, ritual stains, cave fractures, or corrupted ground.
   const S2=96;
@@ -72,6 +74,10 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0){
       }
       if(region===3&&v%8===0){ctx.strokeStyle='#7398a35c';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(ox+12,oy+72);ctx.lineTo(ox+44,oy+28);ctx.lineTo(ox+69,oy+46);ctx.stroke();}
       if(region===4&&v%11===0){ctx.fillStyle='#6c3d7844';ctx.beginPath();ctx.arc(ox+31,oy+65,20,0,Math.PI*2);ctx.fill();}
+      if(region===5&&v%6===0){ctx.strokeStyle='#8d9e9266';ctx.beginPath();ctx.arc(ox+48,oy+46,24,0,Math.PI*2);ctx.stroke();}
+      if(region===6&&v%10===0){ctx.fillStyle='#536e3360';ctx.fillRect(ox+5,oy+19,53,11);}
+      if(region===7&&v%8===0){ctx.strokeStyle='#b5dff275';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(ox+12,oy+76);ctx.lineTo(ox+31,oy+27);ctx.lineTo(ox+60,oy+49);ctx.stroke();}
+      if(region===8&&v%10===0){ctx.fillStyle='#9a3a254e';ctx.beginPath();ctx.moveTo(ox+15,oy+70);ctx.lineTo(ox+40,oy+18);ctx.lineTo(ox+70,oy+74);ctx.fill();}
       if(region===1&&v%9===0){ctx.fillStyle='#151a1acc';ctx.fillRect(ox+20,oy+15,62,9);ctx.strokeStyle='#8d785866';ctx.strokeRect(ox+20,oy+15,62,9);}
     }
   // Carved northern ritual circle, deliberately placed beneath characters.
@@ -128,16 +134,16 @@ export function pillar(ctx,b){
   }
 }
 export function torch(ctx,t){fixture(ctx,t.x,t.y);}
-export function scenery(ctx,cam,vw,vh,worldW,worldH,tick){
+export function scenery(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   if(!ready)return;
   // A few non-interactive set dressing objects, deterministic by tile position.
   const S=48,x0=Math.max(2,Math.floor(cam.x/S)),x1=Math.min(Math.floor(worldW/S)-2,Math.ceil((cam.x+vw)/S));
   const y0=Math.max(3,Math.floor(cam.y/S)),y1=Math.min(Math.floor(worldH/S)-3,Math.ceil((cam.y+vh)/S));
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
-    const h=hash(x,y,933);
-    if(h%137===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
-    if(h%253===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
-    if(h%181===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
+    const h=hash(x,y,933 ^ seed ^ ((region+1)*1193));
+    if(h%[101,83,155,117,92,89,123,111,72][region]===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
+    if(h%[281,91,137,304,99,193,81,185,73][region]===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
+    if(h%[193,163,67,107,79,65,131,101,67][region]===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
   }
 }
 function frameFor(kind,walking,elapsed){
@@ -148,22 +154,8 @@ function frameFor(kind,walking,elapsed){
 function shadow(ctx,x,y,rx,ry,alpha=.65){
   ctx.fillStyle='rgba(0,0,0,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+2,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
-export function hero(ctx,p,tick){
-  const moving= Math.abs(p.walk-prevHeroWalk)>0.0001;prevHeroWalk=p.walk;
-  ctx.save();ctx.translate(Math.round(p.x),Math.round(p.y));
-  shadow(ctx,3,9,24,10,.7);
-  gradientSpot(ctx,0,-20,58,'#e5a45423','#d2a04d00');
-  const direction=Math.cos(p.angle),faceLeft=direction<-.25;
-  if(faceLeft)ctx.scale(-1,1);
-  if(ready){
-    const hit=p.invuln>0&&Math.floor(tick*15)%3===0;
-    let source;
-    if(hit)source=FRAME.mageHit;
-    else source=frameFor('mage',moving,tick);
-    sprite(ctx,source,-31,-91,62,109);
-    if(p.cast>0){gradientSpot(ctx,28,-55,27,'#ffcf8ca8','#df672500');}
-  }else{ctx.fillStyle='#526e7d';ctx.fillRect(-16,-46,32,46);}
-  ctx.restore();
+export function hero(ctx,p,tick,gear){
+  drawMage(ctx,p,tick,gear);
   ctx.strokeStyle='#e6bc645c';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(p.x,p.y+9,28,11,0,0,Math.PI*2);ctx.stroke();
 }
 let prevHeroWalk=0;
@@ -230,4 +222,5 @@ export function loot(ctx,d,tick){
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
 }
+export function drawItemIcon(canvas,item){return drawEquipmentIcon(canvas,item);}
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}

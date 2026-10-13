@@ -23,7 +23,7 @@ try{
         id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId
       });
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
-        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},
+        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
         inventory:[
           item('staff','weapon','余烬裁决长杖',3,[{key:'power',value:28},{key:'fire',value:13},{key:'crit',value:5}],55),
           item('helmet','head','龙焰冠冕',4,[{key:'resistFire',value:12}],0,8,24,'dragonflame'),
@@ -37,7 +37,7 @@ try{
       }));
     });
     page.on('pageerror',e=>errs.push(e.message));
-    const response=await page.goto('http://127.0.0.1:8765/2d/',{waitUntil:'load'});
+    const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
     await page.waitForTimeout(300);
@@ -48,28 +48,33 @@ try{
       return art.artStatus();
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
-    assert.equal(await page.locator('#region-select option').count(),5,'all five regions present');
+    assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
-    // Traverse an actual door by holding keyboard movement for ~one room width.
-    // The 2D game uses the same seed formula as the test character fixture.
-    const direction=await page.evaluate(async()=>{
-      const {generateMaze,connectedIds}=await import('./maze.js');
-      const maze=generateMaze(20261013+2*19);
-      const first=maze.rooms[maze.entrance],id=connectedIds(maze,maze.entrance)[0];
-      const next=maze.rooms[id];
-      if(next.x>first.x)return 'd';
-      if(next.x<first.x)return 'a';
-      if(next.y>first.y)return 's';
-      return 'w';
+    const maze=await page.evaluate(()=>window.__ember2dQA.mazeInfo());
+    assert.ok(maze.rooms>=16&&maze.hasMask&&maze.explored===1,'v0.3.3 must run on real multiroom maze');
+    const firstBoss=await page.evaluate(()=>window.__ember2dQA.bossTest());
+    assert.equal(firstBoss.state,'playing','boss defeat must not end the game');
+    assert.equal(firstBoss.bossDefeated,true);
+    assert.ok(firstBoss.drops.length>=2,'first boss kill must drop ordinary and exclusive loot');
+    assert.equal(firstBoss.drops.some(d=>d.rarity===3&&d.persistent),true,'guaranteed special legendary');
+    assert.equal(firstBoss.bossKills,1);
+    assert.equal(await page.locator('#portal-open').isVisible(),true,'boss portal must appear');
+    assert.equal(firstBoss.pending,firstBoss.drops.length);
+    assert.equal(await page.locator('#scrim').isVisible(),false,'no victory modal should block loot pickup');
+    const zoomPrevention=await page.evaluate(()=>{
+      const event=new MouseEvent('dblclick',{bubbles:true,cancelable:true});
+      document.querySelector('#game').dispatchEvent(event);
+      return {prevented:event.defaultPrevented,touch:window.getComputedStyle(document.body).touchAction};
     });
-    await page.keyboard.down(direction);
-    await page.waitForTimeout(1680);
-    await page.keyboard.up(direction);
-    assert.match(await page.locator('#quest-progress').innerText(),/迷宫已探索 [2-9]/,
-      'the playable character should discover an adjacent room by crossing its real door');
+    assert.equal(zoomPrevention.prevented,true,'double-tap should be prevented');
+    assert.equal(zoomPrevention.touch,'manipulation');
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const shot=await page.screenshot({type:'jpeg',quality:70});
+      console.log((viewport.isMobile?'BOSS_DROP_MOBILE_BASE64:':'BOSS_DROP_DESKTOP_BASE64:')+shot.toString('base64'));
+    }
     const canvas=page.locator('#game');
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
     await page.keyboard.down('d');await page.waitForTimeout(110);await page.keyboard.up('d');
@@ -82,19 +87,59 @@ try{
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
-    assert.equal(await page.locator('.catalog-skill').count(),7);
+    assert.equal(await page.locator('.catalog-skill').count(),11,'expanded spell catalogue should show all eleven skills');
+    assert.equal(await page.locator('[data-skill]').count(),7,'only seven loadout slots visible on mobile');
+    assert.equal(await page.locator('.skill-slot').count(),11,'skills may be assigned to the action bar');
+    assert.ok(await page.locator('.item-thumbnail').count()>0,'bag should include actual item icon canvases');
+    assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
     await page.locator('.item-detail').first().evaluate(el=>el.click());
+    assert.equal(await page.locator('#item-inspect canvas.item-preview').count(),1,'inspected gear has picture');
     assert.ok((await page.locator('#item-inspect').innerText()).includes('装备'));
+    assert.ok(await page.locator('#inv-quick-equip').isEnabled(),'selected item must support direct equipping');
+    assert.equal(await page.locator('.material-token').count(),3,'all salvage material wallets must render');
+    await page.selectOption('#auto-salvage','1');
+    assert.equal(await page.inputValue('#auto-salvage'),'1');
+    const beforeTemper=await page.locator('#item-inspect').innerText();
+    const temperReady=await page.locator('#inv-temper').isEnabled();
+    assert.equal(typeof temperReady,'boolean');
+    assert.ok((await page.locator('#temper-cost').innerText()).includes('淬炼花费'));
+    const spellRow=page.locator('.skill-catalog-entry').filter({hasText:'冰暴领域'});
+    await spellRow.locator('select').selectOption('0');
+    assert.equal(await page.locator('button[data-skill="storm"]').count(),1);
+    assert.equal(await page.locator('[data-skill]').count(),7);
+    assert.equal(await page.locator('#portal-open').isVisible(),false,'portal button must not cover the inventory');
+    await page.selectOption('#inv-filter','accessory');
+    assert.ok((await page.locator('.item-thumbnail').count())>=1,'accessory filter must retain jewelry');
+    await page.selectOption('#inv-filter','all');
+    const overflow=await page.locator('.inv-workspace').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
+    assert.ok(overflow.scroll<=overflow.client+3,'inventory must not overflow horizontally: '+JSON.stringify(overflow));
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const visual=await page.screenshot({type:'jpeg',quality:62});
       console.log((viewport.isMobile?'INVENTORY_MOBILE_BASE64:':'INVENTORY_DESKTOP_BASE64:')+visual.toString('base64'));
     }
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const craftShot=await page.screenshot({type:'jpeg',quality:69});
+      console.log((viewport.isMobile?'CRAFT_MOBILE_BASE64:':'CRAFT_DESKTOP_BASE64:')+craftShot.toString('base64'));
+    }
     await page.click('#inv-close');
     assert.equal(await page.locator('#inventory').isVisible(),false);
+    await page.keyboard.press('6');
+    await page.waitForTimeout(150);
     await page.click('#btn-pause');
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
+    await page.click('#portal-open');
+    assert.equal(await page.locator('#portal-panel').isVisible(),true);
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const portalImage=await page.screenshot({type:'jpeg',quality:68});
+      console.log((viewport.isMobile?'PORTAL_MOBILE_BASE64:':'PORTAL_DESKTOP_BASE64:')+portalImage.toString('base64'));
+    }
+    assert.equal(await page.locator('#portal-destination option').count(),9);
+    await page.selectOption('#portal-destination','1');
+    await page.click('#portal-next');
+    assert.equal(await page.locator('#portal-panel').isVisible(),false);
+    assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
     await page.waitForTimeout(230);

@@ -64,3 +64,90 @@
  .joystick{bottom:162px}
 }
 @media(max-width:420px){.top-actions button{padding:5px 6px}.brand b{font-size:15px}.brand small{display:none}.region-picker select{max-width:70px}.hud{padding-right:8px}.abilitybar{grid-template-columns:repeat(4,42px)}.abilitybar button{width:42px;min-width:42px}.minimap{display:none}}
+
+/* Mobile game must never trigger double-tap page magnification. User panning
+   inside the inventory is preserved; no inaccessible viewport maximum-scale. */
+html,body,#game,.topbar,.hud,.joystick,.abilitybar,.scrim,.panel-wrap,
+button,select,a,canvas {touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#game,.joystick,.joystick * {touch-action:none;user-select:none;-webkit-user-select:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.equipment-slot{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.equipment-icon{width:37px;height:37px;flex:none;image-rendering:pixelated;filter:drop-shadow(0 1px 4px #0009)}
+.item-detail{display:flex;align-items:center;gap:9px}
+.item-thumbnail{width:45px;height:45px;flex-shrink:0;image-rendering:pixelated;border-radius:2px}
+.item-labels{display:flex;flex-direction:column;min-width:0;text-align:left}
+.item-labels strong{overflow-wrap:anywhere}
+.item-preview{width:64px;height:64px;image-rendering:pixelated;float:left;margin:1px 15px 12px 0}
+.item-inspect:after{content:"";display:block;clear:both}
+@media(max-width:760px){.equipment-icon{width:32px;height:32px}.item-thumbnail{width:40px;height:40px}.item-preview{width:52px;height:52px}}
+
+/* v0.3.2: practical three-column inventory, generous reading area and no overflows */
+.inv-workspace{display:grid;grid-template-columns:minmax(205px,.92fr) minmax(250px,1.08fr) minmax(275px,1.25fr);gap:13px;margin:14px 0;align-items:start}
+.inv-workspace>section{min-width:0;border:1px solid #755a3f66;padding:11px;border-radius:3px;background:#10151bbd}
+.inventory-panel{width:min(1240px,98vw);padding:18px;max-height:94dvh;overflow-y:auto}
+.inv-gear-column .equipment{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.inv-gear-column .equipment-slot{min-height:76px;padding:8px 4px;min-width:0}
+.inv-gear-column .equipment-slot b{max-height:unset;min-height:12px;font-size:11px;white-space:normal;overflow-wrap:anywhere}
+.inv-details-column .item-inspect{min-height:245px;max-width:100%;overflow-wrap:anywhere;margin:12px 0}
+.inv-details-column .item-inspect ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.item-inspect h3,.item-inspect li,.item-inspect p,.inventory-items strong,.inventory-items small,.catalog-skill{white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.item-inspect .set-description{clear:both}
+.inv-details-column .character-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:9px 0}
+.inv-details-column .character-stats span{white-space:normal;display:flex;justify-content:space-between;gap:4px;overflow-wrap:anywhere}
+.inv-details-column .character-stats b,.inv-details-column .character-stats strong{flex-shrink:0}
+.quick-equip{width:100%;min-height:42px;margin-bottom:10px;font-size:13px}
+.quick-equip:disabled{opacity:.5}
+.bag-controls{display:flex;gap:8px;padding:10px 0;flex-wrap:wrap}
+.bag-controls label{display:flex;align-items:center;gap:5px;flex:1;min-width:108px;font-size:11px;color:#b7a489}
+.bag-controls select{width:100%;min-width:0;color:#dec9a8;background:#1b242d;border:1px solid #665540;padding:8px 4px}
+.inv-bag-column .inventory-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:450px;overflow-y:auto}
+.inv-bag-column .item{display:flex;flex-direction:column;min-width:0;gap:7px;padding:8px;background:#161d26;border:1px solid #55504b}
+.inv-bag-column .item.is-selected{border-color:#e6b777;background:#302925}
+.inv-bag-column .item-detail{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%}
+.inv-bag-column .item-detail .item-thumbnail{width:48px;height:48px;flex:none}
+.inv-bag-column .item-labels{align-items:center;text-align:center}
+.inv-bag-column .item-actions{display:flex;gap:5px}
+.inv-bag-column .item-actions button{flex:1;min-width:0;padding:5px 3px;font-size:10px}
+.inv-bag-column .item-detail strong{line-height:1.35;font-size:10px}
+.inv-bag-column .item-detail small{font-size:9px}
+.portal-open{position:fixed;left:50%;bottom:140px;transform:translateX(-50%);z-index:18;padding:12px 21px;border:1px solid #e8ae69;background:#271e19eb;color:#f5d6a9;box-shadow:0 0 27px #ff8a4a66;border-radius:35px;font:600 13px system-ui;cursor:pointer;white-space:nowrap;max-width:96vw}
+.portal-wrap{z-index:40;background:#04080ad9}
+.portal-dialog{margin:auto;width:min(470px,94vw);max-height:90dvh;overflow-y:auto;padding:26px;background:linear-gradient(145deg,#30231b,#131920 68%);border:2px solid #9a6b42;box-shadow:0 20px 95px #000e;color:#e2d1ba}
+.portal-dialog h2{font:normal 28px Georgia,serif;color:#f3c186;margin:14px 0}
+.portal-dialog p{font-size:13px;line-height:1.8;color:#baae9e}
+.portal-dialog label{display:flex;flex-direction:column;gap:8px;margin:16px 0;font-size:12px}
+.portal-dialog select{background:#171e26;color:#f4d9a8;border:1px solid #b98b5a;padding:11px;font-size:14px;width:100%}
+.portal-actions{display:grid;gap:10px}
+.portal-actions button{width:100%;min-height:43px}
+@media(max-width:1030px){.inv-workspace{grid-template-columns:minmax(170px,.9fr) minmax(190px,1fr) minmax(220px,1.2fr)}.inventory-panel{padding:11px}.inv-workspace>section{padding:7px}}
+@media(max-width:700px){
+ .inventory-panel{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;overflow-y:auto;border-radius:0;padding:12px}
+ .inv-workspace{display:grid;grid-template-columns:1fr;gap:9px}
+ .inv-gear-column .equipment{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .inv-gear-column .equipment-slot{min-height:66px}
+ .inv-details-column .item-inspect{min-height:135px}
+ .inv-bag-column .inventory-items{grid-template-columns:repeat(3,minmax(0,1fr));max-height:330px}
+ .inv-bag-column .item-actions{flex-direction:column}
+ .portal-open{bottom:172px;font-size:11px;padding:10px 12px}
+ .portal-dialog{padding:18px}
+}
+@media(max-width:390px){.inv-bag-column .inventory-items{grid-template-columns:repeat(2,minmax(0,1fr))}.inv-gear-column .equipment-slot b{font-size:9px}}
+
+/* v0.3.3 crafting and hotbar: avoid widening the inventory on compact devices */
+.salvage-settings{display:grid;grid-template-columns:1fr;gap:7px;border:1px solid #615341;background:#22201d;padding:9px;border-radius:4px;margin:9px 0}
+.salvage-settings label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;color:#dbba8e}
+.salvage-settings select{font-size:11px;max-width:72%;width:auto;min-width:0;color:#e5d1a9;background:#101721;border:1px solid #746044;padding:7px 4px}
+.salvage-settings button,.tempering-action{padding:9px;border:1px solid #9c7450;background:linear-gradient(#43352b,#241d1c);color:#f4d9b4;white-space:normal;line-height:1.4}
+.salvage-settings small{font-size:10px;color:#b6aca0;overflow-wrap:anywhere;line-height:1.5}
+.material-wallet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:9px 0 12px}
+.material-token{display:flex;flex-direction:column;min-width:0;gap:6px;padding:9px 3px;text-align:center;border:1px solid #746047;background:#141b26}
+.material-token span{font-size:10px;color:#c6b4a0;overflow-wrap:anywhere}
+.material-token strong{font-size:17px}
+.material-token.dust strong{color:#c9bcc5}.material-token.crystal strong{color:#80c6ec}.material-token.core strong{color:#f4a568}
+.tempering-action{display:block;width:100%;margin-bottom:7px}
+.tempering-action:disabled{opacity:.46}
+.crafting-tip{font-size:10px;line-height:1.6;color:#b4a998;margin-bottom:9px;overflow-wrap:anywhere}
+.skill-catalog-entry{display:flex;flex-direction:column;min-width:0;border:1px solid #6b574266;background:#121a22}
+.skill-catalog-entry .catalog-skill{flex:1;border:0;padding:9px;min-height:70px}
+.skill-slot{font-size:10px;max-width:100%;width:100%;background:#28272a;color:#eacba3;border:1px solid #81603c;padding:8px 4px}
+@media(max-width:700px){.material-wallet{grid-template-columns:repeat(3,minmax(0,1fr))}.skill-catalog-entry .catalog-skill{min-height:65px}}

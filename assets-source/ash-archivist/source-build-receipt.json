@@ -1,0 +1,32 @@
+{
+  "mode": "source-only",
+  "generatorSha256": "f7bdbc36ce8fc646818f4eb1aacac3d118d7d05c58313dc97efe12b8d7542d7a",
+  "sourceBlendSha256": "d02212c51ab4c1f130789f28e0c884a2d37d3dffa4045ca8fe6c45d7c06dd64b",
+  "triangles": 45710,
+  "bones": 163,
+  "clips": [
+    "Idle",
+    "Walk",
+    "Cast"
+  ],
+  "packedImages": 22,
+  "coherentCoatTailWeights": [
+    {
+      "part": "Split coat tail -1",
+      "pairedVertices": 425,
+      "changedPairs": 425,
+      "originalWeightL1DifferenceMax": 0.18169023096561432,
+      "baseLayerWeightsChanged": false,
+      "method": "Solidify duplicate layer uses the corresponding original/base-layer weights before rest-pose baking; the first vertex block is not necessarily the physical outside on both panels"
+    },
+    {
+      "part": "Split coat tail 1",
+      "pairedVertices": 425,
+      "changedPairs": 425,
+      "originalWeightL1DifferenceMax": 0.24619630724191666,
+      "baseLayerWeightsChanged": false,
+      "method": "Solidify duplicate layer uses the corresponding original/base-layer weights before rest-pose baking; the first vertex block is not necessarily the physical outside on both panels"
+    }
+  ],
+  "publishedAssetsTouched": false
+}
