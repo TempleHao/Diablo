@@ -65,7 +65,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:{}};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -80,6 +80,12 @@ export function sanitizeSave(raw){
       const item=normalizeItem(value);
       if(item&&!ids.has(item.id)){ids.add(item.id);p.inventory.push(item);}
       if(p.inventory.length>=MAX_ITEMS)break;
+    }
+  }
+  if(raw.bossKills&&typeof raw.bossKills==='object'){
+    for(let region=0;region<5;region++){
+      const rawKills=Number(raw.bossKills[region]);
+      if(Number.isFinite(rawKills))p.bossKills[region]=clamp(Math.floor(rawKills),0,100000);
     }
   }
   let pointsSpent=0;
