@@ -244,11 +244,23 @@ function puff(x,y,color,count=9,radius=3,speed=150){
 function floatText(x,y,value,color='#f1ca90'){texts.push({x,y,text:String(value),color,life:.85});if(texts.length>50)texts.shift();}
 function injury(amount){
   if(hero.invuln>0||state!=='playing')return;
-  hero.hp=Math.max(0,hero.hp-amount);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(amount),'#ff9990');
+  const defense=stats(profile);
+  const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
+  hero.hp=Math.max(0,hero.hp-mitigated);hero.invuln=.6;puff(hero.x,hero.y,'#e46455',13,4,145);floatText(hero.x,hero.y-30,Math.round(mitigated),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
-function dealDamage(e,damage){
-  e.hp-=damage;floatText(e.x,e.y-35,Math.round(damage));puff(e.x,e.y,e.kind==='boss'?'#c88ae2':'#eaa161',6,3);
+function dealDamage(e,damage,school='physical'){
+  if(!enemies.includes(e))return;
+  const bonus=stats(profile);
+  const bonusDamage=school==='fire'?bonus.fire:school==='cold'?bonus.cold:0;
+  damage*=1+bonusDamage/100;
+  if(school==='fire')damage*=1+bonus.skillFire*.09;
+  if(school==='cold')damage*=1+bonus.skillCold*.09;
+  const crit=rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
+  if(school==='fire'&&bonus.sets.dragonflame>=3&&++combo%3===0)damage*=1.45;
+  damage=Math.max(1,Math.round(damage));
+  if(bonus.lifesteal)hero.hp=Math.min(hero.maxHp,hero.hp+bonus.lifesteal);
+  e.hp-=damage;floatText(e.x,e.y-35,(crit?'✦ ':'')+damage,crit?'#ffe29b':'#f1ca90');puff(e.x,e.y,e.kind==='boss'?'#c88ae2':'#eaa161',6,3);
   if(e.hp>0)return;
   const i=enemies.indexOf(e);if(i>=0)enemies.splice(i,1);
   puff(e.x,e.y,e.kind==='boss'?'#e89bff':'#e8904b',22,7,240);
@@ -273,37 +285,43 @@ function dropItem(x,y,rare=false) {
 }
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
 function cast(skill){
-  if(state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0)return;
-  if(skill==='fire'){
-    let dx=Math.cos(hero.angle),dy=Math.sin(hero.angle);
-    if(manualAim && distance(hero,manualAim)>20){
-      const a=Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x);dx=Math.cos(a);dy=Math.sin(a);
-    }else{const e=nearest();if(e){const a=Math.atan2(e.y-hero.y,e.x-hero.x);dx=Math.cos(a);dy=Math.sin(a);}}
-    hero.angle=Math.atan2(dy,dx);hero.cast=.2;cooldowns.fire=.25;
-    missiles.push({x:hero.x+dx*24,y:hero.y+dy*24,vx:dx*680,vy:dy*680,life:1.1,kind:'ember',damage:stats(profile).power});
-    puff(hero.x+dx*27,hero.y+dy*27,'#fdb073',4,2,90);
+  const rule=SKILLS[skill];
+  if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
+  if(hero.mana<rule.mana){announce('法力不足');return;}
+  if(skill==='heal'&&hero.hp>=hero.maxHp)return;
+  const bonus=stats(profile);
+  hero.mana-=rule.mana;
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140);
+  hero.cast=.3;
+  const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
+    Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
+    Math.atan2(target.y-hero.y,target.x-hero.x):hero.angle;
+  const dx=Math.cos(angle),dy=Math.sin(angle);hero.angle=angle;
+  if(skill==='fire'||skill==='shard'){
+    const frost=skill==='shard',speed=frost?570:680;
+    missiles.push({x:hero.x+dx*25,y:hero.y+dy*25,vx:dx*speed,vy:dy*speed,life:frost?1.2:1.1,
+      kind:frost?'shard':'ember',damage:bonus.power*(frost?.82:1),hits:0,hitIds:new Set()});
+    puff(hero.x+dx*27,hero.y+dy*27,frost?'#9bdcf2':'#ffad6e',6,3,100);
   }
-  if(skill==='ice'){
-    if(hero.mana<30){announce('法力不足');return;}
-    hero.mana-=30;cooldowns.ice=5;hero.cast=.35;
-    hazards.push({x:hero.x,y:hero.y,r:0,max:190,life:.45,type:'nova'});
-    for(const e of [...enemies])if(distance(hero,e)<190){e.slow=3;dealDamage(e,stats(profile).power*1.65);}
-    puff(hero.x,hero.y,'#8de4ff',27,4,270);
+  if(skill==='nova'){
+    hazards.push({x:hero.x,y:hero.y,r:0,max:196,life:.45,type:'nova'});
+    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,bonus.power*1.3,'cold');}
+    puff(hero.x,hero.y,'#91deff',27,4,270);
+  }
+  if(skill==='armor'){armorUntil=tick+7;announce('冰甲已激活 · 7 秒',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);}
+  if(skill==='meteor'){
+    const dest=target||{x:hero.x+dx*220,y:hero.y+dy*220};
+    hazards.push({x:dest.x,y:dest.y,r:0,max:125,life:1.0,type:'meteor',triggered:false});
+    announce('陨火坠落！',true);
   }
   if(skill==='blink'){
-    if(hero.mana<20){announce('法力不足');return;}
-    hero.mana-=20;cooldowns.blink=3.6;hero.invuln=.4;
-    const vector=movementVector(), m=Math.hypot(vector.x,vector.y);
-    const dx=m>.05?vector.x/m:Math.cos(hero.angle),dy=m>.05?vector.y/m:Math.sin(hero.angle);
-    puff(hero.x,hero.y,'#a995ff',22,4,170);
-    for(let t=0;t<18;t++)moveWithCollision(hero,dx*950,dy*950,1/60,dungeon,hero.radius);
-    puff(hero.x,hero.y,'#c1adff',22,4,170);
+    const v=movementVector(),mag=Math.hypot(v.x,v.y);
+    const bx=mag>.05?v.x/mag:dx,by=mag>.05?v.y/mag:dy;
+    hero.invuln=.4;puff(hero.x,hero.y,'#aa97ec',21,4,170);
+    for(let t=0;t<18;t++)moveWithCollision(hero,bx*950,by*950,1/60,dungeon,hero.radius);
+    puff(hero.x,hero.y,'#c8b1fe',21,4,170);
   }
-  if(skill==='heal'){
-    if(hero.hp>=hero.maxHp)return;
-    hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*.48);cooldowns.heal=14;
-    puff(hero.x,hero.y,'#a6e4aa',22,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');
-  }
+  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*.48);puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
   updateHud();
 }
 function movementVector() {
@@ -314,7 +332,7 @@ function movementVector() {
 function update(dt){
   tick+=dt;
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
-  hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*7);
+  hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
   if(pointers.size || keys.has('1'))cast('fire');
@@ -322,7 +340,7 @@ function update(dt){
     e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);
     const dx=hero.x-e.x,dy=hero.y-e.y,d=Math.max(1,Math.hypot(dx,dy));
     const speed=e.speed*(e.slow? .38:1);
-    const isRanged=e.kind==='archer', isBoss=e.kind==='boss';
+    const isRanged=['archer','cultist'].includes(e.kind), isBoss=e.kind==='boss';
     if(d>(isRanged?310:isBoss?72:34)){
       const vx=dx/d*speed,vy=dy/d*speed;
       moveWithCollision(e,vx,vy,dt,dungeon,e.radius);
@@ -330,21 +348,28 @@ function update(dt){
       if(d>250&&e.kind==='boss'&&Math.abs(e.x-WIDTH/2)>800){e.x=clamp(e.x,hero.x-700,hero.x+700);}
     }else if(isRanged&&d<230)moveWithCollision(e,-dx/d*speed*.5,-dy/d*speed*.5,dt,dungeon,e.radius);
     if(e.attack<=0){
-      if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
+      if(isRanged&&d<550){const vx=dx/d*355,vy=dy/d*355;missiles.push({x:e.x,y:e.y,vx,vy,kind:e.kind==='cultist'?'void':'shadow',life:2.1,damage:9+profile.clears*2});e.attack=2.3+rng()*.5;}
       else if(isBoss&&d<520){
         const a=Math.atan2(dy,dx);
-        for(let k=-2;k<=2;k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
+        if(e.hp<e.maxHp*.52&&!e.enraged){e.enraged=true;spawn('cultist',randomPoint(160));spawn('spider',randomPoint(160));announce('灰烬司祭进入第二阶段！',true);}
+        for(let k=e.enraged?-3:-2;k<=(e.enraged?3:2);k++){const t=a+k*.19;missiles.push({x:e.x,y:e.y,vx:Math.cos(t)*330,vy:Math.sin(t)*330,kind:'void',life:2.0,damage:13+profile.clears*3});}
         hazards.push({x:e.x,y:e.y,r:0,max:90,life:.6,type:'void'});e.attack=2.3;
-      }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:1.0;}
+      }else if(!isRanged&&!isBoss&&d<e.radius+hero.radius+17){injury(e.kind==='brute'?16+profile.clears*2:e.kind==='spider'?6+profile.clears*2:8+profile.clears*2);e.attack=e.kind==='brute'?1.45:e.kind==='spider'?.72:1.0;}
       else if(isBoss&&d<90){injury(19+profile.clears*3);e.attack=1.35;}
     }
   }
   for(const m of [...missiles]){
     m.x+=m.vx*dt;m.y+=m.vy*dt;m.life-=dt;
     if(m.life<=0||!walkable(m.x,m.y,7,dungeon)){missiles.splice(missiles.indexOf(m),1);continue;}
-    if(m.kind==='ember'){
-      const e=enemies.find(q=>distance(q,m)<q.radius+11);
-      if(e){dealDamage(e,m.damage);puff(m.x,m.y,'#ffba6e',10,3);missiles.splice(missiles.indexOf(m),1);}
+    if(m.kind==='ember'||m.kind==='shard'){
+      const e=enemies.find(q=>!m.hitIds?.has(q.id)&&distance(q,m)<q.radius+11);
+      if(e){
+        dealDamage(e,m.damage,m.kind==='shard'?'cold':'fire');
+        if(m.kind==='shard')e.slow=Math.max(e.slow,1.5);
+        puff(m.x,m.y,m.kind==='shard'?'#b4e9ff':'#ffba6e',10,3);
+        m.hitIds?.add(e.id);m.hits=(m.hits||0)+1;
+        if(m.kind==='ember'||m.hits>=2)missiles.splice(missiles.indexOf(m),1);
+      }
     }else if(distance(hero,m)<hero.radius+9){injury(m.damage);puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(missiles.indexOf(m),1);}
   }
   for(const d of [...drops]){
@@ -357,7 +382,14 @@ function update(dt){
   }
   for(const p of [...particles]){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=1-dt*2;p.vy*=1-dt*2;p.life-=dt;if(p.life<=0)particles.splice(particles.indexOf(p),1);}
   for(const f of [...texts]){f.y-=dt*36;f.life-=dt;if(f.life<=0)texts.splice(texts.indexOf(f),1);}
-  for(const h of [...hazards]){h.life-=dt;h.r+=(h.max-h.r)*dt*13;if(h.life<=0)hazards.splice(hazards.indexOf(h),1);}
+  for(const h of [...hazards]){
+    h.life-=dt;h.r+=(h.max-h.r)*dt*13;
+    if(h.type==='meteor'&&!h.triggered&&h.life<.25){
+      h.triggered=true;puff(h.x,h.y,'#ff9146',50,8,280);
+      for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*2.8,'fire');
+    }
+    if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
+  }
   updateHud();
 }
 function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick); }
@@ -368,8 +400,9 @@ function enemyDraw(e){ Art.enemy(ctx,e,tick); }
 function heroDraw(){ Art.hero(ctx,hero,tick); }
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));
-  if(m.kind==='ember'){
-    const g=ctx.createRadialGradient(0,0,2,0,0,25);g.addColorStop(0,'#fff3c9');g.addColorStop(.3,'#ffb65a');g.addColorStop(1,'#ef5f1800');
+  if(m.kind==='ember'||m.kind==='shard'){
+    const ice=m.kind==='shard';
+    const g=ctx.createRadialGradient(0,0,2,0,0,25);g.addColorStop(0,'#f6f5ff');g.addColorStop(.3,ice?'#8de2fc':'#ffb65a');g.addColorStop(1,ice?'#2d6d9c00':'#ef5f1800');
     ellipse(-12,0,25,13,'#e65d1840');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,25,0,7);ctx.fill();ellipse(0,0,7,5,'#ffead2');
   }else{ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');ellipse(-8,0,12,4,'#8c66b388');}
   ctx.restore();
