@@ -53,6 +53,23 @@ try{
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
+    // Traverse an actual door by holding keyboard movement for ~one room width.
+    // The 2D game uses the same seed formula as the test character fixture.
+    const direction=await page.evaluate(async()=>{
+      const {generateMaze,connectedIds}=await import('./maze.js');
+      const maze=generateMaze(20261013+2*19);
+      const first=maze.rooms[maze.entrance],id=connectedIds(maze,maze.entrance)[0];
+      const next=maze.rooms[id];
+      if(next.x>first.x)return 'd';
+      if(next.x<first.x)return 'a';
+      if(next.y>first.y)return 's';
+      return 'w';
+    });
+    await page.keyboard.down(direction);
+    await page.waitForTimeout(1680);
+    await page.keyboard.up(direction);
+    assert.match(await page.locator('#quest-progress').innerText(),/迷宫已探索 [2-9]/,
+      'the playable character should discover an adjacent room by crossing its real door');
     const canvas=page.locator('#game');
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
     await page.keyboard.down('d');await page.waitForTimeout(110);await page.keyboard.up('d');
