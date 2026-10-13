@@ -1,6 +1,6 @@
 import * as Art from './art.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage } from './core.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -187,7 +187,7 @@ function renderInventory(){
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
     ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
     ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
-    ['已净化',profile.clears]
+    ['未分配技能点',profile.skillPoints],['已净化',profile.clears]
   ];
   const char=$('character-stats');char.replaceChildren();
   for(const [k,v] of statFields){const node=document.createElement('span');const b=document.createElement('strong');node.textContent=k+' ';b.textContent=v;node.append(b);char.append(node);}
@@ -222,9 +222,15 @@ function renderInventory(){
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
   for(const [key,skill] of Object.entries(SKILLS)){
     const btn=document.createElement('button');btn.type='button';
-    btn.className='catalog-skill '+(profile.level<skill.unlocked?'unavailable':'');
-    btn.textContent=skill.icon+' '+skill.name+' · '+skill.desc+'（'+skill.unlocked+' 级解锁）';
-    btn.onclick=()=>announce(skill.name+'：'+skill.desc,true);skillPanel.append(btn);
+    const rank=profile.skillRanks[key]||0,locked=profile.level<skill.unlocked;
+    btn.className='catalog-skill '+(locked?'unavailable':'');
+    btn.textContent=skill.icon+' '+skill.name+' · 等级 '+rank+'/8 · '+skill.desc+
+      (locked?'（'+skill.unlocked+' 级解锁）':profile.skillPoints>0&&rank<8?' · 点击升级':'');
+    btn.disabled=locked||profile.skillPoints<=0||rank>=8;
+    btn.onclick=()=>{
+      if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
+    };
+    skillPanel.append(btn);
   }
 }
 $('export-save').onclick=()=>{
@@ -311,9 +317,9 @@ function cast(skill){
   if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
   if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
-  const bonus=stats(profile);
+  const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
   hero.mana-=rule.mana;
-  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140);
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02));
   hero.cast=.3;
   const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
     Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
@@ -322,28 +328,28 @@ function cast(skill){
   if(skill==='fire'||skill==='shard'){
     const frost=skill==='shard',speed=frost?570:680;
     missiles.push({x:hero.x+dx*25,y:hero.y+dy*25,vx:dx*speed,vy:dy*speed,life:frost?1.2:1.1,
-      kind:frost?'shard':'ember',damage:bonus.power*(frost?.82:1),hits:0,hitIds:new Set()});
+      kind:frost?'shard':'ember',damage:bonus.power*(frost?.82:1)*(1+rank*.13),hits:0,hitIds:new Set()});
     puff(hero.x+dx*27,hero.y+dy*27,frost?'#9bdcf2':'#ffad6e',6,3,100);
   }
   if(skill==='nova'){
     hazards.push({x:hero.x,y:hero.y,r:0,max:196,life:.45,type:'nova'});
-    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,bonus.power*1.3,'cold');}
+    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,bonus.power*(1.3+rank*.18),'cold');}
     puff(hero.x,hero.y,'#91deff',27,4,270);
   }
-  if(skill==='armor'){armorUntil=tick+7;announce('冰甲已激活 · 7 秒',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);}
+  if(skill==='armor'){armorUntil=tick+7+rank*.5;announce('冰甲已激活',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);}
   if(skill==='meteor'){
     const dest=target||{x:hero.x+dx*220,y:hero.y+dy*220};
-    hazards.push({x:dest.x,y:dest.y,r:0,max:125,life:1.0,type:'meteor',triggered:false});
+    hazards.push({x:dest.x,y:dest.y,r:0,max:125,life:1.0,type:'meteor',triggered:false,rank});
     announce('陨火坠落！',true);
   }
   if(skill==='blink'){
     const v=movementVector(),mag=Math.hypot(v.x,v.y);
     const bx=mag>.05?v.x/mag:dx,by=mag>.05?v.y/mag:dy;
     hero.invuln=.4;puff(hero.x,hero.y,'#aa97ec',21,4,170);
-    for(let t=0;t<18;t++)moveWithCollision(hero,bx*950,by*950,1/60,dungeon,hero.radius);
+    for(let t=0;t<18;t++)moveWithCollision(hero,bx*(950+rank*85),by*(950+rank*85),1/60,dungeon,hero.radius);
     puff(hero.x,hero.y,'#c8b1fe',21,4,170);
   }
-  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*.48);puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
+  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
   updateHud();
 }
 function movementVector() {
@@ -408,7 +414,7 @@ function update(dt){
     h.life-=dt;h.r+=(h.max-h.r)*dt*13;
     if(h.type==='meteor'&&!h.triggered&&h.life<.25){
       h.triggered=true;puff(h.x,h.y,'#ff9146',50,8,280);
-      for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*2.8,'fire');
+      for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*(2.8+(h.rank||0)*.36),'fire');
     }
     if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
   }
