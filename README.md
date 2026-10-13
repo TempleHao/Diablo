@@ -1,8 +1,10 @@
 # 余烬法师 · Ember Mage
 
-> **2D 试玩迭代（v0.3.5）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 试玩迭代（v0.3.6 候选版）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
 
+> **v0.3.6 试玩候选：密集战斗与五种法师外观**：增加五色法师皮肤选择（星辉蓝、烈焰红、圣辉白、暗影紫、自然绿），旧存档安全兼容。全区普通怪总量从 12 提升至 36，三波各 12、后两波含精英守卫，Boss 仍有专属掉落和下一图传送阵。冰晶、火焰飞弹、闪电、奥术与冲击波新增粒子/光效（有限额）；装备图标重新打磨金属材质、稀有边框与真实槽位轮廓；地牢增石砖裂纹、拱廊阴影、火把局部光池和仪式台。**这仍是试玩版特效和程序化换色，尚非 5 种独立逐帧角色或概念图级真实迷宫**。详见 [v0.3.6 验收](docs/2D-V0.3.6-ACCEPTANCE.md)，写实暗黑 2.5D 最终路线继续按 [双轨纲领](docs/2d-final/DUAL-ART-DIRECTION.md)推进。
+>
 > **v0.3.5 测试版像素法师动作更新**：用用户提供的蓝金色星辉像素法师参考图制作游戏内实机角色，替换临时僵硬的矢量角色；加入下摆/脚步分层的走路循环、呼吸/摇摆、施法光环、受击闪烁、足迹与移动残影，保持手机与桌面小比例。原矢量法师仅作为贴图载入失败时的回退。真正运行截图：[PC 待机](docs/screenshots/2d-v0.3.5-mage-idle-desktop.jpg) · [PC 跑步](docs/screenshots/2d-v0.3.5-mage-running-desktop.jpg) · [手机待机](docs/screenshots/2d-v0.3.5-mage-idle-mobile.jpg) · [手机跑步](docs/screenshots/2d-v0.3.5-mage-running-mobile.jpg)。这仍是基于单角色画面的程序化动画，不是完整八方向逐帧手绘。**像素风只适用现有 Demo，正式最终版仍锁定写实暗黑斜俯视 2.5D A 方向**，详见 [不可变的双轨美术纲领](docs/2d-final/DUAL-ART-DIRECTION.md)。
 >
 > **v0.3.4 体验修复**：重新绘制更纤细的深色法师并降低人物/怪物在手机上的绘制比例；改善中文字体和行高；手机背包采用“背包 / 装备对比 / 已穿装备”三标签与固定穿戴按钮，单击物品直接对比，两个戒指槽可以指定替换。保留旧存档。实际 Chromium 测试画面：[手机版角色](docs/screenshots/2d-v0.3.4-scene-mobile.jpg) · [手机版背包](docs/screenshots/2d-v0.3.4-inventory-bag-mobile.jpg) · [手机版属性对比](docs/screenshots/2d-v0.3.4-inventory-compare-mobile.jpg) · [横屏对比](docs/screenshots/2d-v0.3.4-inventory-compare-landscape.jpg) · [电脑版](docs/screenshots/2d-v0.3.4-scene-desktop.jpg)。详见 [真实验收清单](docs/2D-V0.3.4-ACCEPTANCE.md)。目前人物是过渡矢量美术，写实 A 向高质量 sprite/地牢场景尚未完成。
