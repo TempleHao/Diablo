@@ -42,7 +42,15 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   const draw=(dx,dy,alpha=1,filter='none')=>{
     ctx.save();ctx.globalAlpha=alpha;ctx.filter=filter;
     ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(mage,0,0,imageW,imageH,dx-imageW/2,dy-imageH+3,imageW,imageH);
+    const bottom=imageH-33;
+    if(pose.moving){
+      // Real, separately transformed lower-body layer: alternating foot travel,
+      // not simply translating an unchanging still picture.
+      ctx.drawImage(mage,0,0,imageW,bottom,dx-imageW/2,dy-imageH+3,imageW,bottom);
+      ctx.save();ctx.translate(pose.stride*1.8,Math.abs(pose.stride)*-.65);
+      ctx.drawImage(mage,0,bottom,imageW,33,dx-imageW/2,dy-imageH+3+bottom,imageW,33);
+      ctx.restore();
+    }else ctx.drawImage(mage,0,0,imageW,imageH,dx-imageW/2,dy-imageH+3,imageW,imageH);
     ctx.restore();
   };
   // Rapid caster lean + short-lived trail, independent of the world collider.
