@@ -52,7 +52,8 @@ test('XP gain levels repeatedly and stops at 60',()=>{
 });
 test('old or absent data does not crash current 2D save',()=>{
   assert.deepEqual(sanitizeSave(null),freshSave());
-  assert.deepEqual(sanitizeSave({version:2,level:99}),freshSave());
+  assert.equal(sanitizeSave({version:2,level:99}).level,60);
+  assert.deepEqual(sanitizeSave({version:3,level:99}),freshSave());
 });
 test('saved equipment referencing missing item is cleared',()=>{
   const p=sanitizeSave({version:1,level:12,xp:0,inventory:[],equipped:{weapon:'absent'}});
