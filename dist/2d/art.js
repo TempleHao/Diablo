@@ -46,13 +46,13 @@ function fixture(ctx,x,y,r=1){
   ctx.fillStyle='#fff3bb';ctx.beginPath();ctx.ellipse(0,-12,2,4*pulse,0,0,Math.PI*2);ctx.fill();
   ctx.restore();
 }
-export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0){
+export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   ctx.fillStyle='#0a1015';ctx.fillRect(0,0,worldW,worldH);
   if(!ready)return;
   const S=48, left=Math.max(0,Math.floor(cam.x/S)-1),right=Math.min(Math.ceil(worldW/S),Math.ceil((cam.x+vw)/S)+1);
   const top=Math.max(0,Math.floor(cam.y/S)-1),bottom=Math.min(Math.ceil(worldH/S),Math.ceil((cam.y+vh)/S)+1);
   for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
-    const v=hash(x,y,501),tex=FRAME.floor[v%8];
+    const v=hash(x,y,501 ^ seed ^ ((region+1)*733)),tex=FRAME.floor[(v+region*2)%8];
     sprite(ctx,[tex[0],tex[1],16,16],x*S,y*S,S+1,S+1);
     // Keep pixel-art intact; irregular soot patches and scattered rubble are transparent overlays.
     if(v%15===0){ctx.fillStyle='#090d1180';ctx.fillRect(x*S+7,y*S+7,18,6);}
@@ -128,16 +128,16 @@ export function pillar(ctx,b){
   }
 }
 export function torch(ctx,t){fixture(ctx,t.x,t.y);}
-export function scenery(ctx,cam,vw,vh,worldW,worldH,tick){
+export function scenery(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   if(!ready)return;
   // A few non-interactive set dressing objects, deterministic by tile position.
   const S=48,x0=Math.max(2,Math.floor(cam.x/S)),x1=Math.min(Math.floor(worldW/S)-2,Math.ceil((cam.x+vw)/S));
   const y0=Math.max(3,Math.floor(cam.y/S)),y1=Math.min(Math.floor(worldH/S)-3,Math.ceil((cam.y+vh)/S));
   for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
-    const h=hash(x,y,933);
-    if(h%137===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
-    if(h%253===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
-    if(h%181===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
+    const h=hash(x,y,933 ^ seed ^ ((region+1)*1193));
+    if(h%[101,83,155,117,92][region]===0)sprite(ctx,FRAME.crate,x*S+3,y*S-12,37,55);
+    if(h%[281,91,137,304,99][region]===0)sprite(ctx,FRAME.banner,x*S+10,y*S-8,30,31);
+    if(h%[193,163,67,107,79][region]===0)sprite(ctx,FRAME.skull,x*S+19,y*S+15,26,26);
   }
 }
 function frameFor(kind,walking,elapsed){
