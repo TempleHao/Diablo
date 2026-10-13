@@ -1,0 +1,481 @@
+{
+  "stage": "Native Blender GLB cloth imported into fresh studio scene",
+  "sourceSha": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+  "scriptSha": "4ade2759642629b3f78bb2d8fd27d712c5c143c1803333a4a859ee80bf8c736e",
+  "samples": [
+    {
+      "label": "old-high",
+      "asset": "ember-mage-realism.glb",
+      "assetSha": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3",
+      "mode": "normal",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-high-Walk-f9-tail-normal.png",
+      "outputSha": "bc43e52b37df7571aad1e389bc352b7f3cb25b796de3ac034183d6ace992d335"
+    },
+    {
+      "label": "old-high",
+      "asset": "ember-mage-realism.glb",
+      "assetSha": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3",
+      "mode": "zero",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-high-Walk-f9-tail-zero.png",
+      "outputSha": "de87fd6bced4c558f51587d83c0f4233ca9942330379035156ee3585aa975804"
+    },
+    {
+      "label": "old-high",
+      "asset": "ember-mage-realism.glb",
+      "assetSha": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3",
+      "mode": "neutral",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-high-Walk-f9-tail-neutral.png",
+      "outputSha": "2503f1b367e974a1624f5a36e4482a99ae45beab9c962537f2290234e98d3dff"
+    },
+    {
+      "label": "old-low",
+      "asset": "ember-mage-combat.glb",
+      "assetSha": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+      "mode": "normal",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-low-Walk-f9-tail-normal.png",
+      "outputSha": "9557c74a8e8dc71a8e7d800cc53c796df0068b08a0d4457119a8c0bc41fa0483"
+    },
+    {
+      "label": "old-low",
+      "asset": "ember-mage-combat.glb",
+      "assetSha": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+      "mode": "zero",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-low-Walk-f9-tail-zero.png",
+      "outputSha": "e6c6ca0bf2e461fdb5d11ff43aa2edc040b0cb51af12bc42fa2304933e60988b"
+    },
+    {
+      "label": "old-low",
+      "asset": "ember-mage-combat.glb",
+      "assetSha": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+      "mode": "neutral",
+      "clip": "Walk_AshArchivistRig",
+      "frame": 9,
+      "fps": 24,
+      "camera": [
+        0.949999988079071,
+        -1.850000023841858,
+        0.8700000047683716
+      ],
+      "cameraQuaternion": [
+        0.7240988612174988,
+        0.648432195186615,
+        0.1567591279745102,
+        0.17505159974098206
+      ],
+      "lens": 75.0,
+      "target": [
+        0.0,
+        0.0,
+        0.6399999856948853
+      ],
+      "lights": [
+        {
+          "name": "Warm neutral key",
+          "type": "AREA",
+          "energy": 500.0,
+          "location": [
+            -3.0,
+            -4.0,
+            5.0
+          ],
+          "color": [
+            1.0,
+            0.8399999737739563,
+            0.6700000166893005
+          ],
+          "size": 4.0
+        },
+        {
+          "name": "Cool restrained rim",
+          "type": "AREA",
+          "energy": 400.0,
+          "location": [
+            2.0,
+            2.0,
+            3.0
+          ],
+          "color": [
+            0.6100000143051147,
+            0.6800000071525574,
+            0.7599999904632568
+          ],
+          "size": 3.0
+        },
+        {
+          "name": "Soft face fill",
+          "type": "AREA",
+          "energy": 160.0,
+          "location": [
+            1.0,
+            -4.0,
+            2.5999999046325684
+          ],
+          "color": [
+            0.8999999761581421,
+            0.8899999856948853,
+            0.8500000238418579
+          ],
+          "size": 3.0
+        }
+      ],
+      "output": "old-low-Walk-f9-tail-neutral.png",
+      "outputSha": "2e032d7f79f03fddb0ed5e7e674a1d2dc4c54b83a0cd5625366908c4331757a6"
+    }
+  ],
+  "limitations": [
+    "480 square crop, Cycles 8 samples, one CPU thread, fixed Walk frame 9.",
+    "Studio light/camera ablation is separate from actual Chromium production-preview shader evidence.",
+    "Shared opaque atlas is ablated globally; neutral shader removes all opaque texture/material variation.",
+    "No real-device or commercial art-quality claim."
+  ]
+}

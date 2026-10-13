@@ -17,3 +17,15 @@ Experimental budget source is saved and Python compilation passes. It reconstruc
 Native baseline viewer checked fixed Idle/front/back normal/zero-normal/neutral materials; normal-vs-zero RGB difference is tiny and old offline black spots were not reproduced there. Neutral material still shows pointed/folded tail geometry. More fixed Walk/Cast evidence is being collected. Do not claim exclusive normal-map cause or elimination of an unobserved defect.
 
 Next: inspect scratch budget result/failures, final exported texCoord1 compatibility and full-cycle coat-tail errors, then compare real native/offline pictures. Source receipt and generation command permit rebuilding without the old machine. ART-02 remains in_progress and all final assets/tests/deployment are pending.
+
+## Checkpoint3 — 2026-10-13T03:44:06Z
+
+Real source-shell root issue measured: original 6mm paired coat layers separate to20.38097mm at Walk9 because corresponding inside/outside nearest-bone groups differ. Generator now copies paired outer weights before rest-pose bake. Fresh corrected source SHA958e42d3864cf7a71fc2728f3329d59f875e377e2ec93e5598ec83774eadd70c.
+
+Independent Blender comparison passes across215 parts: source topology/rest positions/UV, all rest bones/actions, outer coat and every other part's weights unchanged.84 source layer samples (full Walk and selected Idle/Cast) give corrected max6.000096mm. Source-check helper, receipts and actual original/corrected measurements are saved in docs/qa.
+
+Baseline renderer result:36 actual viewer ablations +6 Cycles8 studio crops +portable6-image quick execution pass; no specific black-spot disappearance was demonstrated when normal was removed. Do not turn old studio concern into claimed unique normal root cause.
+
+Experimental budget remains unverified. Earlier low-shell even-offset created a24.934mm reverse-direction spike and was rejected; uniform6mm fixed it. Fresh coherent-source L0 bidirectional surface max5.977mm passed12mm target, but actual NormalUV pixel overlap gate rejected atlas; no new GLB was exported or integrated. Current source snapshot is saved while packing/bake diagnostics continue. Keep12/25mm tail gates and zero overlap/coverage gates; do not loosen to declare pass.
+
+Next: finish non-overlapping final-low normal charts/high-to-low projections, verify native texCoord1/PBR/frame behavior on L0/L1 and actual pictures, then save final binaries/report before integration. Face/scalp/material polish and commercial/user acceptance remain pending ART-02.

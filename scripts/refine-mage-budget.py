@@ -20,10 +20,14 @@ from mathutils.bvhtree import BVHTree
 
 cli = argparse.ArgumentParser(description=__doc__)
 cli.add_argument('project')
-cli.add_argument('--tail-ratio-l0', type=float, default=.70)
-cli.add_argument('--tail-ratio-l1', type=float, default=.32)
+cli.add_argument('--tail-ratio-l0', type=float, default=.80)
+cli.add_argument('--tail-ratio-l1', type=float, default=.40)
 cli.add_argument('--tail-error-l0', type=float, default=.012)
 cli.add_argument('--tail-error-l1', type=float, default=.025)
+cli.add_argument('--baseline-shell-report', type=Path)
+cli.add_argument('--baseline-source-sha256')
+cli.add_argument('--allow-incoherent-source', action='store_true',
+                 help='Diagnostic only: disclose and repair an older source with mismatched shell-layer weights')
 ARGS = cli.parse_args(sys.argv[sys.argv.index('--') + 1:])
 ROOT = Path(ARGS.project).resolve()
 OUT = ROOT / 'assets-source/ash-archivist'
@@ -37,12 +41,26 @@ FOCUS = bpy.data.objects.get('face_focus')
 assert PARTS and FOCUS
 SOURCE_FILE = bpy.data.filepath
 REPORT = {'schema': 2, 'inputBlend': Path(SOURCE_FILE).name,
+          'generator': {'file':Path(__file__).name,
+                        'sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                        'settings':{k:str(v) if isinstance(v,Path) else v for k,v in vars(ARGS).items()}},
           'sourceBlendSha256': hashlib.sha256(Path(SOURCE_FILE).read_bytes()).hexdigest(),
           'sourceTriangles': sum(sum(len(p.vertices)-2 for p in o.data.polygons) for o in PARTS),
           'sourceBones': len(RIG.data.bones), 'atlasResolution': 2048,
           'limitations': ['No measured real-device GPU frame rate, memory, heat or battery evidence',
                           'Commercial D2R/D4 art quality is not established',
                           'Inactive face/toe helper channels are merged; separate facial animation requires the source rig']}
+if ARGS.baseline_shell_report:
+    assert ARGS.baseline_source_sha256 and re.fullmatch('[a-f0-9]{64}', ARGS.baseline_source_sha256)
+    evidence_file = ARGS.baseline_shell_report.resolve()
+    evidence_data = json.loads(evidence_file.read_text())
+    baseline_samples = evidence_data['samples'] if isinstance(evidence_data,dict) else evidence_data
+    REPORT['sourceShellBaseline'] = {
+        'sourceBlendSha256':ARGS.baseline_source_sha256,
+        'diagnosticFile':evidence_file.name, 'diagnosticSha256':hashlib.sha256(evidence_file.read_bytes()).hexdigest(),
+        'originalPairSeparationMaxMeters':max(s['pairedShellSeparationMaxMeters'] for s in baseline_samples),
+        'intentionalChange':'Source generator now shares corresponding tail-layer weights; original outside weighting is retained',
+        'samples':baseline_samples}
 
 
 def triangles(obj):
@@ -101,9 +119,47 @@ TAIL_FRAMES = [('Walk', frame) for frame in range(int(CLIPS['Walk'].frame_range.
                                                int(CLIPS['Walk'].frame_range.y)+1)]
 TAIL_FRAMES += [(clip, frame) for clip, frame in SAMPLES if clip != 'Walk']
 TAIL_REFERENCE = {}
+TAIL_SHARED_REFERENCE = {}
+shared_tails = {}
+for source in TAILS:
+    copy = source.copy(); copy.data = source.data.copy(); copy.name = 'Shared-weight tail reference '+source.name
+    bpy.context.collection.objects.link(copy); shared_tails[source.name] = copy
+    count = len(copy.data.vertices)//2
+    assert count*2 == len(copy.data.vertices)
+    for i in range(count):
+        outside_weights = [(g.group,g.weight) for g in copy.data.vertices[i].groups]
+        for group in list(copy.data.vertices[i+count].groups): copy.vertex_groups[group.group].remove([i+count])
+        for group,weight in outside_weights: copy.vertex_groups[group].add([i+count],weight,'REPLACE')
+shell_correction = []
 for clip, frame in TAIL_FRAMES:
     pose(clip, frame)
     TAIL_REFERENCE[(clip, frame)] = {o.name: points(o) for o in TAILS}
+    TAIL_SHARED_REFERENCE[(clip, frame)] = {name:points(copy) for name,copy in shared_tails.items()}
+    for source in TAILS:
+        original = TAIL_REFERENCE[(clip,frame)][source.name]
+        shared = TAIL_SHARED_REFERENCE[(clip,frame)][source.name]
+        count = len(original)//2
+        shell_correction.append({'part':source.name,'clip':clip,'frame':frame,
+            'originalShellPairSeparationMaxMeters':float(np.linalg.norm(original[:count]-original[count:],axis=1).max()),
+            'sharedWeightShellPairSeparationMaxMeters':float(np.linalg.norm(shared[:count]-shared[count:],axis=1).max()),
+            'intentionalInnerVertexCorrectionMaxMeters':float(np.linalg.norm(shared[count:]-original[count:],axis=1).max()),
+            'outsideVertexChangeMaxMeters':float(np.linalg.norm(shared[:count]-original[:count],axis=1).max())})
+for copy in shared_tails.values(): bpy.data.objects.remove(copy,do_unlink=True)
+REPORT['tailShellWeightCorrection'] = {
+    'method':'Retain authored outside weights; share those weights with corresponding inside vertices',
+    'reason':'Independent nearest-three-bone selection gives opposing layers different bone sets despite only 6mm separation',
+    'inputBlendUnmodified':True,
+    'referenceDisclosure':'Tail fidelity gate uses this explicit corrected high reference; frozen-original deformation differences are separately measured',
+    'originalShellPairSeparationMaxMeters':max(s['originalShellPairSeparationMaxMeters'] for s in shell_correction),
+    'sharedWeightShellPairSeparationMaxMeters':max(s['sharedWeightShellPairSeparationMaxMeters'] for s in shell_correction),
+    'intentionalInnerVertexCorrectionMaxMeters':max(s['intentionalInnerVertexCorrectionMaxMeters'] for s in shell_correction),
+    'outsideVertexChangeMaxMeters':max(s['outsideVertexChangeMaxMeters'] for s in shell_correction),
+    'samples':shell_correction}
+assert REPORT['tailShellWeightCorrection']['outsideVertexChangeMaxMeters'] < 1e-7
+assert REPORT['tailShellWeightCorrection']['sharedWeightShellPairSeparationMaxMeters'] < .006001
+REPORT['tailShellWeightCorrection']['sourceWasAlreadyCoherent'] = REPORT['tailShellWeightCorrection']['intentionalInnerVertexCorrectionMaxMeters'] < 1e-7
+assert ARGS.allow_incoherent_source or REPORT['tailShellWeightCorrection']['sourceWasAlreadyCoherent'], \
+    'Rebuild the source with corresponding tail-layer weights before producing release budgets'
 
 KEEP = {'root', 'spine01', 'spine02', 'spine03', 'spine04', 'spine05', 'neck01', 'head'}
 for side in ('L', 'R'):
@@ -489,7 +545,7 @@ def reduce_tail(obj, ratio):
     border = {v.index for e in bm.edges if e.is_boundary for v in e.verts}
     bm.free()
     protect = obj.vertex_groups.new(name='Budget tail border protection')
-    protect.add(sorted(border), 1, 'REPLACE')
+    protection_weights = {vertex:1.0 for vertex in border}
     # Mark high skin-weight gradients as well as the opening and hem. The group
     # is only a collapse cost and is removed before normal skin normalization.
     bone_groups = {g.index for g in obj.vertex_groups if g.name in KEEP}
@@ -497,7 +553,10 @@ def reduce_tail(obj, ratio):
     for edge in obj.data.edges:
         a, b = edge.vertices
         gradient = sum(abs(skin[a].get(i, 0)-skin[b].get(i, 0)) for i in skin[a].keys()|skin[b].keys())
-        if gradient > .16: protect.add([a,b], min(1, gradient*2), 'REPLACE')
+        if gradient > .16:
+            for vertex in (a,b):
+                protection_weights[vertex] = max(protection_weights.get(vertex,0), min(1,gradient*2))
+    for vertex,weight in protection_weights.items(): protect.add([vertex],weight,'REPLACE')
     # The temporary group must not participate in the runtime skin weights.
     active(obj)
     dec = obj.modifiers.new('Outside-only weighted tail collapse', 'DECIMATE')
@@ -510,7 +569,7 @@ def reduce_tail(obj, ratio):
     if remaining_protection: obj.vertex_groups.remove(remaining_protection)
     normalize_weights(obj)
     shell = obj.modifiers.new('Final corresponding 6mm tail shell', 'SOLIDIFY')
-    shell.thickness = .006; shell.offset = -1; shell.use_even_offset = True
+    shell.thickness = .006; shell.offset = -1; shell.use_even_offset = False
     while obj.modifiers.find(shell.name) > 0: bpy.ops.object.modifier_move_up(modifier=shell.name)
     bpy.ops.object.modifier_apply(modifier=shell.name)
     obj.data.update()
@@ -538,10 +597,14 @@ def uv_raster_evidence(objects, rectangle):
     """
     x, y, width, height = rectangle
     coverage = np.zeros((height, width), dtype=np.uint16)
+    owners = np.full((height,width),-1,dtype=np.int32)
+    face_labels = []
+    overlaps = []
     areas = []
     for obj in objects:
         uv = obj.data.uv_layers['NormalUV']
         for polygon in obj.data.polygons:
+            face_index = len(face_labels); face_labels.append((obj.name,polygon.index))
             a,b,c = [np.array(uv.data[i].uv)*2048-np.array((x,y)) for i in polygon.loop_indices]
             ab,ac = b-a,c-a
             determinant = ab[0]*ac[1]-ab[1]*ac[0]
@@ -555,13 +618,21 @@ def uv_raster_evidence(objects, rectangle):
             u=(dx*ac[1]-dy*ac[0])/determinant
             v=(ab[0]*dy-ab[1]*dx)/determinant
             interior=(u>1e-5)&(v>1e-5)&(u+v<1-1e-5)
+            region = coverage[low[1]:high[1]+1,low[0]:high[0]+1]
+            owner_region = owners[low[1]:high[1]+1,low[0]:high[0]+1]
+            for previous in np.unique(owner_region[interior & (region>0)]):
+                overlaps.append({'previous':face_labels[int(previous)],'current':face_labels[face_index]})
+            owner_region[interior & (region==0)] = face_index
             coverage[low[1]:high[1]+1,low[0]:high[0]+1] += interior
     result={'triangles':len(areas),'minimumTriangleAreaPixels':min(areas),
             'coveredInteriorPixels':int(np.count_nonzero(coverage)),
             'overlappingInteriorPixels':int(np.count_nonzero(coverage>1)),
             'verification':'triangle interiors sampled at original 512px tile pixel centers'}
     assert result['minimumTriangleAreaPixels'] > 1e-7, 'Degenerate normal UV triangle'
-    assert result['overlappingInteriorPixels'] == 0, 'Overlapping final cloth NormalUV interiors'
+    if result['overlappingInteriorPixels']:
+        result['overlappingFaces'] = overlaps
+        bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'normal-uv-failure.blend'))
+    assert result['overlappingInteriorPixels'] == 0, 'Overlapping final cloth NormalUV interiors: '+json.dumps(result)
     return result, coverage > 0
 
 
@@ -582,14 +653,17 @@ def cloth_normal(lod, objects):
     coverage_masks = {}
     for material_name, group in groups.items():
         x,y,width,height = ATLAS[material_name]['rectanglePixels']
-        pixels[y:y+height,x:x+width] = (.5,.5,1,1)
+        # A sentinel distinguishes an untouched texel from a legitimate neutral
+        # baked normal. It is replaced only after coverage validation succeeds.
+        pixels[y:y+height,x:x+width] = (.5,.5,0,1)
         bpy.ops.object.select_all(action='DESELECT')
         for obj in group:
             obj.select_set(True); obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
         bpy.context.view_layer.objects.active = group[0]
         bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=.018,
+        bpy.ops.uv.smart_project(angle_limit=math.radians(45), island_margin=.018,
                                  area_weight=0, correct_aspect=False, scale_to_bounds=True)
+        bpy.ops.uv.select_all(action='SELECT')
         bpy.ops.uv.pack_islands(rotate=True, margin_method='FRACTION', margin=8/(width-32), shape_method='CONCAVE')
         bpy.ops.object.mode_set(mode='OBJECT')
         for obj in group:
@@ -634,8 +708,6 @@ def cloth_normal(lod, objects):
         obj.data.uv_layers['AtlasUV'].active_render = True
         assert [layer.name for layer in obj.data.uv_layers] == ['AtlasUV','NormalUV']
         assert np.array_equal(atlas_before[obj.name], np.array([tuple(loop.uv) for loop in obj.data.uv_layers['AtlasUV'].data]))
-    result.save(); result.pack()
-    file = Path(result.filepath_raw)
     values = np.asarray(result.pixels[:],dtype=np.float32).reshape(-1,4)
     value_image = values.reshape(2048,2048,4)
     for material_name,mask in coverage_masks.items():
@@ -644,12 +716,21 @@ def cloth_normal(lod, objects):
         vectors = encoded*2-1
         lengths = np.linalg.norm(vectors,axis=1)
         holes = np.count_nonzero(np.max(encoded,axis=1) < .01)
+        unprojected = np.count_nonzero(np.all(abs(encoded-np.array((.5,.5,0))) < 1e-6,axis=1))
         evidence[material_name]['bakedInteriorPixels'] = len(encoded)
         evidence[material_name]['blackHolePixels'] = int(holes)
+        evidence[material_name]['unprojectedInteriorPixels'] = int(unprojected)
         evidence[material_name]['backwardNormalPixels'] = int(np.count_nonzero(vectors[:,2] < -.01))
         evidence[material_name]['encodedNormalLengthMin'] = float(lengths.min())
         evidence[material_name]['encodedNormalLengthMax'] = float(lengths.max())
         assert holes == 0, 'Unprojected black normal pixels in cloth interiors'
+        assert unprojected == 0, 'Untouched normal projection sentinel in cloth interiors'
+        tile = value_image[y:y+height,x:x+width]
+        background = np.all(abs(tile[:,:,:3]-np.array((.5,.5,0))) < 1e-6,axis=2)
+        tile[background] = (.5,.5,1,1)
+    result.pixels.foreach_set(values.ravel())
+    result.save(); result.pack()
+    file = Path(result.filepath_raw)
     return {'method':'selected authored high to final triangulated low; one source object per cloth bake',
             'uvLayer':'NormalUV', 'texCoord':1, 'uvTiles':evidence, 'parts':bake_parts,
             'cageExtrusionMeters':.016, 'maxRayDistanceMeters':.032,
@@ -667,24 +748,42 @@ def tail_errors(objects, limit):
         pose(clip, frame)
         for source in TAILS:
             obj = tails[source.name]
-            coords = TAIL_REFERENCE[(clip,frame)][source.name]
+            coords = TAIL_SHARED_REFERENCE[(clip,frame)][source.name]
+            frozen_original = TAIL_REFERENCE[(clip,frame)][source.name]
             bvh = tree(obj)
             forwards = [bvh.find_nearest(Vector(p))[3] for p in coords]
+            original_forwards = [bvh.find_nearest(Vector(p))[3] for p in frozen_original]
             source_bvh = BVHTree.FromPolygons([Vector(p) for p in coords],
                 [tuple(p.vertices) for p in source.data.polygons], all_triangles=False)
-            backwards = [source_bvh.find_nearest(Vector(p))[3] for p in points(obj)]
+            low_coords = points(obj)
+            backwards = [source_bvh.find_nearest(Vector(p))[3] for p in low_coords]
             worst = max(max(forwards),max(backwards))
+            source_worst_index = int(np.argmax(forwards))
+            low_worst_index = int(np.argmax(backwards))
             samples.append({'part':source.name,'clip':clip,'frame':frame,
                 'sourceVertexSamples':len(forwards),'lowVertexSamples':len(backwards),
                 'sourceToLowMaxMeters':float(max(forwards)), 'lowToSourceMaxMeters':float(max(backwards)),
+                'frozenOriginalSourceToLowMaxMeters':float(max(original_forwards)),
+                'finalShellPairSeparationMaxMeters':float(np.linalg.norm(low_coords[:len(low_coords)//2]-low_coords[len(low_coords)//2:],axis=1).max()),
                 'bidirectionalMaxMeters':float(worst),
+                'sourceWorstVertexIndex':source_worst_index,
+                'sourceWorstVertexLayer':'outside' if source_worst_index < len(coords)//2 else 'inside',
+                'sourceWorstVertexPosition':coords[source_worst_index].tolist(),
+                'lowWorstVertexIndex':low_worst_index,
+                'lowWorstVertexLayer':'outside' if low_worst_index < len(low_coords)//2 else 'inside',
+                'lowWorstVertexPosition':low_coords[low_worst_index].tolist(),
                 'sourceToLowRmsMeters':float(np.sqrt(np.mean(np.square(forwards)))),
                 'lowToSourceRmsMeters':float(np.sqrt(np.mean(np.square(backwards))))})
     worst = max(samples,key=lambda row:row['bidirectionalMaxMeters'])
     print('BUDGET_TAIL_SURFACE', json.dumps(worst), flush=True)
+    (OUT / ('tail-diagnostic-'+str(limit)+'.json')).write_text(json.dumps(samples,indent=2)+'\n')
     assert worst['bidirectionalMaxMeters'] <= limit, 'Tail surface gate missed: '+json.dumps(worst)
+    assert max(s['finalShellPairSeparationMaxMeters'] for s in samples) < .006001
     return {'method':'all source and final low vertices against the opposite deformed triangle surface',
+            'reference':'Explicit corresponding-layer shared-weight high reference; original outside weights and rest geometry retained',
             'walkCoverage':'every integer authored frame', 'limitMeters':limit,
+            'frozenOriginalSourceToLowMaxMeters':max(s['frozenOriginalSourceToLowMaxMeters'] for s in samples),
+            'finalShellPairSeparationMaxMeters':max(s['finalShellPairSeparationMaxMeters'] for s in samples),
             'maxMeters':worst['bidirectionalMaxMeters'], 'worstSample':worst,'samples':samples}
 
 

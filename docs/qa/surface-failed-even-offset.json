@@ -1,0 +1,1636 @@
+[
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 2,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004923735745251179,
+    "lowToSourceMaxMeters": 0.005859954282641411,
+    "bidirectionalMaxMeters": 0.005859954282641411,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22275929152965546,
+      -0.07506803423166275,
+      1.0200434923171997
+    ],
+    "sourceToLowRmsMeters": 0.0007721205459646706,
+    "lowToSourceRmsMeters": 0.0005910889772336853
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 2,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.00474750017747283,
+    "lowToSourceMaxMeters": 0.02493354305624962,
+    "bidirectionalMaxMeters": 0.02493354305624962,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.19955413043498993,
+      -0.11492011696100235,
+      0.9631242156028748
+    ],
+    "sourceToLowRmsMeters": 0.0007712581695965306,
+    "lowToSourceRmsMeters": 0.0010941181299691017
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 3,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924340173602104,
+    "lowToSourceMaxMeters": 0.00576727045699954,
+    "bidirectionalMaxMeters": 0.00576727045699954,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22341831028461456,
+      -0.07408539205789566,
+      1.0223305225372314
+    ],
+    "sourceToLowRmsMeters": 0.0007823614984620183,
+    "lowToSourceRmsMeters": 0.0005950068955026107
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 3,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.005209383554756641,
+    "lowToSourceMaxMeters": 0.024933477863669395,
+    "bidirectionalMaxMeters": 0.024933477863669395,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.0876946672797203,
+      0.23352621495723724,
+      0.7198988795280457
+    ],
+    "sourceToLowRmsMeters": 0.0008002458896262928,
+    "lowToSourceRmsMeters": 0.0011166965274965516
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 4,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924600012600422,
+    "lowToSourceMaxMeters": 0.005653527565300465,
+    "bidirectionalMaxMeters": 0.005653527565300465,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22398613393306732,
+      -0.07297142595052719,
+      1.0243762731552124
+    ],
+    "sourceToLowRmsMeters": 0.000796464268142498,
+    "lowToSourceRmsMeters": 0.000600483337727859
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 4,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.007643431890755892,
+    "lowToSourceMaxMeters": 0.024933453649282455,
+    "bidirectionalMaxMeters": 0.024933453649282455,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08796379715204239,
+      0.24701152741909027,
+      0.7292659282684326
+    ],
+    "sourceToLowRmsMeters": 0.0008375622838186511,
+    "lowToSourceRmsMeters": 0.0011344181840217003
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 5,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924602806568146,
+    "lowToSourceMaxMeters": 0.005531427916139364,
+    "bidirectionalMaxMeters": 0.005531427916139364,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22445163130760193,
+      -0.07183340936899185,
+      1.0261127948760986
+    ],
+    "sourceToLowRmsMeters": 0.0008103313415699834,
+    "lowToSourceRmsMeters": 0.0006072366242164518
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 5,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.009701799601316452,
+    "lowToSourceMaxMeters": 0.0249333493411541,
+    "bidirectionalMaxMeters": 0.0249333493411541,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08835858106613159,
+      0.25837451219558716,
+      0.7380006313323975
+    ],
+    "sourceToLowRmsMeters": 0.0008770882046866834,
+    "lowToSourceRmsMeters": 0.00114332243138771
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 6,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924444481730461,
+    "lowToSourceMaxMeters": 0.0054155676625669,
+    "bidirectionalMaxMeters": 0.0054155676625669,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22481052577495575,
+      -0.07078852504491806,
+      1.0274934768676758
+    ],
+    "sourceToLowRmsMeters": 0.0008198649794529089,
+    "lowToSourceRmsMeters": 0.0006138996720835649
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 6,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.011372442357242107,
+    "lowToSourceMaxMeters": 0.024933403357863426,
+    "bidirectionalMaxMeters": 0.024933403357863426,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08879297226667404,
+      0.2673654556274414,
+      0.7455210089683533
+    ],
+    "sourceToLowRmsMeters": 0.0009126475129526468,
+    "lowToSourceRmsMeters": 0.0011473288183557443
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 7,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924313630908728,
+    "lowToSourceMaxMeters": 0.005320444703102112,
+    "bidirectionalMaxMeters": 0.005320444703102112,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22506344318389893,
+      -0.06994836032390594,
+      1.028491497039795
+    ],
+    "sourceToLowRmsMeters": 0.0008276488987295413,
+    "lowToSourceRmsMeters": 0.000619190417528426
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 7,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0126017602160573,
+    "lowToSourceMaxMeters": 0.024933457374572754,
+    "bidirectionalMaxMeters": 0.024933457374572754,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08917985111474991,
+      0.2738438844680786,
+      0.7513078451156616
+    ],
+    "sourceToLowRmsMeters": 0.0009407786156025553,
+    "lowToSourceRmsMeters": 0.0011505575982426015
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 8,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924090579152107,
+    "lowToSourceMaxMeters": 0.005258074961602688,
+    "bidirectionalMaxMeters": 0.005258074961602688,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22521325945854187,
+      -0.06940417736768723,
+      1.0290935039520264
+    ],
+    "sourceToLowRmsMeters": 0.0008328204467200871,
+    "lowToSourceRmsMeters": 0.0006226252651868954
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 8,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.013353321701288223,
+    "lowToSourceMaxMeters": 0.02493344433605671,
+    "bidirectionalMaxMeters": 0.02493344433605671,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08944518864154816,
+      0.27774524688720703,
+      0.7549532651901245
+    ],
+    "sourceToLowRmsMeters": 0.000958929312102922,
+    "lowToSourceRmsMeters": 0.0011525371158048897
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 9,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924071487039328,
+    "lowToSourceMaxMeters": 0.005236383527517319,
+    "bidirectionalMaxMeters": 0.005236383527517319,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22526279091835022,
+      -0.06921596080064774,
+      1.0292946100234985
+    ],
+    "sourceToLowRmsMeters": 0.000834624810881393,
+    "lowToSourceRmsMeters": 0.0006238227947881403
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 9,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.013606010004878044,
+    "lowToSourceMaxMeters": 0.024933384731411934,
+    "bidirectionalMaxMeters": 0.024933384731411934,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08953939378261566,
+      0.2790471613407135,
+      0.7561981678009033
+    ],
+    "sourceToLowRmsMeters": 0.0009652506569650008,
+    "lowToSourceRmsMeters": 0.0011528276106673814
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 10,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924090579152107,
+    "lowToSourceMaxMeters": 0.005258074961602688,
+    "bidirectionalMaxMeters": 0.005258074961602688,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22521325945854187,
+      -0.06940417736768723,
+      1.0290935039520264
+    ],
+    "sourceToLowRmsMeters": 0.0008328204467200871,
+    "lowToSourceRmsMeters": 0.0006226252651868954
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 10,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.013353321701288223,
+    "lowToSourceMaxMeters": 0.02493344433605671,
+    "bidirectionalMaxMeters": 0.02493344433605671,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08944518864154816,
+      0.27774524688720703,
+      0.7549532651901245
+    ],
+    "sourceToLowRmsMeters": 0.000958929312102922,
+    "lowToSourceRmsMeters": 0.0011525371158048897
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 11,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924313630908728,
+    "lowToSourceMaxMeters": 0.005320444703102112,
+    "bidirectionalMaxMeters": 0.005320444703102112,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22506344318389893,
+      -0.06994836032390594,
+      1.028491497039795
+    ],
+    "sourceToLowRmsMeters": 0.0008276488987295413,
+    "lowToSourceRmsMeters": 0.000619190417528426
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 11,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0126017602160573,
+    "lowToSourceMaxMeters": 0.024933457374572754,
+    "bidirectionalMaxMeters": 0.024933457374572754,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08917985111474991,
+      0.2738438844680786,
+      0.7513078451156616
+    ],
+    "sourceToLowRmsMeters": 0.0009407786156025553,
+    "lowToSourceRmsMeters": 0.0011505575982426015
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 12,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924444481730461,
+    "lowToSourceMaxMeters": 0.0054155676625669,
+    "bidirectionalMaxMeters": 0.0054155676625669,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22481052577495575,
+      -0.07078852504491806,
+      1.0274934768676758
+    ],
+    "sourceToLowRmsMeters": 0.0008198649794529089,
+    "lowToSourceRmsMeters": 0.0006138996720835649
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 12,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.011372442357242107,
+    "lowToSourceMaxMeters": 0.024933403357863426,
+    "bidirectionalMaxMeters": 0.024933403357863426,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08879297226667404,
+      0.2673654556274414,
+      0.7455210089683533
+    ],
+    "sourceToLowRmsMeters": 0.0009126475129526468,
+    "lowToSourceRmsMeters": 0.0011473288183557443
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 13,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924602806568146,
+    "lowToSourceMaxMeters": 0.005531427916139364,
+    "bidirectionalMaxMeters": 0.005531427916139364,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22445163130760193,
+      -0.07183340936899185,
+      1.0261127948760986
+    ],
+    "sourceToLowRmsMeters": 0.0008103313415699834,
+    "lowToSourceRmsMeters": 0.0006072366242164518
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 13,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.009701799601316452,
+    "lowToSourceMaxMeters": 0.0249333493411541,
+    "bidirectionalMaxMeters": 0.0249333493411541,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08835858106613159,
+      0.25837451219558716,
+      0.7380006313323975
+    ],
+    "sourceToLowRmsMeters": 0.0008770882046866834,
+    "lowToSourceRmsMeters": 0.00114332243138771
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 14,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924600012600422,
+    "lowToSourceMaxMeters": 0.005653527565300465,
+    "bidirectionalMaxMeters": 0.005653527565300465,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22398613393306732,
+      -0.07297142595052719,
+      1.0243762731552124
+    ],
+    "sourceToLowRmsMeters": 0.000796464268142498,
+    "lowToSourceRmsMeters": 0.000600483337727859
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 14,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.007643431890755892,
+    "lowToSourceMaxMeters": 0.024933453649282455,
+    "bidirectionalMaxMeters": 0.024933453649282455,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08796379715204239,
+      0.24701152741909027,
+      0.7292659282684326
+    ],
+    "sourceToLowRmsMeters": 0.0008375622838186511,
+    "lowToSourceRmsMeters": 0.0011344181840217003
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 15,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004924340173602104,
+    "lowToSourceMaxMeters": 0.00576727045699954,
+    "bidirectionalMaxMeters": 0.00576727045699954,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22341831028461456,
+      -0.07408539205789566,
+      1.0223305225372314
+    ],
+    "sourceToLowRmsMeters": 0.0007823614984620183,
+    "lowToSourceRmsMeters": 0.0005950068955026107
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 15,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.005209383554756641,
+    "lowToSourceMaxMeters": 0.024933477863669395,
+    "bidirectionalMaxMeters": 0.024933477863669395,
+    "sourceWorstVertexIndex": 673,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.0876946672797203,
+      0.23352621495723724,
+      0.7198988795280457
+    ],
+    "sourceToLowRmsMeters": 0.0008002458896262928,
+    "lowToSourceRmsMeters": 0.0011166965274965516
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 16,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004923735745251179,
+    "lowToSourceMaxMeters": 0.005859954282641411,
+    "bidirectionalMaxMeters": 0.005859954282641411,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22275929152965546,
+      -0.07506803423166275,
+      1.0200434923171997
+    ],
+    "sourceToLowRmsMeters": 0.0007721205459646706,
+    "lowToSourceRmsMeters": 0.0005910889772336853
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 16,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.00474750017747283,
+    "lowToSourceMaxMeters": 0.02493354305624962,
+    "bidirectionalMaxMeters": 0.02493354305624962,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.19955413043498993,
+      -0.11492011696100235,
+      0.9631242156028748
+    ],
+    "sourceToLowRmsMeters": 0.0007712581695965306,
+    "lowToSourceRmsMeters": 0.0010941181299691017
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 17,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 17,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 18,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004921490326523781,
+    "lowToSourceMaxMeters": 0.005952960811555386,
+    "bidirectionalMaxMeters": 0.005952960811555386,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2212536633014679,
+      -0.07708703726530075,
+      1.0104931592941284
+    ],
+    "sourceToLowRmsMeters": 0.0007666128000152661,
+    "lowToSourceRmsMeters": 0.000594056472019878
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 18,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004740410018712282,
+    "lowToSourceMaxMeters": 0.024928487837314606,
+    "bidirectionalMaxMeters": 0.024928487837314606,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20247161388397217,
+      -0.1179807037115097,
+      0.9765985608100891
+    ],
+    "sourceToLowRmsMeters": 0.0007742330913288577,
+    "lowToSourceRmsMeters": 0.0010930924113961905
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 19,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004919910803437233,
+    "lowToSourceMaxMeters": 0.005785542540252209,
+    "bidirectionalMaxMeters": 0.005785542540252209,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22046908736228943,
+      -0.078040212392807,
+      1.003623366355896
+    ],
+    "sourceToLowRmsMeters": 0.0007678010597676945,
+    "lowToSourceRmsMeters": 0.000600461367159677
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 19,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0058348155580461025,
+    "lowToSourceMaxMeters": 0.02492152713239193,
+    "bidirectionalMaxMeters": 0.02492152713239193,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08199595659971237,
+      -0.27975910902023315,
+      0.5278115272521973
+    ],
+    "sourceToLowRmsMeters": 0.0008179856275952674,
+    "lowToSourceRmsMeters": 0.00110907536819905
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 20,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004918232094496489,
+    "lowToSourceMaxMeters": 0.005594612564891577,
+    "bidirectionalMaxMeters": 0.005594612564891577,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21971362829208374,
+      -0.07870075851678848,
+      0.9972753524780273
+    ],
+    "sourceToLowRmsMeters": 0.0007707257280171054,
+    "lowToSourceRmsMeters": 0.0006125604523164318
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 20,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.008442001417279243,
+    "lowToSourceMaxMeters": 0.02491307258605957,
+    "bidirectionalMaxMeters": 0.02491307258605957,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08831776678562164,
+      -0.3015163242816925,
+      0.5327856540679932
+    ],
+    "sourceToLowRmsMeters": 0.0008739619638341214,
+    "lowToSourceRmsMeters": 0.0011274888040194294
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 21,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004916435573250055,
+    "lowToSourceMaxMeters": 0.005423476453870535,
+    "bidirectionalMaxMeters": 0.005423476453870535,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2190273553133011,
+      -0.07910721004009247,
+      0.991706132888794
+    ],
+    "sourceToLowRmsMeters": 0.0007746365055723034,
+    "lowToSourceRmsMeters": 0.0006289500497224114
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 21,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.01067333109676838,
+    "lowToSourceMaxMeters": 0.02490408532321453,
+    "bidirectionalMaxMeters": 0.02490408532321453,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.09399852156639099,
+      -0.3201698362827301,
+      0.5380235314369202
+    ],
+    "sourceToLowRmsMeters": 0.0009327198092652771,
+    "lowToSourceRmsMeters": 0.0011456892496102087
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 22,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049149091355502605,
+    "lowToSourceMaxMeters": 0.005280481651425362,
+    "bidirectionalMaxMeters": 0.005280481651425362,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21844825148582458,
+      -0.07932018488645554,
+      0.9871370196342468
+    ],
+    "sourceToLowRmsMeters": 0.0007787022934923049,
+    "lowToSourceRmsMeters": 0.0006464349913627764
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 22,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.012455535121262074,
+    "lowToSourceMaxMeters": 0.024895748123526573,
+    "bidirectionalMaxMeters": 0.024895748123526573,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.09874854981899261,
+      -0.33516183495521545,
+      0.5429237484931946
+    ],
+    "sourceToLowRmsMeters": 0.0009821886432687208,
+    "lowToSourceRmsMeters": 0.001161622258882029
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 23,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004913624841719866,
+    "lowToSourceMaxMeters": 0.005483568646013737,
+    "bidirectionalMaxMeters": 0.005483568646013737,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2180090695619583,
+      -0.07940807193517685,
+      0.9837451577186584
+    ],
+    "sourceToLowRmsMeters": 0.0007821756307243092,
+    "lowToSourceRmsMeters": 0.0006588526646750647
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 23,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.013746783137321472,
+    "lowToSourceMaxMeters": 0.02488882653415203,
+    "bidirectionalMaxMeters": 0.02488882653415203,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.10232482850551605,
+      -0.34610509872436523,
+      0.5469100475311279
+    ],
+    "sourceToLowRmsMeters": 0.0010210699988325708,
+    "lowToSourceRmsMeters": 0.0011726360295502291
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 24,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004912851378321648,
+    "lowToSourceMaxMeters": 0.005617941729724407,
+    "bidirectionalMaxMeters": 0.005617941729724407,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21773502230644226,
+      -0.07943232357501984,
+      0.9816585183143616
+    ],
+    "sourceToLowRmsMeters": 0.0007845004304210398,
+    "lowToSourceRmsMeters": 0.0006646532783321339
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 24,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.014526622369885445,
+    "lowToSourceMaxMeters": 0.02488442324101925,
+    "bidirectionalMaxMeters": 0.02488442324101925,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.10454542934894562,
+      -0.3527567386627197,
+      0.5495091676712036
+    ],
+    "sourceToLowRmsMeters": 0.001046354885263273,
+    "lowToSourceRmsMeters": 0.0011794576218325979
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 25,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004912537522614002,
+    "lowToSourceMaxMeters": 0.005656546913087368,
+    "bidirectionalMaxMeters": 0.005656546913087368,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21764187514781952,
+      -0.07943539321422577,
+      0.9809544682502747
+    ],
+    "sourceToLowRmsMeters": 0.000785310745059233,
+    "lowToSourceRmsMeters": 0.0006665818303671497
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 25,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.014787253923714161,
+    "lowToSourceMaxMeters": 0.024882879108190536,
+    "bidirectionalMaxMeters": 0.024882879108190536,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.10529821366071701,
+      -0.3549872934818268,
+      0.550411581993103
+    ],
+    "sourceToLowRmsMeters": 0.00105518892847703,
+    "lowToSourceRmsMeters": 0.0011814980117451363
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 26,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004912851378321648,
+    "lowToSourceMaxMeters": 0.005617941729724407,
+    "bidirectionalMaxMeters": 0.005617941729724407,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21773502230644226,
+      -0.07943232357501984,
+      0.9816585183143616
+    ],
+    "sourceToLowRmsMeters": 0.0007845004304210398,
+    "lowToSourceRmsMeters": 0.0006646532783321339
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 26,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.014526622369885445,
+    "lowToSourceMaxMeters": 0.02488442324101925,
+    "bidirectionalMaxMeters": 0.02488442324101925,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.10454542934894562,
+      -0.3527567386627197,
+      0.5495091676712036
+    ],
+    "sourceToLowRmsMeters": 0.001046354885263273,
+    "lowToSourceRmsMeters": 0.0011794576218325979
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 27,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004913624841719866,
+    "lowToSourceMaxMeters": 0.005483568646013737,
+    "bidirectionalMaxMeters": 0.005483568646013737,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2180090695619583,
+      -0.07940807193517685,
+      0.9837451577186584
+    ],
+    "sourceToLowRmsMeters": 0.0007821756307243092,
+    "lowToSourceRmsMeters": 0.0006588526646750647
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 27,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.013746783137321472,
+    "lowToSourceMaxMeters": 0.02488882653415203,
+    "bidirectionalMaxMeters": 0.02488882653415203,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.10232482850551605,
+      -0.34610509872436523,
+      0.5469100475311279
+    ],
+    "sourceToLowRmsMeters": 0.0010210699988325708,
+    "lowToSourceRmsMeters": 0.0011726360295502291
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 28,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049149091355502605,
+    "lowToSourceMaxMeters": 0.005280481651425362,
+    "bidirectionalMaxMeters": 0.005280481651425362,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21844825148582458,
+      -0.07932018488645554,
+      0.9871370196342468
+    ],
+    "sourceToLowRmsMeters": 0.0007787022934923049,
+    "lowToSourceRmsMeters": 0.0006464349913627764
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 28,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.012455535121262074,
+    "lowToSourceMaxMeters": 0.024895748123526573,
+    "bidirectionalMaxMeters": 0.024895748123526573,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.09874854981899261,
+      -0.33516183495521545,
+      0.5429237484931946
+    ],
+    "sourceToLowRmsMeters": 0.0009821886432687208,
+    "lowToSourceRmsMeters": 0.001161622258882029
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 29,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004916435573250055,
+    "lowToSourceMaxMeters": 0.005423476453870535,
+    "bidirectionalMaxMeters": 0.005423476453870535,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2190273553133011,
+      -0.07910721004009247,
+      0.991706132888794
+    ],
+    "sourceToLowRmsMeters": 0.0007746365055723034,
+    "lowToSourceRmsMeters": 0.0006289500497224114
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 29,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.01067333109676838,
+    "lowToSourceMaxMeters": 0.02490408532321453,
+    "bidirectionalMaxMeters": 0.02490408532321453,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.09399852156639099,
+      -0.3201698362827301,
+      0.5380235314369202
+    ],
+    "sourceToLowRmsMeters": 0.0009327198092652771,
+    "lowToSourceRmsMeters": 0.0011456892496102087
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 30,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004918232094496489,
+    "lowToSourceMaxMeters": 0.005594612564891577,
+    "bidirectionalMaxMeters": 0.005594612564891577,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.21971362829208374,
+      -0.07870075851678848,
+      0.9972753524780273
+    ],
+    "sourceToLowRmsMeters": 0.0007707257280171054,
+    "lowToSourceRmsMeters": 0.0006125604523164318
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 30,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.008442001417279243,
+    "lowToSourceMaxMeters": 0.02491307258605957,
+    "bidirectionalMaxMeters": 0.02491307258605957,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08831776678562164,
+      -0.3015163242816925,
+      0.5327856540679932
+    ],
+    "sourceToLowRmsMeters": 0.0008739619638341214,
+    "lowToSourceRmsMeters": 0.0011274888040194294
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 31,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004919910803437233,
+    "lowToSourceMaxMeters": 0.005785542540252209,
+    "bidirectionalMaxMeters": 0.005785542540252209,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22046908736228943,
+      -0.078040212392807,
+      1.003623366355896
+    ],
+    "sourceToLowRmsMeters": 0.0007678010597676945,
+    "lowToSourceRmsMeters": 0.000600461367159677
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 31,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0058348155580461025,
+    "lowToSourceMaxMeters": 0.02492152713239193,
+    "bidirectionalMaxMeters": 0.02492152713239193,
+    "sourceWorstVertexIndex": 750,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.08199595659971237,
+      -0.27975910902023315,
+      0.5278115272521973
+    ],
+    "sourceToLowRmsMeters": 0.0008179856275952674,
+    "lowToSourceRmsMeters": 0.00110907536819905
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 32,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004921490326523781,
+    "lowToSourceMaxMeters": 0.005952960811555386,
+    "bidirectionalMaxMeters": 0.005952960811555386,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2212536633014679,
+      -0.07708703726530075,
+      1.0104931592941284
+    ],
+    "sourceToLowRmsMeters": 0.0007666128000152661,
+    "lowToSourceRmsMeters": 0.000594056472019878
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 32,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004740410018712282,
+    "lowToSourceMaxMeters": 0.024928487837314606,
+    "bidirectionalMaxMeters": 0.024928487837314606,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20247161388397217,
+      -0.1179807037115097,
+      0.9765985608100891
+    ],
+    "sourceToLowRmsMeters": 0.0007742330913288577,
+    "lowToSourceRmsMeters": 0.0010930924113961905
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Walk",
+    "frame": 33,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 33,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Cast",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Cast",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Cast",
+    "frame": 8,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004923384636640549,
+    "lowToSourceMaxMeters": 0.005892472807317972,
+    "bidirectionalMaxMeters": 0.005892472807317972,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2277900129556656,
+      -0.07438970357179642,
+      1.0255147218704224
+    ],
+    "sourceToLowRmsMeters": 0.0007688270741965718,
+    "lowToSourceRmsMeters": 0.0005905088119304819
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Cast",
+    "frame": 8,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004743993282318115,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.1956763118505478,
+      -0.11541474610567093,
+      0.9774118661880493
+    ],
+    "sourceToLowRmsMeters": 0.0007575804685215951,
+    "lowToSourceRmsMeters": 0.0010857242583895653
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Cast",
+    "frame": 16,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004923566244542599,
+    "lowToSourceMaxMeters": 0.0058735511265695095,
+    "bidirectionalMaxMeters": 0.0058735511265695095,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.23063382506370544,
+      -0.07364506274461746,
+      1.0294203758239746
+    ],
+    "sourceToLowRmsMeters": 0.0007701217983711927,
+    "lowToSourceRmsMeters": 0.0005910505424118889
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Cast",
+    "frame": 16,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004743995610624552,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.19302935898303986,
+      -0.11499425768852234,
+      0.9800252914428711
+    ],
+    "sourceToLowRmsMeters": 0.0007584949285527323,
+    "lowToSourceRmsMeters": 0.0010864983109457353
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Cast",
+    "frame": 24,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004923384636640549,
+    "lowToSourceMaxMeters": 0.005892472807317972,
+    "bidirectionalMaxMeters": 0.005892472807317972,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.2277900129556656,
+      -0.07438970357179642,
+      1.0255147218704224
+    ],
+    "sourceToLowRmsMeters": 0.0007688270741965718,
+    "lowToSourceRmsMeters": 0.0005905088119304819
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Cast",
+    "frame": 24,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004743993282318115,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.1956763118505478,
+      -0.11541474610567093,
+      0.9774118661880493
+    ],
+    "sourceToLowRmsMeters": 0.0007575804685215951,
+    "lowToSourceRmsMeters": 0.0010857242583895653
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Cast",
+    "frame": 31,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Cast",
+    "frame": 31,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 1,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 19,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 19,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 37,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 37,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 55,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 55,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  },
+  {
+    "part": "Split coat tail -1",
+    "clip": "Idle",
+    "frame": 73,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.0049227639101445675,
+    "lowToSourceMaxMeters": 0.005923028104007244,
+    "bidirectionalMaxMeters": 0.005923028104007244,
+    "sourceWorstVertexIndex": 58,
+    "sourceWorstVertexLayer": "outside",
+    "sourceWorstVertexPosition": [
+      -0.22202853858470917,
+      -0.07583650946617126,
+      1.017603874206543
+    ],
+    "sourceToLowRmsMeters": 0.000767709812467773,
+    "lowToSourceRmsMeters": 0.0005903139513498308
+  },
+  {
+    "part": "Split coat tail 1",
+    "clip": "Idle",
+    "frame": 73,
+    "sourceVertexSamples": 850,
+    "lowVertexSamples": 696,
+    "sourceToLowMaxMeters": 0.004744007717818022,
+    "lowToSourceMaxMeters": 0.024933528155088425,
+    "bidirectionalMaxMeters": 0.024933528155088425,
+    "sourceWorstVertexIndex": 506,
+    "sourceWorstVertexLayer": "inside",
+    "sourceWorstVertexPosition": [
+      0.20102936029434204,
+      -0.11626512557268143,
+      0.9721267223358154
+    ],
+    "sourceToLowRmsMeters": 0.0007569375576433082,
+    "lowToSourceRmsMeters": 0.0010851535435407508
+  }
+]

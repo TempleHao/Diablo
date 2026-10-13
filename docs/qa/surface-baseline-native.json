@@ -1,0 +1,5070 @@
+{
+  "stage": "ART-02 D1 fixed native production-preview cloth ablation",
+  "url": "http://127.0.0.1:5184",
+  "hashes": {
+    "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+    "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+    "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+    "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+    "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+    "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+    "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+    "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+    "models/ember-mage-realism.glb": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3"
+  },
+  "errors": [],
+  "samples": [
+    {
+      "filename": "Idle-t0-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 42,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 43,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 44,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 46,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 47,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Idle",
+        "time": 0,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 48,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 50,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 51,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 52,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 54,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 55,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Idle-t0.5-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Idle",
+        "time": 1.5208333730697632,
+        "duration": 3.0416667461395264
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 56,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 58,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 59,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 60,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 62,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 63,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.25-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.34375,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 64,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 66,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 67,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 68,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 70,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 71,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Walk-t0.5-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Walk",
+        "time": 0.6875,
+        "duration": 1.375
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 72,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 74,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 75,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 76,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 78,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 79,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.15-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.19374999403953552,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 80,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-back-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 82,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-back-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 83,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-back-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": 3.141592653589793,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 84,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-front-normal.png",
+      "quality": "detail",
+      "mode": "normal",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 86,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                1,
+                -1
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-front-zero.png",
+      "quality": "detail",
+      "mode": "zero",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 87,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": true,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "Cast-t0.3-front-neutral.png",
+      "quality": "detail",
+      "mode": "neutral",
+      "pose": {
+        "clip": "Cast",
+        "time": 0.38749998807907104,
+        "duration": 1.2916666269302368
+      },
+      "camera": [
+        0.07,
+        1.087971525415749,
+        3.9370401915210653
+      ],
+      "cameraQuaternion": [
+        -0.010156337873619647,
+        0.008888414876717564,
+        0.00009028196805257815,
+        0.9999089142172614
+      ],
+      "rotation": -0.18,
+      "view": "full",
+      "zoom": 1,
+      "height": 2.0159430508314977,
+      "lights": [
+        {
+          "type": "HemisphereLight",
+          "color": [
+            0.7681511472425809,
+            0.7454042095350284,
+            0.6866853124288864
+          ],
+          "intensity": 0.85,
+          "position": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            1,
+            0.8796223968851662,
+            0.7230551289161951
+          ],
+          "intensity": 5,
+          "position": [
+            -2,
+            4,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.5394794890033748,
+            0.5840784178830671,
+            0.6104955708001716
+          ],
+          "intensity": 1.8,
+          "position": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "type": "DirectionalLight",
+          "color": [
+            0.4178850708380236,
+            0.5332764040016892,
+            0.6307571363387763
+          ],
+          "intensity": 1.75,
+          "position": [
+            2,
+            2,
+            -2
+          ]
+        }
+      ],
+      "render": {
+        "frame": 88,
+        "calls": 3,
+        "triangles": 34707,
+        "points": 0,
+        "lines": 0
+      },
+      "clips": [
+        {
+          "name": "Idle",
+          "duration": 3.0416667461395264
+        },
+        {
+          "name": "Walk",
+          "duration": 1.375
+        },
+        {
+          "name": "Cast",
+          "duration": 1.2916666269302368
+        }
+      ],
+      "materials": [
+        {
+          "mesh": "Bent_bronze_focus_cage005",
+          "material": [
+            {
+              "name": "Ash atlas opaque",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": false,
+              "vertexColors": false,
+              "roughness": 0.85,
+              "side": 2
+            }
+          ]
+        },
+        {
+          "mesh": "Bent_bronze_focus_cage005_1",
+          "material": [
+            {
+              "name": "Ash atlas cutout",
+              "normal": false,
+              "normalScale": [
+                0,
+                0
+              ],
+              "map": true,
+              "vertexColors": true,
+              "roughness": 1,
+              "side": 2
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Single Chromium with ANGLE SwiftShader software WebGL.",
+    "Interception serves a frozen dist and adds diagnostics to production mage-preview.js only in the browser response.",
+    "Normal ablation affects the shared opaque atlas material, including cloth and other opaque body surfaces.",
+    "Neutral-gray ablation removes opaque PBR maps and vertex colors; cutout hair retains its base map to preserve alpha silhouette.",
+    "Fixed sampled poses and screenshots do not establish real-device performance or art acceptance."
+  ],
+  "gpu": {
+    "vendor": "Google Inc. (Google)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "pass": true
+}

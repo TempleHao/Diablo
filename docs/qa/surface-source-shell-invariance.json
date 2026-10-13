@@ -1,0 +1,3096 @@
+{
+  "baselineBlendSha256": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+  "currentBlendSha256": "958e42d3864cf7a71fc2728f3329d59f875e377e2ec93e5598ec83774eadd70c",
+  "parts": [
+    {
+      "part": "Bent bronze focus cage",
+      "vertices": 21,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 21,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Bent bronze focus cage.001",
+      "vertices": 21,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 21,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broad leather waist belt",
+      "vertices": 384,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 384,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 0",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 1",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 2",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 3",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 4",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 5",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 6",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Broken frontal forelock 7",
+      "vertices": 20,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 20,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Carved ash staff",
+      "vertices": 330,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 330,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Close cropped scalp and recession",
+      "vertices": 250,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 250,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Close fitted boot quarter stitching",
+      "vertices": 102,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 102,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Close fitted boot quarter stitching.001",
+      "vertices": 102,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 102,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Close fitted boot quarter stitching.002",
+      "vertices": 102,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 102,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Close fitted boot quarter stitching.003",
+      "vertices": 102,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 102,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 0",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 1",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 10",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 11",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 12",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 13",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 14",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 15",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 16",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 17",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 18",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 19",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 2",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 20",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 21",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 3",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 4",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 5",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 6",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 7",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 8",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card -1 9",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 0",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 1",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 10",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 11",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 12",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 13",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 14",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 15",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 16",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 17",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 18",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 19",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 2",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 20",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 21",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 3",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 4",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 5",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 6",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 7",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 8",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Combed temple and sideburn card 1 9",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Continuous full length linen sleeve L",
+      "vertices": 850,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 850,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Continuous full length linen sleeve R",
+      "vertices": 850,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 850,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Continuous leather boot toe box L",
+      "vertices": 462,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 462,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Continuous leather boot toe box R",
+      "vertices": 462,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 462,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Continuous mature face neck and articulated hands",
+      "vertices": 7967,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 7967,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Exposed parchment edge",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Flat fitted cross-body leather harness",
+      "vertices": 80,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 80,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Frayed oxblood facing -1",
+      "vertices": 300,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 300,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Frayed oxblood facing 1",
+      "vertices": 300,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 300,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Grimoire spine",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Hollow forged belt clasp",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Hollow forged belt clasp.001",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Hollow forged belt clasp.002",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Hollow forged belt clasp.003",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Leather grimoire",
+      "vertices": 56,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 56,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Proper recessed brown eyeballs",
+      "vertices": 1064,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 1064,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Raised sewn facing margin -1",
+      "vertices": 120,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 120,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Raised sewn facing margin 1",
+      "vertices": 120,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 120,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Rolled leather chest harness edge",
+      "vertices": 144,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 144,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Rolled leather chest harness edge.001",
+      "vertices": 144,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 144,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Rounded rolled collar top",
+      "vertices": 294,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 294,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Segmented leather shoulder yoke -1",
+      "vertices": 306,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 306,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Segmented leather shoulder yoke 1",
+      "vertices": 306,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 306,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Shoulder mantle with gravity folds",
+      "vertices": 806,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 806,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Shoulder yoke rolled seam -1",
+      "vertices": 84,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 84,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Shoulder yoke rolled seam 1",
+      "vertices": 84,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 84,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Small amber focus",
+      "vertices": 42,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 42,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Soft open front standing leather collar",
+      "vertices": 480,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 480,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Split coat tail -1",
+      "vertices": 850,
+      "maxPositionMeters": 5.960464477539063e-08,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 425,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Split coat tail 1",
+      "vertices": 850,
+      "maxPositionMeters": 5.960464477539063e-08,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 425,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Staff leather and bronze binding",
+      "vertices": 96,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 96,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Staff leather and bronze binding.001",
+      "vertices": 96,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 96,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Staff leather and bronze binding.002",
+      "vertices": 96,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 96,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Staff leather and bronze binding.003",
+      "vertices": 96,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 96,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.001",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.002",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.003",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.004",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.005",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.006",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.007",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.008",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.009",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.010",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.011",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.012",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.013",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.014",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.015",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.016",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.017",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.018",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.019",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.020",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Subdued yoke saddle stitch.021",
+      "vertices": 8,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 8,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 0",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 1",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 10",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 11",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 12",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 13",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 14",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 15",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 16",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 17",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 18",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 19",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 2",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 20",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 21",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 22",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 23",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 3",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 4",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 5",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 6",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 7",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 8",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 0 9",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 0",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 1",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 10",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 11",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 12",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 13",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 14",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 15",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 16",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 17",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 18",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 19",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 2",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 20",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 21",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 22",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 23",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 3",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 4",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 5",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 6",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 7",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 8",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 1 9",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 0",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 1",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 10",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 11",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 12",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 13",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 14",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 15",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 16",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 17",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 18",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 19",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 2",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 20",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 21",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 22",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 23",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 3",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 4",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 5",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 6",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 7",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 8",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Swept crown strand card 2 9",
+      "vertices": 18,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 18,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tailored continuous linen torso",
+      "vertices": 1394,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 1394,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 0",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 1",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 10",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 11",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 12",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 13",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 14",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 15",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 16",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 17",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 18",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 19",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 2",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 3",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 4",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 5",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 6",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 7",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 8",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered nape strand card 9",
+      "vertices": 16,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 16,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered natural brow -1",
+      "vertices": 50,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 50,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Tapered natural brow 1",
+      "vertices": 50,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 50,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Thick stitched boot sole L",
+      "vertices": 132,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 132,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Thick stitched boot sole R",
+      "vertices": 132,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 132,
+      "maxUnchangedWeightDifference": 0.0
+    },
+    {
+      "part": "Wool trousers",
+      "vertices": 1137,
+      "maxPositionMeters": 0.0,
+      "maxUvDifference": 0.0,
+      "unchangedWeightVertices": 1137,
+      "maxUnchangedWeightDifference": 0.0
+    }
+  ],
+  "restBoneMatrixMaxDifference": 0.0,
+  "sourceAnimationsUnchanged": true,
+  "sourceGeometryUvOuterAndOtherWeightsUnchanged": true,
+  "originalWorstLayerSample": {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 9,
+    "maxLayerDistanceMeters": 0.020380970987958585,
+    "minLayerDistanceMeters": 0.0034572051824219535,
+    "worstPairIndex": 248
+  },
+  "correctedWorstLayerSample": {
+    "part": "Split coat tail 1",
+    "clip": "Walk",
+    "frame": 2,
+    "maxLayerDistanceMeters": 0.006000096316097918,
+    "minLayerDistanceMeters": 0.005996320525822898,
+    "worstPairIndex": 137
+  },
+  "originalLayerSamples": [
+    {
+      "part": "Split coat tail -1",
+      "clip": "Idle",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Idle",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Idle",
+      "frame": 37,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Idle",
+      "frame": 37,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 2,
+      "maxLayerDistanceMeters": 0.00636376982536724,
+      "minLayerDistanceMeters": 0.005619298186127347,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 2,
+      "maxLayerDistanceMeters": 0.008510297922496,
+      "minLayerDistanceMeters": 0.004431047381051619,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 3,
+      "maxLayerDistanceMeters": 0.006708044278701132,
+      "minLayerDistanceMeters": 0.005276304419168401,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 3,
+      "maxLayerDistanceMeters": 0.011196801030009489,
+      "minLayerDistanceMeters": 0.004604737435872853,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 4,
+      "maxLayerDistanceMeters": 0.007019500798564424,
+      "minLayerDistanceMeters": 0.004986477436709319,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 4,
+      "maxLayerDistanceMeters": 0.01375625480653709,
+      "minLayerDistanceMeters": 0.004552456658182755,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 5,
+      "maxLayerDistanceMeters": 0.007287121437346241,
+      "minLayerDistanceMeters": 0.004758179877082111,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 5,
+      "maxLayerDistanceMeters": 0.016020197088780982,
+      "minLayerDistanceMeters": 0.004168961898082433,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.007502617059273131,
+      "minLayerDistanceMeters": 0.004592104054958518,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.017877716889567578,
+      "minLayerDistanceMeters": 0.003860971171598847,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 7,
+      "maxLayerDistanceMeters": 0.007660102838348236,
+      "minLayerDistanceMeters": 0.004482642121047705,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 7,
+      "maxLayerDistanceMeters": 0.01925309607541591,
+      "minLayerDistanceMeters": 0.003637309574656806,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 8,
+      "maxLayerDistanceMeters": 0.0077559077850427776,
+      "minLayerDistanceMeters": 0.004421708004064664,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 8,
+      "maxLayerDistanceMeters": 0.02009674041915898,
+      "minLayerDistanceMeters": 0.003502310411211452,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 9,
+      "maxLayerDistanceMeters": 0.00778804834613777,
+      "minLayerDistanceMeters": 0.004402297247141524,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 9,
+      "maxLayerDistanceMeters": 0.020380970987958585,
+      "minLayerDistanceMeters": 0.0034572051824219535,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 10,
+      "maxLayerDistanceMeters": 0.0077559077850427776,
+      "minLayerDistanceMeters": 0.004421708004064664,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 10,
+      "maxLayerDistanceMeters": 0.02009674041915898,
+      "minLayerDistanceMeters": 0.003502310411211452,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.007660102838348236,
+      "minLayerDistanceMeters": 0.004482642121047705,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.01925309607541591,
+      "minLayerDistanceMeters": 0.003637309574656806,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 12,
+      "maxLayerDistanceMeters": 0.007502617059273131,
+      "minLayerDistanceMeters": 0.004592104054958518,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 12,
+      "maxLayerDistanceMeters": 0.017877716889567578,
+      "minLayerDistanceMeters": 0.003860971171598847,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 13,
+      "maxLayerDistanceMeters": 0.007287121437346241,
+      "minLayerDistanceMeters": 0.004758179877082111,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 13,
+      "maxLayerDistanceMeters": 0.016020197088780982,
+      "minLayerDistanceMeters": 0.004168961898082433,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 14,
+      "maxLayerDistanceMeters": 0.007019500798564424,
+      "minLayerDistanceMeters": 0.004986477436709319,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 14,
+      "maxLayerDistanceMeters": 0.01375625480653709,
+      "minLayerDistanceMeters": 0.004552456658182755,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 15,
+      "maxLayerDistanceMeters": 0.006708044278701132,
+      "minLayerDistanceMeters": 0.005276304419168401,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 15,
+      "maxLayerDistanceMeters": 0.011196801030009489,
+      "minLayerDistanceMeters": 0.004604737435872853,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.00636376982536724,
+      "minLayerDistanceMeters": 0.005619298186127347,
+      "worstPairIndex": 424
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.008510297922496,
+      "minLayerDistanceMeters": 0.004431047381051619,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 17,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 17,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 18,
+      "maxLayerDistanceMeters": 0.0064023510105386955,
+      "minLayerDistanceMeters": 0.0056309454542242034,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 18,
+      "maxLayerDistanceMeters": 0.0084327612947524,
+      "minLayerDistanceMeters": 0.004302204158277595,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 19,
+      "maxLayerDistanceMeters": 0.006809255310334785,
+      "minLayerDistanceMeters": 0.005280831504069986,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 19,
+      "maxLayerDistanceMeters": 0.01102834470510844,
+      "minLayerDistanceMeters": 0.0044313605084134716,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 20,
+      "maxLayerDistanceMeters": 0.007195396629896072,
+      "minLayerDistanceMeters": 0.004965512505537608,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 20,
+      "maxLayerDistanceMeters": 0.013512552246582057,
+      "minLayerDistanceMeters": 0.0047399914778147815,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.007538737636191121,
+      "minLayerDistanceMeters": 0.004697786716452884,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.015722332537477998,
+      "minLayerDistanceMeters": 0.004413854813408714,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 22,
+      "maxLayerDistanceMeters": 0.007821791812634118,
+      "minLayerDistanceMeters": 0.0044861165534863245,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 22,
+      "maxLayerDistanceMeters": 0.01754476363223234,
+      "minLayerDistanceMeters": 0.004154908105205077,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 23,
+      "maxLayerDistanceMeters": 0.008032060867097816,
+      "minLayerDistanceMeters": 0.0043346195389109545,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 23,
+      "maxLayerDistanceMeters": 0.018899708163036346,
+      "minLayerDistanceMeters": 0.003968636426578103,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 24,
+      "maxLayerDistanceMeters": 0.008161250482199468,
+      "minLayerDistanceMeters": 0.004244172055381564,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 24,
+      "maxLayerDistanceMeters": 0.019733266736608638,
+      "minLayerDistanceMeters": 0.003856900901672044,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 25,
+      "maxLayerDistanceMeters": 0.008204819246071434,
+      "minLayerDistanceMeters": 0.0042141288078519,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 25,
+      "maxLayerDistanceMeters": 0.020014453513352043,
+      "minLayerDistanceMeters": 0.0038197090221778135,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.008161250482199468,
+      "minLayerDistanceMeters": 0.004244172055381564,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.019733266736608638,
+      "minLayerDistanceMeters": 0.003856900901672044,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 27,
+      "maxLayerDistanceMeters": 0.008032060867097816,
+      "minLayerDistanceMeters": 0.0043346195389109545,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 27,
+      "maxLayerDistanceMeters": 0.018899708163036346,
+      "minLayerDistanceMeters": 0.003968636426578103,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 28,
+      "maxLayerDistanceMeters": 0.007821791812634118,
+      "minLayerDistanceMeters": 0.0044861165534863245,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 28,
+      "maxLayerDistanceMeters": 0.01754476363223234,
+      "minLayerDistanceMeters": 0.004154908105205077,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 29,
+      "maxLayerDistanceMeters": 0.007538737636191121,
+      "minLayerDistanceMeters": 0.004697786716452884,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 29,
+      "maxLayerDistanceMeters": 0.015722332537477998,
+      "minLayerDistanceMeters": 0.004413854813408714,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 30,
+      "maxLayerDistanceMeters": 0.007195396629896072,
+      "minLayerDistanceMeters": 0.004965512505537608,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 30,
+      "maxLayerDistanceMeters": 0.013512552246582057,
+      "minLayerDistanceMeters": 0.0047399914778147815,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.006809255310334785,
+      "minLayerDistanceMeters": 0.005280831504069986,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.01102834470510844,
+      "minLayerDistanceMeters": 0.0044313605084134716,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 32,
+      "maxLayerDistanceMeters": 0.0064023510105386955,
+      "minLayerDistanceMeters": 0.0056309454542242034,
+      "worstPairIndex": 271
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 32,
+      "maxLayerDistanceMeters": 0.0084327612947524,
+      "minLayerDistanceMeters": 0.004302204158277595,
+      "worstPairIndex": 325
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 33,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 33,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.006087694372400944,
+      "minLayerDistanceMeters": 0.005926561633999982,
+      "worstPairIndex": 174
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.006504781159261381,
+      "minLayerDistanceMeters": 0.005753147979065423,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006151577506408293,
+      "minLayerDistanceMeters": 0.005872018390119984,
+      "worstPairIndex": 174
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006893865050771822,
+      "minLayerDistanceMeters": 0.005613316816545295,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.0061748784370746195,
+      "minLayerDistanceMeters": 0.005851921110583657,
+      "worstPairIndex": 174
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.007039778271208596,
+      "minLayerDistanceMeters": 0.005571217198482149,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.006151577506408293,
+      "minLayerDistanceMeters": 0.005872018390119984,
+      "worstPairIndex": 174
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.006893865050771822,
+      "minLayerDistanceMeters": 0.005613316816545295,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006087694372400944,
+      "minLayerDistanceMeters": 0.005926561633999982,
+      "worstPairIndex": 174
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006504781159261381,
+      "minLayerDistanceMeters": 0.005753147979065423,
+      "worstPairIndex": 248
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959562722362,
+      "worstPairIndex": 186
+    }
+  ],
+  "correctedLayerSamples": [
+    {
+      "part": "Split coat tail -1",
+      "clip": "Idle",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Idle",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Idle",
+      "frame": 37,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Idle",
+      "frame": 37,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 2,
+      "maxLayerDistanceMeters": 0.006000021213561194,
+      "minLayerDistanceMeters": 0.005994971772830308,
+      "worstPairIndex": 410
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 2,
+      "maxLayerDistanceMeters": 0.006000096316097918,
+      "minLayerDistanceMeters": 0.005996320525822898,
+      "worstPairIndex": 137
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 3,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005980687190637047,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 3,
+      "maxLayerDistanceMeters": 0.006000058536277318,
+      "minLayerDistanceMeters": 0.005985948833069166,
+      "worstPairIndex": 349
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 4,
+      "maxLayerDistanceMeters": 0.006000015248536044,
+      "minLayerDistanceMeters": 0.00595938828211294,
+      "worstPairIndex": 160
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 4,
+      "maxLayerDistanceMeters": 0.006000052036957467,
+      "minLayerDistanceMeters": 0.005970641021766548,
+      "worstPairIndex": 341
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 5,
+      "maxLayerDistanceMeters": 0.006000021479569684,
+      "minLayerDistanceMeters": 0.005934395170496041,
+      "worstPairIndex": 49
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 5,
+      "maxLayerDistanceMeters": 0.006000045800293467,
+      "minLayerDistanceMeters": 0.005952809222180546,
+      "worstPairIndex": 388
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005909517576054406,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.00600006341136048,
+      "minLayerDistanceMeters": 0.00593520908263926,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 7,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005888509512273584,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 7,
+      "maxLayerDistanceMeters": 0.006000065072352278,
+      "minLayerDistanceMeters": 0.00592042955182564,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 8,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005874500224000907,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 8,
+      "maxLayerDistanceMeters": 0.006000077130748446,
+      "minLayerDistanceMeters": 0.005910679050364321,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 9,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005869627088988592,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 9,
+      "maxLayerDistanceMeters": 0.0060000690679768605,
+      "minLayerDistanceMeters": 0.005907239417350074,
+      "worstPairIndex": 245
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 10,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005874500224000907,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 10,
+      "maxLayerDistanceMeters": 0.006000077130748446,
+      "minLayerDistanceMeters": 0.005910679050364321,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005888509512273584,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006000065072352278,
+      "minLayerDistanceMeters": 0.00592042955182564,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 12,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005909517576054406,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 12,
+      "maxLayerDistanceMeters": 0.00600006341136048,
+      "minLayerDistanceMeters": 0.00593520908263926,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 13,
+      "maxLayerDistanceMeters": 0.006000021479569684,
+      "minLayerDistanceMeters": 0.005934395170496041,
+      "worstPairIndex": 49
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 13,
+      "maxLayerDistanceMeters": 0.006000045800293467,
+      "minLayerDistanceMeters": 0.005952809222180546,
+      "worstPairIndex": 388
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 14,
+      "maxLayerDistanceMeters": 0.006000015248536044,
+      "minLayerDistanceMeters": 0.00595938828211294,
+      "worstPairIndex": 160
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 14,
+      "maxLayerDistanceMeters": 0.006000052036957467,
+      "minLayerDistanceMeters": 0.005970641021766548,
+      "worstPairIndex": 341
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 15,
+      "maxLayerDistanceMeters": 0.006000010317935075,
+      "minLayerDistanceMeters": 0.005980687190637047,
+      "worstPairIndex": 21
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 15,
+      "maxLayerDistanceMeters": 0.006000058536277318,
+      "minLayerDistanceMeters": 0.005985948833069166,
+      "worstPairIndex": 349
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.006000021213561194,
+      "minLayerDistanceMeters": 0.005994971772830308,
+      "worstPairIndex": 410
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.006000096316097918,
+      "minLayerDistanceMeters": 0.005996320525822898,
+      "worstPairIndex": 137
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 17,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 17,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 18,
+      "maxLayerDistanceMeters": 0.006000065392092744,
+      "minLayerDistanceMeters": 0.005995306934092611,
+      "worstPairIndex": 337
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 18,
+      "maxLayerDistanceMeters": 0.006000052169888173,
+      "minLayerDistanceMeters": 0.00599567743926614,
+      "worstPairIndex": 137
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 19,
+      "maxLayerDistanceMeters": 0.006000080790772525,
+      "minLayerDistanceMeters": 0.005981912958515327,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 19,
+      "maxLayerDistanceMeters": 0.006000015178573668,
+      "minLayerDistanceMeters": 0.005983368376271417,
+      "worstPairIndex": 407
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 20,
+      "maxLayerDistanceMeters": 0.006000046016933329,
+      "minLayerDistanceMeters": 0.005961921224018835,
+      "worstPairIndex": 340
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 20,
+      "maxLayerDistanceMeters": 0.006000014592081306,
+      "minLayerDistanceMeters": 0.005964826880610307,
+      "worstPairIndex": 282
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.0060000799574468165,
+      "minLayerDistanceMeters": 0.005938421696038443,
+      "worstPairIndex": 285
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.006000015182667605,
+      "minLayerDistanceMeters": 0.005942984635348969,
+      "worstPairIndex": 48
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 22,
+      "maxLayerDistanceMeters": 0.006000056000737167,
+      "minLayerDistanceMeters": 0.005915040103387724,
+      "worstPairIndex": 349
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 22,
+      "maxLayerDistanceMeters": 0.006000029874614684,
+      "minLayerDistanceMeters": 0.005921108103073203,
+      "worstPairIndex": 341
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 23,
+      "maxLayerDistanceMeters": 0.006000059954254041,
+      "minLayerDistanceMeters": 0.005895329119436992,
+      "worstPairIndex": 335
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 23,
+      "maxLayerDistanceMeters": 0.006000007402197658,
+      "minLayerDistanceMeters": 0.005902579414691682,
+      "worstPairIndex": 22
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 24,
+      "maxLayerDistanceMeters": 0.006000054988551572,
+      "minLayerDistanceMeters": 0.00588216160730145,
+      "worstPairIndex": 240
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 24,
+      "maxLayerDistanceMeters": 0.006000007402197658,
+      "minLayerDistanceMeters": 0.0058902177419599055,
+      "worstPairIndex": 22
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 25,
+      "maxLayerDistanceMeters": 0.006000077738694103,
+      "minLayerDistanceMeters": 0.005877556535704446,
+      "worstPairIndex": 236
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 25,
+      "maxLayerDistanceMeters": 0.006000007402197658,
+      "minLayerDistanceMeters": 0.00588587647275779,
+      "worstPairIndex": 22
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006000054988551572,
+      "minLayerDistanceMeters": 0.00588216160730145,
+      "worstPairIndex": 240
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006000007402197658,
+      "minLayerDistanceMeters": 0.0058902177419599055,
+      "worstPairIndex": 22
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 27,
+      "maxLayerDistanceMeters": 0.006000059954254041,
+      "minLayerDistanceMeters": 0.005895329119436992,
+      "worstPairIndex": 335
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 27,
+      "maxLayerDistanceMeters": 0.006000007402197658,
+      "minLayerDistanceMeters": 0.005902579414691682,
+      "worstPairIndex": 22
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 28,
+      "maxLayerDistanceMeters": 0.006000056000737167,
+      "minLayerDistanceMeters": 0.005915040103387724,
+      "worstPairIndex": 349
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 28,
+      "maxLayerDistanceMeters": 0.006000029874614684,
+      "minLayerDistanceMeters": 0.005921108103073203,
+      "worstPairIndex": 341
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 29,
+      "maxLayerDistanceMeters": 0.0060000799574468165,
+      "minLayerDistanceMeters": 0.005938421696038443,
+      "worstPairIndex": 285
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 29,
+      "maxLayerDistanceMeters": 0.006000015182667605,
+      "minLayerDistanceMeters": 0.005942984635348969,
+      "worstPairIndex": 48
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 30,
+      "maxLayerDistanceMeters": 0.006000046016933329,
+      "minLayerDistanceMeters": 0.005961921224018835,
+      "worstPairIndex": 340
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 30,
+      "maxLayerDistanceMeters": 0.006000014592081306,
+      "minLayerDistanceMeters": 0.005964826880610307,
+      "worstPairIndex": 282
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.006000080790772525,
+      "minLayerDistanceMeters": 0.005981912958515327,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.006000015178573668,
+      "minLayerDistanceMeters": 0.005983368376271417,
+      "worstPairIndex": 407
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 32,
+      "maxLayerDistanceMeters": 0.006000065392092744,
+      "minLayerDistanceMeters": 0.005995306934092611,
+      "worstPairIndex": 337
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 32,
+      "maxLayerDistanceMeters": 0.006000052169888173,
+      "minLayerDistanceMeters": 0.00599567743926614,
+      "worstPairIndex": 137
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Walk",
+      "frame": 33,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Walk",
+      "frame": 33,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 1,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.006000034182238522,
+      "minLayerDistanceMeters": 0.00599893633944051,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 6,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.00599980865318696,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006000013511531812,
+      "minLayerDistanceMeters": 0.005996822650474791,
+      "worstPairIndex": 161
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 11,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.00599945917578867,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.006000027492764002,
+      "minLayerDistanceMeters": 0.00599578686250173,
+      "worstPairIndex": 110
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 16,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999263780112813,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.006000013511531812,
+      "minLayerDistanceMeters": 0.005996822650474791,
+      "worstPairIndex": 161
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 21,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.00599945917578867,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006000034182238522,
+      "minLayerDistanceMeters": 0.00599893633944051,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 26,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.00599980865318696,
+      "worstPairIndex": 186
+    },
+    {
+      "part": "Split coat tail -1",
+      "clip": "Cast",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.0060000449628030625,
+      "minLayerDistanceMeters": 0.005999963270576544,
+      "worstPairIndex": 264
+    },
+    {
+      "part": "Split coat tail 1",
+      "clip": "Cast",
+      "frame": 31,
+      "maxLayerDistanceMeters": 0.006000040454459999,
+      "minLayerDistanceMeters": 0.005999959010424582,
+      "worstPairIndex": 186
+    }
+  ],
+  "limitations": [
+    "Source-layer deformation validation is separate from final LOD render and commercial art acceptance"
+  ]
+}

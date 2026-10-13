@@ -1,7 +1,7 @@
 {
   "mode": "source-only",
-  "generatorSha256": "b255e064a4d5c7aabff0fb716f16fb07df13cde0bd15dceec95f2cb9e5e5de9c",
-  "sourceBlendSha256": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+  "generatorSha256": "67cf69e3b7de60b921dabc9b3b35832d1810e8e5fd61be0e11050eec27a45d93",
+  "sourceBlendSha256": "958e42d3864cf7a71fc2728f3329d59f875e377e2ec93e5598ec83774eadd70c",
   "triangles": 45710,
   "bones": 163,
   "clips": [
@@ -10,5 +10,23 @@
     "Cast"
   ],
   "packedImages": 22,
+  "coherentCoatTailWeights": [
+    {
+      "part": "Split coat tail -1",
+      "pairedVertices": 425,
+      "changedPairs": 425,
+      "originalWeightL1DifferenceMax": 0.18169023096561432,
+      "outerWeightsChanged": false,
+      "method": "Inner layer uses the corresponding outer-layer weights before rest-pose baking"
+    },
+    {
+      "part": "Split coat tail 1",
+      "pairedVertices": 425,
+      "changedPairs": 425,
+      "originalWeightL1DifferenceMax": 0.24619630724191666,
+      "outerWeightsChanged": false,
+      "method": "Inner layer uses the corresponding outer-layer weights before rest-pose baking"
+    }
+  ],
   "publishedAssetsTouched": false
 }

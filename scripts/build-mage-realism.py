@@ -186,6 +186,10 @@ def strip(name, rows, material, bone=None):
         for j in range(width-1): faces.append((k*width+j,k*width+j+1,(k+1)*width+j+1,(k+1)*width+j))
     uv=[[(j/(width-1),k/(len(rows)-1)),((j+1)/(width-1),k/(len(rows)-1)),((j+1)/(width-1),(k+1)/(len(rows)-1)),(j/(width-1),(k+1)/(len(rows)-1))] for k in range(len(rows)-1) for j in range(width-1)]
     obj=make_mesh(name,verts,faces,material,uv,rigid=bone)
+    if name.startswith('Split coat tail '):
+        # Solidify keeps corresponding front/back vertices in the two halves.
+        # Record provenance so skinning can keep this physical layer coherent.
+        obj['shellBaseVertexCount']=len(obj.data.vertices)
     sol=obj.modifiers.new('Cloth and leather thickness','SOLIDIFY');sol.thickness=.006
     bpy.context.view_layer.objects.active=obj;bpy.ops.object.modifier_apply(modifier=sol.name)
     return obj
@@ -593,6 +597,7 @@ def segment_weights(v):
         candidates.append((dist,n))
     candidates=sorted(candidates)[:3];total=sum(math.exp(-d*26) for d,n in candidates)
     return [(n,math.exp(-d*26)/total) for d,n in candidates]
+shell_weight_receipt=[]
 for obj,original,rigid in parts:
     obj.parent=rig
     groups_by_name={}
@@ -604,6 +609,21 @@ for obj,original,rigid in parts:
         for name,w in ws:
             if name not in groups_by_name:groups_by_name[name]=obj.vertex_groups.new(name=name)
             groups_by_name[name].add([v.index],w/total,'REPLACE')
+    if obj.get('shellBaseVertexCount'):
+        count=int(obj['shellBaseVertexCount'])
+        assert len(obj.data.vertices)==count*2,'Unexpected coat-tail shell vertex order'
+        changed=0;max_l1=0
+        for i in range(count):
+            outside={g.group:g.weight for g in obj.data.vertices[i].groups}
+            inside={g.group:g.weight for g in obj.data.vertices[i+count].groups}
+            difference=sum(abs(outside.get(k,0)-inside.get(k,0)) for k in outside.keys()|inside.keys())
+            changed+=difference>1e-7;max_l1=max(max_l1,difference)
+            for k in inside:obj.vertex_groups[k].remove([i+count])
+            for k,weight in outside.items():obj.vertex_groups[k].add([i+count],weight,'REPLACE')
+        obj['coherentShellWeights']=True
+        shell_weight_receipt.append({'part':obj.name,'pairedVertices':count,'changedPairs':changed,
+            'originalWeightL1DifferenceMax':max_l1,'outerWeightsChanged':False,
+            'method':'Inner layer uses the corresponding outer-layer weights before rest-pose baking'})
     mod=obj.modifiers.new('Smooth anatomical skinning','ARMATURE');mod.object=rig
 
 # Relax the A-pose into a natural resting stance and bake it as the rest pose.
@@ -717,6 +737,7 @@ if '--source-only' in sys.argv:
         'bones':len(rig.data.bones),
         'clips':['Idle','Walk','Cast'],
         'packedImages':sum(bool(i.packed_file) for i in bpy.data.images),
+        'coherentCoatTailWeights':shell_weight_receipt,
         'publishedAssetsTouched':False
     }
     (out/'source-build-receipt.json').write_text(json.dumps(source_receipt,indent=2)+'\n')

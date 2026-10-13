@@ -1,0 +1,53 @@
+{
+  "scope": "ART-02 D1 baseline cloth native ablation; no production asset change",
+  "frozenHighSha": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3",
+  "frozenCombatSha": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+  "frozenSourceStudioSha": "b78ee35ce2b8f1e91ef7be5a9da30645bd09aaf07abc9c3c7c0aae5b2ddec503",
+  "browser": {
+    "engine": "Chromium ANGLE SwiftShader",
+    "preview": "Actual production hero.js and mage-preview.js; diagnostics only in intercepted module response",
+    "canvas": "640x640",
+    "samples": 36,
+    "clips": {
+      "Idle": [
+        0,
+        0.5
+      ],
+      "Walk": [
+        0.25,
+        0.5
+      ],
+      "Cast": [
+        0.15,
+        0.3
+      ]
+    },
+    "views": [
+      "front rotation -.18",
+      "back rotation PI"
+    ],
+    "modes": [
+      "original PBR normal",
+      "normalScale (0,0), other PBR preserved",
+      "opaque neutral gray, no normal/base/roughness/metallic/emissive maps or vertex color"
+    ],
+    "cameraLightsPose": "camera/light and clip time remain fixed across each three-mode group",
+    "finding": "In sampled current game viewer lighting/framing, authored normal vs zero differ little; old studio conspicuous black spots not reproduced. Broad tail folds and hard silhouette edges remain under neutral-gray geometry shading.",
+    "tailCropDiff": "Mean abs RGB .0687-.0835, >10px channel change 0 for 11/12 sampled views and 1 for Walk .5 back; this numerical small change does not exclude other camera/light/time defects."
+  },
+  "studio": {
+    "engine": "Blender native imported frozen high/low GLB, Cycles8 one thread",
+    "canvas": "480x480 waist/tail crop",
+    "sourceScene": "Fresh source-only blend with packed maps, retained studio area lights/ground",
+    "pose": "Walk action frame9",
+    "modes": [
+      "PBR original normal",
+      "NormalMap Strength0",
+      "neutral gray"
+    ],
+    "finding": "Same cropped studio scene shows little normal-strength ablation difference. Low LOD folds/creased silhouette remain in neutral shading; no demonstrated disappearance of a specific rendered black spot.",
+    "limitations": "8 samples shows noise, one camera/pose is not full studio defect coverage."
+  },
+  "staticSupport": "Embedded images and finite mesh normals inspected separately; negative-Z atlas pixels are hypotheses only, not rendered correspondence/root cause.",
+  "artAcceptance": "No real-device FPS/thermal/long-session or commercial art-quality claim."
+}
