@@ -234,6 +234,12 @@
       "severity": "P1",
       "status": "open",
       "description": "怪物缺少足够差异化行为和可识别前摇"
+    },
+    {
+      "id": "P1-007",
+      "severity": "P1",
+      "status": "open",
+      "description": "F2 branch does not persist unclaimed boss ground loot across refresh; code write blocked by safety check on 2026-10-13. New real screenshots unavailable."
     }
   ],
   "deltaTop3": [
@@ -241,20 +247,18 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F2 下一个代码切片：实现主城安全区（铁匠/商人/仓库/传送师）和野外/地牢入口的显式导航；设置击败首领后的可选继续探索/下一层/手动重刷，且保证 Boss 战利品刷新后不会丢失。添加浏览器流程与老存档迁移回归，保持现有 A 向美术 P1 阻断。",
+  "nextAction": "F2: Retry approved source-code write on isolated branch to persist pendingLoot and bossKills after Boss kill, restore loot on page reload, and remove picked-up loot atomically; add old-save migration and Chromium PC/mobile boss flow tests. Resolve main drift without touching 3D or force-merging.",
   "lastAttempt": {
     "at": "2026-10-13",
     "phase": "F2",
-    "status": "partial-playable-boss-loot",
+    "status": "blocked-code-write",
     "verified": {
-      "commit": "12c770bef56238e72bce6b6d10da3fa1f8628c05",
-      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38387621782",
-      "unitTests": [
-        "tests/2d-boss-loot.test.mjs",
-        "tests/2d-maze-world.test.mjs"
-      ]
+      "branchHeadBeforeAttempt": "ee02f969aba7e785cefa13f0b479460ca168b4a4",
+      "mainHead": "0abae7ee52dd620b8b97b1743f7c87e7765e2b31",
+      "pr": 6
     },
-    "caveat": "Regional loot and first kill guarantee are implemented/tested in branch only; no town/world or A-direction art acceptance. Draft PR #6, not deployed."
+    "blocker": "GitHub update_file attempt for dist/2d/core.js returned: This tool call was blocked by OpenAI's safety checks. No game-code commit, new CI run or new Chromium screenshots.",
+    "caveat": "The branch is behind main, and PR #6 is not mergeable. Do not force merge or treat main's v0.3.1 as A-direction final."
   },
   "candidate": {
     "status": "none",
