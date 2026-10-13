@@ -271,5 +271,10 @@
     "pagesRun": null,
     "rollbackCommit": null
   },
-  "updatedAt": "2026-10-13"
+  "updatedAt": "2026-10-13",
+  "lastWritePermissionProbe": {
+    "at": "2026-10-13",
+    "purpose": "User-present GitHub write authorization check; no gameplay or 3D changes",
+    "status": "authorization-check"
+  }
 }
