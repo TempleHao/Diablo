@@ -1,6 +1,39 @@
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {inflateSync} from 'node:zlib';
 import assert from 'node:assert/strict';
+
+// Inspect the exported bytes as well as Blender's float report. Byte PNGs
+// quantize 0.5 to 128/255, which makes an exact float-sentinel comparison unsafe.
+function readNormalPng(bytes){
+  assert.equal(bytes.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  let width,height,channels;const data=[];
+  for(let offset=8;offset<bytes.length;){
+    const length=bytes.readUInt32BE(offset),type=bytes.toString('ascii',offset+4,offset+8);
+    const chunk=bytes.subarray(offset+8,offset+8+length);
+    if(type==='IHDR'){
+      width=chunk.readUInt32BE(0);height=chunk.readUInt32BE(4);
+      assert.equal(chunk[8],8,'Expected 8-bit normal PNG');
+      assert.ok(chunk[9]===6||chunk[9]===2,'Expected RGB/RGBA normal PNG');
+      channels=chunk[9]===6?4:3;
+      assert.equal(chunk[10],0);assert.equal(chunk[11],0);assert.equal(chunk[12],0,'Interlaced normal PNG unsupported');
+    }else if(type==='IDAT')data.push(chunk);
+    offset+=length+12;
+  }
+  assert.equal(width,2048);assert.equal(height,2048);
+  const stride=width*channels,raw=inflateSync(Buffer.concat(data)),pixels=Buffer.alloc(stride*height);
+  assert.equal(raw.length,(stride+1)*height);
+  const paeth=(a,b,c)=>{const p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);return pa<=pb&&pa<=pc?a:pb<=pc?b:c;};
+  for(let y=0;y<height;y++){
+    const filter=raw[y*(stride+1)];assert.ok(filter<=4,'Invalid PNG row filter');
+    for(let x=0;x<stride;x++){
+      const at=y*stride+x,a=x>=channels?pixels[at-channels]:0,b=y?pixels[at-stride]:0,c=y&&x>=channels?pixels[at-stride-channels]:0;
+      const prediction=[0,a,b,Math.floor((a+b)/2),paeth(a,b,c)][filter];
+      pixels[at]=(raw[y*(stride+1)+1+x]+prediction)&255;
+    }
+  }
+  return {width,height,channels,pixels};
+}
 
 const project=new URL('../',import.meta.url);
 for(const directory of ['assets-source/human-base/','assets-source/environment-pbr/']){
@@ -68,6 +101,8 @@ for(const node of model.nodes){
 }
 assert.ok(weightedVertices>0&&triangles>0,'Character geometry missing');
 const primitives=model.meshes.flatMap(m=>m.primitives);
+const normalImageHashes=new Set();
+let normalPng;
 for(const primitive of primitives){
   const positions=model.accessors[primitive.attributes.POSITION];
   for(const name of ['TEXCOORD_0','TEXCOORD_1']){
@@ -90,6 +125,12 @@ for(const material of model.materials){
   assert.ok(material.pbrMetallicRoughness?.metallicRoughnessTexture,'Missing baked roughness/metalness');
   assert.ok(material.normalTexture&&material.emissiveTexture,'Missing baked normal/emission');
   assert.equal(material.normalTexture.texCoord??0,1,'Cloth normal map must use dedicated UV1');
+  const normalImage=model.images[model.textures[material.normalTexture.index].source];
+  const normalView=model.bufferViews[normalImage.bufferView];
+  assert.equal(normalImage.mimeType,'image/png','Normal image must retain lossless bake encoding');
+  const normalBytes=binary.subarray(normalView.byteOffset||0,(normalView.byteOffset||0)+normalView.byteLength);
+  normalImageHashes.add(createHash('sha256').update(normalBytes).digest('hex'));
+  normalPng??=readNormalPng(normalBytes);
   for(const texture of [material.pbrMetallicRoughness.baseColorTexture,material.pbrMetallicRoughness.metallicRoughnessTexture,material.emissiveTexture])assert.equal(texture.texCoord??0,0,'Authored color/roughness/emission UV changed');
   if(material.alphaMode==='MASK')assert.equal(material.alphaCutoff??.5,.5);
 }
@@ -101,7 +142,8 @@ const clipTimes=model.animations.map(a=>({name:a.name,times:a.samplers.map(s=>{
 })}));
 const jointNames=model.skins[0].joints.map(i=>model.nodes[i].name);
 console.log(JSON.stringify({filename,modelBytes:bytes.length,triangles,weightedVertices,joints:jointNames.length,materials:model.materials.length,images:model.images.length}));
-return {statistics,jointNames,clipTimes};
+assert.equal(normalImageHashes.size,1,'Both material primitives must share the same normal atlas');
+return {statistics,jointNames,clipTimes,normalImageSha256:[...normalImageHashes][0],normalPng};
 }
 const detail=checkCharacter('ember-mage-realism.glb','statistics.json',35000);
 const combat=checkCharacter('ember-mage-combat.glb','combat-statistics.json',15000);
@@ -127,8 +169,30 @@ for(const lod of ['L0','L1']){
   assert.ok(tail.samples.length>=86,'Tail sweep must include full Walk and Idle/Cast samples for both panels');
   const normal=report.lods[lod].clothNormal;
   assert.equal(normal.texCoord,1);assert.equal(normal.uvLayer,'NormalUV');assert.match(normal.sha256,/^[a-f0-9]{64}$/);
+  assert.equal(normal.sha256,(lod==='L0'?detail:combat).normalImageSha256,'Embedded normal image differs from bake evidence');
   assert.ok(normal.parts.length>0,'Missing isolated high-to-low bake evidence');
   const tiles=Object.values(normal.uvTiles);
   assert.ok(tiles.length>0,'Missing normal UV occupancy evidence');
   assert.ok(tiles.every(t=>t.overlappingInteriorPixels===0),'Normal UV interiors overlap');
+  for(const tile of tiles){
+    const [left,bottom,width,height]=tile.rectanglePixels;
+    const png=(lod==='L0'?detail:combat).normalPng;
+    // Include margins and background: tiny triangles and texture filtering can
+    // sample texels outside the pixel-center interior mask used by the baker.
+    let backwardBytes=0,invalidLengths=0;
+    for(let y=png.height-bottom-height;y<png.height-bottom;y++)for(let x=left;x<left+width;x++){
+      const offset=(y*png.width+x)*png.channels;
+      const r=png.pixels[offset]/255*2-1,g=png.pixels[offset+1]/255*2-1,b=png.pixels[offset+2]/255*2-1;
+      if(b<-.01)backwardBytes++;
+      const length=Math.hypot(r,g,b);if(length<.85||length>1.02)invalidLengths++;
+    }
+    assert.equal(backwardBytes,0,'Actual exported normal tile contains reverse normals, including margins/background');
+    assert.equal(invalidLengths,0,'Actual exported normal tile contains invalid encoded vectors');
+    assert.ok(tile.coveredInteriorPixels>=width*height*.15,'Cloth normal chart interiors occupy less than 15% of their tile');
+    assert.equal(tile.bakedInteriorPixels,tile.coveredInteriorPixels,'Baked coverage differs from actual UV interiors');
+    assert.equal(tile.blackHolePixels,0,'Cloth normal interior contains a black projection hole');
+    assert.equal(tile.unprojectedInteriorPixels,0,'Cloth normal interior contains untouched projection sentinel');
+    assert.equal(tile.backwardNormalPixels,0,'Cloth normal interior points behind its low surface');
+    assert.ok(tile.encodedNormalLengthMin>=.85&&tile.encodedNormalLengthMax<=1.02,'Encoded cloth normal has invalid length');
+  }
 }

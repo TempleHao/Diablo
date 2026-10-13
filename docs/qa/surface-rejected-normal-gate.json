@@ -1,0 +1,64 @@
+{
+  "status": "rejected-not-published",
+  "validation": "actual Node exported-byte asset checker expected failure; independent Pillow decode cross-check",
+  "command": "node scripts/check-art-assets.mjs in frozen rejected candidate root",
+  "exitCode": 1,
+  "failure": "Actual exported normal tile contains reverse normals, including margins/background",
+  "nodeFirstTileActual": 239354,
+  "pillowFirstTileMatchesNode": true,
+  "fixedTargets": {
+    "tileInteriorCoverageFractionMin": 0.15,
+    "backwardNormalPixels": 0,
+    "encodedNormalLengthMin": 0.85,
+    "encodedNormalLengthMax": 1.02
+  },
+  "assets": {
+    "L0": {
+      "glbSha256": "001c67a908a58e536dcea79be1d3ee97e17da67bd35fab372a9dbab6f1f8e14b",
+      "normalImageSha256": "fec99b7a6f0f2c6167cf2584f8b791373b5f7e1c0c67077544a76a66ff52b84f",
+      "normalImageMatchesBakeReport": true,
+      "tiles": {
+        "Weathered charcoal linen": {
+          "actualEmbeddedPngNegativeZPixelsIncludingMarginAndBackground": 239354,
+          "actualEmbeddedPngInvalidVectorLengthPixels": 623,
+          "reportedPixelCenterInteriorNegativeZPixels": 90,
+          "coveredInteriorPixels": 4030,
+          "tileAreaPixels": 262144
+        },
+        "Oxblood wool": {
+          "actualEmbeddedPngNegativeZPixelsIncludingMarginAndBackground": 214870,
+          "actualEmbeddedPngInvalidVectorLengthPixels": 1231,
+          "reportedPixelCenterInteriorNegativeZPixels": 132,
+          "coveredInteriorPixels": 24655,
+          "tileAreaPixels": 262144
+        }
+      }
+    },
+    "L1": {
+      "glbSha256": "215f8478b05b5d1c31e4c855c6c3cae4d96d9b5ff1d660a3f5e8344667a8260d",
+      "normalImageSha256": "7e50589ee441df75ee048c8e52fb86c6581ac32269cb69f7840a6f8400583489",
+      "normalImageMatchesBakeReport": true,
+      "tiles": {
+        "Weathered charcoal linen": {
+          "actualEmbeddedPngNegativeZPixelsIncludingMarginAndBackground": 212008,
+          "actualEmbeddedPngInvalidVectorLengthPixels": 3287,
+          "reportedPixelCenterInteriorNegativeZPixels": 771,
+          "coveredInteriorPixels": 18794,
+          "tileAreaPixels": 262144
+        },
+        "Oxblood wool": {
+          "actualEmbeddedPngNegativeZPixelsIncludingMarginAndBackground": 193255,
+          "actualEmbeddedPngInvalidVectorLengthPixels": 2650,
+          "reportedPixelCenterInteriorNegativeZPixels": 1777,
+          "coveredInteriorPixels": 45815,
+          "tileAreaPixels": 262144
+        }
+      }
+    }
+  },
+  "limitations": [
+    "This expected rejection verifies a new gate, not candidate correctness or visual acceptance",
+    "Published GLBs remain unchanged",
+    "Low-chart source/normal repair is still in progress"
+  ]
+}

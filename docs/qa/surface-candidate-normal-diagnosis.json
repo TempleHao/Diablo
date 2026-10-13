@@ -1,0 +1,724 @@
+{
+  "stage": "ART-02 D1 first candidate high normal failure diagnosis",
+  "createdUtc": "2026-10-13T03:57:18.048531+00:00",
+  "candidateStatus": "FAILED VISUAL GATE; diagnosis of first candidate, not final validated art",
+  "scope": "High candidate only; frozen combat remains baseline",
+  "highSha": "001c67a908a58e536dcea79be1d3ee97e17da67bd35fab372a9dbab6f1f8e14b",
+  "combatSha": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+  "baselineHighSha": "e7e16babefac9fac546739721a885c140b68910ae7672edee6ba498e30b4b2f3",
+  "moduleHashes": {
+    "vendor/three.module.js": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb",
+    "hero.js": "b10aa7ee7e02ca8e407ec65fdabc09fdab3215696a3673cc546ce0da54f7a07e",
+    "vendor/GLTFLoader.js": "aebcb5659d71015f936c4cbcb72eb32fdafd865072d7cd489c03aae757301fcc",
+    "mage-preview.js": "4fe1fef2b542cf36bb3d378eb278da2ab0b38b0d1e4b6d4a1450fef655fc91aa",
+    "vendor/utils/BufferGeometryUtils.js": "51db05616ad0ddf7722e4ae8ad06bacc464985f510db3e65501498c4a816b10c",
+    "vendor/utils/SkeletonUtils.js": "2ddb9e16eec56fa3f90cf2b107d16defbd7ae276d2f9ff2b4e281a6a318ee46a",
+    "lighting.js": "95e5e14ffe6d8e28913bdf20b4389c7ecd1df7ce20b31324dd780d1becffbc54",
+    "models/ember-mage-combat.glb": "79db8bce51b85f97331226e1fc60bcf059c595038326fa4bfb7b8390bae1dfaa",
+    "models/ember-mage-realism.glb": "001c67a908a58e536dcea79be1d3ee97e17da67bd35fab372a9dbab6f1f8e14b"
+  },
+  "gpu": {
+    "vendor": "Google Inc. (Google)",
+    "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)"
+  },
+  "productionFilesChanged": false,
+  "qaHelperFile": "tests/art/surface.cjs",
+  "qaHelperSha": "3a413bb9e7379c251fa414125c774139502198b81508bd2e02a335334e032091",
+  "browserCompatibility": {
+    "pass": true,
+    "boneCount": 60,
+    "drawCalls": 3,
+    "normalChannel": [
+      1,
+      1
+    ],
+    "baseChannel": [
+      0,
+      0
+    ],
+    "geometry": [
+      {
+        "mesh": "Bent_bronze_focus_cage005",
+        "attributes": {
+          "position": {
+            "count": 21669,
+            "itemSize": 3
+          },
+          "normal": {
+            "count": 21669,
+            "itemSize": 3
+          },
+          "uv": {
+            "count": 21669,
+            "itemSize": 2
+          },
+          "uv1": {
+            "count": 21669,
+            "itemSize": 2
+          },
+          "color": {
+            "count": 21669,
+            "itemSize": 4
+          },
+          "color_1": {
+            "count": 21669,
+            "itemSize": 4
+          },
+          "skinIndex": {
+            "count": 21669,
+            "itemSize": 4
+          },
+          "skinWeight": {
+            "count": 21669,
+            "itemSize": 4
+          }
+        },
+        "triangles": 30144,
+        "joints": 60,
+        "uv1": {
+          "count": 21669,
+          "min": [
+            0.0078125,
+            0.0078125
+          ],
+          "max": [
+            0.9923033118247986,
+            0.9921891689300537
+          ],
+          "finite": true,
+          "nonzero": 21669
+        }
+      },
+      {
+        "mesh": "Bent_bronze_focus_cage005_1",
+        "attributes": {
+          "position": {
+            "count": 3656,
+            "itemSize": 3
+          },
+          "normal": {
+            "count": 3656,
+            "itemSize": 3
+          },
+          "uv": {
+            "count": 3656,
+            "itemSize": 2
+          },
+          "uv1": {
+            "count": 3656,
+            "itemSize": 2
+          },
+          "color": {
+            "count": 3656,
+            "itemSize": 4
+          },
+          "color_1": {
+            "count": 3656,
+            "itemSize": 4
+          },
+          "skinIndex": {
+            "count": 3656,
+            "itemSize": 4
+          },
+          "skinWeight": {
+            "count": 3656,
+            "itemSize": 4
+          }
+        },
+        "triangles": 4328,
+        "joints": 60,
+        "uv1": {
+          "count": 3656,
+          "min": [
+            0.0078125,
+            0.0078125
+          ],
+          "max": [
+            0.9921875,
+            0.4921875
+          ],
+          "finite": true,
+          "nonzero": 3656
+        }
+      }
+    ]
+  },
+  "fixedComparison": {
+    "pose": {
+      "clip": "Idle",
+      "time": 0,
+      "duration": 3.0416667461395264
+    },
+    "camera": [
+      0.07,
+      1.087971525415749,
+      3.9370401915210653
+    ],
+    "cameraQuaternion": [
+      -0.010156337873619647,
+      0.008888414876717564,
+      9.028196805257815e-05,
+      0.9999089142172614
+    ],
+    "lights": [
+      {
+        "type": "HemisphereLight",
+        "color": [
+          0.7681511472425809,
+          0.7454042095350284,
+          0.6866853124288864
+        ],
+        "intensity": 0.85,
+        "position": [
+          0,
+          1,
+          0
+        ]
+      },
+      {
+        "type": "DirectionalLight",
+        "color": [
+          1,
+          0.8796223968851662,
+          0.7230551289161951
+        ],
+        "intensity": 5,
+        "position": [
+          -2,
+          4,
+          3
+        ]
+      },
+      {
+        "type": "DirectionalLight",
+        "color": [
+          0.5394794890033748,
+          0.5840784178830671,
+          0.6104955708001716
+        ],
+        "intensity": 1.8,
+        "position": [
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "type": "DirectionalLight",
+        "color": [
+          0.4178850708380236,
+          0.5332764040016892,
+          0.6307571363387763
+        ],
+        "intensity": 1.75,
+        "position": [
+          2,
+          2,
+          -2
+        ]
+      }
+    ],
+    "baselineCameraQuaternionHeightIdentical": true
+  },
+  "nativeControls": {
+    "originalNormal": "New dark triangles at chest and both sleeves absent in baseline.",
+    "normalScaleZero": "Dark triangles persist. This controls XY normal strength, not mapN.z or presence of normalMap.",
+    "normalMapNull": "Preserves all base/ORM/emission/vertex channels and removes visible dark triangles.",
+    "flatNormal": "Replaces only normal pixels with [128,128,255,255], keeps channel1/UV1/scale and all other PBR; visible dark triangles disappear.",
+    "baseOnly": "UV0 base color with no normal/ORM/emission/vertex variation also removes dark triangles.",
+    "neutralGray": "Geometry/silhouette control removing all opaque PBR-map variation."
+  },
+  "causeSupportedByNativeEvidence": "The first candidate contains reversed tangent-space normal texels at three rendered dark triangle locations. Removing normalMap or replacing only its pixels by positive-Z flat normal removes those triangles with fixed camera/light/pose. normalScale=(0,0) leaves negative mapN.z intact and is not a valid no-normal control for this defect.",
+  "shaderEvidence": {
+    "file": "dist/vendor/three.module.js",
+    "line": 14126,
+    "expression": "vec3 mapN = texture2D(normalMap, vNormalMapUv).xyz * 2.0 - 1.0; mapN.xy *= normalScale; normal = normalize(tbn * mapN);"
+  },
+  "screenToTriangleUvAndTexelProbes": [
+    {
+      "pixel": [
+        314,
+        165
+      ],
+      "hit": true,
+      "mesh": "Bent_bronze_focus_cage005",
+      "faceIndex": 27708,
+      "vertexIndices": [
+        19290,
+        19352,
+        19250
+      ],
+      "point": [
+        -0.017791073387547634,
+        1.5365972336801548,
+        0.14387036449268717
+      ],
+      "uvTriangles": {
+        "uv0": {
+          "vertices": [
+            [
+              0.763671875,
+              0.5666580200195312
+            ],
+            [
+              0.7578124403953552,
+              0.5509923100471497
+            ],
+            [
+              0.7578125,
+              0.5683705806732178
+            ]
+          ],
+          "signedArea": -5.091295326309364e-05
+        },
+        "uv1": {
+          "vertices": [
+            [
+              0.9799281358718872,
+              0.6155148148536682
+            ],
+            [
+              0.9793845415115356,
+              0.615688145160675
+            ],
+            [
+              0.9799281358718872,
+              0.6160265207290649
+            ]
+          ],
+          "signedArea": -1.390802140122105e-07
+        }
+      },
+      "normal": {
+        "source": "original GLB normalMap pixels, nearest CPU sample",
+        "channel": 1,
+        "uv": [
+          0.979707326795033,
+          0.6157675801559204
+        ],
+        "texel": [
+          2006,
+          1261
+        ],
+        "rgba": [
+          128,
+          128,
+          0,
+          255
+        ],
+        "decodedZ": -1
+      },
+      "renderedRgbAtPixel": {
+        "baseline": [
+          41,
+          37,
+          32
+        ],
+        "candidate_normal": [
+          13,
+          17,
+          20
+        ],
+        "candidate_zero": [
+          13,
+          17,
+          20
+        ],
+        "candidate_none": [
+          41,
+          37,
+          32
+        ],
+        "candidate_flat": [
+          41,
+          37,
+          32
+        ],
+        "candidate_base_only": [
+          41,
+          37,
+          32
+        ],
+        "candidate_neutral": [
+          226,
+          223,
+          217
+        ]
+      },
+      "uv1AreaIn2048TexelSquared": 0.5833446979522705,
+      "normalTexelRgbCrop": {
+        "path": "normal-defect-chest-texels.png",
+        "sha256": "93e2300081695d0ede67e318ed9dc16303a8c787d3509bfcdefadf3ca958c79b",
+        "sourcePngSha": "fec99b7a6f0f2c6167cf2584f8b791373b5f7e1c0c67077544a76a66ff52b84f",
+        "bounds": [
+          1990,
+          1245,
+          2022,
+          1277
+        ],
+        "sampleAtCropPixel": [
+          16,
+          16
+        ],
+        "sampleRgb": [
+          128,
+          128,
+          0
+        ]
+      }
+    },
+    {
+      "pixel": [
+        238,
+        218
+      ],
+      "hit": true,
+      "mesh": "Bent_bronze_focus_cage005",
+      "faceIndex": 3174,
+      "vertexIndices": [
+        1927,
+        1875,
+        1938
+      ],
+      "point": [
+        -0.2850526848454535,
+        1.3644288969013478,
+        0.0463215941934575
+      ],
+      "uvTriangles": {
+        "uv0": {
+          "vertices": [
+            [
+              0.81640625,
+              0.654296875
+            ],
+            [
+              0.826171875,
+              0.6697996854782104
+            ],
+            [
+              0.8266435861587524,
+              0.6396484375
+            ]
+          ],
+          "signedArea": -0.00015087931486590378
+        },
+        "uv1": {
+          "vertices": [
+            [
+              0.834710955619812,
+              0.546071469783783
+            ],
+            [
+              0.8349155187606812,
+              0.546586275100708
+            ],
+            [
+              0.8349155187606812,
+              0.5455254912376404
+            ]
+          ],
+          "signedArea": -1.0849863940620708e-07
+        }
+      },
+      "normal": {
+        "source": "original GLB normalMap pixels, nearest CPU sample",
+        "channel": 1,
+        "uv": [
+          0.8348296992995494,
+          0.5459496002823752
+        ],
+        "texel": [
+          1709,
+          1118
+        ],
+        "rgba": [
+          128,
+          128,
+          0,
+          255
+        ],
+        "decodedZ": -1
+      },
+      "renderedRgbAtPixel": {
+        "baseline": [
+          33,
+          29,
+          25
+        ],
+        "candidate_normal": [
+          11,
+          14,
+          16
+        ],
+        "candidate_zero": [
+          11,
+          14,
+          16
+        ],
+        "candidate_none": [
+          33,
+          29,
+          25
+        ],
+        "candidate_flat": [
+          32,
+          29,
+          25
+        ],
+        "candidate_base_only": [
+          33,
+          30,
+          26
+        ],
+        "candidate_neutral": [
+          219,
+          215,
+          210
+        ]
+      },
+      "uv1AreaIn2048TexelSquared": 0.45507627725601196,
+      "normalTexelRgbCrop": {
+        "path": "normal-defect-left-sleeve-texels.png",
+        "sha256": "dacd26a0091763ec735a0d91ab8f72cf8375242698efa2c27627a5aa245a5964",
+        "sourcePngSha": "fec99b7a6f0f2c6167cf2584f8b791373b5f7e1c0c67077544a76a66ff52b84f",
+        "bounds": [
+          1693,
+          1102,
+          1725,
+          1134
+        ],
+        "sampleAtCropPixel": [
+          16,
+          16
+        ],
+        "sampleRgb": [
+          128,
+          128,
+          0
+        ]
+      }
+    },
+    {
+      "pixel": [
+        416,
+        250
+      ],
+      "hit": true,
+      "mesh": "Bent_bronze_focus_cage005",
+      "faceIndex": 1981,
+      "vertexIndices": [
+        1223,
+        1248,
+        1221
+      ],
+      "point": [
+        0.3236967401006924,
+        1.2456633259383794,
+        0.2088394738112383
+      ],
+      "uvTriangles": {
+        "uv0": {
+          "vertices": [
+            [
+              0.796875,
+              0.579916775226593
+            ],
+            [
+              0.787109375,
+              0.5728509426116943
+            ],
+            [
+              0.787109375,
+              0.595703125
+            ]
+          ],
+          "signedArea": -0.00011158292181789875
+        },
+        "uv1": {
+          "vertices": [
+            [
+              0.8042423725128174,
+              0.564219057559967
+            ],
+            [
+              0.8039584159851074,
+              0.5640488862991333
+            ],
+            [
+              0.8039584159851074,
+              0.5647403001785278
+            ]
+          ],
+          "signedArea": -9.81657422016724e-08
+        }
+      },
+      "normal": {
+        "source": "original GLB normalMap pixels, nearest CPU sample",
+        "channel": 1,
+        "uv": [
+          0.8040295076936935,
+          0.5642572377356565
+        ],
+        "texel": [
+          1646,
+          1155
+        ],
+        "rgba": [
+          128,
+          128,
+          0,
+          255
+        ],
+        "decodedZ": -1
+      },
+      "renderedRgbAtPixel": {
+        "baseline": [
+          47,
+          44,
+          40
+        ],
+        "candidate_normal": [
+          0,
+          0,
+          0
+        ],
+        "candidate_zero": [
+          0,
+          0,
+          0
+        ],
+        "candidate_none": [
+          47,
+          44,
+          40
+        ],
+        "candidate_flat": [
+          47,
+          44,
+          40
+        ],
+        "candidate_base_only": [
+          47,
+          45,
+          41
+        ],
+        "candidate_neutral": [
+          229,
+          227,
+          223
+        ]
+      },
+      "uv1AreaIn2048TexelSquared": 0.41173696517944336,
+      "normalTexelRgbCrop": {
+        "path": "normal-defect-right-sleeve-texels.png",
+        "sha256": "a9b8be2eea4ed4026ca3af838eb97fd15d1d20891a788beec49f5e64850bd583",
+        "sourcePngSha": "fec99b7a6f0f2c6167cf2584f8b791373b5f7e1c0c67077544a76a66ff52b84f",
+        "bounds": [
+          1630,
+          1139,
+          1662,
+          1171
+        ],
+        "sampleAtCropPixel": [
+          16,
+          16
+        ],
+        "sampleRgb": [
+          128,
+          128,
+          0
+        ]
+      }
+    }
+  ],
+  "uvDegeneracyBoundary": "All three matched defect faces have nonzero UV0 and UV1 area. Their UV1 footprint is only about0.4-0.6 texel squared at2048². Static full-mesh triangle-area report is separate; these controls do not establish indexed UV0 sequence/index corruption as the cause.",
+  "uv0StaticPositionMatchSupport": "24,429 unambiguous position-matched old/candidate triangles, including3,194 linen-selected, have bit-identical ordered UV0 triples; unmatched geometry is outside this statement.",
+  "uv0RemainingStaticConcern": "Candidate has14 centroid-linen-selected tail triangles with one UV0 corner outside linen bounds; baseline has0. They are in tail positions, not the three matched chest/sleeve defect rays. This is a static concern for budget review, not a rendered UV0 failure proof.",
+  "pipelineCauseNotYetProven": "Native diagnosis establishes reversed normal data at rendered locations. Tiny-triangle raster coverage, sentinel8-bit quantization, shell ray crossover, and the bake pipeline mechanism are hypotheses or independently reviewed source findings; they are not proved solely by this render.",
+  "artifacts": {
+    "normal_zero_neutral": {
+      "path": "qa/surface/art2-surface.json",
+      "sha256": "5de27b12ddce6667a9cdd86f04731751d7fbf2930582411150a72a67e12cda18"
+    },
+    "base_only": {
+      "path": "base-only/surface/art2-surface.json",
+      "sha256": "0c35f170a4d16d2275c0572f695fc412d7352a54999c489d4019d03e6b66e442"
+    },
+    "no_normal": {
+      "path": "no-normal/surface/art2-surface.json",
+      "sha256": "84dc2b7304cc77ba5d80f0b8ffdb1b954960a249be5daef02695452ee3366e70"
+    },
+    "flat_normal_and_ray_probes": {
+      "path": "flat-normal/surface/art2-surface.json",
+      "sha256": "e3bad487e602fca50dba2757a999370c6b23de1b046824d6ca33868d23cc5582"
+    },
+    "static_glb": {
+      "path": "static/glb-stage2-static-comparison.json",
+      "sha256": "959344e53b5b549e4ef4afd70c90ea130a0105c4dd23db09a19c4c8140c1782c"
+    },
+    "static_color_uv": {
+      "path": "static/color-uv-distribution.json",
+      "sha256": "31340df653d2dca27ac5d1cc8fa5a9b0cefc74a706f54ee9ebbbe214bf3d904d"
+    },
+    "static_indexed_uv_areas": {
+      "path": "static/indexed-uv-triangle-areas.json",
+      "sha256": "ef45889baa9ea5cc526dcd02a00e28d82d5fa342bce309bfc99f57dfe7379480"
+    },
+    "static_uv0_position_match": {
+      "path": "static/indexed-uv0-position-match.json",
+      "sha256": "4125020796605b2c3ed816e96a98b3b32e09ec6d9157cf7f15fe766f24a276e0"
+    },
+    "static_linen_cross_slot": {
+      "path": "static/linen-centroid-outside-corners.json",
+      "sha256": "9dc3300ff58d6880b6004da85c9679c0caf7d54db5ef2ef2680f46edb1495bf4"
+    }
+  },
+  "controlScreenshots": {
+    "baseline": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/native-ablation/Idle-t0-front-normal.png",
+      "sha256": "240227d6700104c90b459b3a8e74ed9502f6bcb2610ea60b907792ea803804c2"
+    },
+    "candidate_normal": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/qa/surface/Idle-t0-front-normal.png",
+      "sha256": "691b6524be4507c1a14f0ab09ddd9ddceb0873494a186d812a3bab49e718a138"
+    },
+    "candidate_zero": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/qa/surface/Idle-t0-front-zero.png",
+      "sha256": "fc796ca534df084a447774987b4db46236a2bf296305d6a50c9213161fcc0c15"
+    },
+    "candidate_none": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/no-normal/surface/Idle-t0-front-none.png",
+      "sha256": "412d846f4efc415951e21331cc3a1320fecbb5f238d345ba2aa8585bfc6c1e7f"
+    },
+    "candidate_flat": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/flat-normal/surface/Idle-t0-front-flat.png",
+      "sha256": "dc1002b14e16b855e8df28afbaf0ffd53703596f112839b6346790c04307e829"
+    },
+    "candidate_base_only": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/base-only/surface/Idle-t0-front-base.png",
+      "sha256": "ae17a4d9d3c25ab4bc35cc58e27c33a3cfad4b1263c9eea9ea3b1d96200b9a8a"
+    },
+    "candidate_neutral": {
+      "path": "/workspace/scratch/ember-qa/surface-d1-20261013/stage2-high/qa/surface/Idle-t0-front-neutral.png",
+      "sha256": "ac8bb0ce2fdf0d5d67253813779b50c713bedcfe4ba7ed02e48e83fa5ad8b05e"
+    }
+  },
+  "limitations": [
+    "Single Chromium ANGLE SwiftShader; no real-device/FPS or commercial quality claim.",
+    "Idle time0 front/back only for this failing candidate; full clip/game regressions deferred until assets stabilize.",
+    "Raycaster resolves actual posed native Three mesh and UV1; RGBA is a CPU nearest texel sample, not a reconstructed GPU filtered/mip texel.",
+    "Three matching rays and controlled normal removal/flat replacement support reversed normal-data failure here; not full-surface or shell crossover coverage.",
+    "Head/hair showed no obvious new regression in these full-view samples, not dedicated close-up skin/hair acceptance."
+  ],
+  "reviewBoards": [
+    {
+      "path": "normal-defect-chest-controls.png",
+      "sha256": "0ff295921fa147a5d49d19ae3dbd6d3a144e52761c6c2733d5e2094b71515722"
+    },
+    {
+      "path": "normal-defect-five-controls.png",
+      "sha256": "db7666be7302d553cf3fd656e65b7425b50639d2d122797479fdcbf7141e6285"
+    }
+  ]
+}
