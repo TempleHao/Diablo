@@ -26,16 +26,16 @@
     "substep": "D1-cloth-surface-artifact",
     "trigger": "continuation",
     "startedAt": "2026-10-13T03:22:28Z",
-    "heartbeatAt": "2026-10-13T03:22:28Z",
-    "leaseExpiresAt": "2026-10-13T05:22:28.000Z"
+    "heartbeatAt": "2026-10-13T03:27:17Z",
+    "leaseExpiresAt": "2026-10-13T05:27:17.000Z"
   },
   "leasePolicy": {
     "ttlMinutes": 120,
     "acquisition": "GitHub branch-head compare-and-swap",
     "heartbeat": "Refresh during completed small work steps; check holder before writes"
   },
-  "resumeBranch": null,
-  "resumeCommit": null,
+  "resumeBranch": "checkpoint/art-02-d1",
+  "resumeCommit": "21ba0bebcc98893f8082709ec05745b2d0010641",
   "nextAction": "ART-02 D1: reproduce and repair cloth-tail normal/atlas/decimation black spots/fold lines on latest main; inspect real UV/tangent/shell/weight overlap, save source checkpoint early, verify final L0/L1 native shots and motion/skin/budget regressions before integration. Leave independent dist/2d and its systems untouched; face/scalp/cloth production polish remains later ART-02 work.",
   "lastAttempt": {
     "runId": "auto-ART-02-D1-20261013032228-df3abdbf",
@@ -43,13 +43,21 @@
     "substep": "D1-cloth-surface-artifact",
     "startedAt": "2026-10-13T03:22:28Z",
     "status": "running",
-    "phase": "inspect-actual-cloth-normal-atlas-decimation-defect"
+    "phase": "source-only-source-saved-generation-and-native-cloth-diagnosis-pending",
+    "checkpointCommit": "21ba0bebcc98893f8082709ec05745b2d0010641",
+    "validation": {
+      "pythonCompilation": "passed",
+      "publishedAssets": "unchanged",
+      "sourceGeneration": "in progress",
+      "clothDiagnosis": "in progress",
+      "finalModels": "not generated/verified"
+    }
   },
   "blocked": null,
   "automationTitle": "余烬纪事断点续做",
   "requestedRetryIntervalHours": 5,
   "quotaState": "unknown-no-query-tool",
-  "lastUpdatedAt": "2026-10-13T03:22:28Z",
+  "lastUpdatedAt": "2026-10-13T03:27:17Z",
   "validationLimitations": [
     "Commercial D2R/D4 art quality and user visual acceptance remain unmet; ART-02 in_progress",
     "Cloth-tail normal/atlas/decimation spots/fold lines, L1 local Walk surface error58.132mm; skin/scalp/cloth polish pending",
@@ -66,9 +74,9 @@
     "configuredAt": "2026-10-11T21:19:10.848248+00:00"
   },
   "lastWorkBranch": {
-    "name": "checkpoint/art-02",
-    "commit": "e325f59c3bd8c168b8152884c4595213b7b5f5e4",
-    "status": "validated-partial-integrated"
+    "name": "checkpoint/art-02-d1",
+    "commit": "21ba0bebcc98893f8082709ec05745b2d0010641",
+    "status": "source-checkpoint-unverified"
   },
   "userFeedback": {
     "recordedAt": "2026-10-12T05:14:55Z",
