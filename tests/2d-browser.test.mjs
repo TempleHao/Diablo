@@ -50,9 +50,17 @@ try{
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
+    assert.equal(await page.locator('#mage-skin-start option').count(),5,'five mage palette selections');
+    await page.selectOption('#mage-skin-start','flame');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'flame','appearance persists');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
+    const density=await page.evaluate(()=>window.__ember2dQA.encounterInfo());
+    assert.equal(density.total,36,'threefold population in actual game');
+    assert.equal(density.alive,12,'twelve spawn in first encounter');
+    assert.equal(density.skin,'flame');
+    assert.equal(density.waves,3);
     const sprite=await page.evaluate(async()=>{
       const mod=await import('./pixel-mage-demo.js');
       for(let i=0;i<30&&!mod.status().ready;i++)await new Promise(resolve=>setTimeout(resolve,50));
@@ -101,9 +109,21 @@ try{
     await page.keyboard.press('q');
     await page.waitForTimeout(960);
     assert.ok(Number(await page.locator('#mana-num').innerText())<170,'spell mana should really be consumed');
+    const effects=await page.evaluate(()=>window.__ember2dQA.castPreview('nova'));
+    assert.equal(effects.skill,'nova');
+    assert.ok(effects.count>0,'skill effects must create visible particles');
+    if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
+      const fxShot=await page.screenshot({type:'jpeg',quality:73});
+      console.log((viewport.width===1365?'VFX_DESKTOP_BASE64:':viewport.width===390?'VFX_MOBILE_BASE64:':'VFX_LANDSCAPE_BASE64:')+fxShot.toString('base64'));
+    }
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
+    assert.equal(await page.inputValue('#mage-skin-inventory'),'flame','equipment appearance must sync with start screen');
+    await page.selectOption('#mage-skin-inventory','shadow');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'shadow');
+    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
     assert.equal(await page.locator('.catalog-skill').count(),11,'expanded spell catalogue should show all eleven skills');
     assert.equal(await page.locator('[data-skill]').count(),7,'only seven loadout slots visible on mobile');
     assert.equal(await page.locator('.skill-slot').count(),11,'skills may be assigned to the action bar');

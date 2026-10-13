@@ -55,7 +55,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroSkin:'arcane',activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -64,6 +64,7 @@ export function sanitizeSave(raw){
     const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
+  p.heroSkin=['arcane','flame','light','shadow','nature'].includes(raw.heroSkin)?raw.heroSkin:'arcane';
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
   if(Array.isArray(raw.activeSkills)){

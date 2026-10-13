@@ -35,16 +35,50 @@ function resolve(item){
 }
 const shapes={staff,sword,dagger,shield,book,helmet,shoulders,chest,gloves,belt,pants,boots,ring,amulet,relic};
 export function iconType(item){return resolve(item);}
+// v0.3.6: compact equipment miniatures on sculpted dark-stone plaques.
+// Each material silhouette remains slot-correct; no unrelated icon substitution.
 export function drawEquipmentIcon(canvas,item){
- const ctx=canvas.getContext('2d');canvas.width=48;canvas.height=48;
- const r=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
- const border=rarityColors[r],grad=ctx.createLinearGradient(0,0,48,48);
- grad.addColorStop(0,'#38302d');grad.addColorStop(.5,'#131922');grad.addColorStop(1,'#080d15');
- ctx.fillStyle=grad;ctx.fillRect(0,0,48,48);
- ctx.strokeStyle=border;ctx.lineWidth=1.6;ctx.strokeRect(2,2,44,44);
- ctx.fillStyle=border+'22';ctx.fillRect(5,5,38,38);
- ctx.save();ctx.shadowColor=border;ctx.shadowBlur=r>=3?7:2;
- shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
- ctx.strokeStyle='#ffffff20';ctx.strokeRect(6,6,36,36);
+ const ctx=canvas.getContext('2d');
+ const size=80;canvas.width=size;canvas.height=size;
+ const name=String(item?.name||''),tier=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
+ const frame=rarityColors[tier];
+ const cold=/霜|冰|雪|寒|蓝/.test(name),fire=/火|焰|烬|炎/.test(name);
+ const glow=cold?'#58caff':fire?'#fa7b3b':tier>=3?'#bd82f5':frame;
+ ctx.clearRect(0,0,size,size);
+ ctx.save();ctx.scale(size/48,size/48);
+ const stone=ctx.createLinearGradient(0,0,48,48);
+ stone.addColorStop(0,'#4c4540');stone.addColorStop(.23,'#1e252e');stone.addColorStop(.64,'#111824');stone.addColorStop(1,'#090b13');
+ ctx.fillStyle=stone;ctx.fillRect(0,0,48,48);
+ // Vignette, hammered metal, microscopic chisel chips — no repeated stock tiles.
+ const halo=ctx.createRadialGradient(24,21,2,24,24,30);
+ halo.addColorStop(0,glow+'42');halo.addColorStop(.55,glow+'0b');halo.addColorStop(1,'#080a1100');
+ ctx.fillStyle=halo;ctx.fillRect(0,0,48,48);
+ for(let n=0;n<27;n++){
+   const x=(n*23+Math.floor(tier*9))%43+3,y=(n*17+11)%43+3;
+   ctx.fillStyle=n%3===0?'#dedad314':'#0507093b';
+   ctx.fillRect(x,y,(n%4)+.6,.6);
+ }
+ ctx.strokeStyle='#101116';ctx.lineWidth=4;ctx.strokeRect(2,2,44,44);
+ ctx.strokeStyle=frame;ctx.lineWidth=1.5;ctx.strokeRect(2.7,2.7,42.6,42.6);
+ ctx.strokeStyle='#f7e6c048';ctx.lineWidth=.7;ctx.strokeRect(5.1,5.1,37.8,37.8);
+ // Nine-slot ornament: corner brackets and forged ornamental rivets.
+ for(const [x,y] of [[4.5,4.5],[43.5,4.5],[4.5,43.5],[43.5,43.5]]){
+   ctx.fillStyle=frame;ctx.beginPath();ctx.arc(x,y,1.5,0,7);ctx.fill();
+ }
+ ctx.save();ctx.shadowColor='#02040d';ctx.shadowOffsetX=2.2;ctx.shadowOffsetY=3.1;ctx.shadowBlur=2.4;
+ const kind=resolve(item);
+ shapes[kind](ctx,name);
+ ctx.restore();
+ // A physical specular highlight gives the curved gear silhouette volume.
+ ctx.save();ctx.globalCompositeOperation='screen';
+ const glint=ctx.createLinearGradient(0,3,40,34);
+ glint.addColorStop(0,'#fcebd839');glint.addColorStop(.3,'#ffffff07');glint.addColorStop(1,'#00000000');
+ ctx.fillStyle=glint;ctx.fillRect(7,7,34,34);
+ ctx.restore();
+ if(tier>=2){
+  ctx.strokeStyle=glow+'b0';ctx.lineWidth=.8;
+  ctx.beginPath();ctx.moveTo(8,8);ctx.lineTo(15,8);ctx.moveTo(33,40);ctx.lineTo(40,40);ctx.stroke();
+ }
+ ctx.restore();
  return resolve(item);
 }
