@@ -54,7 +54,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:[0,0,0,0,0],pendingLoot:[]};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -62,6 +62,15 @@ export function sanitizeSave(raw){
   for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
     const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?4:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
+  }
+  // Keep Boss progression and unclaimed, already-generated drops across reloads.
+  if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:5},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
+  const pendingIds=new Set();
+  if(Array.isArray(raw.pendingLoot))for(const entry of raw.pendingLoot.slice(0,MAX_ITEMS*2)){
+    const item=normalizeItem(entry?.item);
+    if(!item||pendingIds.has(item.id)||!Number.isInteger(entry?.region)||entry.region<0||entry.region>4)continue;
+    pendingIds.add(item.id);
+    if(p.pendingLoot.length<MAX_ITEMS)p.pendingLoot.push({item,region:entry.region});
   }
   if(Array.isArray(raw.inventory)){
     const ids=new Set();
@@ -71,6 +80,7 @@ export function sanitizeSave(raw){
       if(p.inventory.length>=MAX_ITEMS)break;
     }
   }
+  p.pendingLoot=p.pendingLoot.filter(d=>!p.inventory.some(i=>i.id===d.item.id));
   let pointsSpent=0;
   if(raw.skillRanks&&typeof raw.skillRanks==='object'){
     for(const key of Object.keys(SKILLS)){
