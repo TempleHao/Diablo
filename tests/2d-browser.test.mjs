@@ -48,6 +48,25 @@ try{
       return art.artStatus();
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
+    // Contrast regression: offscreen mask is rendered by the actual game lighting module.
+    const lightContrast = await page.evaluate(async ()=>{
+      const {drawAtmosphere} = await import('./lighting.js');
+      function render(region,torches){
+        const c=document.createElement('canvas');c.width=320;c.height=230;
+        const cx=c.getContext('2d',{willReadFrequently:true});
+        cx.fillStyle='#b4b4b4';cx.fillRect(0,0,c.width,c.height);
+        drawAtmosphere(cx,{w:320,h:230,cam:{x:0,y:0},hero:{x:160,y:105,cast:0},
+          torches,missiles:[],enemies:[],tick:.5,region});
+        const l=(x,y)=>{const d=cx.getImageData(x,y,1,1).data;
+          return Math.round(d[0]*.2126+d[1]*.7152+d[2]*.0722);};
+        return {center:l(160,70),corner:l(4,4),torch:l(30,28)};
+      }
+      return {entrance:render(0,[{x:30,y:44}]),cavern:render(3,[])};
+    });
+    assert.ok(lightContrast.entrance.center>lightContrast.cavern.corner+20,
+      'player light should preserve much better visibility than cave darkness');
+    assert.ok(lightContrast.entrance.torch>lightContrast.cavern.corner+6,
+      'torches should visibly illuminate nearby masonry');
     assert.equal(await page.locator('#region-select option').count(),5,'all five regions present');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
     await page.click('#modal-primary');
