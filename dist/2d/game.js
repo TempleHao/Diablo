@@ -1,5 +1,6 @@
 import * as Art from './art.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
+import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -17,7 +18,7 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, combo=0, bossDefeated=false;
+let armorUntil=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 for(const [key,meta] of Object.entries(SKILLS)){
@@ -41,6 +42,30 @@ regionSelect.addEventListener('change',()=>{
   profile.region=next;build();persist();if(state==='victory'||state==='death')state='intro';
   announce('已进入 '+REGION_DATA[next].name,true);
 });
+
+const portalOptions=$('portal-destination');
+for(const {index,name} of destinationOptions(profile.region).destinations){
+  const option=document.createElement('option');option.value=String(index);option.textContent=name;portalOptions.append(option);
+}
+function openPortalMenu(){
+  if(!bossDefeated||!portal||state!=='playing')return false;
+  clearInput();$('portal-panel').hidden=false;
+  $('portal-destination').value=String(destinationOptions(profile.region).next);
+  return true;
+}
+function closePortalMenu(){$('portal-panel').hidden=true;clearInput();}
+function travelTo(region){
+  if(!bossDefeated||!validateDestination(region))return false;
+  closePortalMenu();profile.region=region;
+  profile.regionVisits[region]=(profile.regionVisits[region]||0)+1;
+  build();persist();announce('传送抵达 '+REGION_DATA[region].name+' · 新的远征开始',true);
+  return true;
+}
+$('portal-open').onclick=openPortalMenu;
+$('portal-stay').onclick=closePortalMenu;
+$('portal-next').onclick=()=>travelTo(Number($('portal-destination').value));
+$('portal-random').onclick=()=>travelTo(pickRandomDestination(rng,profile.region));
+$('portal-panel').addEventListener('pointerdown',e=>{if(e.target===$('portal-panel'))closePortalMenu();});
 
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
@@ -94,7 +119,8 @@ function build() {
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;bossDefeated=false;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;combo=0;bossDefeated=false;portal=null;
+  $('portal-panel').hidden=true;$('portal-open').hidden=true;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
     drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
@@ -147,7 +173,7 @@ $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
 function showInventory() {
-  if(state==='intro'||state==='victory'||state==='death')return;
+  if(state==='intro'||state==='victory'||state==='death'||!$('portal-panel').hidden)return;
   $('inventory').hidden=false;clearInput();renderInventory();
 }
 $('btn-inventory').onclick=showInventory;
@@ -308,7 +334,7 @@ function dealDamage(e,damage,school='physical'){
     const reward=rollBossRewards(rng,profile.level,region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++));
     profile.bossKills[region]=previousKills+1;
     profile.essence+=reward.materials;profile.clears++;
-    boss=null;bossDefeated=true;ui.boss.hidden=true;
+    boss=null;bossDefeated=true;portal={x:e.x,y:e.y};ui.boss.hidden=true;$('portal-open').hidden=false;
     for(const [index,item] of reward.drops.entries()){
       const angle=index*2.4,rad=60+index*15;
       const x=e.x+Math.cos(angle)*rad,y=e.y+Math.sin(angle)*rad;
@@ -319,7 +345,8 @@ function dealDamage(e,damage,school='physical'){
     }
     persist();
     announce((reward.firstKill?'首杀奖励！':'首领战利品！')+' '+reward.drops.length+' 件装备 · '+reward.materials+' 精华'+(reward.exclusive?' · 专属传奇！':''),true);
-    ui.title.textContent='首领已击败 · 余烬仍在';
+    ui.title.textContent='首领已击败 · 传送阵已开启';
+    ui.progress.textContent='专属奖励已掉落 · 传送阵可选择下一图或随机远征';
   }else{
     kills++;
     if(kills===4||kills===8)spawnWave(kills/4);
@@ -384,6 +411,7 @@ function update(dt){
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
+  if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
   if(pointers.size || keys.has('1'))cast('fire');
   for(const e of [...enemies]){
     e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);
@@ -457,6 +485,16 @@ function missileDraw(m){
   }else{ellipse(0,0,m.kind==='void'?12:9,7,m.kind==='void'?'#d88bef':'#978dcc');ellipse(-8,0,12,4,'#8c66b388');}
   ctx.restore();
 }
+function drawPortal(p){
+  const pulse=Math.sin(tick*2.7)*4;
+  ctx.save();ctx.translate(p.x,p.y);
+  ctx.shadowBlur=22;ctx.shadowColor='#8bc4f4';
+  ctx.strokeStyle='#85bceaaa';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,8,78+pulse,31+pulse/3,0,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#f2c88bd5';ctx.lineWidth=2;
+  for(let n=0;n<8;n++){const a=n*Math.PI/4+tick*.14;ctx.beginPath();ctx.moveTo(Math.cos(a)*56,8+Math.sin(a)*23);ctx.lineTo(Math.cos(a)*70,8+Math.sin(a)*29);ctx.stroke();}
+  ctx.fillStyle='#70bdf132';ctx.beginPath();ctx.ellipse(0,7,64,23,0,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;ctx.textAlign='center';ctx.font='bold 16px system-ui';ctx.strokeStyle='#07111ce8';ctx.lineWidth=4;ctx.strokeText('✦ 地图传送阵 ✦',0,-65);ctx.fillStyle='#f4d19b';ctx.fillText('✦ 地图传送阵 ✦',0,-65);ctx.restore();
+}
 function render(){
   if(!hero){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#121b22';ctx.fillRect(0,0,vw,vh);return;}
   cam.x=clamp(hero.x-vw/2,0,Math.max(0,WIDTH-vw));
@@ -472,6 +510,7 @@ function render(){
   for(const t of dungeon.torches)if(t.x>cam.x-160&&t.x<cam.x+vw+160&&t.y>cam.y-160&&t.y<cam.y+vh+160)
     layers.push({y:t.y+13,render:()=>torchDraw(t)});
   for(const d of drops)layers.push({y:d.y+7,render:()=>Art.loot(ctx,d,tick)});
+  if(portal)layers.push({y:portal.y+12,render:()=>drawPortal(portal)});
   for(const e of enemies)layers.push({y:e.y+10,render:()=>enemyDraw(e)});
   layers.push({y:hero.y+10,render:heroDraw});
   layers.sort((a,b)=>a.y-b.y);
@@ -509,7 +548,7 @@ function drawMinimap(){
 }
 function loop(now){
   const dt=Math.min(.04,(now-last)/1000 || .016);last=now;
-  if(state==='playing'&&$('inventory').hidden)update(dt);
+  if(state==='playing'&&$('inventory').hidden&&$('portal-panel').hidden)update(dt);
   render();requestAnimationFrame(loop);
 }
 function aimAt(clientX,clientY) {
@@ -536,8 +575,10 @@ window.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA'].includes(tag)||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
-  if(k==='escape'){if(!$('inventory').hidden)closeInventory();else onPause();return;}
+  if(k==='escape'){if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
+  if(k==='t'){openPortalMenu();return;}
+  if(k==='escape'&&!$('portal-panel').hidden){closePortalMenu();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
