@@ -151,3 +151,75 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .skill-catalog-entry .catalog-skill{flex:1;border:0;padding:9px;min-height:70px}
 .skill-slot{font-size:10px;max-width:100%;width:100%;background:#28272a;color:#eacba3;border:1px solid #81603c;padding:8px 4px}
 @media(max-width:700px){.material-wallet{grid-template-columns:repeat(3,minmax(0,1fr))}.skill-catalog-entry .catalog-skill{min-height:65px}}
+
+
+/* v0.3.4 typography: use native CJK glyphs, avoid artificial glyph compression */
+html,body,button,select,input{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;font-synthesis:none}
+body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.inventory-panel,.inventory-panel *{letter-spacing:normal;line-height:1.5}
+.inventory-panel h2{line-height:1.22}
+.inventory-panel .item-detail strong,.inventory-panel .item-inspect,.inventory-panel .slot b{word-break:normal;overflow-wrap:anywhere}
+.inventory-panel small,.inventory-panel .item-detail small{font-size:clamp(11px,.82vw,13px)}
+.inventory-panel .item-detail strong{font-size:clamp(12px,.9vw,14px)}
+.inventory-panel .item-inspect h3{font-family:inherit;font-size:18px;line-height:1.4}
+.abilitybar button b,.abilitybar button small{font-family:inherit;font-synthesis:none;letter-spacing:0;line-height:1.2}
+.abilitybar .ability-icon{font-family:system-ui,"Segoe UI Symbol",sans-serif;line-height:1.12}
+.mobile-inv-tabs,.mobile-inv-actions{display:none}
+.compare-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.compare-gear{min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:10px 6px;border:1px solid #6e634f;background:linear-gradient(#1f252d,#111820)}
+.compare-gear.new-gear{border-color:#9e7d4f;background:linear-gradient(#2b2926,#161b22)}
+.compare-gear small{font-size:12px!important;color:#b2aa9c}
+.compare-gear strong{font-size:13px;max-width:100%;overflow-wrap:anywhere}
+.compare-icon{width:54px;height:54px;image-rendering:auto}
+.ring-choice{margin:8px 0 14px}
+.ring-choice label{display:flex;align-items:center;gap:12px;font-size:13px}
+.ring-choice select{flex:1;padding:9px;border:1px solid #8f7956;background:#18202a;color:#f5d6ad;font-size:14px}
+.equipment-slot.is-selected{border-color:#d0a66b;background:#302820}
+@media(max-width:700px), (max-height:550px) and (pointer:coarse){
+  #inventory{padding:0;place-items:stretch;backdrop-filter:none;background:#0d131b}
+  #inventory .inventory-panel{width:100%;max-width:100%;height:100dvh;max-height:100dvh;min-height:0;display:block;padding:0 12px calc(95px + env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;background:#111820;border:0;scrollbar-width:thin}
+  #inventory .panel-head{position:sticky;top:0;z-index:8;padding:12px 0 9px;min-height:64px;background:#111820;border-bottom:1px solid #4f4335}
+  #inventory .panel-head h2{font-size:22px;line-height:1.2;margin:5px 0}
+  #inventory .panel-head .eyebrow{font-size:11px;letter-spacing:.4px}
+  #inventory .panel-head .icon-button{min-width:42px;min-height:42px}
+  .mobile-inv-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:sticky;top:64px;z-index:7;gap:5px;margin:0 -4px 10px;padding:8px 4px;background:#111820;border-bottom:1px solid #615440}
+  .mobile-inv-tabs button{padding:12px 2px;min-height:45px;background:#1e2731;color:#c8bca9;border:1px solid #5d5549;border-radius:4px;font-size:14px;font-weight:600}
+  .mobile-inv-tabs button.is-active{color:#ffdb9b;border-color:#bc9462;background:#3b2c24}
+  .inv-workspace{display:block;margin:0 0 18px}
+  #inventory .inv-workspace>section{display:none;padding:12px 10px;min-height:calc(100dvh - 235px);background:#161d26}
+  #inventory[data-mobile-view="bag"] .inv-bag-column{display:block}
+  #inventory[data-mobile-view="compare"] .inv-details-column{display:block}
+  #inventory[data-mobile-view="gear"] .inv-gear-column{display:block}
+  .inv-bag-column .inventory-items{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:none;overflow:visible}
+  .inv-bag-column .item{gap:7px;padding:12px 5px;min-height:160px}
+  .inv-bag-column .item-detail .item-thumbnail{width:52px;height:52px}
+  .inv-bag-column .item-detail strong{font-size:13px;line-height:1.4}
+  .inv-bag-column .item-detail small{font-size:11px}
+  .inv-bag-column .item-actions{flex-direction:row;flex-wrap:wrap}
+  .inv-bag-column .item-actions button{font-size:12px;min-height:36px;padding:5px 2px}
+  .inv-gear-column .equipment{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .inv-gear-column .equipment-slot{min-height:110px;padding:10px 4px}
+  .inv-gear-column .equipment-slot b{font-size:12px;line-height:1.4}
+  .inv-gear-column .equipment-slot small{font-size:11px}
+  .inv-details-column .item-inspect{font-size:13px;min-height:120px;overflow:visible;padding:14px}
+  .inv-details-column .item-inspect li,.inv-details-column .item-inspect p{font-size:13px;line-height:1.55}
+  .inv-details-column .item-inspect h3{font-size:20px}
+  .inv-details-column .item-inspect ul{display:grid;grid-template-columns:1fr;gap:7px}
+  .inv-details-column .character-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .inv-details-column .character-stats span{font-size:13px}
+  .mobile-inv-actions{position:fixed;bottom:0;left:0;right:0;display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(120px,.8fr);gap:7px;align-items:center;z-index:20;padding:9px 11px calc(11px + env(safe-area-inset-bottom));background:#151b24;box-shadow:0 -5px 22px #000b;border-top:1px solid #93704b}
+  .mobile-selection{min-width:0;display:flex;flex-direction:column;gap:2px}
+  .mobile-selection small{font-size:11px;color:#b4a58b}
+  .mobile-selection strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:#ead1ad}
+  .mobile-inv-actions button{min-height:45px;padding:8px 4px;font-size:13px;border:1px solid #97704b;background:#2d3033;color:#f2d6ac}
+  .mobile-inv-actions .primary{width:100%;min-width:0;max-width:none;margin:0;padding:8px 4px;font-size:13px;letter-spacing:normal;background:linear-gradient(#9e6637,#6b3f26)}
+  .mobile-inv-actions .primary:disabled{opacity:.45}
+  #inventory .panel-subhead strong,#inventory .paper-doll-head strong{font-size:15px}
+  #inventory .panel-subhead span,#inventory .paper-doll-head small{font-size:11px}
+  .bag-controls select,.salvage-settings select{font-size:14px;min-height:40px}
+  .catalog-skill,.skill-slot{font-size:13px}
+  .mobile-inv-tabs button{touch-action:manipulation}
+}
+@media(max-width:375px){.mobile-inv-actions{grid-template-columns:minmax(0,1fr) 73px 110px}.mobile-inv-actions button{font-size:12px}.inv-gear-column .equipment{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+@media(max-height:550px) and (pointer:coarse){.topbar{height:50px}.quest{top:54px}.joystick{bottom:45px;width:86px;height:86px}.joystick span{left:25px;top:25px;width:34px;height:34px}.hud{min-height:67px;padding:6px}.orb{width:40px;height:40px}.abilitybar button{height:45px;min-width:40px;width:40px}.abilitybar{gap:3px}.abilitybar .ability-icon{font-size:16px!important}.abilitybar b{font-size:10px}.mobile-inv-actions{padding:5px 12px calc(5px + env(safe-area-inset-bottom))}.mobile-inv-actions button{min-height:39px}.mobile-inv-tabs{padding:4px}.mobile-inv-tabs button{min-height:39px;padding:5px}}

@@ -154,20 +154,22 @@ function frameFor(kind,walking,elapsed){
 function shadow(ctx,x,y,rx,ry,alpha=.65){
   ctx.fillStyle='rgba(0,0,0,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+2,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
-export function hero(ctx,p,tick,gear){
-  drawMage(ctx,p,tick,gear);
-  ctx.strokeStyle='#e6bc645c';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(p.x,p.y+9,28,11,0,0,Math.PI*2);ctx.stroke();
+export function hero(ctx,p,tick,gear,scale=.65){
+  ctx.save();ctx.translate(p.x,p.y);ctx.scale(scale,scale);
+  drawMage(ctx,{...p,x:0,y:0},tick,gear);
+  ctx.strokeStyle='#977a5148';ctx.lineWidth=1.6;ctx.beginPath();
+  ctx.ellipse(0,7,25,8,0,0,Math.PI*2);ctx.stroke();ctx.restore();
 }
 let prevHeroWalk=0;
-export function enemy(ctx,e,tick){
-  if(e.kind==='spider'){spiderEnemy(ctx,e,tick);return;}
+export function enemy(ctx,e,tick,scale=.72){
+  if(e.kind==='spider'){spiderEnemy(ctx,e,tick,scale);return;}
   const cfg=e.kind==='boss'?{type:'boss',width:136,height:154,off:-123}
     :e.kind==='brute'?{type:'brute',width:113,height:127,off:-100}
     :e.kind==='archer'?{type:'archer',width:64,height:93,off:-76}
     :e.kind==='cultist'?{type:'cultist',width:66,height:94,off:-76}
     :{type:'wretch',width:59,height:59,off:-47};
-  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
-  if(e.kind==='boss')gradientSpot(ctx,0,-45,117,'#a64d8950','#983b8600');
+  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
+  if(e.kind==='boss')gradientSpot(ctx,0,-45,117,'#a64d8933','#983b8600');
   shadow(ctx,0,6,cfg.width*.36,12,.73);
   if(ready){
     const previous=prevEnemyPos.get(e.id);
@@ -188,8 +190,8 @@ export function enemy(ctx,e,tick){
   prevEnemyPos.set(e.id,{x:e.x,y:e.y});
 }
 const prevEnemyPos=new Map();
-function spiderEnemy(ctx,e,tick){
-  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
+function spiderEnemy(ctx,e,tick,scale=.72){
+  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
   const step=Math.sin(tick*17+e.phase)*7;
   ctx.fillStyle='#05070bb9';ctx.beginPath();ctx.ellipse(0,13,37,13,0,0,Math.PI*2);ctx.fill();
   ctx.lineWidth=5;ctx.strokeStyle='#483747';

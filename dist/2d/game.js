@@ -19,7 +19,7 @@ const enemyWaves=(region)=> {
   return [types,types.slice().reverse(),[types[2],types[0],types[3],types[1]]];
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
-let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
+let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null, selectedRingSlot=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 function renderSkillBar(){
@@ -177,9 +177,30 @@ function onPause(){ if(!$('inventory').hidden)return; if(state==='playing')showM
 $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
+const mobileMode=()=>window.matchMedia('(max-width:700px), (max-height:550px) and (pointer:coarse)').matches;
+function setMobileInventoryView(view){
+  if(!['bag','gear','compare'].includes(view))return;
+  $('inventory').dataset.mobileView=view;
+  for(const tab of $('mobile-inv-tabs').querySelectorAll('button[data-view]')){
+    const active=tab.dataset.view===view;tab.classList.toggle('is-active',active);tab.setAttribute('aria-pressed',String(active));
+  }
+  const panel=$('inventory').querySelector('.inventory-panel');panel.scrollTop=0;
+}
+for(const tab of $('mobile-inv-tabs').querySelectorAll('button[data-view]'))tab.onclick=()=>setMobileInventoryView(tab.dataset.view);
+$('mobile-back-to-bag').onclick=()=>setMobileInventoryView('bag');
+$('mobile-equip').onclick=()=>$('inv-quick-equip').click();
+$('ring-target').onchange=()=>{
+  selectedRingSlot=$('ring-target').value;
+  const item=profile.inventory.find(i=>i.id===selectedItemId);inspectItem(item||null);
+};
+function selectEquipmentItem(item){
+  selectedItemId=item?.id||null;selectedRingSlot=item?.slot?.startsWith('ring')?Object.keys(profile.equipped).find(k=>k.startsWith('ring')&&profile.equipped[k]===item.id)||null:null;
+  renderInventory();if(item&&mobileMode())setMobileInventoryView('compare');
+}
 function showInventory() {
   if(state==='intro'||state==='victory'||state==='death'||!$('portal-panel').hidden)return;
   $('inventory').hidden=false;$('portal-open').hidden=true;clearInput();renderInventory();
+  if(mobileMode())setMobileInventoryView('bag');
 }
 $('btn-inventory').onclick=showInventory;
 function closeInventory(){$('inventory').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
@@ -232,7 +253,7 @@ $('inv-temper').onclick=()=>{
 };
 function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
-  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
+  if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('compare-pair').replaceChildren();$('ring-choice').hidden=true;$('mobile-item-name').textContent='点选背包中的装备';$('mobile-equip').disabled=true;$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
@@ -246,8 +267,23 @@ function inspectItem(item){
     const set=SETS[item.setId],count=Object.values(profile.equipped).map(id=>profile.inventory.find(i=>i.id===id)).filter(i=>i?.setId===item.setId).length;
     const p=document.createElement('p');p.className='set-description';p.textContent=set.name+'（已装备 '+count+'/3） · 2 件：'+set.two+' · 3 件：'+set.three;panel.append(p);
   }
-  const target=item.slot.startsWith('ring')?(profile.equipped.ring1?'ring2':'ring1'):item.slot;
+  const isRing=item.slot.startsWith('ring');
+  const target=isRing?(selectedRingSlot||Object.keys(profile.equipped).find(k=>k.startsWith('ring')&&profile.equipped[k]===item.id)||(!profile.equipped.ring1?'ring1':'ring2')):item.slot;
+  $('ring-choice').hidden=!isRing;
+  if(isRing)$('ring-target').value=target;
+  $('mobile-item-name').textContent=item.name;
+  $('mobile-equip').disabled=false;
   const worn=profile.inventory.find(i=>i.id===profile.equipped[target]);
+  const pair=$('compare-pair');pair.replaceChildren();
+  for(const [gear,label] of [[worn,'当前装备'],[item,'候选装备']]){
+    const card=document.createElement('div');card.className='compare-gear '+(label==='候选装备'?'new-gear':'worn-gear');
+    const caption=document.createElement('small');caption.textContent=label;
+    const pic=document.createElement('canvas');pic.className='compare-icon';pic.setAttribute('aria-hidden','true');
+    if(gear)Art.drawItemIcon(pic,gear);
+    const name=document.createElement('strong');name.textContent=gear?.name||'空槽位';
+    if(gear)name.className='rarity-'+gear.rarity;
+    card.append(caption,pic,name);pair.append(card);
+  }
   const delta=Math.round(itemScore(item)-itemScore(worn||{power:0,hp:0,mana:0,armor:0,affixes:[]}));
   const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
   compare.textContent='相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 评分变化 '+(delta>0?'+':'')+delta;
@@ -274,9 +310,10 @@ function inspectItem(item){
     panel.append(grid);
   }
   const quick=$('inv-quick-equip');
-  const wornHere=Object.values(profile.equipped).includes(item.id);
+  const wornHere=profile.equipped[target]===item.id;
   quick.disabled=false;
   quick.textContent=wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
+  $('mobile-equip').textContent=wornHere?'卸下装备':'穿戴 / 替换';
   const cost=temperCost(item);
   $('inv-temper').disabled=!canTemper(profile,item.id);
   $('inv-temper').textContent=item.tempered?'该装备已淬炼':canTemper(profile,item.id)?'用材料淬炼第一条词缀':'材料不足 / 无可淬炼词缀';
@@ -303,13 +340,13 @@ function renderInventory(){
   for(const [k,v] of statFields){const node=document.createElement('span');const b=document.createElement('strong');node.textContent=k+' ';b.textContent=v;node.append(b);char.append(node);}
   const equipment=$('equipment');equipment.replaceChildren();
   for(const [slot,label,glyph] of SLOTS){
-    const node=document.createElement('button');node.type='button';node.className='slot equipment-slot';
+    const node=document.createElement('button');node.type='button';node.className='slot equipment-slot'+(profile.equipped[slot]===selectedItemId?' is-selected':'');
     const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
     const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
     title.textContent=item?.name||'空位';if(item)title.classList.add('rarity-'+item.rarity);
     if(item){const icon=document.createElement('canvas');icon.className='equipment-icon';icon.setAttribute('aria-hidden','true');Art.drawItemIcon(icon,item);node.append(icon);}
     node.append(name,title);
-    node.onclick=()=>{selectedItemId=item?.id||null;inspectItem(item);};
+    node.onclick=()=>selectEquipmentItem(item);
     node.ondblclick=()=>{if(item){selectedItemId=item.id;applyEquipmentChange(()=>profile.equipped[slot]=null);}};
     equipment.append(node);
   }
@@ -331,7 +368,7 @@ function renderInventory(){
     const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1]+' · '+(item.affixes?.length||0)+' 条词缀';
     const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
     const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
-    detail.append(img,labels);detail.onclick=()=>{selectedItemId=item.id;renderInventory();};
+    detail.append(img,labels);detail.onclick=()=>selectEquipmentItem(item);
     detail.ondblclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const actions=document.createElement('div');actions.className='item-actions';
@@ -636,11 +673,13 @@ function floorDraw(){ Art.floor(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,d
 function stoneDraw(b){ Art.pillar(ctx,b); }
 function torchDraw(t){ Art.torch(ctx,t); }
 function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
-function enemyDraw(e){ Art.enemy(ctx,e,tick); }
+const characterScale=()=>mobileMode()?.54:.65;
+const monsterScale=()=>mobileMode()?.57:.70;
+function enemyDraw(e){ Art.enemy(ctx,e,tick,monsterScale()*(e.kind==='boss'?1.08:1)); }
 function heroDraw(){
   const worn={};for(const [slot,id] of Object.entries(profile.equipped))worn[slot]=profile.inventory.find(x=>x.id===id)||null;
-  Art.hero(ctx,hero,tick,worn);
-  if(wardHp>0){ctx.strokeStyle='#93cdffb5';ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor='#a2d5ff';ctx.beginPath();ctx.ellipse(hero.x,hero.y-49,32,60,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;}
+  Art.hero(ctx,hero,tick,worn,characterScale());
+  if(wardHp>0){const k=characterScale();ctx.strokeStyle='#93cdffb5';ctx.lineWidth=2;ctx.shadowBlur=9;ctx.shadowColor='#a2d5ff';ctx.beginPath();ctx.ellipse(hero.x,hero.y-49*k,29*k,58*k,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;}
 }
 function missileDraw(m){
   ctx.save();ctx.translate(m.x,m.y);ctx.rotate(Math.atan2(m.vy,m.vx));

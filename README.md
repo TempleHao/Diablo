@@ -1,8 +1,10 @@
 # 余烬法师 · Ember Mage
 
-> **2D 试玩迭代（v0.3.3）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
+> **2D 试玩迭代（v0.3.4）**：采用 Canvas 2D 俯视角渲染，无需加载 Three.js / GLB 模型。与原 3D 版并行维护，互不覆盖。
 >
 
+> **v0.3.4 体验修复**：重新绘制更纤细的深色法师并降低人物/怪物在手机上的绘制比例；改善中文字体和行高；手机背包采用“背包 / 装备对比 / 已穿装备”三标签与固定穿戴按钮，单击物品直接对比，两个戒指槽可以指定替换。保留旧存档。实际 Chromium 测试画面：[手机版角色](docs/screenshots/2d-v0.3.4-scene-mobile.jpg) · [手机版背包](docs/screenshots/2d-v0.3.4-inventory-bag-mobile.jpg) · [手机版属性对比](docs/screenshots/2d-v0.3.4-inventory-compare-mobile.jpg) · [横屏对比](docs/screenshots/2d-v0.3.4-inventory-compare-landscape.jpg) · [电脑版](docs/screenshots/2d-v0.3.4-scene-desktop.jpg)。详见 [真实验收清单](docs/2D-V0.3.4-ACCEPTANCE.md)。目前人物是过渡矢量美术，写实 A 向高质量 sprite/地牢场景尚未完成。
+>
 > **v0.3.3 开发预览**：清晰的原创 Canvas 法师模型（披风、头盔和法杖配色随装备变化）、新增 4 个可用法术至 11 个、可配置 7 槽技能快捷栏、默认关闭的自动/批量分解、三种分解材料及装备词缀淬炼。已装备、收藏、传奇和套装不会被自动回收。详见 [v0.3.3 验收记录](docs/2D-V0.3.3-ACCEPTANCE.md)。**本版仍属试玩性质，写实暗黑 A 方向的迷宫、场景和怪物尚在重构。**
 >
 > **v0.3.3 Chromium 实机画面**：[PC 新法师与场景](docs/screenshots/2d-v0.3.3-game-desktop.jpg) · [手机实机画面](docs/screenshots/2d-v0.3.3-game-mobile.jpg) · [PC 自动分解与锻造界面](docs/screenshots/2d-v0.3.3-crafting-desktop.jpg) · [手机自动分解界面](docs/screenshots/2d-v0.3.3-crafting-mobile.jpg)。这些是真实的游戏浏览器截图，不是风格概念图。
