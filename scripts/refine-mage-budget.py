@@ -588,7 +588,7 @@ def finalize_triangles(obj):
     assert all(len(p.vertices) == 3 for p in obj.data.polygons)
 
 
-def uv_raster_evidence(objects, rectangle):
+def uv_raster_evidence(objects, rectangle, strict=True):
     """Verify triangle interiors at the actual tile pixel centers.
 
     This is a finite raster check, not a mathematical all-resolution claim.
@@ -629,11 +629,83 @@ def uv_raster_evidence(objects, rectangle):
             'overlappingInteriorPixels':int(np.count_nonzero(coverage>1)),
             'verification':'triangle interiors sampled at original 512px tile pixel centers'}
     assert result['minimumTriangleAreaPixels'] > 1e-7, 'Degenerate normal UV triangle'
-    if result['overlappingInteriorPixels']:
+    if result['overlappingInteriorPixels'] and strict:
         result['overlappingFaces'] = overlaps
         bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'normal-uv-failure.blend'))
-    assert result['overlappingInteriorPixels'] == 0, 'Overlapping final cloth NormalUV interiors: '+json.dumps(result)
+    if overlaps: result['overlappingFaces'] = overlaps
+    if strict: assert result['overlappingInteriorPixels'] == 0, 'Overlapping final cloth NormalUV interiors: '+json.dumps(result)
     return result, coverage > 0
+
+
+def repair_projected_uv(group, rectangle):
+    """Separate just the triangles whose projected islands fold onto themselves.
+
+    Smart Project can preserve a small self-overlap within a folded thin-shell
+    island. Island packing cannot cure that. Split the offending triangle UVs
+    from their neighbors, then repack the complete material group.
+    """
+    x,y,width,height = rectangle
+    separated = set()
+    for attempt in range(8):
+        evidence, mask = uv_raster_evidence(group,rectangle,strict=False)
+        if not evidence['overlappingInteriorPixels']:
+            evidence['separatedProjectedTriangles'] = len(separated)
+            evidence['projectionRepairPasses'] = attempt
+            return evidence,mask
+        collisions = {tuple(pair[key]) for pair in evidence['overlappingFaces'] for key in ('previous','current')}
+        by_name = {obj.name:obj for obj in group}
+        for obj in group:
+            for loop in obj.data.uv_layers['NormalUV'].data:
+                loop.uv = ((loop.uv.x*2048-x-16)/(width-32),(loop.uv.y*2048-y-16)/(height-32))
+        for index,(name,face) in enumerate(sorted(collisions)):
+            obj = by_name[name]; separated.add((name,face))
+            for loop_index in obj.data.polygons[face].loop_indices:
+                obj.data.uv_layers['NormalUV'].data[loop_index].uv += Vector((.002*(index+1),.001*(index+1)))
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in group:
+            obj.select_set(True); obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
+        bpy.context.view_layer.objects.active = group[0]
+        bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.uv.select_all(action='SELECT')
+        bpy.ops.uv.pack_islands(rotate=True, udim_source='ACTIVE_UDIM', margin_method='FRACTION', margin=8/(width-32),shape_method='CONCAVE')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for obj in group:
+            for loop in obj.data.uv_layers['NormalUV'].data:
+                loop.uv = ((x+16+loop.uv.x*(width-32))/2048,(y+16+loop.uv.y*(height-32))/2048)
+    return uv_raster_evidence(group,rectangle,strict=True)
+
+
+def unwrap_cloth(group, rectangle):
+    x,y,width,height = rectangle
+    for obj in group:
+        obj.data.set_sharp_from_angle(angle=math.radians(60))
+        bm = bmesh.new(); bm.from_mesh(obj.data)
+        atlas = bm.loops.layers.uv['AtlasUV']
+        signs = {}
+        for face in bm.faces:
+            uv = [loop[atlas].uv for loop in face.loops]
+            determinant = sum(a.x*b.y-b.x*a.y for a,b in zip(uv,uv[1:]+uv[:1]))
+            signs[face] = 0 if abs(determinant)<1e-10 else (1 if determinant>0 else -1)
+        for edge in bm.edges:
+            edge.seam = len(edge.link_faces)!=2
+            if len(edge.link_faces)!=2: continue
+            a,b = edge.link_faces
+            coordinates = [{loop.vert.index:loop[atlas].uv.copy() for loop in face.loops} for face in (a,b)]
+            discontinuity = any((coordinates[0][v.index]-coordinates[1][v.index]).length>1e-6 for v in edge.verts)
+            edge.seam = discontinuity or signs[a]!=signs[b] or edge.calc_face_angle()>math.radians(60)
+        bm.to_mesh(obj.data); bm.free()
+        obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in group: obj.select_set(True)
+    bpy.context.view_layer.objects.active = group[0]
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.uv.select_all(action='SELECT')
+    bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0, fill_holes=True, correct_aspect=False)
+    bpy.ops.uv.average_islands_scale()
+    bpy.ops.uv.pack_islands(rotate=True, udim_source='ACTIVE_UDIM', margin_method='FRACTION', margin=8/(width-32),shape_method='CONCAVE')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for obj in group:
+        for loop in obj.data.uv_layers['NormalUV'].data:
+            loop.uv = ((x+16+loop.uv.x*(width-32))/2048,(y+16+loop.uv.y*(height-32))/2048)
+    return repair_projected_uv(group,rectangle)
 
 
 def cloth_normal(lod, objects):
@@ -656,23 +728,9 @@ def cloth_normal(lod, objects):
         # A sentinel distinguishes an untouched texel from a legitimate neutral
         # baked normal. It is replaced only after coverage validation succeeds.
         pixels[y:y+height,x:x+width] = (.5,.5,0,1)
-        bpy.ops.object.select_all(action='DESELECT')
-        for obj in group:
-            obj.select_set(True); obj.data.uv_layers.active = obj.data.uv_layers['NormalUV']
-        bpy.context.view_layer.objects.active = group[0]
-        bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.uv.smart_project(angle_limit=math.radians(45), island_margin=.018,
-                                 area_weight=0, correct_aspect=False, scale_to_bounds=True)
-        bpy.ops.uv.select_all(action='SELECT')
-        bpy.ops.uv.pack_islands(rotate=True, margin_method='FRACTION', margin=8/(width-32), shape_method='CONCAVE')
-        bpy.ops.object.mode_set(mode='OBJECT')
-        for obj in group:
-            for loop in obj.data.uv_layers['NormalUV'].data:
-                loop.uv = ((x+16+loop.uv.x*(width-32))/2048,
-                           (y+16+loop.uv.y*(height-32))/2048)
-        raster,coverage_masks[material_name] = uv_raster_evidence(group, [x,y,width,height])
+        raster,coverage_masks[material_name] = unwrap_cloth(group,[x,y,width,height])
         evidence[material_name] = {'rectanglePixels':[x,y,width,height], 'partCount':len(group),
-                                  'unwrap':'all final low cloth parts and shell sides packed together',
+                                  'unwrap':'AtlasUV discontinuity, orientation and 60-degree feature seams; Angle Based charts with equal surface texel density',
                                   'bakeMarginPixels':3, 'islandMarginPixels':8,
                                   **raster}
     result.pixels.foreach_set(pixels.ravel())
@@ -817,6 +875,7 @@ for lod, target in (('L0', 34500), ('L1', 14750)):
         before = triangles(source)
         if not (source in TAILS or is_body(source) or protected(source) or is_eye(source)):
             reduce(obj, ratio)
+        if obj.get('budgetClothMaterial'): obj.data.set_sharp_from_angle(angle=math.radians(60))
         finalize_triangles(obj)
         reduction.append({'part': source.name, 'sourceTriangles': before, 'triangles': triangles(obj)})
     surface_errors = []

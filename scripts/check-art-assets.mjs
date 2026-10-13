@@ -38,7 +38,9 @@ let triangles=0,weightedVertices=0;
 const sizes={5120:1,5121:1,5122:2,5123:2,5125:4,5126:4};
 function value(accessor,index,component){
   const view=model.bufferViews[accessor.bufferView],size=sizes[accessor.componentType];
-  const offset=(view.byteOffset||0)+(accessor.byteOffset||0)+index*(view.byteStride||size*4)+component*size;
+  const components={SCALAR:1,VEC2:2,VEC3:3,VEC4:4}[accessor.type];
+  assert.ok(components,'Unsupported accessor shape');
+  const offset=(view.byteOffset||0)+(accessor.byteOffset||0)+index*(view.byteStride||size*components)+component*size;
   assert.ok(offset+size<=binary.length,'Accessor outside BIN');
   switch(accessor.componentType){
     case 5121:return binary.readUInt8(offset)/(accessor.normalized?255:1);
@@ -66,6 +68,17 @@ for(const node of model.nodes){
 }
 assert.ok(weightedVertices>0&&triangles>0,'Character geometry missing');
 const primitives=model.meshes.flatMap(m=>m.primitives);
+for(const primitive of primitives){
+  const positions=model.accessors[primitive.attributes.POSITION];
+  for(const name of ['TEXCOORD_0','TEXCOORD_1']){
+    const uv=model.accessors[primitive.attributes[name]];
+    assert.ok(uv,`Missing ${name} for dual-UV surface`);assert.equal(uv.count,positions.count);assert.equal(uv.type,'VEC2');
+    for(let i=0;i<uv.count;i++)for(let k=0;k<2;k++){
+      const coordinate=value(uv,i,k);assert.ok(Number.isFinite(coordinate)&&coordinate>=-1e-6&&coordinate<=1.000001,'Invalid atlas UV');
+    }
+  }
+  assert.equal(primitive.attributes.TANGENT,undefined,'Use derivative tangent reconstruction for dedicated normal UV');
+}
 assert.ok(triangles<=triangleLimit,`Triangle budget exceeded: ${filename}`);
 assert.equal(model.meshes.length,1,'Character must be joined into one skinned mesh');
 assert.equal(primitives.length,2,'Character must use exactly two atlas primitives');
@@ -76,6 +89,8 @@ for(const material of model.materials){
   assert.ok(material.pbrMetallicRoughness?.baseColorTexture,'Missing baked base color');
   assert.ok(material.pbrMetallicRoughness?.metallicRoughnessTexture,'Missing baked roughness/metalness');
   assert.ok(material.normalTexture&&material.emissiveTexture,'Missing baked normal/emission');
+  assert.equal(material.normalTexture.texCoord??0,1,'Cloth normal map must use dedicated UV1');
+  for(const texture of [material.pbrMetallicRoughness.baseColorTexture,material.pbrMetallicRoughness.metallicRoughnessTexture,material.emissiveTexture])assert.equal(texture.texCoord??0,0,'Authored color/roughness/emission UV changed');
   if(material.alphaMode==='MASK')assert.equal(material.alphaCutoff??.5,.5);
 }
 assert.equal(statistics.triangles,triangles);assert.equal(statistics.glbBytes,bytes.length);
@@ -93,6 +108,10 @@ const combat=checkCharacter('ember-mage-combat.glb','combat-statistics.json',150
 assert.deepEqual(combat.jointNames,detail.jointNames,'LOD rig order differs');
 assert.deepEqual(combat.clipTimes,detail.clipTimes,'LOD animation sampling differs');
 const report=JSON.parse(readFileSync(new URL('assets-source/ash-archivist/budget-report.json',project)));
+const sourceReceipt=JSON.parse(readFileSync(new URL('assets-source/ash-archivist/source-build-receipt.json',project)));
+assert.equal(sourceReceipt.sourceBlendSha256,report.sourceBlendSha256,'Budget uses a different source build');
+assert.equal(report.tailShellWeightCorrection.sourceWasAlreadyCoherent,true,'Release source has incoherent coat layers');
+assert.ok(report.tailShellWeightCorrection.sharedWeightShellPairSeparationMaxMeters<=.006001,'Source coat layers exceed 6 mm');
 assert.equal(report.lods.L0.actualExport.sha256,detail.statistics.sha256);
 assert.equal(report.lods.L1.actualExport.sha256,combat.statistics.sha256);
 assert.ok(report.rig.samples.length===15,'Expected three clips at five pose samples');
@@ -101,4 +120,15 @@ for(const lod of ['L0','L1']){
   assert.ok(report.lods[lod].samples.length===15);
   assert.ok(report.lods[lod].sampledBodySurfaceErrorMaxMeters<.004,'Face/hand sampled LOD error exceeds 4 mm');
   assert.ok(report.lods[lod].samples.every(s=>s.maxBoundsMeters<.005),'LOD grounding/bounds error exceeds 5 mm');
+  const tail=report.lods[lod].tailSurface;
+  assert.ok(tail&&tail.walkCoverage==='every integer authored frame','Missing full-cycle tail surface measurement');
+  const limit=lod==='L0'?.012:.025;
+  assert.equal(tail.limitMeters,limit);assert.ok(tail.maxMeters<=limit,'Tail surface error exceeds fixed target');
+  assert.ok(tail.samples.length>=86,'Tail sweep must include full Walk and Idle/Cast samples for both panels');
+  const normal=report.lods[lod].clothNormal;
+  assert.equal(normal.texCoord,1);assert.equal(normal.uvLayer,'NormalUV');assert.match(normal.sha256,/^[a-f0-9]{64}$/);
+  assert.ok(normal.parts.length>0,'Missing isolated high-to-low bake evidence');
+  const tiles=Object.values(normal.uvTiles);
+  assert.ok(tiles.length>0,'Missing normal UV occupancy evidence');
+  assert.ok(tiles.every(t=>t.overlappingInteriorPixels===0),'Normal UV interiors overlap');
 }
