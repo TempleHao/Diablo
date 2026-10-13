@@ -4,13 +4,15 @@
  * Programmatic secondary animation makes walking/casting responsive without
  * pretending that a single illustration is a true hand-drawn walk cycle.
  */
-const mage=new Image();
-mage.decoding='async';
-mage.src=new URL('./art/ember-mage-test-blue.webp',import.meta.url).href;
-let ready=false, failed=false;
-mage.addEventListener('load',()=>{ready=true;});
-mage.addEventListener('error',()=>{failed=true;});
-export const status=()=>({ready,failed,width:mage.naturalWidth,height:mage.naturalHeight});
+const mage=typeof Image==='undefined'?null:new Image();
+let ready=false,failed=false;
+if(mage){
+  mage.decoding='async';
+  mage.addEventListener('load',()=>{ready=true;});
+  mage.addEventListener('error',()=>{failed=true;});
+  mage.src=new URL('./art/ember-mage-test-blue.webp',import.meta.url).href;
+}
+export const status=()=>({ready,failed,width:mage?.naturalWidth??0,height:mage?.naturalHeight??0});
 export const animationPose=(actor,tick)=>{
   const moving=!!actor.moving;
   const phase=Number.isFinite(actor.walk)?actor.walk:0;
@@ -36,7 +38,7 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   const facingLeft=Math.cos(actor.angle)<-.15;
   if(facingLeft)ctx.scale(-1,1);
   ctx.rotate(pose.lean);
-  const imageW=88,imageH=120,foot=-120+117+pose.bob;
+  const imageW=88,imageH=120;
   const draw=(dx,dy,alpha=1,filter='none')=>{
     ctx.save();ctx.globalAlpha=alpha;ctx.filter=filter;
     ctx.imageSmoothingEnabled=false;
