@@ -29,6 +29,8 @@ try{
       return art.artStatus();
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
+    assert.equal(await page.locator('#region-select option').count(),5,'all five regions present');
+    assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
@@ -38,11 +40,20 @@ try{
     await page.keyboard.press('2');
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
+    assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
+    assert.equal(await page.locator('.catalog-skill').count(),7);
+    assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
     await page.click('#inv-close');
     assert.equal(await page.locator('#inventory').isVisible(),false);
     await page.click('#btn-pause');
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
+    page.once('dialog',d=>d.accept());
+    await page.selectOption('#region-select','2');
+    await page.waitForTimeout(230);
+    assert.equal(await page.locator('#region-name').innerText(),'余烬祭坛');
+    assert.equal(await page.locator('#map-label').innerText(),'血色符文');
+    await page.selectOption('#region-select','3').catch(()=>{});
     await page.waitForTimeout(200);
     if(process.env.SCREENSHOT_FOR_REVIEW==='1') {
       const screenshot=await page.screenshot({type:'jpeg',quality:54});
