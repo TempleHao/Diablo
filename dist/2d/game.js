@@ -476,7 +476,7 @@ function dropItem(x,y,rare=false) {
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
 function cast(skill){
   const rule=SKILLS[skill];
-  if(!rule||state!=='playing'||!$('inventory').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
+  if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
   if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
   const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
@@ -751,7 +751,7 @@ window.addEventListener('keydown',e=>{
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
-    const byKey=Object.fromEntries(profile.activeSkills.map(id=>[SKILLS[id].key.toLowerCase(),id]));
+    const byKey=Object.fromEntries(profile.activeSkills.map(id=>[SKILLS[id].key==='空格'?' ':SKILLS[id].key.toLowerCase(),id]));
     if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
   }
 });
