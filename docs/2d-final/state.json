@@ -4,7 +4,7 @@
   "track": "Ember Chronicles 2D A-direction final",
   "state": "development",
   "baseline": {
-    "game": "2D v0.3 pixel-prototype",
+    "game": "v0.3.3 main (4b6a20c) + F1 maze integration candidate, not A-direction final",
     "confirmed": "not A-direction final",
     "existing3D": "separate/unchanged",
     "reference": "user-supplied five A-direction target pictures; conceptual, not gameplay"
@@ -15,7 +15,7 @@
     "branch": null,
     "taskId": null
   },
-  "currentPhase": "F1",
+  "currentPhase": "F2",
   "phases": {
     "F0": {
       "status": "done",
@@ -36,18 +36,44 @@
       ]
     },
     "F1": {
-      "status": "pending",
+      "status": "done",
       "gateIds": [
         "G01"
       ],
-      "evidence": []
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "68feaf5437cb89b921f78683371ab75746a7b67d"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38386923283"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-desktop.jpg"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-mobile.jpg"
+        }
+      ]
     },
     "F2": {
-      "status": "pending",
+      "status": "active",
       "gateIds": [
         "G02"
       ],
-      "evidence": []
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "12c770bef56238e72bce6b6d10da3fa1f8628c05"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38387621782"
+        }
+      ]
     },
     "F3": {
       "status": "pending",
@@ -114,8 +140,25 @@
   },
   "gates": {
     "G01": {
-      "status": "unverified",
-      "evidence": []
+      "status": "pass",
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "68feaf5437cb89b921f78683371ab75746a7b67d"
+        },
+        {
+          "kind": "test-run",
+          "ref": "https://github.com/TempleHao/Diablo/actions/runs/38386923283"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-desktop.jpg"
+        },
+        {
+          "kind": "browser-screenshot",
+          "ref": "docs/screenshots/2d-f1-maze-mobile.jpg"
+        }
+      ]
     },
     "G02": {
       "status": "unverified",
@@ -158,14 +201,15 @@
     {
       "id": "P1-001",
       "severity": "P1",
-      "status": "open",
-      "description": "实际地牢地图缺少可探索多房间迷宫及回路"
+      "status": "fixed",
+      "description": "实际地牢地图缺少可探索多房间迷宫及回路",
+      "resolution": "F1 multi-room room graph, actual collision doors, fog and browser movement; see GH Actions run 38386923283"
     },
     {
       "id": "P1-002",
       "severity": "P1",
       "status": "open",
-      "description": "Boss 无专属掉落/首杀机制，通关后自动重置"
+      "description": "Boss现有首杀专属传奇/区域掉落且击杀后不会自动重置，但缺少城镇/下一层/传送与跨刷新掉落持久化完整流程，仍禁止最终发布"
     },
     {
       "id": "P1-003",
@@ -190,6 +234,12 @@
       "severity": "P1",
       "status": "open",
       "description": "怪物缺少足够差异化行为和可识别前摇"
+    },
+    {
+      "id": "P1-007",
+      "severity": "P1",
+      "status": "open",
+      "description": "F2 branch does not persist unclaimed boss ground loot across refresh; code write blocked by safety check on 2026-10-13. New real screenshots unavailable."
     }
   ],
   "deltaTop3": [
@@ -197,16 +247,16 @@
     "迷宫、主城、野外与不自动重置的持续玩法未实装",
     "怪物生态、Boss 特殊掉落、可见换装与完成度不足"
   ],
-  "nextAction": "F1：新建独立的房间图迷宫模块（入口、支路、死路、至少一个回路、可到达的 Boss 房/出口），先用 100 个固定种子验证可达性与路径多样性；通过后才集成 2D 战斗画布与迷雾。",
+  "nextAction": "Run v0.3.3+maze rules, 100 seeds, Boss/portal/save, Chromium PC/mobile and audit; commit actual screenshots, fix regressions. Keep PR Draft until F8 and user confirmation.",
   "lastAttempt": {
-    "at": "2026-10-13",
-    "phase": "F0",
-    "status": "passed-only-baseline-and-audit",
+    "at": "2026-10-14",
+    "phase": "F2",
+    "status": "integrated-code-awaiting-ci-and-visual-evidence",
     "verified": {
-      "ci": "https://github.com/TempleHao/Diablo/actions/runs/38352511685",
-      "commit": "748ef5d5cbe36d7c8c88a0035dfaad388965116e"
+      "mainBaseline": "4b6a20c89d22d80be60938dc94fd239f1a4d4e19",
+      "sourcePR": 6
     },
-    "caveat": "No F1-F9 gameplay or A-direction art gate passed; no final game release."
+    "caveat": "Branch integrates v0.3.3 and maze; requires fresh CI, browser screenshots and visual review."
   },
   "candidate": {
     "status": "none",
@@ -223,5 +273,10 @@
     "pagesRun": null,
     "rollbackCommit": null
   },
-  "updatedAt": "2026-10-13"
+  "updatedAt": "2026-10-13",
+  "lastWritePermissionProbe": {
+    "at": "2026-10-13",
+    "purpose": "Explicit user authorization; verify isolated 2D branch write access",
+    "status": "write-check-pending"
+  }
 }

@@ -7,16 +7,18 @@ import {audit,PHASES,GATES} from '../scripts/audit-2d-final.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const fresh=()=>structuredClone(JSON.parse(fs.readFileSync(path.join(root,'docs/2d-final/state.json'),'utf8')));
 const ev=(kind='test-run')=>({kind,ref:'https://github.com/TempleHao/Diablo/actions/runs/123456'});
+// Mutating tests must start from an unverified F1 baseline, even when the live branch has already passed F1.
+const unverifiedF1=()=>{const s=fresh();s.phases.F1.status='pending';s.phases.F1.evidence=[];s.gates.G01={status:'unverified',evidence:[]};s.phases.F2.status='pending';s.phases.F2.evidence=[];return s;};
 test('baseline unverified state is truthful and structurally valid',()=>assert.deepEqual(audit(fresh()),[]));
 test('cannot complete a phase with no tests or uncompleted dependencies',()=>{
- const s=fresh();s.phases.F1.status='done';assert.ok(audit(s).some(x=>x.where==='phases.F1'));
+ const s=unverifiedF1();s.phases.F1.status='done';assert.ok(audit(s).some(x=>x.where==='phases.F1'));
 });
 test('gate can only pass with traceable evidence',()=>{
- const s=fresh();s.gates.G01.status='pass';assert.ok(audit(s).some(x=>x.where==='gates.G01'));
+ const s=unverifiedF1();s.gates.G01.status='pass';assert.ok(audit(s).some(x=>x.where==='gates.G01'));
  s.gates.G01.evidence=[ev()];assert.deepEqual(audit(s),[]);
 });
 test('phase done needs dependency and matched gate',()=>{
- const s=fresh();
+ const s=unverifiedF1();
  s.phases.F0.status='done';s.phases.F0.evidence=[ev('commit')];
  s.phases.F1.status='done';s.phases.F1.evidence=[ev('test-run')];
  assert.ok(audit(s).some(x=>x.where==='phases.F1'&&x.message.includes('G01')));

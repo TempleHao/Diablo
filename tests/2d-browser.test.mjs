@@ -53,6 +53,8 @@ try{
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
+    const maze=await page.evaluate(()=>window.__ember2dQA.mazeInfo());
+    assert.ok(maze.rooms>=16&&maze.hasMask&&maze.explored===1,'v0.3.3 must run on real multiroom maze');
     const firstBoss=await page.evaluate(()=>window.__ember2dQA.bossTest());
     assert.equal(firstBoss.state,'playing','boss defeat must not end the game');
     assert.equal(firstBoss.bossDefeated,true);

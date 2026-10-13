@@ -45,7 +45,18 @@ export function hitsRect(x, y, radius, box) {
   return (x - cx) ** 2 + (y - cy) ** 2 < radius ** 2;
 }
 export function walkable(x, y, radius, dungeon) {
-  if (x < radius + TILE || y < radius + TILE || x > WIDTH - radius - TILE || y > HEIGHT - radius - TILE) return false;
+  const maxW=dungeon?.width??WIDTH,maxH=dungeon?.height??HEIGHT;
+  if (x < radius || y < radius || x > maxW-radius || y > maxH-radius) return false;
+  if (dungeon?.floorMask){
+    // Entity disk must fit wholly inside traversable floors, including corner clipping.
+    const grid=dungeon.floorMask,cols=dungeon.cols,S=dungeon.cellSize;
+    for(const [px,py] of [[x-radius,y],[x+radius,y],[x,y-radius],[x,y+radius],
+      [x-radius*.71,y-radius*.71],[x+radius*.71,y-radius*.71],
+      [x-radius*.71,y+radius*.71],[x+radius*.71,y+radius*.71]]){
+      const c=Math.floor(px/S),r=Math.floor(py/S);
+      if(c<0||r<0||c>=cols||r>=dungeon.rows||!grid[r*cols+c])return false;
+    }
+  }else if (x < radius + TILE || y < radius + TILE || x > WIDTH - radius - TILE || y > HEIGHT - radius - TILE)return false;
   return !dungeon.blocks.some(b => hitsRect(x, y, radius, b));
 }
 export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
