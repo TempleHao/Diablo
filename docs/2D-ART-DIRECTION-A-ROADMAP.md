@@ -34,3 +34,11 @@ v0.3 实机使用 0x72 DungeonTileset II（CC0）像素图集，角色大头比�
 
 实际变更文件 / 本次 commit / 测试通过或失败项 / 截图对比 / 是否部署 / 阻碍与下一阶段。
 没有新源素材或有授权疑虑时，不把“计划”、“色调更改”写成“写实化完成”。
+
+## 2026-10-13 第一轮光照质量复核
+
+- 代码：`dist/2d/lighting.js`（半分辨率暗度遮罩、火把与技能发光），`dist/2d/game.js`（绘制集成）；`tests/2d-browser.test.mjs` 直接断言实 Canvas 中玩家照明和火把光源的像素亮度差异。
+- GitHub Actions [38348136399](https://github.com/TempleHao/Diablo/actions/runs/38348136399) 的桌面/手机浏览器测试成功，截图来自真实 Chromium Canvas，非生成式宣传图。
+- [桌面版截图](../docs/screenshots/2d-lighting-qa-desktop.jpg) / [手机视口截图](../docs/screenshots/2d-lighting-qa-mobile.jpg)。
+- 截图表明“照明正确工作”，**不表明写实度已经改善到方向 A**：贴图仍是低分辨率像素图，房间构图、角色比例及角色动画差距依然很大。
+- 质量判定：**PR #4 继续保持 Draft，不覆盖正式 GitHub Pages**；后续优先真实斜俯视素材来源与可复用的地图场景制作，不再把调暗画面视为写实化。
