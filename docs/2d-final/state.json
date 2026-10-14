@@ -253,19 +253,18 @@
     "角色仍是粉紫色卡通/过渡图，怪物与 Boss 缺少同一世界观的多方向写实动作",
     "手机 Boss 战角色/文字/按钮密集，主城野外与可见换装依然不足"
   ],
-  "nextAction": "Retry permitted source edit for per-region worldStates (seed/explored/bossDefeated) in isolated 2D branch, add save migration and Chromium reload/Boss tests; only then run Node + 100-seed + Chromium three-viewports and audit, capture real-game screenshots. Reconcile merged Demo v0.3.5 without importing its pixel art as final.",
+  "nextAction": "Retry approved F2 integration on independent branch: import sanitizeWorldStates in core.js, add worldStates to freshSave/sanitizeSave, add tests/2d-world-progress.test.mjs for malformed seeds/room IDs and v1/v2 migration; run Node/100 seeds/Chromium and capture real screenshots before claiming gate pass.",
   "lastAttempt": {
     "at": "2026-10-14",
     "phase": "F2",
-    "status": "blocked-source-write",
+    "status": "blocked-code-and-test-write",
     "verified": {
-      "mainCommit": "a00182e42dee26aba8d6e709acd78c9d4c89c482",
-      "mergedDemoPR": 11,
-      "mazePR": 6,
-      "mazeBranchHead": "7d7563cc2e39eb3e050414a8aa5d5ce29ed3b0b1"
+      "mainHead": "0443a29b733e8d1ed7a52d9986a9c0710bccad60",
+      "branchHeadBeforeAttempt": "4c91df9e384de0f367d2d4aa68c3de34548eb658",
+      "pr": 6
     },
-    "blocker": "GitHub update_file to dist/2d/core.js was blocked by OpenAI safety checks while adding bounded worldStates save migration. No source commit, new CI, browser screenshot, or runtime audit from this attempt.",
-    "caveat": "Demo v0.3.5 pixel mage is strictly demo-only under main/docs/2d-final/DUAL-ART-DIRECTION.md. Draft branch does not yet contain this policy file; preserve final realistic A-direction and keep PR #6 draft."
+    "blocker": "GitHub update_file dist/2d/core.js and create_file tests/2d-world-progress.test.mjs both blocked by OpenAI safety checks. No source or test commit, no new CI, no Chromium screenshots. PR #6 remains Draft; no merge.",
+    "caveat": "v0.3.6 demo is separate pixel-art direction; F4/F5 A-direction visual gates remain unverified."
   },
   "candidate": {
     "status": "none",
