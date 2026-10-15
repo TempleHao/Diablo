@@ -139,31 +139,50 @@ export function makeLoot(rng,level,id,{boss=false}={}){
   return item;
 }
 export function emptyEquipment(){return Object.fromEntries(SLOT_IDS.map(s=>[s,null]));}
+const percentFrom=text=>Math.max(0,Math.min(100,Number(/(\d+(?:\.\d+)?)%/.exec(text||'')?.[1]||0)));
 export function equipmentBonus(profile) {
-  const extra={},totals={}; const itemById=new Map(profile.inventory.map(i=>[i.id,i]));
+  const extra={},totals={};
+  const tradeoffs={hpPct:0,resistPenalty:0,movePenalty:0,manaCostPct:0,potionCooldownPct:0};
+  const itemById=new Map(profile.inventory.map(i=>[i.id,i]));
   for(const slot of SLOT_IDS){
     const item=itemById.get(profile.equipped[slot]);
     if(!item||getSlotForItem(item,slot)!==slot)continue;
     for(const key of ['power','hp','mana','armor'])extra[key]=(extra[key]||0)+(item[key]||0);
     for(const affix of item.affixes||[])extra[affix.key]=(extra[affix.key]||0)+affix.value;
     if(item.setId)totals[item.setId]=(totals[item.setId]||0)+1;
+    if(item.rarity===4&&item.effectName.startsWith('古王·')){
+      if(item.theme==='火')extra.skillFire=(extra.skillFire||0)+1;
+      if(item.theme==='霜')extra.skillCold=(extra.skillCold||0)+1;
+    }
+    if(item.rarity===4&&item.drawback){
+      const pct=percentFrom(item.drawback);
+      if(item.drawback.includes('最大生命降低'))tradeoffs.hpPct+=pct;
+      else if(item.drawback.includes('元素抗性降低'))tradeoffs.resistPenalty+=pct;
+      else if(item.drawback.includes('移动速度降低'))tradeoffs.movePenalty+=pct;
+      else if(item.drawback.includes('主动技能法力消耗增加'))tradeoffs.manaCostPct+=pct;
+      else if(item.drawback.includes('药剂冷却时间增加'))tradeoffs.potionCooldownPct+=pct;
+    }
   }
   for(const [id,count] of Object.entries(totals)){
     if(count>=2)for(const [key,value] of Object.entries(SETS[id].special))extra[key]=(extra[key]||0)+value;
     if(count>=3&&id==='warden'){extra.hp=(extra.hp||0)+70;extra.crit=(extra.crit||0)+5;}
   }
-  return {extra,sets:totals};
+  return {extra,sets:totals,tradeoffs};
 }
 export function calculateStats(profile){
-  const {extra,sets}=equipmentBonus(profile);
+  const {extra,sets,tradeoffs}=equipmentBonus(profile);
   const value=(k,d=0)=>(extra[k]||0)+d;
-  return {power:17+profile.level*3+value('power'),hp:105+(profile.level-1)*13+value('hp'),
+  const baseHp=105+(profile.level-1)*13+value('hp');
+  return {power:17+profile.level*3+value('power'),hp:Math.max(1,Math.round(baseHp*(1-tradeoffs.hpPct/100))),
     mana:100+value('mana'),armor:value('armor'),
     crit:Math.min(70,5+value('crit')),critDmg:50+value('critDmg'),
     haste:Math.min(70,value('haste')),fire:value('fire'),cold:value('cold'),
-    resistFire:Math.min(75,value('resistFire')),resistCold:Math.min(75,value('resistCold')),
-    resistDark:Math.min(75,value('resistDark')),regen:7+value('regen'),
-    lifesteal:value('lifesteal'),skillFire:value('skillFire'),skillCold:value('skillCold'),sets};
+    resistFire:Math.max(0,Math.min(75,value('resistFire')-tradeoffs.resistPenalty)),
+    resistCold:Math.max(0,Math.min(75,value('resistCold')-tradeoffs.resistPenalty)),
+    resistDark:Math.max(0,Math.min(75,value('resistDark')-tradeoffs.resistPenalty)),regen:7+value('regen'),
+    lifesteal:value('lifesteal'),skillFire:value('skillFire'),skillCold:value('skillCold'),
+    moveSpeed:Math.max(60,100-tradeoffs.movePenalty),manaCost:100+tradeoffs.manaCostPct,
+    potionCooldown:100+tradeoffs.potionCooldownPct,sets};
 }
 export function formatAffixes(item){
   const entries=[];
