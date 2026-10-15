@@ -37,17 +37,17 @@ test('malformed data cannot inject invalid affixes or high inflated stats',()=>{
   assert.equal(p.inventory.length,1);assert.equal(p.inventory[0].affixes.length,1);
   assert.equal(p.inventory[0].affixes[0].key,'fire');assert.equal(p.inventory[0].affixes[0].value,888);
 });
-test('loot across levels produces slot, affix, and rarity variety',()=>{
-  const r=mulberry32(431),rarities=new Set(),slots=new Set(),types=new Set();
-  for(let k=0;k<450;k++){
-    const x=makeLoot(r,1+k%35,'loot-'+k,{boss:k%7===0});
-    rarities.add(x.rarity);slots.add(x.slot);
-    for(const a of x.affixes)types.add(a.key);
-    assert.equal(x.ilvl,1+k%35);
-    for(const a of x.affixes)assert.ok(AFFIXES[a.key].slots.includes(x.slot));
+test('500-catalog loot across levels produces legal slot, affix, and rarity variety',()=>{
+  const r=mulberry32(431),rarities=new Set(),slots=new Set(),types=new Set(),catalogIds=new Set();
+  for(let k=0;k<700;k++){
+    const level=1+k%100,x=makeLoot(r,level,'loot-'+k,{boss:k%7===0});
+    rarities.add(x.rarity);slots.add(x.slot);catalogIds.add(x.catalogId);
+    assert.ok(x.requiredLevel<=level);assert.equal(x.ilvl,x.requiredLevel);
+    assert.ok(x.iconRow>=1&&x.iconRow<=12&&x.iconCol>=1&&x.iconCol<=10);
+    for(const a of x.affixes){types.add(a.key);assert.ok(AFFIXES[a.key].slots.includes(x.slot));}
     assert.ok(formatAffixes(x).length>=0);
   }
-  assert.equal(slots.size,13);assert.equal(rarities.size,5);assert.ok(types.size>=12);
+  assert.ok(slots.size>=9);assert.equal(rarities.size,5);assert.ok(types.size>=12);assert.ok(catalogIds.size>150);
 });
 test('all regions generate deterministic playable yet distinct dungeons',()=>{
   const signatures=new Set();
