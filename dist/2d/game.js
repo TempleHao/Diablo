@@ -49,6 +49,12 @@ function renderSkillBar(){
   }
 }
 renderSkillBar();
+const skinSelect=$('skin-select');
+skinSelect.value=String(profile.characterSkin||0);
+skinSelect.addEventListener('change',()=>{
+  profile.characterSkin=Math.max(0,Math.min(4,Math.floor(Number(skinSelect.value)||0)));
+  persist();announce('法师形象已切换',true);
+});
 const regionSelect=$('region-select');
 REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
 regionSelect.value=String(profile.region);
@@ -894,7 +900,7 @@ function ellipse(x,y,rx,ry,color){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math
 function enemyDraw(e){ Art.enemy(ctx,e,tick); }
 function heroDraw(){
   const worn={};for(const [slot,id] of Object.entries(profile.equipped))worn[slot]=profile.inventory.find(x=>x.id===id)||null;
-  Art.hero(ctx,hero,tick,worn);
+  Art.hero(ctx,hero,tick,worn,profile.characterSkin);
   if(wardHp>0||effectState.relicWardHp>0){
     const relic=effectState.relicWardHp>0;
     ctx.strokeStyle=relic?'#e6b66bcf':'#93cdffb5';ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor=relic?'#d89a46':'#a2d5ff';
