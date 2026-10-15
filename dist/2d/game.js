@@ -536,14 +536,14 @@ function injury(amount,school='physical'){
       effectState.relicWardUntil=tick+5;
       announce('灰烬回护 · 获得 '+Math.round(ash)+'% 生命护盾',true);
     }
-    const lastBreath=effectPercent(profile,'断气续命');
+    const lastBreath=effectPercent(profile,'断气续命',1);
     if(lastBreath&&beforeHp>hero.maxHp*.25&&hero.hp<=hero.maxHp*.25&&tick>=effectState.lowLifeReady){
       effectState.relicWardHp=Math.max(effectState.relicWardHp,Math.round(hero.maxHp*lastBreath/100));
       effectState.relicWardUntil=Math.max(effectState.relicWardUntil,tick+8);
       effectState.lowLifeReady=tick+60;
       announce('断气续命 · 低生命护盾已生成',true);
     }
-    const oath=effectPercent(profile,'残月守誓');
+    const oath=effectPercent(profile,'残月守誓',1);
     if(oath&&hero.hp<=hero.maxHp*.4&&tick>=effectState.oathReady){
       effectState.oathPct=oath;effectState.oathUntil=tick+6;effectState.oathReady=tick+30;
       announce('残月守誓 · 全元素抗性 +'+Math.round(oath)+'%',true);
