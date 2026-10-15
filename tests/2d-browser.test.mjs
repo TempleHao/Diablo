@@ -93,6 +93,9 @@ try{
     assert.ok(postRefresh.maze.explored>=preRefresh.explored,'explored rooms disappeared');
     assert.equal(postRefresh.profile.bossKills[0],1);
     assert.equal(postRefresh.profile.pendingLoot.length,firstBoss.pending,'unclaimed Boss loot lost on reload');
+    const restoredDrops=postRefresh.profile.pendingLoot.map(d=>({id:d.item.id,x:d.x,y:d.y})).sort((a,b)=>a.id.localeCompare(b.id));
+    const originalDrops=firstBoss.drops.map(d=>({id:d.id,x:d.x,y:d.y})).sort((a,b)=>a.id.localeCompare(b.id));
+    assert.deepEqual(restoredDrops,originalDrops,'unclaimed Boss loot coordinates changed on reload');
     assert.equal(await page.locator('#portal-open').isVisible(),true);
     const canvas=page.locator('#game');
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
