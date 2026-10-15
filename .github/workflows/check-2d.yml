@@ -22,12 +22,18 @@ jobs:
           node --check dist/2d/systems.js
           node --check dist/2d/boss-loot.js
           node --check dist/2d/equipment-icons.js
+          node --check dist/2d/equipment-catalog.js
+          node --check dist/2d/equipment-catalog-N.js
+          node --check dist/2d/equipment-catalog-M.js
+          node --check dist/2d/equipment-catalog-E.js
+          node --check dist/2d/equipment-catalog-L.js
+          node --check dist/2d/equipment-catalog-U.js
           node --check dist/2d/travel.js
           node --check dist/2d/crafting.js
           node --check dist/2d/mage-portrait.js
           node --check dist/2d/maze.js
           node --check dist/2d/maze-world.js
-          node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-maze.test.mjs tests/2d-maze-world.test.mjs
+          node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-equipment-catalog.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-maze.test.mjs tests/2d-maze-world.test.mjs
       - name: Browser runtime smoke tests
         run: |
           sudo apt-get update -qq
