@@ -1,5 +1,6 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
 import {CATALOG_QUALITY_NAMES,pickCatalogEntry} from './equipment-catalog.js';
+import {highTierEffectFor} from './equipment-effects.js';
 export const SLOTS = Object.freeze([
   ['head','头盔','⛑'],['shoulders','肩甲','♜'],['robe','胸甲','♟'],
   ['gloves','手套','♧'],['belt','腰带','▤'],['pants','腿甲','♙'],
@@ -82,6 +83,7 @@ export function normalizeItem(item) {
   const setId=Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
   const catalogId=typeof item.catalogId==='string'&&/^EQ-[NMELU]-\d{3}$/.test(item.catalogId)?item.catalogId:null;
   const prototypeId=typeof item.prototypeId==='string'&&/^B\d{3}$/.test(item.prototypeId)?item.prototypeId:null;
+  const authoredEffect=catalogId?highTierEffectFor(catalogId):null;
   const text=(value,max=40)=>typeof value==='string'?value.slice(0,max):'';
   return {
     id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,100),
@@ -92,6 +94,7 @@ export function normalizeItem(item) {
     hands:safeNum(item.hands,2),sockets:safeNum(item.sockets,4),mainStat:safeNum(item.mainStat,999),
     iconRow:safeNum(item.iconRow,12),iconCol:safeNum(item.iconCol,10),catalogScore:safeNum(item.catalogScore,9999),
     qualityColor:/^#[0-9A-Fa-f]{6}$/.test(item.qualityColor||'')?item.qualityColor:'',
+    effectName:authoredEffect?.name||'',effectDescription:authoredEffect?.description||'',drawback:authoredEffect?.drawback||'',
     favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
