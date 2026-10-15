@@ -19,7 +19,9 @@ function poseFor(p,tick){
   if(p.moving)return 1+(Math.floor((p.walk||tick*8)*.42)&1);
   return 0;
 }
-export function drawMageSprite(ctx,p,tick){
+const SKIN_FILTERS=['none','hue-rotate(140deg) saturate(1.22)','grayscale(.72) brightness(1.55) contrast(.92)','hue-rotate(58deg) saturate(1.28)','hue-rotate(255deg) saturate(1.08) brightness(.9)'];
+export const MAGE_SKIN_NAMES=Object.freeze(['蓝晶术士','赤焰术士','圣辉术士','虚空术士','苍翠术士']);
+export function drawMageSprite(ctx,p,tick,skin=0){
   if(!ready||!sheet)return false;
   const pose=poseFor(p,tick),col=pose%3,row=Math.floor(pose/3);
   const sw=sheet.naturalWidth/3,sh=sheet.naturalHeight/2;
@@ -29,7 +31,9 @@ export function drawMageSprite(ctx,p,tick){
   if(Math.cos(p.angle||0)<-.2&&pose!==5)ctx.scale(-1,1);
   ctx.imageSmoothingEnabled=false;
   ctx.fillStyle='#02040ab5';ctx.beginPath();ctx.ellipse(0,7,26,9,0,0,Math.PI*2);ctx.fill();
+  ctx.filter=SKIN_FILTERS[Math.max(0,Math.min(4,Math.floor(skin)||0))];
   ctx.drawImage(sheet,col*sw,row*sh,sw,sh,-w/2,-h+7,w,h);
+  ctx.filter='none';
   ctx.restore();
   return true;
 }
