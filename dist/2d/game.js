@@ -24,7 +24,14 @@ const enemyWaves=(region)=> {
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 let currentRoom=null,enteredRooms=new Set(),expedition=null;
-const newEffectState=()=>({skillCasts:0,manaSpent:0,nextAttackBonus:0,eliteBuffPct:0,eliteBuffUntil:0,bloodStacks:0,bloodUntil:0,spiritCrownReady:0});
+const newEffectState=()=>({
+  skillCasts:0,manaSpent:0,nextAttackBonus:0,eliteBuffPct:0,eliteBuffUntil:0,
+  bloodStacks:0,bloodUntil:0,spiritCrownReady:0,deepBagReady:0,lastElement:'',
+  relicWardHp:0,relicWardUntil:0,incomingHits:0,
+  heavyReady:0,heavyDRPct:0,heavyDRUntil:0,lowLifeReady:0,
+  oathReady:0,oathPct:0,oathUntil:0,huntReady:0,huntPct:0,huntUntil:0,
+  critHastePct:0,critHasteUntil:0
+});
 let effectState=newEffectState();
 const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#B7B7B7','#3293FF','#AF5CFF','#FF8928','#D8AA53'] };
@@ -162,7 +169,14 @@ function enterChamber(id){
     const e=spawn(kind,point);
     if(chamber.type==='elite'&&n===0){e.maxHp*=1.7;e.hp=e.maxHp;e.speed*=1.12;e.elite=true;}
   }
-  if(chamber.type==='elite')announce('精英密室 · 警惕重型守卫',true);
+  if(chamber.type==='elite'){
+    announce('精英密室 · 警惕重型守卫',true);
+    const hunt=effectPercent(profile,'猎首预兆');
+    if(hunt&&tick>=effectState.huntReady){
+      effectState.huntPct=hunt;effectState.huntUntil=tick+8;effectState.huntReady=tick+20;
+      announce('猎首预兆 · 对精英伤害 +'+Math.round(hunt)+'%',true);
+    }
+  }
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
