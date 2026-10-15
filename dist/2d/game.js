@@ -74,6 +74,37 @@ $('portal-open').onclick=openPortalMenu;
 $('portal-stay').onclick=closePortalMenu;
 $('portal-next').onclick=()=>travelTo(Number($('portal-destination').value));
 $('portal-random').onclick=()=>travelTo(pickRandomDestination(rng,profile.region));
+
+function updateTownSummary(){
+  $('town-region').textContent=REGION_DATA[profile.region].name;
+  $('town-visits').textContent=String(profile.regionVisits[profile.region]||0);
+  $('town-loot').textContent=String(profile.pendingLoot.length);
+  $('town-boss-kills').textContent=String(profile.bossKills[profile.region]||0);
+}
+function enterTown(){
+  if(!hero||state==='intro'||state==='death')return false;
+  $('inventory').hidden=true;$('portal-panel').hidden=true;$('portal-open').hidden=true;
+  clearInput();persist();updateTownSummary();$('town-panel').hidden=false;state='town';
+  announce('已返回余烬营地 · 当前远征已保存',true);
+  return true;
+}
+function resumeFromTown(){
+  if($('town-panel').hidden)return false;
+  $('town-panel').hidden=true;state='playing';$('portal-open').hidden=!bossDefeated;clearInput();
+  announce('继续 '+REGION_DATA[profile.region].name+' 的远征',true);
+  return true;
+}
+function refarmFromTown(){
+  if($('town-panel').hidden)return false;
+  startDestinationExpedition(profile,profile.region);
+  $('town-panel').hidden=true;build();persist();state='playing';clearInput();
+  announce(REGION_DATA[profile.region].name+' · 新迷宫已生成',true);
+  return true;
+}
+$('btn-town').onclick=enterTown;
+$('portal-town').onclick=enterTown;
+$('town-resume').onclick=resumeFromTown;
+$('town-refarm').onclick=refarmFromTown;
 $('portal-panel').addEventListener('pointerdown',e=>{if(e.target===$('portal-panel'))closePortalMenu();});
 
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
@@ -132,7 +163,7 @@ function enterChamber(id){
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
-  const proposedSeed=(20261013+profile.clears*19+profile.region*7919)>>>0;
+  const proposedSeed=(20261013+profile.clears*19+profile.region*7919+(profile.regionVisits[profile.region]||0)*104729)>>>0;
   expedition=ensureWorldState(profile,profile.region,proposedSeed);
   const seed=expedition.seed;
   rng=mulberry32(seed);dungeon=createMazeWorld(seed,profile.region);
@@ -202,7 +233,7 @@ $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
 function showInventory() {
-  if(state==='intro'||state==='victory'||state==='death'||!$('portal-panel').hidden)return;
+  if(state==='intro'||state==='victory'||state==='death'||state==='town'||!$('portal-panel').hidden)return;
   $('inventory').hidden=false;$('portal-open').hidden=true;clearInput();renderInventory();
 }
 $('btn-inventory').onclick=showInventory;
@@ -788,7 +819,7 @@ window.addEventListener('keydown',e=>{
   if(['INPUT','TEXTAREA'].includes(tag)||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
   if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
-  if(k==='escape'){if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
+  if(k==='escape'){if(!$('town-panel').hidden)resumeFromTown();else if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
   if(k==='t'){openPortalMenu();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
