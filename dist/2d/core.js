@@ -93,7 +93,9 @@ export function sanitizeSave(raw){
     const item=normalizeItem(entry?.item);
     if(!item||pendingIds.has(item.id)||!Number.isInteger(entry?.region)||entry.region<0||entry.region>=REGION_DATA.length)continue;
     pendingIds.add(item.id);
-    if(p.pendingLoot.length<MAX_ITEMS)p.pendingLoot.push({item,region:entry.region});
+    const x=Number(entry?.x),y=Number(entry?.y);
+    const position=Number.isFinite(x)&&Number.isFinite(y)?{x:clamp(x,0,1000000),y:clamp(y,0,1000000)}:{};
+    if(p.pendingLoot.length<MAX_ITEMS)p.pendingLoot.push({item,region:entry.region,...position});
   }
   if(Array.isArray(raw.inventory)){
     const ids=new Set();
