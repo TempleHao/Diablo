@@ -35,7 +35,7 @@ export function rollBossRewards(rng,level,region,previousKills,newId){
     const scale=1+Math.floor(Math.max(1,level)/8)*.14;
     const stats=Object.fromEntries(Object.entries(pool.stats).map(([key,val])=>[key,Math.round(val*scale)]));
     const item=normalizeItem({
-      id:newId(),name:pool.item,slot:pool.slot,rarity:3,ilvl:Math.min(60,Math.max(1,level)),
+      id:newId(),name:pool.item,slot:pool.slot,rarity:3,ilvl:Math.min(100,Math.max(1,level)),
       power:0,hp:0,mana:0,armor:0,value:450+Math.max(1,level)*18,...stats,
       affixes:pool.affixes.map(a=>({key:a.key,value:Math.max(1,Math.round(a.value*scale))}))
     });
