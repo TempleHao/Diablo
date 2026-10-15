@@ -114,3 +114,41 @@ test('untrusted expedition metadata cannot inject malformed seeds or room IDs',(
   assert.equal(save.worldStates[3].explored.length,64);
   assert.equal(save.worldStates[3].bossDefeated,true);
 });
+
+
+import {destinationOptions,pickRandomDestination,startDestinationExpedition} from '../dist/2d/travel.js';
+
+test('portal travel preserves character progression while creating a fresh destination expedition',()=>{
+  const p=freshSave();
+  p.level=14;p.xp=37;p.gold=912;p.essence=44;p.clears=3;p.skillRanks={fire:2};
+  p.worldStates[0]={seed:111,explored:[0,1],enteredRooms:[0,1],bossDefeated:true};
+  p.worldStates[1]={seed:222,explored:[0,2],enteredRooms:[0,2],bossDefeated:true};
+  p.pendingLoot=[
+    {region:0,x:450,y:620,item:{id:'old-a',slot:'weapon',name:'旧图A',rarity:3,ilvl:10,power:20,hp:0,mana:0,armor:0,value:10,affixes:[]}},
+    {region:1,x:880,y:930,item:{id:'old-b',slot:'head',name:'旧图B',rarity:3,ilvl:10,power:0,hp:5,mana:0,armor:5,value:10,affixes:[]}}
+  ];
+  const before={level:p.level,xp:p.xp,gold:p.gold,essence:p.essence,clears:p.clears,skillRanks:{...p.skillRanks}};
+  const moved=startDestinationExpedition(p,1);
+  assert.deepEqual(moved,{from:0,to:1,visit:1});
+  assert.equal(p.region,1);
+  assert.equal(p.worldStates[1],null,'destination maze must be regenerated');
+  assert.equal(p.worldStates[0].bossDefeated,true,'source expedition history must remain intact');
+  assert.deepEqual({level:p.level,xp:p.xp,gold:p.gold,essence:p.essence,clears:p.clears,skillRanks:p.skillRanks},before);
+  assert.deepEqual(p.pendingLoot.find(x=>x.region===0)?.x,450,'other-region loot coordinates must remain untouched');
+  const recovered=p.pendingLoot.find(x=>x.region===1);
+  assert.equal('x' in recovered,false,'old destination coordinates must not leak into a fresh maze');
+  assert.equal('y' in recovered,false);
+  const revived=sanitizeSave(JSON.parse(JSON.stringify(p)));
+  assert.equal(revived.region,1);
+  assert.equal(revived.pendingLoot.length,2);
+});
+
+test('travel destination selection wraps and random travel never picks the current region',()=>{
+  const p=freshSave();p.region=8;
+  assert.equal(destinationOptions(8).next,0);
+  assert.equal(pickRandomDestination(()=>0,4),0);
+  assert.equal(pickRandomDestination(()=>.999999,4),8);
+  for(const value of [0,.1,.25,.5,.75,.999999]){
+    assert.notEqual(pickRandomDestination(()=>value,4),4);
+  }
+});
