@@ -363,7 +363,7 @@ function renderInventory(){
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
     ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
-    ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
+    ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],['暗抗',statsNow.resistDark+'%'],
     ['移动速度',statsNow.moveSpeed+'%'],['法力消耗',statsNow.manaCost+'%'],['药剂冷却',statsNow.potionCooldown+'%'],
     ['未分配技能点',profile.skillPoints],['已净化',profile.clears]
   ];
@@ -484,10 +484,11 @@ function puff(x,y,color,count=9,radius=3,speed=150){
   if(particles.length>270)particles.splice(0,particles.length-270);
 }
 function floatText(x,y,value,color='#f1ca90'){texts.push({x,y,text:String(value),color,life:.85});if(texts.length>50)texts.shift();}
-function injury(amount){
+function injury(amount,school='physical'){
   if(hero.invuln>0||state!=='playing')return;
   const defense=stats(profile);
-  const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
+  const resist=school==='fire'?defense.resistFire:school==='cold'?defense.resistCold:school==='dark'?defense.resistDark:0;
+  const mitigated=Math.max(1,amount*(1-resist/100)*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
   const absorbed=Math.min(wardHp,mitigated);wardHp-=absorbed;
   const finalDamage=mitigated-absorbed;
   if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
@@ -535,9 +536,9 @@ function dealDamage(e,damage,school='physical',opts={}){
     }
     const rift=strongestEffect(profile,'裂界余响');
     if(rift&&rng()*100<(rift.numbers[0]||0)){
-      const pct=rift.numbers[1]||0;
-      floatText(e.x,e.y-56,'裂界余响','#c6a6ff');puff(e.x,e.y,'#b585ed',18,4,200);
-      for(const other of [...enemies])if(other!==e&&distance(e,other)<210)dealDamage(other,damage*pct/100,school,{proc:true});
+      const pct=rift.numbers[1]||0,extra=Math.max(1,Math.round(damage*pct/100));
+      e.hp-=extra;floatText(e.x,e.y-56,'裂界余响 +'+extra,'#c6a6ff');puff(e.x,e.y,'#b585ed',18,4,200);
+      for(const other of [...enemies])if(other!==e&&distance(e,other)<210)dealDamage(other,extra,school,{proc:true});
     }
   }
 
@@ -742,7 +743,7 @@ function update(dt){
         m.hitIds?.add(e.id);m.hits=(m.hits||0)+1;
         if(m.kind==='ember'||m.hits>=2)missiles.splice(missiles.indexOf(m),1);
       }
-    }else if(distance(hero,m)<hero.radius+9){injury(m.damage);puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(missiles.indexOf(m),1);}
+    }else if(distance(hero,m)<hero.radius+9){injury(m.damage,m.kind==='void'||m.kind==='shadow'?'dark':'physical');puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(missiles.indexOf(m),1);}
   }
   for(const d of [...drops]){
     d.age+=dt;
