@@ -3,7 +3,7 @@ import {createMazeWorld,roomAt,roomCenter,enterRoom,drawMazeWalls,drawExploratio
 import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from './world-progress.js';
-import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
+import {destinationOptions,pickRandomDestination,validateDestination,startDestinationExpedition} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
@@ -48,8 +48,8 @@ regionSelect.addEventListener('change',()=>{
   if(state==='playing'&&!confirm('切换区域将重新开始当前远征。角色装备与进度不会丢失，继续吗？')){
     regionSelect.value=String(profile.region);return;
   }
-  profile.region=next;build();persist();if(state==='victory'||state==='death')state='intro';
-  announce('已进入 '+REGION_DATA[next].name,true);
+  startDestinationExpedition(profile,next);build();persist();if(state==='victory'||state==='death')state='intro';
+  announce('已进入 '+REGION_DATA[next].name+' · 新远征已生成',true);
 });
 
 const portalOptions=$('portal-destination');
@@ -65,10 +65,8 @@ function openPortalMenu(){
 function closePortalMenu(){$('portal-panel').hidden=true;$('portal-open').hidden=!bossDefeated;clearInput();}
 function travelTo(region){
   if(!bossDefeated||!validateDestination(region))return false;
-  closePortalMenu();profile.region=region;
-  profile.regionVisits[region]=(profile.regionVisits[region]||0)+1;
-  // Explicit portal travel starts a new run in the destination region.
-  profile.worldStates[region]=null;
+  closePortalMenu();
+  startDestinationExpedition(profile,region);
   build();persist();announce('传送抵达 '+REGION_DATA[region].name+' · 新的远征开始',true);
   return true;
 }
