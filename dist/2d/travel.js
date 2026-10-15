@@ -1,4 +1,4 @@
-import {REGION_DATA} from './systems.js';
+import {REGION_DATA,MAX_ITEMS} from './systems.js';
 
 export function destinationOptions(from) {
  const next=(from+1)%REGION_DATA.length;
@@ -40,4 +40,29 @@ export function startDestinationExpedition(profile,index){
    return rest;
  });
  return {from,to:index,visit:profile.regionVisits[index]};
+}
+
+
+/**
+ * Move as much persisted expedition loot as possible into the character bag.
+ * This is intentionally explicit (camp recovery) so a full bag never deletes
+ * rewards. Returns counts for UI feedback.
+ */
+export function recoverPendingLoot(profile){
+ if(!profile||typeof profile!=='object')throw new TypeError('profile required');
+ if(!Array.isArray(profile.inventory)||!Array.isArray(profile.pendingLoot))throw new TypeError('loot collections missing');
+ const room=Math.max(0,MAX_ITEMS-profile.inventory.length);
+ if(room===0)return {recovered:0,remaining:profile.pendingLoot.length};
+ const owned=new Set(profile.inventory.map(item=>item?.id).filter(Boolean));
+ const recovered=[];
+ const keep=[];
+ for(const entry of profile.pendingLoot){
+   const id=entry?.item?.id;
+   if(!id||owned.has(id))continue;
+   if(recovered.length<room){recovered.push(entry.item);owned.add(id);}
+   else keep.push(entry);
+ }
+ profile.inventory.push(...recovered);
+ profile.pendingLoot=keep;
+ return {recovered:recovered.length,remaining:keep.length};
 }
