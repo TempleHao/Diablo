@@ -31,10 +31,18 @@ test('axis-separated movement prevents walking through a wall',()=>{
   moveWithCollision(p,100,0,.2,d,18);assert.equal(p.x,170);
   moveWithCollision(p,0,100,.2,d,18);assert.equal(p.y,170);
 });
-test('seeded loot generator produces valid gear across slots',()=>{
+test('seeded loot generator produces level-legal catalog gear',()=>{
   const r=mulberry32(4),slots=new Set(),rarities=new Set();
-  for(let k=0;k<200;k++){const item=createItem(r,9,String(k));slots.add(item.slot);rarities.add(item.rarity);assert.ok(item.power>=0&&item.hp>=0&&item.mana>=0);}
-  assert.equal(slots.size,13,'all equipment slots should receive random drops');assert.ok(rarities.size>=3);
+  for(let k=0;k<300;k++){
+    const level=1+k%100,item=createItem(r,level,String(k));
+    slots.add(item.slot);rarities.add(item.rarity);
+    assert.match(item.catalogId,/^EQ-[NMELU]-\d{3}$/);
+    assert.ok(item.requiredLevel<=level,'drop exceeded character level');
+    assert.equal(item.ilvl,item.requiredLevel);
+    assert.ok(item.power>=0&&item.hp>=0&&item.mana>=0);
+  }
+  assert.ok(slots.size>=9,'catalog should exercise the major equipment locations');
+  assert.ok(rarities.size>=4);
 });
 test('equipping and salvaging gear respects equipped state',()=>{
   const p=freshSave(),item={id:'item-1',slot:'weapon',name:'测试法杖',rarity:2,power:30,hp:0,mana:0,value:10};
@@ -44,15 +52,15 @@ test('equipping and salvaging gear respects equipped state',()=>{
   p.equipped.weapon=null;assert.equal(salvage(p,item.id),true);
   assert.equal(p.essence,5);assert.equal(p.inventory.length,0);
 });
-test('XP gain levels repeatedly and stops at 60',()=>{
+test('XP gain levels repeatedly and stops at 100',()=>{
   const p=freshSave();
   assert.equal(expRequired(1),60);
   assert.equal(gainXp(p,60),1);assert.equal(p.level,2);
-  gainXp(p,100000);assert.equal(p.level,60);assert.equal(p.xp,0);
+  gainXp(p,10000000);assert.equal(p.level,100);assert.equal(p.xp,0);
 });
 test('old or absent data does not crash current 2D save',()=>{
   assert.deepEqual(sanitizeSave(null),freshSave());
-  assert.equal(sanitizeSave({version:2,level:99}).level,60);
+  assert.equal(sanitizeSave({version:2,level:99}).level,99);
   assert.deepEqual(sanitizeSave({version:3,level:99}),freshSave());
 });
 test('saved equipment referencing missing item is cleared',()=>{
@@ -62,7 +70,7 @@ test('saved equipment referencing missing item is cleared',()=>{
 test('save is bounded and removes duplicate item IDs',()=>{
   const items=Array.from({length:33},(_,j)=>({id:j<2?'duplicate':'item'+j,slot:'robe',name:'法袍',rarity:0,power:0,hp:5,mana:0,value:0}));
   const p=sanitizeSave({version:1,level:999,gold:-100,inventory:items,equipped:{robe:'duplicate'}});
-  assert.equal(p.level,60);assert.equal(p.gold,0);assert.equal(p.inventory.length,32);
+  assert.equal(p.level,100);assert.equal(p.gold,0);assert.equal(p.inventory.length,32);
   assert.equal(p.equipped.robe,'duplicate');
 });
 test('invalid item data cannot inject arbitrary object fields or inflated stats',()=>{
