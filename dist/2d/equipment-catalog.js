@@ -38,6 +38,13 @@ export function allCatalogEntries(){
   for(let rarity=0;rarity<5;rarity++)for(let index=0;index<CATALOG_TIER_SIZE;index++)result.push(catalogEntry(rarity,index));
   return result;
 }
+export function catalogEntryById(id){
+  const match=/^EQ-([NMELU])-(\d{3})$/.exec(String(id||''));
+  if(!match)return null;
+  const rarity=CATALOG_QUALITY_CODES.indexOf(match[1]),index=Number(match[2])-1;
+  if(rarity<0||index<0||index>=CATALOG_TIER_SIZE)return null;
+  return catalogEntry(rarity,index);
+}
 export function rarityWeights(level){
   const n=clampLevel(level);
   return DROP_BANDS.find(([lo,hi])=>n>=lo&&n<=hi)[2].slice();
