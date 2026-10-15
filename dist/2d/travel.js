@@ -17,3 +17,27 @@ export function pickRandomDestination(rng,from){
 export function validateDestination(index){
  return Number.isInteger(index)&&index>=0&&index<REGION_DATA.length;
 }
+
+/**
+ * Atomically begin a fresh expedition in a destination region.
+ * Character progression stays on the profile; only the destination world's
+ * room/Boss state is reset. Unclaimed persistent loot for that destination
+ * loses its obsolete maze coordinates and is recovered beside the new entrance.
+ */
+export function startDestinationExpedition(profile,index){
+ if(!profile||typeof profile!=='object')throw new TypeError('profile required');
+ if(!validateDestination(index))throw new RangeError('invalid destination');
+ if(!Array.isArray(profile.worldStates)||profile.worldStates.length!==REGION_DATA.length)throw new TypeError('worldStates missing');
+ if(!Array.isArray(profile.regionVisits)||profile.regionVisits.length!==REGION_DATA.length)throw new TypeError('regionVisits missing');
+ if(!Array.isArray(profile.pendingLoot))throw new TypeError('pendingLoot missing');
+ const from=profile.region;
+ profile.region=index;
+ profile.regionVisits[index]=(Number.isInteger(profile.regionVisits[index])?profile.regionVisits[index]:0)+1;
+ profile.worldStates[index]=null;
+ profile.pendingLoot=profile.pendingLoot.map(entry=>{
+   if(entry?.region!==index)return entry;
+   const {x,y,...rest}=entry;
+   return rest;
+ });
+ return {from,to:index,visit:profile.regionVisits[index]};
+}
