@@ -114,3 +114,10 @@ test('starting a destination expedition preserves loot identity and only clears 
   assert.equal(Object.hasOwn(p.pendingLoot[1],'x'),false);
   assert.equal(p.pendingLoot[1].item.id,'destination-loot');
 });
+
+test('character appearance is bounded, persisted and legacy-safe',()=>{
+  assert.equal(freshSave().characterSkin,0);
+  assert.equal(sanitizeSave({version:2,characterSkin:3,inventory:[]}).characterSkin,3);
+  assert.equal(sanitizeSave({version:2,characterSkin:99,inventory:[]}).characterSkin,4);
+  assert.equal(sanitizeSave({version:1,inventory:[]}).characterSkin,0);
+});
