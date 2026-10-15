@@ -61,8 +61,8 @@ test('generated loot uses authored 500-item catalog identities instead of placeh
  const r=mulberry32(2026),catalogIds=new Set(),prototypeIds=new Set();
  for(let k=0;k<240;k++){
   const item=makeLoot(r,15,'u-'+k);
-  assert.match(item.catalogId,/^EQ-[NMELU]-\\d{3}$/);
-  assert.match(item.prototypeId,/^B\\d{3}$/);
+  assert.match(item.catalogId,/^EQ-[NMELU]-\d{3}$/);
+  assert.match(item.prototypeId,/^B\d{3}$/);
   const authored=catalogEntryById(item.catalogId);
   assert.ok(authored,'generated catalog item must resolve back to authored entry');
   assert.equal(item.name,authored.name);
