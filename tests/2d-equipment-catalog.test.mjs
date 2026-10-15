@@ -4,7 +4,9 @@ import {
   CATALOG_SIZE,CATALOG_TIER_SIZE,CATALOG_QUALITY_NAMES,CATALOG_QUALITY_COLORS,
   catalogEntry,allCatalogEntries,rarityWeights,rollCatalogRarity,pickCatalogEntry
 } from '../dist/2d/equipment-catalog.js';
-import {SLOT_IDS,makeLoot} from '../dist/2d/systems.js';
+import {SLOT_IDS,makeLoot,normalizeItem,calculateStats} from '../dist/2d/systems.js';
+import {HIGH_TIER_EFFECTS,highTierEffectFor} from '../dist/2d/equipment-effects.js';
+import {iconType} from '../dist/2d/equipment-icons.js';
 import {mulberry32} from '../dist/2d/core.js';
 
 test('Black-Iron catalog contains exactly 500 uniquely identified items',()=>{
@@ -63,4 +65,55 @@ test('live loot keeps runtime IDs separate from authored catalog IDs',()=>{
     assert.ok(item.requiredLevel<=level);seen.add(item.catalogId);
   }
   assert.ok(seen.size>100);
+});
+
+
+test('all 200 high-tier effects are stable and unique items carry authored drawbacks',()=>{
+  assert.equal(HIGH_TIER_EFFECTS.length,200);
+  assert.equal(new Set(HIGH_TIER_EFFECTS.map(x=>x[0])).size,200);
+  assert.equal(highTierEffectFor('EQ-L-001').name,'裂界余响');
+  assert.equal(highTierEffectFor('EQ-U-100').name,'古王·秘文回响');
+  assert.equal(highTierEffectFor('EQ-U-100').drawback,'主动技能法力消耗增加8%');
+  assert.equal(highTierEffectFor('EQ-N-001'),null);
+});
+
+test('catalog identity is verified before an authored effect can attach',()=>{
+  const t=catalogEntry(4,0);
+  const valid=normalizeItem({id:'u1',catalogId:t.catalogId,slot:t.slot,name:t.name,rarity:t.rarity,ilvl:100,power:9999,hp:9999,mana:9999,armor:9999,value:99999,affixes:[]});
+  assert.equal(valid.catalogId,'EQ-U-001');
+  assert.equal(valid.effectName,'古王·破绽追猎');
+  assert.equal(valid.drawback,'最大生命降低6%');
+  assert.equal(valid.power,t.attack,'catalog attack must be restored from authored data');
+  assert.equal(valid.hp,t.hp,'catalog life must be restored from authored data');
+  const forged=normalizeItem({...valid,id:'fake',catalogId:'EQ-U-100'});
+  assert.equal(forged.catalogId,null,'mismatched catalog identity must be stripped');
+  assert.equal(forged.effectName,'');
+  assert.equal(forged.drawback,'');
+});
+
+test('unique tradeoffs and ancient resonance affect live character statistics',()=>{
+  const p={level:100,inventory:[],equipped:Object.fromEntries(SLOT_IDS.map(s=>[s,null]))};
+  const make=(rarity,index,id)=>{
+    const t=catalogEntry(rarity,index);
+    return normalizeItem({id,catalogId:t.catalogId,slot:t.slot,name:t.name,rarity:t.rarity,ilvl:t.requiredLevel,power:t.attack,hp:t.hp,mana:t.mana,armor:t.armor,value:t.score,affixes:[]});
+  };
+  const base=calculateStats(p);
+  const hpCost=make(4,0,'hp-cost');
+  p.inventory.push(hpCost);p.equipped[hpCost.slot]=hpCost.id;
+  const afterHp=calculateStats(p);
+  assert.ok(afterHp.hp<base.hp+hpCost.hp,'6% unique life penalty must reduce final life');
+  const fireUnique=make(4,4,'mana-cost');
+  p.inventory.push(fireUnique);p.equipped[fireUnique.slot]=fireUnique.id;
+  const afterFire=calculateStats(p);
+  assert.equal(afterFire.skillFire,1,'fire-themed ancient resonance must add a fire skill rank');
+  assert.equal(afterFire.manaCost,108,'active-skill mana drawback must be live');
+});
+
+test('fallback equipment renderer follows catalog weapon subtype instead of drawing everything as a staff',()=>{
+  const examples=[
+    [catalogEntry(0,5),'axe'],[catalogEntry(0,7),'hammer'],[catalogEntry(0,9),'spear'],
+    [catalogEntry(0,20),'bow'],[catalogEntry(0,24),'crossbow'],[catalogEntry(0,26),'quiver'],
+    [catalogEntry(0,0),'sword'],[catalogEntry(0,30),'staff']
+  ];
+  for(const [item,type] of examples)assert.equal(iconType(item),type,item.catalogId);
 });
