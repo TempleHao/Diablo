@@ -496,23 +496,72 @@ function injury(amount){
   if(finalDamage)floatText(hero.x,hero.y-30,Math.round(finalDamage),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
-function dealDamage(e,damage,school='physical'){
+function dealDamage(e,damage,school='physical',opts={}){
   if(!enemies.includes(e))return;
-  const bonus=stats(profile);
+  const bonus=stats(profile),allowProcs=!opts.proc,wasFull=e.hp>=e.maxHp-.01;
   const bonusDamage=school==='fire'?bonus.fire:school==='cold'?bonus.cold:0;
   damage*=1+bonusDamage/100;
   if(school==='fire')damage*=1+bonus.skillFire*.09;
   if(school==='cold')damage*=1+bonus.skillCold*.09;
-  const crit=rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
+  if(effectState.eliteBuffUntil>tick)damage*=1+effectState.eliteBuffPct/100;
+  if(e.vulnerableUntil>tick)damage*=1+(e.vulnerablePct||0)/100;
+  if(allowProcs&&wasFull){
+    const pct=effectPercent(profile,'裂魂猛袭');
+    if(pct){damage*=1+pct/100;floatText(e.x,e.y-54,'裂魂猛袭','#d9a2ff');}
+  }
+  if(allowProcs&&boss&&distance(hero,boss)<900){
+    const pct=effectPercent(profile,'王权共鸣');
+    if(pct)damage*=1+pct/100;
+  }
+  if(allowProcs&&effectState.nextAttackBonus>0){
+    damage*=1+effectState.nextAttackBonus/100;
+    floatText(e.x,e.y-54,'蓄势 +'+Math.round(effectState.nextAttackBonus)+'%','#9fdcff');
+    effectState.nextAttackBonus=0;
+  }
+  const crit=!opts.proc&&rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
   if(school==='fire'&&bonus.sets.dragonflame>=3&&++combo%3===0)damage*=1.45;
   damage=Math.max(1,Math.round(damage));
   if(bonus.lifesteal)hero.hp=Math.min(hero.maxHp,hero.hp+bonus.lifesteal);
   e.hp-=damage;floatText(e.x,e.y-35,(crit?'✦ ':'')+damage,crit?'#ffe29b':'#f1ca90');puff(e.x,e.y,e.kind==='boss'?'#c88ae2':'#eaa161',6,3);
+
+  if(allowProcs){
+    const pursuit=strongestEffect(profile,'破绽追猎');
+    if(pursuit){
+      e.playerHitCount=(e.playerHitCount||0)+1;
+      if(e.playerHitCount%3===0){
+        e.vulnerablePct=pursuit.numbers[0]||0;e.vulnerableUntil=tick+3;
+        floatText(e.x,e.y-50,'破绽 '+Math.round(e.vulnerablePct)+'%','#ffb594');
+      }
+    }
+    const rift=strongestEffect(profile,'裂界余响');
+    if(rift&&rng()*100<(rift.numbers[0]||0)){
+      const pct=rift.numbers[1]||0;
+      floatText(e.x,e.y-56,'裂界余响','#c6a6ff');puff(e.x,e.y,'#b585ed',18,4,200);
+      for(const other of [...enemies])if(other!==e&&distance(e,other)<210)dealDamage(other,damage*pct/100,school,{proc:true});
+    }
+  }
+
   if(e.hp>0)return;
   const i=enemies.indexOf(e);if(i>=0)enemies.splice(i,1);
   puff(e.x,e.y,e.kind==='boss'?'#e89bff':'#e8904b',22,7,240);
   const bossDied=e.kind==='boss';const advanced=gainXp(profile,bossDied?170:22);
   profile.gold+=bossDied?150:3+Math.floor(rng()*9);
+
+  if(e.elite){
+    const pct=effectPercent(profile,'魔痕收割');
+    if(pct){effectState.eliteBuffPct=pct;effectState.eliteBuffUntil=tick+5;announce('魔痕收割 · 技能伤害 +'+Math.round(pct)+'%',true);}
+  }
+  const soul=strongestEffect(profile,'回魂指环');
+  if(soul&&rng()*100<(soul.numbers[0]||0)){
+    const restore=(soul.numbers[1]||0)/100*hero.maxMana;
+    hero.mana=Math.min(hero.maxMana,hero.mana+restore);floatText(hero.x,hero.y-46,'回魂 +'+Math.round(restore)+' 法力','#9fdcff');
+  }
+  const walker=strongestEffect(profile,'血路行者');
+  if(walker){
+    effectState.bloodStacks=tick<=effectState.bloodUntil?Math.min(3,effectState.bloodStacks+1):1;
+    effectState.bloodUntil=tick+5;
+  }
+
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
   if(!bossDied&&rng()<.42)dropItem(e.x,e.y,false);
   if(bossDied){
