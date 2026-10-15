@@ -823,7 +823,7 @@ document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
 // Dedicated local QA hook: never active on the public GitHub Pages game.
 if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('qa')){
   window.__ember2dQA={
-    mazeInfo:()=>({rooms:dungeon.layout.rooms.length,explored:dungeon.explored.length,bossRoom:dungeon.layout.boss,hasMask:!!dungeon.floorMask}),
+    mazeInfo:()=>({rooms:dungeon.layout.rooms.length,explored:dungeon.explored.length,bossRoom:dungeon.layout.boss,hasMask:!!dungeon.floorMask,seed:dungeon.seed,bossDefeated,portalReady:!!portal}),
     bossTest:()=>{
       if(state!=='playing')throw new Error('start game first');
       enemies.length=0;
