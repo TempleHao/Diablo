@@ -1,7 +1,7 @@
 name: Deploy GitHub Pages
 on:
   push:
-    branches: [main]
+    branches: [main, feature/2d-maze-topology-f1]
   workflow_dispatch:
 permissions:
   contents: read
