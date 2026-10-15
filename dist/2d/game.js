@@ -24,7 +24,7 @@ const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 let currentRoom=null,enteredRooms=new Set(),expedition=null;
 const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
-const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
+const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#B7B7B7','#3293FF','#AF5CFF','#FF8928','#D8AA53'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
 function renderSkillBar(){
   const bar=$('abilitybar');bar.replaceChildren();
@@ -289,9 +289,10 @@ function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
   if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
-  const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+SLOTS.find(s=>s[0]===item.slot)?.[1];
+  const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 需求等级 '+(item.requiredLevel||item.ilvl)+' · '+(item.part||SLOTS.find(s=>s[0]===item.slot)?.[1])+(item.subtype?' / '+item.subtype:'')+(item.catalogId?' · '+item.catalogId:'');
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
   panel.append(preview,title,meta);
+  if(item.preferredClass||item.theme){const origin=document.createElement('small');origin.className='catalog-meta';origin.textContent=(item.preferredClass?'偏好 '+item.preferredClass:'')+(item.theme?' · '+item.theme+'系':'');panel.append(origin);}
   if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
@@ -529,7 +530,6 @@ function dealDamage(e,damage,school='physical'){
 }
 function dropItem(x,y,rare=false) {
   const item=makeLoot(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++,{boss:rare});
-  if(rare&&item.rarity<2){item.rarity=2;item.name='司祭战利品 · '+item.name;}
   drops.push({x,y,item,age:0});floatText(x,y-38,item.name,palette.rare[item.rarity]);
 }
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
