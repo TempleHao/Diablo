@@ -1071,6 +1071,9 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
       enterChamber(bossRoom);
       const e=boss;if(!e)throw new Error('boss chamber did not spawn its guardian');
       e.hp=1;dealDamage(e,10000,'fire');
+      // Keep deterministic persistence checks from being raced by the next
+      // animation frame's proximity auto-pickup. QA only; public gameplay is unchanged.
+      hero.x=dungeon.start.x;hero.y=dungeon.start.y;
       return {state,bossDefeated,drops:drops.map(d=>({id:d.item.id,name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent,x:d.x,y:d.y})),
         pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
     }
