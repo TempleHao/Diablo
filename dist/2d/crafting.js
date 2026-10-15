@@ -5,8 +5,8 @@
 import {normalizeItem,AFFIXES} from './systems.js';
 export const MATERIALS=Object.freeze({
  dust:{label:'灰烬粉尘',description:'用于普通装备强化与初级锻造'},
- crystal:{label:'奥术结晶',description:'用于精炼魔法、稀有装备'},
- core:{label:'传奇余烬',description:'用于传奇与套装的高级淬炼'}
+ crystal:{label:'奥术结晶',description:'用于精炼魔法、史诗装备'},
+ core:{label:'传奇余烬',description:'用于传奇、暗金遗珍与高阶套装的高级淬炼'}
 });
 export const freshMaterials=()=>({dust:0,crystal:0,core:0});
 const amount=(v)=>Number.isFinite(v)?Math.min(999999,Math.max(0,Math.floor(v))):0;
