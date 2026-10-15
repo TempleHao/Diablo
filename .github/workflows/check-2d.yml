@@ -19,6 +19,7 @@ jobs:
         run: |
           node --check dist/2d/core.js
           node --check dist/2d/game.js
+          node --check dist/2d/art.js
           node --check dist/2d/systems.js
           node --check dist/2d/boss-loot.js
           node --check dist/2d/equipment-icons.js
@@ -33,6 +34,7 @@ jobs:
           node --check dist/2d/travel.js
           node --check dist/2d/crafting.js
           node --check dist/2d/mage-portrait.js
+          node --check dist/2d/mage-sprite.js
           node --check dist/2d/maze.js
           node --check dist/2d/maze-world.js
           node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-equipment-catalog.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-maze.test.mjs tests/2d-maze-world.test.mjs
