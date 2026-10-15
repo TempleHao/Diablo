@@ -102,7 +102,10 @@ export function getSlotForItem(item,target){
 }
 export function makeLoot(rng,level,id,{boss=false}={}){
   const n=Math.max(1,Math.min(100,Math.floor(level)||1));
-  const template=pickCatalogEntry(rng,n);
+  let template=pickCatalogEntry(rng,n);
+  // Reward chests/Boss base drops ask for at least an epic template when that
+  // tier is level-legal; the catalog helper falls back safely at low levels.
+  if(boss&&template.rarity<2)template=pickCatalogEntry(rng,n,2);
   const {slot,rarity}=template;
   const choices=Object.keys(AFFIXES).filter(k=>AFFIXES[k].slots.includes(slot));
   const affixes=[];
