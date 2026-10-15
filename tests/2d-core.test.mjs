@@ -74,3 +74,43 @@ test('invalid item data cannot inject arbitrary object fields or inflated stats'
   assert.equal(p.inventory[0].power,9999);
   assert.equal(p.inventory[0].unknown,undefined);
 });
+
+import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from '../dist/2d/world-progress.js';
+import {createMazeWorld,enterRoom} from '../dist/2d/maze-world.js';
+
+test('legacy 2D saves acquire empty per-region expeditions without changing equipment',()=>{
+  for(const version of [1,2]){
+    const save=sanitizeSave({version,region:2,clears:9,inventory:[],equipped:{},worldStates:undefined});
+    assert.equal(save.region,2);assert.equal(save.clears,9);
+    assert.equal(save.worldStates.length,9);
+    assert.equal(save.worldStates.every(v=>v===null),true);
+  }
+});
+test('expedition seed, visited rooms and Boss defeat survive a real save serialization cycle',()=>{
+  const profile=freshSave(),state=ensureWorldState(profile,0,20261015);
+  const world=createMazeWorld(state.seed,0),neighbor=world.layout.edges.find(e=>e.a===world.layout.entrance||e.b===world.layout.entrance);
+  assert.ok(neighbor);
+  const second=neighbor.a===world.layout.entrance?neighbor.b:neighbor.a;
+  enterRoom(world,second);
+  rememberRoomProgress(state,world,new Set([world.layout.entrance,second]));
+  state.bossDefeated=true;profile.clears++;
+  const revived=sanitizeSave(JSON.parse(JSON.stringify(profile)));
+  const restored=ensureWorldState(revived,0,42);
+  assert.equal(restored.seed,20261015,'clears must not change active expedition seed');
+  assert.equal(restored.bossDefeated,true);
+  const rebuilt=createMazeWorld(restored.seed,0);
+  restoreWorldExploration(rebuilt,restored);
+  assert.deepEqual(new Set(rebuilt.explored),new Set(world.explored));
+  assert.ok(restored.enteredRooms.includes(second));
+});
+test('untrusted expedition metadata cannot inject malformed seeds or room IDs',()=>{
+  const save=sanitizeSave({version:2,worldStates:[
+    {seed:0,explored:[0,0,1,-1,999,'2'],enteredRooms:[0,0,3],bossDefeated:'true'},
+    {seed:-1,bossDefeated:true}, {seed:0x100000000,bossDefeated:true},
+    {seed:42,explored:Array.from({length:100},(_,i)=>i),bossDefeated:true}
+  ]});
+  assert.deepEqual(save.worldStates[0],{seed:0,explored:[0,1],enteredRooms:[0,3],bossDefeated:false});
+  assert.equal(save.worldStates[1],null);assert.equal(save.worldStates[2],null);
+  assert.equal(save.worldStates[3].explored.length,64);
+  assert.equal(save.worldStates[3].bossDefeated,true);
+});
