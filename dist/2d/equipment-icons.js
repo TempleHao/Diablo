@@ -75,6 +75,12 @@ function decorate(ctx,item){
 }
 
 export function iconType(item){return resolve(item);}
+export function appearanceKey(item){
+ const rarity=Math.max(0,Math.min(4,Math.floor(Number(item?.rarity)||0)));
+ const row=Math.max(1,Math.min(12,Math.floor(Number(item?.iconRow)||1)));
+ const col=Math.max(1,Math.min(10,Math.floor(Number(item?.iconCol)||1)));
+ return [rarity,row,col,String(item?.theme||''),resolve(item)].join(':');
+}
 function drawAtlasCell(){return false;}
 export function drawEquipmentGlyph(ctx,item,x,y,size=42){
  if(drawAtlasCell(ctx,item,x-size/2,y-size/2,size,size))return 'atlas';
