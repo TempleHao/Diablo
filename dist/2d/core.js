@@ -73,7 +73,7 @@ export function sanitizeSave(raw){
   const p=freshSave();
   if(!raw||typeof raw!=='object'||![1,2].includes(raw.version))return p;
   for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
-    const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
+    const n=Number(raw[k]);const cap=k==='level'?100:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
   p.materials=sanitizeMaterials(raw.materials);
@@ -127,8 +127,8 @@ export function stats(p){return calculateStats(p);}
 export function expRequired(level){return level*45+15;}
 export function gainXp(p,amount){
   p.xp+=Math.max(0,Math.floor(amount));let advanced=0;
-  while(p.level<60&&p.xp>=expRequired(p.level)){p.xp-=expRequired(p.level);p.level++;advanced++;p.skillPoints=(p.skillPoints||0)+1;}
-  if(p.level===60)p.xp=0;return advanced;
+  while(p.level<100&&p.xp>=expRequired(p.level)){p.xp-=expRequired(p.level);p.level++;advanced++;p.skillPoints=(p.skillPoints||0)+1;}
+  if(p.level===100)p.xp=0;return advanced;
 }
 export function createItem(rng,level,id){return makeLoot(rng,level,id);}
 export function equip(p,id,target=null){
