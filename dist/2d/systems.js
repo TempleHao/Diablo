@@ -1,4 +1,5 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
+import {CATALOG_QUALITY_NAMES,pickCatalogEntry} from './equipment-catalog.js';
 export const SLOTS = Object.freeze([
   ['head','头盔','⛑'],['shoulders','肩甲','♜'],['robe','胸甲','♟'],
   ['gloves','手套','♧'],['belt','腰带','▤'],['pants','腿甲','♙'],
@@ -7,7 +8,7 @@ export const SLOTS = Object.freeze([
 ]);
 export const SLOT_IDS=SLOTS.map(x=>x[0]);
 export const MAX_ITEMS=80;
-export const RARITIES=['普通','魔法','稀有','传奇','套装'];
+export const RARITIES=CATALOG_QUALITY_NAMES;
 export const BASES={
   head:['旧皮兜帽','夜行头冠','灰烬面罩','凋零战盔','圣痕面甲','寒铁王冠'],shoulders:['旅者披肩','铜棘护肩','监牢铁肩','守夜肩甲','风暴披肩','兽骨护肩'],
   robe:['行旅布袍','锁链法衣','刻印重甲','暗纹战袍','铁壁胸铠','秘银护胸'],gloves:['粗革手套','幽影指套','烬纹手甲','符咒护手','骑士护腕','蚀骨指套'],
@@ -77,11 +78,20 @@ export function normalizeItem(item) {
       affixes.push({key:entry.key,value:safeNum(entry.value,1000)});seen.add(entry.key);
     }
   }
-  const setId=rarity===4&&Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
+  // Legacy set gear is an orthogonal tag now; rarity 4 is reserved for 暗金遗珍.
+  const setId=Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
+  const catalogId=typeof item.catalogId==='string'&&/^EQ-[NMELU]-\d{3}$/.test(item.catalogId)?item.catalogId:null;
+  const prototypeId=typeof item.prototypeId==='string'&&/^B\d{3}$/.test(item.prototypeId)?item.prototypeId:null;
+  const text=(value,max=40)=>typeof value==='string'?value.slice(0,max):'';
   return {
-    id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,60),
+    id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,100),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
     armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
+    catalogId,prototypeId,subtype:text(item.subtype),preferredClass:text(item.preferredClass),
+    theme:text(item.theme,12),part:text(item.part,12),requiredLevel:safeNum(item.requiredLevel||item.ilvl||1,100),
+    hands:safeNum(item.hands,2),sockets:safeNum(item.sockets,4),mainStat:safeNum(item.mainStat,999),
+    iconRow:safeNum(item.iconRow,12),iconCol:safeNum(item.iconCol,10),catalogScore:safeNum(item.catalogScore,9999),
+    qualityColor:/^#[0-9A-Fa-f]{6}$/.test(item.qualityColor||'')?item.qualityColor:'',
     favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
@@ -91,33 +101,32 @@ export function getSlotForItem(item,target){
   return item.slot===target||target==null?item.slot:null;
 }
 export function makeLoot(rng,level,id,{boss=false}={}){
-  const n=Math.max(1,Math.min(60,level));
-  const roll=rng();
-  const rarity=boss&&roll<.10?4:roll<.035?3:roll<.20?2:roll<.56?1:0;
-  const setId=rarity===4?(rng()<.5?'dragonflame':'warden'):null;
-  const slot=setId?SETS[setId].slots[Math.floor(rng()*3)]:SLOT_IDS[Math.floor(rng()*SLOT_IDS.length)];
-  const base=BASES[slot];
-  const name=base[Math.floor(rng()*base.length)];
-  const affixMax=rarity===0?0:rarity===1?2:rarity===2?4:5;
-  const count=affixMax? Math.max(1,Math.min(affixMax,Math.floor(rng()*affixMax)+1)):0;
+  const n=Math.max(1,Math.min(100,Math.floor(level)||1));
+  const template=pickCatalogEntry(rng,n);
+  const {slot,rarity}=template;
   const choices=Object.keys(AFFIXES).filter(k=>AFFIXES[k].slots.includes(slot));
   const affixes=[];
-  for(let i=0;i<count&&choices.length;i++){
+  const count=Math.min(template.affixCount,choices.length);
+  for(let i=0;i<count;i++){
     const index=Math.floor(rng()*choices.length);
     const key=choices.splice(index,1)[0],rule=AFFIXES[key];
-    const scaling=1+Math.floor(n/7)*.23;
+    const scaling=1+Math.floor(template.requiredLevel/10)*.16+rarity*.08;
     affixes.push({key,value:Math.max(1,Math.round((rule.min+rng()*(rule.max-rule.min))*scaling))});
   }
-  const armorSlot=['head','shoulders','robe','gloves','belt','pants','boots','offhand'].includes(slot);
-  const weaponSlot=slot==='weapon';
-  return normalizeItem({
-    id,slot,rarity,ilvl:n,name:(setId?SETS[setId].name+' · ':rarity===3?'远古 · ':'')+name,
-    power:weaponSlot?Math.round((6+n*2.5)*(1+rarity*.27)):0,
-    hp:slot==='robe'?Math.round(10+n*2.6):0,
-    mana:slot==='offhand'?Math.round(10+n*1.4):0,
-    armor:armorSlot?Math.round((7+n*1.1)*(1+rarity*.19)):0,
-    value:10+n*5+rarity*22,affixes,setId
+  // Bosses still receive a separate exclusive table in boss-loot.js. The catalog
+  // roll itself follows the workbook's level-band probabilities for auditability.
+  const item=normalizeItem({
+    id,slot,rarity,ilvl:template.requiredLevel,name:template.name,
+    power:template.attack,hp:template.hp,mana:template.mana,armor:template.armor,
+    value:Math.max(10,Math.round(template.score*1.7)),affixes,
+    catalogId:template.catalogId,prototypeId:template.prototypeId,subtype:template.subtype,
+    preferredClass:template.preferredClass,theme:template.theme,part:template.part,
+    requiredLevel:template.requiredLevel,hands:template.hands,sockets:template.sockets,
+    mainStat:template.mainStat,iconRow:template.iconRow,iconCol:template.iconCol,
+    catalogScore:template.score,qualityColor:template.qualityColor
   });
+  if(!item)throw new Error('catalog item violated equipment rules');
+  return item;
 }
 export function emptyEquipment(){return Object.fromEntries(SLOT_IDS.map(s=>[s,null]));}
 export function equipmentBonus(profile) {
