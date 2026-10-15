@@ -294,6 +294,14 @@ function inspectItem(item){
   panel.append(preview,title,meta);
   if(item.preferredClass||item.theme){const origin=document.createElement('small');origin.className='catalog-meta';origin.textContent=(item.preferredClass?'偏好 '+item.preferredClass:'')+(item.theme?' · '+item.theme+'系':'');panel.append(origin);}
   if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
+  if(item.effectName){
+    const effect=document.createElement('section');effect.className='item-effect';
+    const effectTitle=document.createElement('strong');effectTitle.textContent='✦ '+item.effectName;
+    const effectText=document.createElement('p');effectText.textContent=item.effectDescription;
+    effect.append(effectTitle,effectText);
+    if(item.drawback){const drawback=document.createElement('p');drawback.className='item-drawback';drawback.textContent='代价 · '+item.drawback;effect.append(drawback);}
+    panel.append(effect);
+  }
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
