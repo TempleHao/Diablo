@@ -62,6 +62,8 @@ try{
     assert.equal(generatedArt.gear.mode,'procedural');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('#skin-select option').count(),5,'five selectable mage appearances must render');
+    const topbarFit=await page.locator('.topbar').evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
+    assert.ok(topbarFit.scroll<=topbarFit.client+2,'top controls overflow viewport: '+JSON.stringify(topbarFit));
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
     await page.selectOption('#skin-select','3');
     assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')))).characterSkin,3,'selected mage appearance did not persist');
