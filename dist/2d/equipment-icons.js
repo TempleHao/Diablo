@@ -2,6 +2,15 @@
 // Original Canvas vector art: no external sprites or third-party licensing.
 const rarityColors=['#B7B7B7','#3293FF','#AF5CFF','#FF8928','#D8AA53'];
 const colors={metal:'#bdc4c6',edge:'#364048',gold:'#b88743',leather:'#70503a',cloth:'#763e42',ember:'#f4a65c',gem:'#63c9e7'};
+const equipmentAtlas=typeof Image!=='undefined'?new Image():null;
+let atlasReady=false,atlasFailed=false;
+if(equipmentAtlas){
+ equipmentAtlas.decoding='async';
+ equipmentAtlas.onload=()=>{atlasReady=true;};
+ equipmentAtlas.onerror=()=>{atlasFailed=true;};
+ equipmentAtlas.src=new URL('./art/equipment-atlas.webp',import.meta.url).href;
+}
+export const equipmentAtlasStatus=()=>({ready:atlasReady,failed:atlasFailed});
 const path=(ctx,pts,close=true)=>{ctx.beginPath();ctx.moveTo(...pts[0]);for(const p of pts.slice(1))ctx.lineTo(...p);if(close)ctx.closePath();};
 const fill=(ctx,pts,color,stroke=colors.edge)=>{path(ctx,pts);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.stroke();}};
 const ellipse=(ctx,x,y,rx,ry,fillColor,stroke)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fillColor;ctx.fill();if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke();}};
@@ -54,6 +63,22 @@ function resolve(item){
 }
 const shapes={staff,sword,dagger,axe,hammer,spear,bow,crossbow,quiver,shield,book,helmet,shoulders,chest,gloves,belt,pants,boots,ring,amulet,relic};
 export function iconType(item){return resolve(item);}
+function drawAtlasCell(ctx,item,x,y,w,h){
+ if(!atlasReady||!equipmentAtlas||!Number.isInteger(item?.iconRow)||!Number.isInteger(item?.iconCol))return false;
+ const rarity=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
+ const row=Math.max(0,Math.min(11,item.iconRow-1)),col=Math.max(0,Math.min(9,item.iconCol-1));
+ const tierH=equipmentAtlas.naturalHeight/5,cellW=equipmentAtlas.naturalWidth/10,cellH=tierH/12;
+ ctx.save();ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(equipmentAtlas,col*cellW,rarity*tierH+row*cellH,cellW,cellH,x,y,w,h);
+ ctx.restore();return true;
+}
+export function drawEquipmentGlyph(ctx,item,x,y,size=42){
+ if(drawAtlasCell(ctx,item,x-size/2,y-size/2,size,size))return 'atlas';
+ ctx.save();ctx.translate(x-size/2,y-size/2);ctx.scale(size/48,size/48);
+ ctx.shadowColor=rarityColors[Math.max(0,Math.min(4,Math.floor(item?.rarity||0)))];ctx.shadowBlur=5;
+ shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
+ return resolve(item);
+}
 export function drawEquipmentIcon(canvas,item){
  const ctx=canvas.getContext('2d');canvas.width=48;canvas.height=48;
  const r=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
@@ -62,8 +87,11 @@ export function drawEquipmentIcon(canvas,item){
  ctx.fillStyle=grad;ctx.fillRect(0,0,48,48);
  ctx.strokeStyle=border;ctx.lineWidth=1.6;ctx.strokeRect(2,2,44,44);
  ctx.fillStyle=border+'22';ctx.fillRect(5,5,38,38);
- ctx.save();ctx.shadowColor=border;ctx.shadowBlur=r>=3?7:2;
- shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
+ const usedAtlas=drawAtlasCell(ctx,item,5,5,38,38);
+ if(!usedAtlas){
+  ctx.save();ctx.shadowColor=border;ctx.shadowBlur=r>=3?7:2;
+  shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
+ }
  ctx.strokeStyle='#ffffff20';ctx.strokeRect(6,6,36,36);
- return resolve(item);
+ return usedAtlas?'atlas':resolve(item);
 }
