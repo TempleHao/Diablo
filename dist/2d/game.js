@@ -270,7 +270,7 @@ $('salvage-bag').onclick=()=>{
   if(profile.autoSalvage<0){announce('请先选择自动分解品质范围',true);return;}
   const eligible=profile.inventory.filter(i=>i.rarity<=profile.autoSalvage&&!i.favorite&&!i.setId&&!Object.values(profile.equipped).includes(i.id));
   if(!eligible.length){announce('没有符合自动分解规则的物品',true);return;}
-  if(!confirm('确认分解 '+eligible.length+' 件低品质装备？已装备、已收藏、传奇与套装会保留。'))return;
+  if(!confirm('确认分解 '+eligible.length+' 件低品质装备？已装备、已收藏、传奇、暗金遗珍与套装标签装备会保留。'))return;
   const results=dismantleAll(profile);
   if(results.some(x=>x.item.id===selectedItemId))selectedItemId=null;
   persist();renderInventory();
