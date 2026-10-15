@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 技能与锻造预览 v0.3.3</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 远征循环预览 v0.3.4</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-town" type="button">营地</button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -105,8 +105,27 @@
     <div class="portal-actions">
       <button id="portal-next" type="button" class="primary">进入指定地图</button>
       <button id="portal-random" type="button">随机远征</button>
+      <button id="portal-town" type="button">返回余烬营地</button>
       <button id="portal-stay" type="button">继续探索本层</button>
     </div>
+  </section>
+</div>
+<div id="town-panel" class="panel-wrap town-wrap" hidden>
+  <section class="town-dialog" role="dialog" aria-modal="true" aria-labelledby="town-heading">
+    <span class="eyebrow">安全区域 · 远征中枢</span>
+    <h2 id="town-heading">余烬营地</h2>
+    <p>角色成长、背包装备与当前远征均已保存。你可以继续原地图，也可以重新开启当前区域的远征来刷新迷宫。</p>
+    <div class="town-summary">
+      <div><small>当前区域</small><strong id="town-region">—</strong></div>
+      <div><small>区域访问</small><strong id="town-visits">0</strong></div>
+      <div><small>待回收战利品</small><strong id="town-loot">0</strong></div>
+      <div><small>首领击杀</small><strong id="town-boss-kills">0</strong></div>
+    </div>
+    <div class="town-actions">
+      <button id="town-resume" type="button" class="primary">继续当前远征</button>
+      <button id="town-refarm" type="button">重新探索当前区域</button>
+    </div>
+    <small class="fineprint">重新探索会生成新的迷宫；该区域未拾取的持久 Boss 战利品会转移到新入口附近，不会被删除。</small>
   </section>
 </div>
 <script type="module" src="./game.js"></script>
