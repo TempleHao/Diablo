@@ -187,6 +187,32 @@ try{
     assert.equal(reloadedTravel.maze.bossDefeated,false);
     assert.deepEqual(reloadedTravel.profile.pendingLoot.map(x=>x.item.id).sort(),carriedLootIds,'carried pending loot vanished after destination reload');
     assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
+
+    // Manual town loop: resume must preserve the current expedition, while
+    // "refarm" starts a different maze without touching character progression.
+    await page.click('#btn-town');
+    assert.equal(await page.locator('#town-panel').isVisible(),true,'manual return to camp must open the camp state');
+    assert.equal(await page.locator('#town-region').innerText(),'遗弃监牢');
+    assert.equal(await page.locator('#town-loot').innerText(),String(carriedLootIds.length));
+    const townBefore=await page.evaluate(()=>({
+      profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')),
+      maze:window.__ember2dQA.mazeInfo()
+    }));
+    await page.click('#town-resume');
+    assert.equal(await page.locator('#town-panel').isVisible(),false);
+    assert.equal((await page.evaluate(()=>window.__ember2dQA.mazeInfo())).seed,townBefore.maze.seed,'camp resume rerolled current expedition');
+    await page.click('#btn-town');
+    await page.click('#town-refarm');
+    const townRefarm=await page.evaluate(()=>({
+      profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')),
+      maze:window.__ember2dQA.mazeInfo()
+    }));
+    assert.equal(townRefarm.profile.region,1);
+    assert.equal(townRefarm.profile.regionVisits[1],townBefore.profile.regionVisits[1]+1,'same-region refarm did not increment visit serial');
+    assert.notEqual(townRefarm.maze.seed,townBefore.maze.seed,'same-region refarm reused the old maze seed');
+    for(const key of ['level','xp','gold','essence','clears'])assert.equal(townRefarm.profile[key],townBefore.profile[key],'camp refarm changed character progression: '+key);
+    assert.deepEqual(townRefarm.profile.pendingLoot.map(x=>x.item.id).sort(),carriedLootIds,'camp refarm deleted pending loot');
+
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
     await page.waitForTimeout(230);
