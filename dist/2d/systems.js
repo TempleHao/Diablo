@@ -1,5 +1,5 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
-import {CATALOG_QUALITY_NAMES,pickCatalogEntry} from './equipment-catalog.js';
+import {CATALOG_QUALITY_NAMES,pickCatalogEntry,catalogEntryById} from './equipment-catalog.js';
 import {highTierEffectFor} from './equipment-effects.js';
 export const SLOTS = Object.freeze([
   ['head','头盔','⛑'],['shoulders','肩甲','♜'],['robe','胸甲','♟'],
@@ -81,19 +81,23 @@ export function normalizeItem(item) {
   }
   // Legacy set gear is an orthogonal tag now; rarity 4 is reserved for 暗金遗珍.
   const setId=Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
-  const catalogId=typeof item.catalogId==='string'&&/^EQ-[NMELU]-\d{3}$/.test(item.catalogId)?item.catalogId:null;
-  const prototypeId=typeof item.prototypeId==='string'&&/^B\d{3}$/.test(item.prototypeId)?item.prototypeId:null;
+  const candidate=typeof item.catalogId==='string'?catalogEntryById(item.catalogId):null;
+  const template=candidate&&candidate.rarity===rarity&&candidate.slot===item.slot&&candidate.name===item.name?candidate:null;
+  const catalogId=template?.catalogId||null,prototypeId=template?.prototypeId||
+    (typeof item.prototypeId==='string'&&/^B\d{3}$/.test(item.prototypeId)?item.prototypeId:null);
   const authoredEffect=catalogId?highTierEffectFor(catalogId):null;
   const text=(value,max=40)=>typeof value==='string'?value.slice(0,max):'';
   return {
-    id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,100),
+    id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(template?.requiredLevel||item.ilvl||1,100),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
     armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
-    catalogId,prototypeId,subtype:text(item.subtype),preferredClass:text(item.preferredClass),
-    theme:text(item.theme,12),part:text(item.part,12),requiredLevel:safeNum(item.requiredLevel||item.ilvl||1,100),
-    hands:safeNum(item.hands,2),sockets:safeNum(item.sockets,4),mainStat:safeNum(item.mainStat,999),
-    iconRow:safeNum(item.iconRow,12),iconCol:safeNum(item.iconCol,10),catalogScore:safeNum(item.catalogScore,9999),
-    qualityColor:/^#[0-9A-Fa-f]{6}$/.test(item.qualityColor||'')?item.qualityColor:'',
+    catalogId,prototypeId,subtype:template?.subtype||text(item.subtype),preferredClass:template?.preferredClass||text(item.preferredClass),
+    theme:template?.theme||text(item.theme,12),part:template?.part||text(item.part,12),
+    requiredLevel:safeNum(template?.requiredLevel||item.requiredLevel||item.ilvl||1,100),
+    hands:safeNum(template?.hands??item.hands,2),sockets:safeNum(template?.sockets??item.sockets,4),
+    mainStat:safeNum(template?.mainStat??item.mainStat,999),iconRow:safeNum(template?.iconRow??item.iconRow,12),
+    iconCol:safeNum(template?.iconCol??item.iconCol,10),catalogScore:safeNum(template?.score??item.catalogScore,9999),
+    qualityColor:template?.qualityColor||(/^#[0-9A-Fa-f]{6}$/.test(item.qualityColor||'')?item.qualityColor:''),
     effectName:authoredEffect?.name||'',effectDescription:authoredEffect?.description||'',drawback:authoredEffect?.drawback||'',
     favorite:item.favorite===true,tempered:item.tempered===true
   };
