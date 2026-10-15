@@ -72,6 +72,22 @@
         {
           "kind": "test-run",
           "ref": "https://github.com/TempleHao/Diablo/actions/runs/38387621782"
+        },
+        {
+          "kind": "commit",
+          "ref": "02ca79cba74d256df71bf54252ce60892df2d51b"
+        },
+        {
+          "kind": "commit",
+          "ref": "adbc3eeecfcdd7a2f2d384e63719ea8377f74546"
+        },
+        {
+          "kind": "commit",
+          "ref": "3b8267f060e4503ce2573b2bf56de8bf2255ed39"
+        },
+        {
+          "kind": "commit",
+          "ref": "d52600694932bcd13290b622587a3b8c78806637"
         }
       ]
     },
@@ -88,7 +104,32 @@
       "gateIds": [
         "G05"
       ],
-      "evidence": []
+      "evidence": [
+        {
+          "kind": "commit",
+          "ref": "2c1b046a363982f2a0ef3aa7cd2f3be111e6e28d"
+        },
+        {
+          "kind": "commit",
+          "ref": "55904267c6821642dc861f3119c8d92d42b3a02a"
+        },
+        {
+          "kind": "commit",
+          "ref": "d9a43be8e5a6a8cc97b18dc283796607a3c61240"
+        },
+        {
+          "kind": "commit",
+          "ref": "a1b74d3d7c048abfe86248e9c2e7a993263388a9"
+        },
+        {
+          "kind": "commit",
+          "ref": "dc1d80e3052add784f15bd98e9b1d06901812d1d"
+        },
+        {
+          "kind": "commit",
+          "ref": "51cb16cb3b20e969408383ad8ebf8bb9fc24ec3a"
+        }
+      ]
     },
     "F5": {
       "status": "pending",
@@ -209,7 +250,7 @@
       "id": "P1-002",
       "severity": "P1",
       "status": "open",
-      "description": "Boss现有首杀专属传奇/区域掉落且击杀后不会自动重置，但缺少城镇/下一层/传送与跨刷新掉落持久化完整流程，仍禁止最终发布"
+      "description": "Boss→传送→下一区域→刷新恢复→营地继续/同区重开已在 Draft 分支实现并有规则/浏览器回归源码；仍待 Actions/真实 Chromium 结果后才可关闭。"
     },
     {
       "id": "P1-003",
@@ -239,13 +280,19 @@
       "id": "P1-007",
       "severity": "P1",
       "status": "open",
-      "description": "F2 reload persistence source and browser regression committed on independent branch 2026-10-15; still open until CI and real Chromium PC/mobile evidence verify Boss/loot/seed restoration."
+      "description": "F2 跨刷新 Boss 战利品坐标、目标区域 seed、角色进度、营地恢复/重开回归均已提交；仍待 CI 和真实 Chromium PC/mobile 证据验证。"
     },
     {
       "id": "P1-008",
       "severity": "P1",
       "status": "open",
       "description": "Original CC0 masonry floors and raised walls are now rendered in playable maze; actual desktop/mobile screenshots committed. Still not A-direction realistic 2.5D and lacks unified character/monster art; keep P1 open."
+    },
+    {
+      "id": "P1-009",
+      "severity": "P1",
+      "status": "open",
+      "description": "500件正式装备数据、五品质、等级概率、200高阶特效与暗金代价已接入；正式五张图鉴二进制素材尚未写入仓库，当前使用已纠正武器类型的 Canvas 过渡图标。"
     }
   ],
   "deltaTop3": [
@@ -253,28 +300,30 @@
     "角色仍是粉紫色卡通/过渡图，怪物与 Boss 缺少同一世界观的多方向写实动作",
     "手机 Boss 战角色/文字/按钮密集，主城野外与可见换装依然不足"
   ],
-  "nextAction": "Inspect GitHub Actions results for 2f974031 / f969f7de / fb2d5d4a, fix failures and run audit-2d-final.mjs; capture fresh Chromium PC/mobile reload and Boss loot screenshots. Resolve PR #6 drift from main v0.3.6 without merging unverified code or altering 3D.",
+  "nextAction": "Obtain executable CI/Chromium evidence for F2/F4, then wire the five authored equipment atlas images and the uploaded six-pose blue-robed mage sprite into the playable build; keep PR #6 Draft and leave main/3D untouched.",
   "lastAttempt": {
     "at": "2026-10-15",
-    "phase": "F2",
-    "status": "runtime-persistence-and-regressions-committed-validation-pending",
+    "phase": "F2/F4",
+    "status": "expedition-loop-and-500-item-catalog-implemented-validation-pending",
     "verified": {
-      "commits": [
-        "394323404c8aa198f1f0d8c6b13d4081d5787e66",
-        "2f9740318b2c1deaf1c366dc3039a06800fddb36",
-        "74d1df2ce76dd5a9b906bc352f81f28cd92075fa",
-        "f969f7de9024210b262c96f631ca667d9a129da3",
-        "fb2d5d4afe6c93922021923bdbe7e96c05efeb35"
+      "branch": "feature/2d-maze-topology-f1",
+      "sourceCommits": [
+        "d52600694932bcd13290b622587a3b8c78806637",
+        "2c1b046a363982f2a0ef3aa7cd2f3be111e6e28d",
+        "d9a43be8e5a6a8cc97b18dc283796607a3c61240",
+        "a1b74d3d7c048abfe86248e9c2e7a993263388a9",
+        "2c83034c6402c193f2b0074eacb63844ea276671"
       ],
-      "branch": "feature/2d-maze-topology-f1"
+      "catalog": "500 authored items / 5 qualities / level 1-100 / 200 high-tier effects"
     },
     "unverified": [
-      "GitHub Actions CI conclusion (commit workflow-run lookup returned no results)",
-      "actual Node/Chromium execution in this environment",
-      "new real-game PC/mobile screenshots",
-      "full F2 persistence gate and main v0.3.6 compatibility"
+      "GitHub Actions conclusion for the newest commits (workflow-run lookup has returned no runs)",
+      "actual Node/Chromium execution for the newest F2/F4 changes",
+      "fresh PC/mobile screenshots of camp, catalog loot, legendary/unique detail panels",
+      "binary authored equipment atlas integration",
+      "uploaded six-pose mage sprite integration"
     ],
-    "caveat": "Source, Chromium regression and pure-rule tests are committed but passing tests and final art are not claimed. Existing PR #6 stays Draft; no main/3D changes."
+    "caveat": "Implementation evidence is source-level only for the newest changes. No CI pass, visual acceptance, merge, release, or 3D modification is claimed."
   },
   "candidate": {
     "status": "none",
