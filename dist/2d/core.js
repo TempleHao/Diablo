@@ -67,7 +67,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),worldStates:Array(REGION_DATA.length).fill(null),materials:freshMaterials(),autoSalvage:-1,activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,characterSkin:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),worldStates:Array(REGION_DATA.length).fill(null),materials:freshMaterials(),autoSalvage:-1,activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -76,6 +76,7 @@ export function sanitizeSave(raw){
     const n=Number(raw[k]);const cap=k==='level'?100:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
+  p.characterSkin=Number.isInteger(raw.characterSkin)?clamp(raw.characterSkin,0,4):0;
   p.materials=sanitizeMaterials(raw.materials);
   // An immutable expedition seed must survive Boss clears and page reloads.
   // Old v1/v2 saves migrate to an empty per-region expedition map.
