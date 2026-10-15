@@ -155,8 +155,8 @@ function frameFor(kind,walking,elapsed){
 function shadow(ctx,x,y,rx,ry,alpha=.65){
   ctx.fillStyle='rgba(0,0,0,'+alpha+')';ctx.beginPath();ctx.ellipse(x,y+2,rx,ry,0,0,Math.PI*2);ctx.fill();
 }
-export function hero(ctx,p,tick,gear){
-  if(!drawMageSprite(ctx,p,tick))drawMage(ctx,p,tick,gear);
+export function hero(ctx,p,tick,gear,skin=0){
+  if(!drawMageSprite(ctx,p,tick,skin))drawMage(ctx,p,tick,gear);
   ctx.strokeStyle='#e6bc645c';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(p.x,p.y+9,28,11,0,0,Math.PI*2);ctx.stroke();
 }
 let prevHeroWalk=0;
