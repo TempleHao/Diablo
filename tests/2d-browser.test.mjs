@@ -51,7 +51,10 @@ try{
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
+    assert.equal(await page.locator('#skin-select option').count(),5,'five selectable mage appearances must render');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
+    await page.selectOption('#skin-select','3');
+    assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')))).characterSkin,3,'selected mage appearance did not persist');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
@@ -92,6 +95,8 @@ try{
     assert.equal(postRefresh.maze.portalReady,true,'cleared Boss portal not restored');
     assert.ok(postRefresh.maze.explored>=preRefresh.explored,'explored rooms disappeared');
     assert.equal(postRefresh.profile.bossKills[0],1);
+    assert.equal(postRefresh.profile.characterSkin,3,'mage appearance was lost on reload');
+    assert.equal(await page.inputValue('#skin-select'),'3');
     assert.equal(postRefresh.profile.pendingLoot.length,firstBoss.pending,'unclaimed Boss loot lost on reload');
     const restoredDrops=postRefresh.profile.pendingLoot.map(d=>({id:d.item.id,x:d.x,y:d.y})).sort((a,b)=>a.id.localeCompare(b.id));
     const originalDrops=firstBoss.drops.map(d=>({id:d.id,x:d.x,y:d.y})).sort((a,b)=>a.id.localeCompare(b.id));
