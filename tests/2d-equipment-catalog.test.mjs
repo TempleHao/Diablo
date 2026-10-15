@@ -7,7 +7,7 @@ import {
 import {SLOT_IDS,makeLoot,normalizeItem,calculateStats} from '../dist/2d/systems.js';
 import {HIGH_TIER_EFFECTS,highTierEffectFor} from '../dist/2d/equipment-effects.js';
 import {iconType} from '../dist/2d/equipment-icons.js';
-import {baseEffectName,effectNumbers,equippedEffectItems,strongestEffect,effectPercent,isRuntimeEffectSupported} from '../dist/2d/equipment-effect-runtime.js';
+import {LIVE_EFFECTS,baseEffectName,effectNumbers,equippedEffectItems,strongestEffect,effectPercent,isRuntimeEffectSupported} from '../dist/2d/equipment-effect-runtime.js';
 import {mulberry32} from '../dist/2d/core.js';
 
 test('Black-Iron catalog contains exactly 500 uniquely identified items',()=>{
@@ -137,4 +137,24 @@ test('effect runtime reads equipped authored effects without double-counting two
   const dataOnly=make(62,'shoulder');
   p.inventory.push(dataOnly);p.equipped.shoulders='shoulder';
   assert.equal(isRuntimeEffectSupported(dataOnly),false);
+});
+
+
+test('second-wave live relics expose the exact authored percentages used by combat',()=>{
+  assert.equal(LIVE_EFFECTS.length,20);
+  for(const name of ['灰烬回护','重甲残响','残月守誓','断气续命','战备深囊','疾影踏火','魔焰联结','猎首预兆','幽瞳觉醒'])
+    assert.ok(LIVE_EFFECTS.includes(name),name+' should be live');
+
+  const make=(index,id)=>{
+    const t=catalogEntry(3,index);
+    return normalizeItem({id,catalogId:t.catalogId,slot:t.slot,name:t.name,rarity:t.rarity,ilvl:t.requiredLevel,power:t.attack,hp:t.hp,mana:t.mana,armor:t.armor,value:t.score,affixes:[]});
+  };
+  const lastBreath=make(82,'last-breath'); // EQ-L-083
+  const oath=make(90,'oath'); // EQ-L-091
+  assert.equal(baseEffectName(lastBreath),'断气续命');
+  assert.deepEqual(effectNumbers(lastBreath),[25,38]);
+  assert.equal(baseEffectName(oath),'残月守誓');
+  assert.deepEqual(effectNumbers(oath),[40,38]);
+  assert.equal(isRuntimeEffectSupported(lastBreath),true);
+  assert.equal(isRuntimeEffectSupported(oath),true);
 });
