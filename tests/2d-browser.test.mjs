@@ -158,9 +158,34 @@ try{
       console.log((viewport.isMobile?'PORTAL_MOBILE_BASE64:':'PORTAL_DESKTOP_BASE64:')+portalImage.toString('base64'));
     }
     assert.equal(await page.locator('#portal-destination option').count(),9);
+    const beforeTravel=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')));
+    const carriedLootIds=beforeTravel.pendingLoot.map(x=>x.item.id).sort();
     await page.selectOption('#portal-destination','1');
     await page.click('#portal-next');
     assert.equal(await page.locator('#portal-panel').isVisible(),false);
+    assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
+    const afterTravel=await page.evaluate(()=>({
+      profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')),
+      maze:window.__ember2dQA.mazeInfo()
+    }));
+    assert.equal(afterTravel.profile.region,1,'portal travel must persist destination region');
+    assert.equal(afterTravel.profile.worldStates[0].bossDefeated,true,'source Boss-clear history was erased');
+    assert.equal(afterTravel.profile.worldStates[1].bossDefeated,false,'destination must begin as a fresh expedition');
+    assert.equal(afterTravel.profile.regionVisits[1],1);
+    assert.deepEqual(afterTravel.profile.pendingLoot.map(x=>x.item.id).sort(),carriedLootIds,'unclaimed Boss loot vanished during travel');
+    for(const key of ['level','xp','gold','essence','clears'])assert.equal(afterTravel.profile[key],beforeTravel[key],'character progression changed during travel: '+key);
+    const destinationSeed=afterTravel.maze.seed;
+    await page.reload({waitUntil:'load'});
+    await page.click('#modal-primary');
+    await page.waitForTimeout(150);
+    const reloadedTravel=await page.evaluate(()=>({
+      profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')),
+      maze:window.__ember2dQA.mazeInfo()
+    }));
+    assert.equal(reloadedTravel.profile.region,1,'destination region did not survive reload');
+    assert.equal(reloadedTravel.maze.seed,destinationSeed,'destination expedition rerolled on reload');
+    assert.equal(reloadedTravel.maze.bossDefeated,false);
+    assert.deepEqual(reloadedTravel.profile.pendingLoot.map(x=>x.item.id).sort(),carriedLootIds,'carried pending loot vanished after destination reload');
     assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
