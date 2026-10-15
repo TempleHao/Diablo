@@ -23,6 +23,7 @@ jobs:
           node --check dist/2d/boss-loot.js
           node --check dist/2d/equipment-icons.js
           node --check dist/2d/equipment-catalog.js
+          node --check dist/2d/equipment-effects.js
           node --check dist/2d/equipment-catalog-N.js
           node --check dist/2d/equipment-catalog-M.js
           node --check dist/2d/equipment-catalog-E.js
