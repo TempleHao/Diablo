@@ -3,7 +3,7 @@
  * Keeps text parsing deterministic so gameplay and UI read the same workbook-authored values.
  */
 const BASE_PREFIX='古王·';
-export const LIVE_EFFECTS=Object.freeze(['裂魂猛袭','裂界余响','破绽追猎','魔痕收割','秘文回响','灵魂冕冠','回魂指环','快刃残影','奥术缚指','血路行者','王权共鸣']);
+export const LIVE_EFFECTS=Object.freeze(['裂魂猛袭','裂界余响','破绽追猎','魔痕收割','秘文回响','灵魂冕冠','回魂指环','快刃残影','奥术缚指','血路行者','王权共鸣','灰烬回护','重甲残响','残月守誓','断气续命','战备深囊','疾影踏火','魔焰联结','猎首预兆','幽瞳觉醒']);
 export function baseEffectName(item){return String(item?.effectName||'').replace(BASE_PREFIX,'');}
 export function effectNumbers(item){
   return [...String(item?.effectDescription||'').matchAll(/(\d+(?:\.\d+)?)%/g)].map(m=>Number(m[1]));
