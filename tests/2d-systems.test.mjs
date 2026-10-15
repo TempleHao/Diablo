@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes} from '../dist/2d/systems.js';
 import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats,upgradeSkill} from '../dist/2d/core.js';
+import {recoverPendingLoot,startDestinationExpedition} from '../dist/2d/travel.js';
 const i=(id,slot,affixes=[],setId=null)=>normalizeItem({id,slot,name:'测试装备',rarity:setId?4:2,ilvl:12,power:0,hp:0,mana:0,armor:0,affixes,setId});
 test('full paper doll includes 13 separate body and accessory slots',()=>{
   assert.equal(SLOTS.length,13);
@@ -81,4 +82,35 @@ test('skill upgrade respects rank cap, unlock and available points',()=>{
   const q=sanitizeSave({version:2,level:60,skillRanks:{fire:999,meteor:999,blink:999},inventory:[]});
   assert.equal(q.skillRanks.fire,8);assert.equal(q.skillRanks.meteor,8);
   assert.ok(q.skillPoints>=0);
+});
+
+
+test('camp recovery turns persisted boss drops into real bag items without deleting overflow',()=>{
+  const p=freshSave();
+  const a=i('boss-a','weapon',[{key:'power',value:10}]);
+  const b=i('boss-b','head',[{key:'hp',value:8}]);
+  p.pendingLoot=[{item:a,region:0,x:100,y:120},{item:b,region:1,x:200,y:220}];
+  const first=recoverPendingLoot(p);
+  assert.deepEqual(first,{recovered:2,remaining:0});
+  assert.deepEqual(p.inventory.map(x=>x.id).sort(),['boss-a','boss-b']);
+  assert.equal(p.pendingLoot.length,0);
+
+  const full=freshSave();
+  full.inventory=Array.from({length:MAX_ITEMS},(_,n)=>i('bag-'+n,'head'));
+  full.pendingLoot=[{item:i('kept-boss','weapon',[{key:'power',value:12}]),region:0,x:9,y:9}];
+  const blocked=recoverPendingLoot(full);
+  assert.deepEqual(blocked,{recovered:0,remaining:1});
+  assert.equal(full.pendingLoot[0].item.id,'kept-boss');
+});
+test('starting a destination expedition preserves loot identity and only clears obsolete destination coordinates',()=>{
+  const p=freshSave();
+  p.pendingLoot=[
+    {item:i('source-loot','weapon'),region:0,x:11,y:22},
+    {item:i('destination-loot','head'),region:1,x:33,y:44}
+  ];
+  const moved=startDestinationExpedition(p,1);
+  assert.deepEqual(moved,{from:0,to:1,visit:1});
+  assert.equal(p.pendingLoot[0].x,11);
+  assert.equal(Object.hasOwn(p.pendingLoot[1],'x'),false);
+  assert.equal(p.pendingLoot[1].item.id,'destination-loot');
 });
