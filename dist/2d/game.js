@@ -6,6 +6,7 @@ import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from './w
 import {destinationOptions,pickRandomDestination,validateDestination,startDestinationExpedition} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
+import {strongestEffect,effectPercent,hasEffect} from './equipment-effect-runtime.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -23,6 +24,8 @@ const enemyWaves=(region)=> {
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
 let currentRoom=null,enteredRooms=new Set(),expedition=null;
+const newEffectState=()=>({skillCasts:0,manaSpent:0,nextAttackBonus:0,eliteBuffPct:0,eliteBuffUntil:0,bloodStacks:0,bloodUntil:0,spiritCrownReady:0});
+let effectState=newEffectState();
 const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#B7B7B7','#3293FF','#AF5CFF','#FF8928','#D8AA53'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
@@ -170,7 +173,7 @@ function build() {
   restoreWorldExploration(dungeon,expedition);
   const s=stats(profile);
   hero={x:dungeon.start.x,y:dungeon.start.y,radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;effectState=newEffectState();
   armorUntil=0;wardHp=0;combo=0;bossDefeated=expedition.bossDefeated;
   portal=bossDefeated?roomCenter(dungeon,dungeon.layout.boss):null;
   currentRoom=null;enteredRooms=new Set(expedition.enteredRooms);
