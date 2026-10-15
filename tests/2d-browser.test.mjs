@@ -16,7 +16,7 @@ try{
   await sleep(750);
   for(const viewport of [{width:1365,height:768,isMobile:false},{width:390,height:844,isMobile:true,hasTouch:true}]){
     const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},isMobile:viewport.isMobile,hasTouch:!!viewport.hasTouch,deviceScaleFactor:1});
-    const page=await context.newPage(),errs=[];
+    const page=await context.newPage(),errs=[],failedRequests=[];
     // Dedicated visual regression character: no fixture is shipped in the game itself.
     await page.addInitScript(()=>{
       const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
@@ -39,6 +39,7 @@ try{
       }));
     });
     page.on('pageerror',e=>errs.push(e.message));
+    page.on('requestfailed',req=>failedRequests.push(req.url()));
     const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
@@ -50,6 +51,15 @@ try{
       return art.artStatus();
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
+    const generatedArt=await page.evaluate(async()=>{
+      const mage=await import('./mage-sprite.js');
+      const gear=await import('./equipment-icons.js');
+      return {mage:mage.mageSpriteStatus(),gear:gear.equipmentAtlasStatus()};
+    });
+    assert.equal(generatedArt.mage.ready,true,'procedural mage renderer unavailable');
+    assert.equal(generatedArt.gear.ready,true,'procedural equipment renderer unavailable');
+    assert.equal(generatedArt.mage.mode,'procedural');
+    assert.equal(generatedArt.gear.mode,'procedural');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('#skin-select option').count(),5,'five selectable mage appearances must render');
     assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
@@ -238,6 +248,7 @@ try{
       console.log((viewport.isMobile?'GAME_MOBILE_SCREENSHOT_BASE64:':'GAME_SCREENSHOT_BASE64:')+screenshot.toString('base64'));
     }
     assert.deepEqual(errs,[],'page JS exceptions');
+    assert.deepEqual(failedRequests,[],'2D runtime requested missing assets');
     console.log('Smoke passed', viewport.width+'x'+viewport.height);
     await context.close();
   }
