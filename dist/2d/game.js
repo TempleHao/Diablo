@@ -3,7 +3,7 @@ import {createMazeWorld,roomAt,roomCenter,enterRoom,drawMazeWalls,drawExploratio
 import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from './world-progress.js';
-import {destinationOptions,pickRandomDestination,validateDestination,startDestinationExpedition} from './travel.js';
+import {destinationOptions,pickRandomDestination,validateDestination,startDestinationExpedition,recoverPendingLoot} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 import {strongestEffect,effectPercent,isRuntimeEffectSupported} from './equipment-effect-runtime.js';
@@ -115,6 +115,14 @@ $('btn-town').onclick=enterTown;
 $('portal-town').onclick=enterTown;
 $('town-resume').onclick=resumeFromTown;
 $('town-refarm').onclick=refarmFromTown;
+$('town-recover').onclick=()=>{
+  if($('town-panel').hidden)return;
+  const result=recoverPendingLoot(profile);
+  persist();updateTownSummary();
+  if(result.recovered)announce('营地回收 · '+result.recovered+' 件 Boss 战利品已收入背包'+(result.remaining?' · 仍有 '+result.remaining+' 件等待空间':'') ,true);
+  else if(result.remaining)announce('背包已满 · '+result.remaining+' 件 Boss 战利品仍安全保留',true);
+  else announce('当前没有待回收的 Boss 战利品',true);
+};
 $('portal-panel').addEventListener('pointerdown',e=>{if(e.target===$('portal-panel'))closePortalMenu();});
 
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
