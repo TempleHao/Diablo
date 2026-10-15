@@ -44,7 +44,7 @@
 .skill-catalog{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px}
 .catalog-skill{font-size:10px;line-height:1.6;background:#111923;text-align:left;border:1px solid #7d603f62;padding:9px;color:#d4c3a8}
 .catalog-skill.unavailable{opacity:.5}
-.rarity-0{color:#d0d0d0!important}.rarity-1{color:#81bde7!important}.rarity-2{color:#eac66d!important}.rarity-3{color:#f6a06d!important}.rarity-4{color:#7ed397!important}
+.rarity-0{color:#B7B7B7!important}.rarity-1{color:#3293FF!important}.rarity-2{color:#AF5CFF!important}.rarity-3{color:#FF8928!important}.rarity-4{color:#D8AA53!important}.catalog-meta{display:block;margin-top:4px;color:#948a78;font-size:10px;letter-spacing:.4px}
 @media(max-width:1100px){.character-stats{grid-template-columns:repeat(4,minmax(0,1fr))}.inventory-items{grid-template-columns:repeat(2,minmax(0,1fr))}.hud{gap:15px}.abilitybar button{width:55px;height:66px}.abilitybar .ability-icon{font-size:23px!important}}
 @media(max-width:760px){
  .region-picker{font-size:0}.region-picker select{max-width:85px;font-size:10px;padding:7px 2px}
