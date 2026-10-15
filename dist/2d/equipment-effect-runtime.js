@@ -3,6 +3,7 @@
  * Keeps text parsing deterministic so gameplay and UI read the same workbook-authored values.
  */
 const BASE_PREFIX='古王·';
+export const LIVE_EFFECTS=Object.freeze(['裂魂猛袭','裂界余响','破绽追猎','魔痕收割','秘文回响','灵魂冕冠','回魂指环','快刃残影','奥术缚指','血路行者','王权共鸣']);
 export function baseEffectName(item){return String(item?.effectName||'').replace(BASE_PREFIX,'');}
 export function effectNumbers(item){
   return [...String(item?.effectDescription||'').matchAll(/(\d+(?:\.\d+)?)%/g)].map(m=>Number(m[1]));
@@ -26,3 +27,5 @@ export function effectPercent(profile,name,index=0){
   return strongestEffect(profile,name)?.numbers?.[index]||0;
 }
 export function hasEffect(profile,name){return !!strongestEffect(profile,name);}
+
+export function isRuntimeEffectSupported(item){return LIVE_EFFECTS.includes(baseEffectName(item));}
