@@ -675,7 +675,17 @@ function cast(skill){
     floatText(hero.x,hero.y-52,'奥术缚指','#b9a4ff');
   }
   const secretEcho=effectState.skillCasts%4===0?effectPercent(profile,'秘文回响'):0;
-  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(skill==='heal'?bonus.potionCooldown/100:1);
+  const link=effectPercent(profile,'魔焰联结');
+  if(link&&['fire','cold'].includes(rule.school)){
+    if(effectState.lastElement&&effectState.lastElement!==rule.school){
+      effectState.nextAttackBonus=Math.max(effectState.nextAttackBonus,link);
+      floatText(hero.x,hero.y-52,'魔焰联结','#ffb885');
+    }
+    effectState.lastElement=rule.school;
+  }
+  const relicHaste=effectState.critHasteUntil>tick?effectState.critHastePct:0;
+  const effectiveHaste=Math.min(120,bonus.haste+relicHaste);
+  cooldowns[skill]=rule.cooldown*(1-effectiveHaste/140)*(1-Math.min(.16,rank*.02))*(skill==='heal'?bonus.potionCooldown/100:1);
   hero.cast=.3;
   const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
     Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
@@ -701,18 +711,33 @@ function cast(skill){
   if(skill==='blink'){
     const v=movementVector(),mag=Math.hypot(v.x,v.y);
     const bx=mag>.05?v.x/mag:dx,by=mag>.05?v.y/mag:dy;
+    const startX=hero.x,startY=hero.y;
     hero.invuln=.4;puff(hero.x,hero.y,'#aa97ec',21,4,170);
     for(let t=0;t<18;t++)moveWithCollision(hero,bx*(950+rank*85),by*(950+rank*85),1/60,dungeon,hero.radius);
     puff(hero.x,hero.y,'#c8b1fe',21,4,170);
+    const trail=effectPercent(profile,'疾影踏火');
+    if(trail){
+      for(let n=1;n<=4;n++){
+        const p={x:startX+(hero.x-startX)*n/4,y:startY+(hero.y-startY)*n/4};
+        if(walkable(p.x,p.y,10,dungeon))hazards.push({x:p.x,y:p.y,r:38,max:38,life:2.8,type:'dashTrail',effectPct:trail/4,hitIds:new Set()});
+      }
+      announce('疾影踏火 · 闪现轨迹已点燃',true);
+    }
     const quickBlade=effectPercent(profile,'快刃残影');
     if(quickBlade){effectState.nextAttackBonus=Math.max(effectState.nextAttackBonus,quickBlade);floatText(hero.x,hero.y-45,'快刃残影','#cdb8ff');}
   }
   if(skill==='heal'){
     hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');
+    const deepBag=effectPercent(profile,'战备深囊');
+    if(deepBag&&tick>=effectState.deepBagReady){
+      const before=hero.hp;hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*deepBag/100);
+      effectState.deepBagReady=tick+15;
+      const gained=Math.max(0,hero.hp-before);if(gained)floatText(hero.x,hero.y-49,'战备深囊 +'+Math.round(gained),'#d7ef9d');
+    }
     const crown=effectPercent(profile,'灵魂冕冠');
     if(crown&&tick>=effectState.spiritCrownReady){
       const restored=hero.maxMana*crown/100;hero.mana=Math.min(hero.maxMana,hero.mana+restored);
-      effectState.spiritCrownReady=tick+12;floatText(hero.x,hero.y-48,'灵魂冕冠 +'+Math.round(restored)+' 法力','#a9d8ff');
+      effectState.spiritCrownReady=tick+12;floatText(hero.x,hero.y-62,'灵魂冕冠 +'+Math.round(restored)+' 法力','#a9d8ff');
     }
   }
   if(skill==='chain'){
