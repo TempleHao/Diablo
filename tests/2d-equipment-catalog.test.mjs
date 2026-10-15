@@ -7,6 +7,7 @@ import {
 import {SLOT_IDS,makeLoot,normalizeItem,calculateStats} from '../dist/2d/systems.js';
 import {HIGH_TIER_EFFECTS,highTierEffectFor} from '../dist/2d/equipment-effects.js';
 import {iconType} from '../dist/2d/equipment-icons.js';
+import {baseEffectName,effectNumbers,equippedEffectItems,strongestEffect,effectPercent,isRuntimeEffectSupported} from '../dist/2d/equipment-effect-runtime.js';
 import {mulberry32} from '../dist/2d/core.js';
 
 test('Black-Iron catalog contains exactly 500 uniquely identified items',()=>{
@@ -116,4 +117,24 @@ test('fallback equipment renderer follows catalog weapon subtype instead of draw
     [catalogEntry(0,0),'sword'],[catalogEntry(0,30),'staff']
   ];
   for(const [item,type] of examples)assert.equal(iconType(item),type,item.catalogId);
+});
+
+
+test('effect runtime reads equipped authored effects without double-counting two-slot references',()=>{
+  const p={level:100,inventory:[],equipped:Object.fromEntries(SLOT_IDS.map(s=>[s,null]))};
+  const make=(index,id)=>{
+    const t=catalogEntry(4,index);
+    return normalizeItem({id,catalogId:t.catalogId,slot:t.slot,name:t.name,rarity:t.rarity,ilvl:t.requiredLevel,power:t.attack,hp:t.hp,mana:t.mana,armor:t.armor,value:t.score,affixes:[]});
+  };
+  const echo=make(99,'echo');
+  p.inventory.push(echo);p.equipped.offhand='echo';
+  assert.equal(baseEffectName(echo),'秘文回响');
+  assert.deepEqual(effectNumbers(echo),[42]);
+  assert.equal(equippedEffectItems(p).length,1);
+  assert.equal(strongestEffect(p,'秘文回响').item.id,'echo');
+  assert.equal(effectPercent(p,'秘文回响'),42);
+  assert.equal(isRuntimeEffectSupported(echo),true);
+  const dataOnly=make(62,'shoulder');
+  p.inventory.push(dataOnly);p.equipped.shoulders='shoulder';
+  assert.equal(isRuntimeEffectSupported(dataOnly),false);
 });
