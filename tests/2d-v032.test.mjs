@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {REGION_DATA, BASES, makeLoot} from '../dist/2d/systems.js';
+import {REGION_DATA, makeLoot} from '../dist/2d/systems.js';
+import {catalogEntryById} from '../dist/2d/equipment-catalog.js';
 import {BOSS_POOLS,rollBossRewards} from '../dist/2d/boss-loot.js';
 import {freshSave,sanitizeSave,makeDungeon,mulberry32} from '../dist/2d/core.js';
 import {pickRandomDestination,destinationOptions,validateDestination} from '../dist/2d/travel.js';
@@ -56,13 +57,19 @@ test('weapons and jewelry icons always match their functional silhouette',()=>{
  assert.equal(iconType(sample('amulet','霜痕吊坠')),'amulet');
  assert.equal(iconType(sample('robe','刻印重甲')),'chest');
 });
-test('equip bases expanded beyond previous placeholder item names',()=>{
- assert.ok(Object.values(BASES).every(names=>names.length>=6));
- const all=new Set(Object.values(BASES).flat());
- assert.ok(all.size>=70);
- const r=mulberry32(2026);
- for(let k=0;k<120;k++){
+test('generated loot uses authored 500-item catalog identities instead of placeholder base names',()=>{
+ const r=mulberry32(2026),catalogIds=new Set(),prototypeIds=new Set();
+ for(let k=0;k<240;k++){
   const item=makeLoot(r,15,'u-'+k);
-  assert.ok(BASES[item.slot].some(base=>item.name.includes(base)));
+  assert.match(item.catalogId,/^EQ-[NMELU]-\\d{3}$/);
+  assert.match(item.prototypeId,/^B\\d{3}$/);
+  const authored=catalogEntryById(item.catalogId);
+  assert.ok(authored,'generated catalog item must resolve back to authored entry');
+  assert.equal(item.name,authored.name);
+  assert.equal(item.slot,authored.slot);
+  assert.equal(item.subtype,authored.subtype);
+  catalogIds.add(item.catalogId);prototypeIds.add(item.prototypeId);
  }
+ assert.ok(catalogIds.size>25,'loot should sample a meaningful range of authored catalog entries');
+ assert.ok(prototypeIds.size>25,'loot should sample a meaningful range of visual prototypes');
 });
