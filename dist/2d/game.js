@@ -500,15 +500,55 @@ function puff(x,y,color,count=9,radius=3,speed=150){
 function floatText(x,y,value,color='#f1ca90'){texts.push({x,y,text:String(value),color,life:.85});if(texts.length>50)texts.shift();}
 function injury(amount,school='physical'){
   if(hero.invuln>0||state!=='playing')return;
+  if(effectState.relicWardUntil<=tick){effectState.relicWardHp=0;effectState.relicWardUntil=0;}
   const defense=stats(profile);
-  const resist=school==='fire'?defense.resistFire:school==='cold'?defense.resistCold:school==='dark'?defense.resistDark:0;
-  const mitigated=Math.max(1,amount*(1-resist/100)*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
-  const absorbed=Math.min(wardHp,mitigated);wardHp-=absorbed;
-  const finalDamage=mitigated-absorbed;
+  const oathResist=effectState.oathUntil>tick?effectState.oathPct:0;
+  const resistBase=school==='fire'?defense.resistFire:school==='cold'?defense.resistCold:school==='dark'?defense.resistDark:0;
+  const resist=Math.min(75,resistBase+oathResist);
+  const heavyDR=effectState.heavyDRUntil>tick?effectState.heavyDRPct:0;
+  const mitigated=Math.max(1,amount*(1-resist/100)*(1-heavyDR/100)*
+    (1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1));
+  const skillAbsorb=Math.min(wardHp,mitigated);wardHp-=skillAbsorb;
+  let remaining=mitigated-skillAbsorb;
+  const relicAbsorb=Math.min(effectState.relicWardHp,remaining);effectState.relicWardHp-=relicAbsorb;
+  remaining-=relicAbsorb;
+  const absorbed=skillAbsorb+relicAbsorb;
+  let finalDamage=remaining;
+  const beforeHp=hero.hp;
+
+  const heavy=effectPercent(profile,'重甲残响');
+  if(finalDamage>=hero.hp&&heavy&&tick>=effectState.heavyReady){
+    finalDamage=Math.max(0,hero.hp-1);
+    effectState.heavyReady=tick+90;effectState.heavyDRPct=heavy;effectState.heavyDRUntil=tick+3;
+    announce('重甲残响 · 致命伤被抵挡',true);floatText(hero.x,hero.y-53,'余命 1','#ffcf86');
+  }
+
   if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
   hero.hp=Math.max(0,hero.hp-finalDamage);hero.invuln=.6;
   puff(hero.x,hero.y,absorbed?'#85bae9':'#e46455',13,4,145);
   if(finalDamage)floatText(hero.x,hero.y-30,Math.round(finalDamage),'#ff9990');
+
+  if(finalDamage>0){
+    effectState.incomingHits++;
+    const ash=effectPercent(profile,'灰烬回护');
+    if(ash&&effectState.incomingHits%3===0){
+      effectState.relicWardHp=Math.max(effectState.relicWardHp,Math.round(hero.maxHp*ash/100));
+      effectState.relicWardUntil=tick+5;
+      announce('灰烬回护 · 获得 '+Math.round(ash)+'% 生命护盾',true);
+    }
+    const lastBreath=effectPercent(profile,'断气续命');
+    if(lastBreath&&beforeHp>hero.maxHp*.25&&hero.hp<=hero.maxHp*.25&&tick>=effectState.lowLifeReady){
+      effectState.relicWardHp=Math.max(effectState.relicWardHp,Math.round(hero.maxHp*lastBreath/100));
+      effectState.relicWardUntil=Math.max(effectState.relicWardUntil,tick+8);
+      effectState.lowLifeReady=tick+60;
+      announce('断气续命 · 低生命护盾已生成',true);
+    }
+    const oath=effectPercent(profile,'残月守誓');
+    if(oath&&hero.hp<=hero.maxHp*.4&&tick>=effectState.oathReady){
+      effectState.oathPct=oath;effectState.oathUntil=tick+6;effectState.oathReady=tick+30;
+      announce('残月守誓 · 全元素抗性 +'+Math.round(oath)+'%',true);
+    }
+  }
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
 function dealDamage(e,damage,school='physical',opts={}){
