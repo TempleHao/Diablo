@@ -559,6 +559,7 @@ function dealDamage(e,damage,school='physical',opts={}){
   if(school==='fire')damage*=1+bonus.skillFire*.09;
   if(school==='cold')damage*=1+bonus.skillCold*.09;
   if(effectState.eliteBuffUntil>tick)damage*=1+effectState.eliteBuffPct/100;
+  if(e.elite&&effectState.huntUntil>tick)damage*=1+effectState.huntPct/100;
   if(e.vulnerableUntil>tick)damage*=1+(e.vulnerablePct||0)/100;
   if(allowProcs&&wasFull){
     const pct=effectPercent(profile,'裂魂猛袭');
@@ -573,7 +574,15 @@ function dealDamage(e,damage,school='physical',opts={}){
     floatText(e.x,e.y-54,'蓄势 +'+Math.round(effectState.nextAttackBonus)+'%','#9fdcff');
     effectState.nextAttackBonus=0;
   }
-  const crit=!opts.proc&&rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
+  const crit=!opts.proc&&rng()*100<bonus.crit;
+  if(crit){
+    damage*=1+bonus.critDmg/100;
+    const awakening=effectPercent(profile,'幽瞳觉醒');
+    if(awakening){
+      effectState.critHastePct=awakening;effectState.critHasteUntil=tick+4;
+      floatText(hero.x,hero.y-52,'幽瞳觉醒','#d8bbff');
+    }
+  }
   if(school==='fire'&&bonus.sets.dragonflame>=3&&++combo%3===0)damage*=1.45;
   damage=Math.max(1,Math.round(damage));
   if(bonus.lifesteal)hero.hp=Math.min(hero.maxHp,hero.hp+bonus.lifesteal);
