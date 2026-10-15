@@ -89,8 +89,8 @@ export function normalizeItem(item) {
   const text=(value,max=40)=>typeof value==='string'?value.slice(0,max):'';
   return {
     id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(template?.requiredLevel||item.ilvl||1,100),
-    power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
-    armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
+    power:safeNum(template?.attack??item.power),hp:safeNum(template?.hp??item.hp),mana:safeNum(template?.mana??item.mana),
+    armor:safeNum(template?.armor??item.armor),value:safeNum(template?Math.max(10,Math.round(template.score*1.7)):item.value,99999),affixes,setId,
     catalogId,prototypeId,subtype:template?.subtype||text(item.subtype),preferredClass:template?.preferredClass||text(item.preferredClass),
     theme:template?.theme||text(item.theme,12),part:template?.part||text(item.part,12),
     requiredLevel:safeNum(template?.requiredLevel||item.requiredLevel||item.ilvl||1,100),
