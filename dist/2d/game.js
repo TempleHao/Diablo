@@ -361,6 +361,7 @@ function renderInventory(){
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
     ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
     ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
+    ['移动速度',statsNow.moveSpeed+'%'],['法力消耗',statsNow.manaCost+'%'],['药剂冷却',statsNow.potionCooldown+'%'],
     ['未分配技能点',profile.skillPoints],['已净化',profile.clears]
   ];
   const char=$('character-stats');char.replaceChildren();
