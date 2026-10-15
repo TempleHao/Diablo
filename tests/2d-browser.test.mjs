@@ -22,6 +22,8 @@ try{
       const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
         id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId
       });
+      // Keep real profile data on reload; fixture applies only to a fresh test context.
+      if(localStorage.getItem('ember-chronicles-2d-v1'))return;
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
         version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
         inventory:[
@@ -75,6 +77,23 @@ try{
       const shot=await page.screenshot({type:'jpeg',quality:70});
       console.log((viewport.isMobile?'BOSS_DROP_MOBILE_BASE64:':'BOSS_DROP_DESKTOP_BASE64:')+shot.toString('base64'));
     }
+    // Regression: killing the Boss increments clears but must not reroll the
+    // active maze seed, erase explored rooms, or respawn the defeated Boss.
+    const preRefresh=await page.evaluate(()=>window.__ember2dQA.mazeInfo());
+    await page.reload({waitUntil:'load'});
+    await page.click('#modal-primary');
+    await page.waitForTimeout(150);
+    const postRefresh=await page.evaluate(()=>({
+      maze:window.__ember2dQA.mazeInfo(),
+      profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1'))
+    }));
+    assert.equal(postRefresh.maze.seed,preRefresh.seed,'Boss clear changed the active maze seed on reload');
+    assert.equal(postRefresh.maze.bossDefeated,true,'Boss defeat state not restored');
+    assert.equal(postRefresh.maze.portalReady,true,'cleared Boss portal not restored');
+    assert.ok(postRefresh.maze.explored>=preRefresh.explored,'explored rooms disappeared');
+    assert.equal(postRefresh.profile.bossKills[0],1);
+    assert.equal(postRefresh.profile.pendingLoot.length,firstBoss.pending,'unclaimed Boss loot lost on reload');
+    assert.equal(await page.locator('#portal-open').isVisible(),true);
     const canvas=page.locator('#game');
     assert.ok(await canvas.evaluate(x=>x.width>0&&x.height>0));
     await page.keyboard.down('d');await page.waitForTimeout(110);await page.keyboard.up('d');
