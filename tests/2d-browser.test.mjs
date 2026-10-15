@@ -194,6 +194,13 @@ try{
     assert.equal(await page.locator('#town-panel').isVisible(),true,'manual return to camp must open the camp state');
     assert.equal(await page.locator('#town-region').innerText(),'遗弃监牢');
     assert.equal(await page.locator('#town-loot').innerText(),String(carriedLootIds.length));
+    const bagBeforeRecovery=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).inventory.length);
+    await page.click('#town-recover');
+    const recoveredAtTown=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')));
+    assert.equal(recoveredAtTown.pendingLoot.length,0,'camp recovery did not clear recovered pending loot');
+    assert.equal(recoveredAtTown.inventory.length,bagBeforeRecovery+carriedLootIds.length,'camp recovery did not move all pending loot into bag');
+    for(const id of carriedLootIds)assert.ok(recoveredAtTown.inventory.some(item=>item.id===id),'recovered Boss item missing from bag: '+id);
+    assert.equal(await page.locator('#town-loot').innerText(),'0');
     const townBefore=await page.evaluate(()=>({
       profile:JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')),
       maze:window.__ember2dQA.mazeInfo()
@@ -211,7 +218,8 @@ try{
     assert.equal(townRefarm.profile.regionVisits[1],townBefore.profile.regionVisits[1]+1,'same-region refarm did not increment visit serial');
     assert.notEqual(townRefarm.maze.seed,townBefore.maze.seed,'same-region refarm reused the old maze seed');
     for(const key of ['level','xp','gold','essence','clears'])assert.equal(townRefarm.profile[key],townBefore.profile[key],'camp refarm changed character progression: '+key);
-    assert.deepEqual(townRefarm.profile.pendingLoot.map(x=>x.item.id).sort(),carriedLootIds,'camp refarm deleted pending loot');
+    assert.equal(townRefarm.profile.pendingLoot.length,0,'recovered Boss loot returned to pending state after refarm');
+    for(const id of carriedLootIds)assert.ok(townRefarm.profile.inventory.some(item=>item.id===id),'recovered Boss loot vanished after refarm: '+id);
 
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
