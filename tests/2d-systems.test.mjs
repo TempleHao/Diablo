@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes} from '../dist/2d/systems.js';
+import {allCatalogEntries,CATALOG_SIZE,CATALOG_TIER_SIZE} from '../dist/2d/equipment-catalog.js';
+import {appearanceKey} from '../dist/2d/equipment-icons.js';
 import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats,upgradeSkill} from '../dist/2d/core.js';
 import {recoverPendingLoot,startDestinationExpedition} from '../dist/2d/travel.js';
 const i=(id,slot,affixes=[],setId=null)=>normalizeItem({id,slot,name:'测试装备',rarity:setId?4:2,ilvl:12,power:0,hp:0,mana:0,armor:0,affixes,setId});
@@ -120,4 +122,16 @@ test('character appearance is bounded, persisted and legacy-safe',()=>{
   assert.equal(sanitizeSave({version:2,characterSkin:3,inventory:[]}).characterSkin,3);
   assert.equal(sanitizeSave({version:2,characterSkin:99,inventory:[]}).characterSkin,4);
   assert.equal(sanitizeSave({version:1,inventory:[]}).characterSkin,0);
+});
+
+
+test('all 500 catalog entries and appearance identities remain unique',()=>{
+  const entries=allCatalogEntries();
+  assert.equal(entries.length,CATALOG_SIZE);
+  assert.equal(CATALOG_SIZE,500);
+  assert.equal(CATALOG_TIER_SIZE,100);
+  assert.equal(new Set(entries.map(x=>x.catalogId)).size,500);
+  assert.equal(new Set(entries.map(appearanceKey)).size,500);
+  assert.equal(new Set(entries.map(x=>x.prototypeId)).size,100);
+  for(let rarity=0;rarity<5;rarity++)assert.equal(entries.filter(x=>x.rarity===rarity).length,100);
 });
