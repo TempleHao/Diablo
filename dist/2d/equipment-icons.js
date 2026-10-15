@@ -2,15 +2,9 @@
 // Original Canvas vector art: no external sprites or third-party licensing.
 const rarityColors=['#B7B7B7','#3293FF','#AF5CFF','#FF8928','#D8AA53'];
 const colors={metal:'#bdc4c6',edge:'#364048',gold:'#b88743',leather:'#70503a',cloth:'#763e42',ember:'#f4a65c',gem:'#63c9e7'};
-const equipmentAtlas=typeof Image!=='undefined'?new Image():null;
-let atlasReady=false,atlasFailed=false;
-if(equipmentAtlas){
- equipmentAtlas.decoding='async';
- equipmentAtlas.onload=()=>{atlasReady=true;};
- equipmentAtlas.onerror=()=>{atlasFailed=true;};
- equipmentAtlas.src=new URL('./art/equipment-atlas.webp',import.meta.url).href;
-}
-export const equipmentAtlasStatus=()=>({ready:atlasReady,failed:atlasFailed});
+// The test build intentionally renders the 100 prototypes in code so GitHub Pages
+// has no binary-art dependency. Five rarity treatments turn them into 500 catalog looks.
+export const equipmentAtlasStatus=()=>({ready:true,failed:false,mode:'procedural'});
 const path=(ctx,pts,close=true)=>{ctx.beginPath();ctx.moveTo(...pts[0]);for(const p of pts.slice(1))ctx.lineTo(...p);if(close)ctx.closePath();};
 const fill=(ctx,pts,color,stroke=colors.edge)=>{path(ctx,pts);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.stroke();}};
 const ellipse=(ctx,x,y,rx,ry,fillColor,stroke)=>{ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fillColor;ctx.fill();if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke();}};
@@ -62,21 +56,31 @@ function resolve(item){
  return {head:'helmet',shoulders:'shoulders',robe:'chest',gloves:'gloves',belt:'belt',pants:'pants',boots:'boots',amulet:'amulet',charm:'relic'}[item?.slot]||'relic';
 }
 const shapes={staff,sword,dagger,axe,hammer,spear,bow,crossbow,quiver,shield,book,helmet,shoulders,chest,gloves,belt,pants,boots,ring,amulet,relic};
-export function iconType(item){return resolve(item);}
-function drawAtlasCell(ctx,item,x,y,w,h){
- if(!atlasReady||!equipmentAtlas||!Number.isInteger(item?.iconRow)||!Number.isInteger(item?.iconCol))return false;
- const rarity=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
- const row=Math.max(0,Math.min(11,item.iconRow-1)),col=Math.max(0,Math.min(9,item.iconCol-1));
- const tierH=equipmentAtlas.naturalHeight/5,cellW=equipmentAtlas.naturalWidth/10,cellH=tierH/12;
- ctx.save();ctx.imageSmoothingEnabled=false;
- ctx.drawImage(equipmentAtlas,col*cellW,rarity*tierH+row*cellH,cellW,cellH,x,y,w,h);
- ctx.restore();return true;
+const themeColors={火:'#ff7a3d',霜:'#65cfff',雷:'#c995ff',毒:'#6ed66f',血:'#d64e55',光:'#ffe19b',暗:'#8057bd',风:'#8bd4c7',岩:'#b98b5d'};
+function decorate(ctx,item){
+ const row=Math.max(1,Math.min(12,Number(item?.iconRow)||1)),col=Math.max(1,Math.min(10,Number(item?.iconCol)||1));
+ const theme=themeColors[String(item?.theme||'')]||rarityColors[Math.max(0,Math.min(4,Number(item?.rarity)||0))];
+ const seed=row*17+col*31+(Number(item?.rarity)||0)*13;
+ ctx.save();
+ ctx.strokeStyle=theme;ctx.fillStyle=theme;ctx.globalAlpha=.78;
+ // Deterministic prototype marks: gem positions, rune bars and studs make the
+ // 100 base prototypes visually distinct even when they share a silhouette.
+ const gx=9+(seed%29),gy=9+((seed*7)%27);
+ if(seed%3===0){ellipse(ctx,gx,gy,2.2,2.2,theme,'#f6e9c7');}
+ if(seed%3===1){ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(8,9+(seed%22));ctx.lineTo(40,9+((seed*3)%22));ctx.stroke();}
+ if(seed%3===2){for(let i=0;i<3;i++){const x=11+((seed+i*11)%27),y=12+((seed+i*7)%24);ctx.fillRect(x,y,2,2);}}
+ if((Number(item?.rarity)||0)>=2){ctx.globalAlpha=.34;ctx.strokeRect(7+(col%3),7+(row%3),34-(col%3)*2,34-(row%3)*2);}
+ if((Number(item?.rarity)||0)>=3){ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(24,24,16+(seed%3),0,Math.PI*2);ctx.stroke();}
+ ctx.restore();
 }
+
+export function iconType(item){return resolve(item);}
+function drawAtlasCell(){return false;}
 export function drawEquipmentGlyph(ctx,item,x,y,size=42){
  if(drawAtlasCell(ctx,item,x-size/2,y-size/2,size,size))return 'atlas';
  ctx.save();ctx.translate(x-size/2,y-size/2);ctx.scale(size/48,size/48);
  ctx.shadowColor=rarityColors[Math.max(0,Math.min(4,Math.floor(item?.rarity||0)))];ctx.shadowBlur=5;
- shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
+ shapes[resolve(item)](ctx,String(item?.name||''));decorate(ctx,item);ctx.restore();
  return resolve(item);
 }
 export function drawEquipmentIcon(canvas,item){
@@ -90,7 +94,7 @@ export function drawEquipmentIcon(canvas,item){
  const usedAtlas=drawAtlasCell(ctx,item,5,5,38,38);
  if(!usedAtlas){
   ctx.save();ctx.shadowColor=border;ctx.shadowBlur=r>=3?7:2;
-  shapes[resolve(item)](ctx,String(item?.name||''));ctx.restore();
+  shapes[resolve(item)](ctx,String(item?.name||''));decorate(ctx,item);ctx.restore();
  }
  ctx.strokeStyle='#ffffff20';ctx.strokeRect(6,6,36,36);
  return usedAtlas?'atlas':resolve(item);
