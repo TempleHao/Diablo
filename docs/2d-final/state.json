@@ -239,7 +239,7 @@
       "id": "P1-007",
       "severity": "P1",
       "status": "open",
-      "description": "F2 branch does not persist unclaimed boss ground loot across refresh; code write blocked by safety check on 2026-10-13. New real screenshots unavailable."
+      "description": "F2 reload persistence source and browser regression committed on independent branch 2026-10-15; still open until CI and real Chromium PC/mobile evidence verify Boss/loot/seed restoration."
     },
     {
       "id": "P1-008",
@@ -253,18 +253,28 @@
     "角色仍是粉紫色卡通/过渡图，怪物与 Boss 缺少同一世界观的多方向写实动作",
     "手机 Boss 战角色/文字/按钮密集，主城野外与可见换装依然不足"
   ],
-  "nextAction": "Retry approved F2 integration on independent branch: import sanitizeWorldStates in core.js, add worldStates to freshSave/sanitizeSave, add tests/2d-world-progress.test.mjs for malformed seeds/room IDs and v1/v2 migration; run Node/100 seeds/Chromium and capture real screenshots before claiming gate pass.",
+  "nextAction": "Inspect GitHub Actions results for 2f974031 / f969f7de / fb2d5d4a, fix failures and run audit-2d-final.mjs; capture fresh Chromium PC/mobile reload and Boss loot screenshots. Resolve PR #6 drift from main v0.3.6 without merging unverified code or altering 3D.",
   "lastAttempt": {
-    "at": "2026-10-14",
+    "at": "2026-10-15",
     "phase": "F2",
-    "status": "blocked-code-and-test-write",
+    "status": "runtime-persistence-and-regressions-committed-validation-pending",
     "verified": {
-      "mainHead": "0443a29b733e8d1ed7a52d9986a9c0710bccad60",
-      "branchHeadBeforeAttempt": "4c91df9e384de0f367d2d4aa68c3de34548eb658",
-      "pr": 6
+      "commits": [
+        "394323404c8aa198f1f0d8c6b13d4081d5787e66",
+        "2f9740318b2c1deaf1c366dc3039a06800fddb36",
+        "74d1df2ce76dd5a9b906bc352f81f28cd92075fa",
+        "f969f7de9024210b262c96f631ca667d9a129da3",
+        "fb2d5d4afe6c93922021923bdbe7e96c05efeb35"
+      ],
+      "branch": "feature/2d-maze-topology-f1"
     },
-    "blocker": "GitHub update_file dist/2d/core.js and create_file tests/2d-world-progress.test.mjs both blocked by OpenAI safety checks. No source or test commit, no new CI, no Chromium screenshots. PR #6 remains Draft; no merge.",
-    "caveat": "v0.3.6 demo is separate pixel-art direction; F4/F5 A-direction visual gates remain unverified."
+    "unverified": [
+      "GitHub Actions CI conclusion (commit workflow-run lookup returned no results)",
+      "actual Node/Chromium execution in this environment",
+      "new real-game PC/mobile screenshots",
+      "full F2 persistence gate and main v0.3.6 compatibility"
+    ],
+    "caveat": "Source, Chromium regression and pure-rule tests are committed but passing tests and final art are not claimed. Existing PR #6 stays Draft; no main/3D changes."
   },
   "candidate": {
     "status": "none",
@@ -281,11 +291,11 @@
     "pagesRun": null,
     "rollbackCommit": null
   },
-  "updatedAt": "2026-10-14",
+  "updatedAt": "2026-10-15",
   "lastWritePermissionProbe": {
-    "at": "2026-10-13",
-    "purpose": "Explicit user authorization; verify isolated 2D branch write access",
-    "status": "write-check-pending"
+    "at": "2026-10-15",
+    "purpose": "Authorized isolated branch development",
+    "status": "source-and-test-write-succeeded"
   },
   "lastVisualEvidence": {
     "kind": "real-game-chromium",
