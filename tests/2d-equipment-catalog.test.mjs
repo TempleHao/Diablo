@@ -102,7 +102,7 @@ test('unique tradeoffs and ancient resonance affect live character statistics',(
   p.inventory.push(hpCost);p.equipped[hpCost.slot]=hpCost.id;
   const afterHp=calculateStats(p);
   assert.ok(afterHp.hp<base.hp+hpCost.hp,'6% unique life penalty must reduce final life');
-  const fireUnique=make(4,4,'mana-cost');
+  const fireUnique=make(4,99,'mana-cost');
   p.inventory.push(fireUnique);p.equipped[fireUnique.slot]=fireUnique.id;
   const afterFire=calculateStats(p);
   assert.equal(afterFire.skillFire,1,'fire-themed ancient resonance must add a fire skill rank');
