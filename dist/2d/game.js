@@ -2,6 +2,7 @@ import * as Art from './art.js';
 import {createMazeWorld,roomAt,roomCenter,enterRoom,drawMazeWalls,drawExplorationFog} from './maze-world.js';
 import {MATERIALS,sanitizeMaterials,dismantle,dismantleAll,autoDismantleDrop,canTemper,temper,temperCost} from './crafting.js';
 import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
+import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from './world-progress.js';
 import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
@@ -21,7 +22,7 @@ const enemyWaves=(region)=> {
 };
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null;
-let currentRoom=null,enteredRooms=new Set();
+let currentRoom=null,enteredRooms=new Set(),expedition=null;
 const worldWidth=()=>dungeon?.width??WIDTH,worldHeight=()=>dungeon?.height??HEIGHT;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:['#c0c5c4','#74bdf0','#ffc16f','#e8894a','#7bc687'] };
 try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
@@ -66,6 +67,8 @@ function travelTo(region){
   if(!bossDefeated||!validateDestination(region))return false;
   closePortalMenu();profile.region=region;
   profile.regionVisits[region]=(profile.regionVisits[region]||0)+1;
+  // Explicit portal travel starts a new run in the destination region.
+  profile.worldStates[region]=null;
   build();persist();announce('传送抵达 '+REGION_DATA[region].name+' · 新的远征开始',true);
   return true;
 }
@@ -103,14 +106,17 @@ function enterChamber(id){
   const chamber=dungeon.layout.rooms.find(r=>r.id===id);
   if(!chamber)return;
   ui.progress.textContent='已探索 '+dungeon.explored.length+' / '+dungeon.layout.rooms.length+' 间房 · 寻找灰烬司祭';
-  if(enteredRooms.has(id))return;
+  const wasEntered=enteredRooms.has(id);
   enteredRooms.add(id);
-  if(chamber.type==='entrance')return;
+  rememberRoomProgress(expedition,dungeon,enteredRooms);
+  persist();
   const c=roomCenter(dungeon,id);
   if(chamber.type==='boss'){
-    if(!bossDefeated)spawn('boss',{x:c.x,y:c.y-55});
+    // A mid-fight reload must not leave an unspawned, unwinnable Boss room.
+    if(!bossDefeated&&!boss)spawn('boss',{x:c.x,y:c.y-55});
     return;
   }
+  if(wasEntered||chamber.type==='entrance')return;
   if(chamber.type==='treasure'){
     dropItem(c.x+46,c.y-20,true);
     announce('发现封存的战利品密室',true);
@@ -128,13 +134,18 @@ function enterChamber(id){
 }
 function build() {
   ui.log.replaceChildren();messageTimes.clear();
-  const seed=20261013+profile.clears*19+profile.region*7919;
+  const proposedSeed=(20261013+profile.clears*19+profile.region*7919)>>>0;
+  expedition=ensureWorldState(profile,profile.region,proposedSeed);
+  const seed=expedition.seed;
   rng=mulberry32(seed);dungeon=createMazeWorld(seed,profile.region);
+  restoreWorldExploration(dungeon,expedition);
   const s=stats(profile);
   hero={x:dungeon.start.x,y:dungeon.start.y,radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0};
   enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];kills=0;boss=null;nextId=1;tick=0;manualAim=null;
-  armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;currentRoom=null;enteredRooms=new Set();
-  $('portal-panel').hidden=true;$('portal-open').hidden=true;
+  armorUntil=0;wardHp=0;combo=0;bossDefeated=expedition.bossDefeated;
+  portal=bossDefeated?roomCenter(dungeon,dungeon.layout.boss):null;
+  currentRoom=null;enteredRooms=new Set(expedition.enteredRooms);
+  $('portal-panel').hidden=true;$('portal-open').hidden=!bossDefeated;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region){
     const x=dungeon.start.x+(i%3-1)*38,y=dungeon.start.y-45-Math.floor(i/3)*36;
     const pos=walkable(x,y,17,dungeon)?{x,y}:dungeon.start;
@@ -466,7 +477,8 @@ function dealDamage(e,damage,school='physical'){
     const reward=rollBossRewards(rng,profile.level,region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++));
     profile.bossKills[region]=previousKills+1;
     profile.essence+=reward.materials;profile.clears++;
-    boss=null;bossDefeated=true;portal={x:e.x,y:e.y};ui.boss.hidden=true;$('portal-open').hidden=false;
+    boss=null;bossDefeated=true;expedition.bossDefeated=true;
+    portal={x:e.x,y:e.y};ui.boss.hidden=true;$('portal-open').hidden=false;
     for(const [index,item] of reward.drops.entries()){
       const angle=index*2.4,rad=60+index*15;
       const x=e.x+Math.cos(angle)*rad,y=e.y+Math.sin(angle)*rad;
