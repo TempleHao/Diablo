@@ -6,7 +6,7 @@ import {ensureWorldState,restoreWorldExploration,rememberRoomProgress} from './w
 import {destinationOptions,pickRandomDestination,validateDestination,startDestinationExpedition} from './travel.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore } from './systems.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
-import {strongestEffect,effectPercent,hasEffect} from './equipment-effect-runtime.js';
+import {strongestEffect,effectPercent,isRuntimeEffectSupported} from './equipment-effect-runtime.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -299,7 +299,7 @@ function inspectItem(item){
   if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   if(item.effectName){
     const effect=document.createElement('section');effect.className='item-effect';
-    const effectTitle=document.createElement('strong');effectTitle.textContent='✦ '+item.effectName;
+    const effectTitle=document.createElement('strong');effectTitle.textContent='✦ '+item.effectName+(isRuntimeEffectSupported(item)?' · 已实装':' · 规则展示');
     const effectText=document.createElement('p');effectText.textContent=item.effectDescription;
     effect.append(effectTitle,effectText);
     if(item.drawback){const drawback=document.createElement('p');drawback.className='item-drawback';drawback.textContent='代价 · '+item.drawback;effect.append(drawback);}
