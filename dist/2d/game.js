@@ -790,6 +790,7 @@ function update(dt){
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
+  hero.moving=l>.02;
   if(l>.02){
     const baseMove=stats(profile).moveSpeed/100;
     const bloodPct=tick<=effectState.bloodUntil?effectPercent(profile,'血路行者')*effectState.bloodStacks:0;
