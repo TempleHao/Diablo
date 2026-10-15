@@ -166,3 +166,5 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .town-actions button{min-height:46px;border:1px solid #92704c;background:#201d1b;color:#ead8bd;padding:11px}
 .town-actions .primary{max-width:none;margin:0}
 @media(max-width:600px){.town-dialog{padding:19px}.town-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.town-actions{grid-template-columns:1fr}}
+
+.item-effect{margin:10px 0;padding:10px 12px;border-left:2px solid #d28a38;background:#130f0b;color:#d9c3a3}.item-effect strong{color:#f0a956;font:600 12px Georgia,serif;letter-spacing:.5px}.item-effect p{margin:6px 0 0;font-size:11px;line-height:1.55;color:#c5b7a1}.item-effect .item-drawback{color:#d98978}
