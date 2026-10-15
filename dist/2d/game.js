@@ -602,6 +602,15 @@ function cast(skill){
   const manaCost=rule.mana*(bonus.manaCost/100);
   if(hero.mana<manaCost){announce('法力不足');return;}
   hero.mana-=manaCost;
+  effectState.skillCasts++;
+  effectState.manaSpent+=manaCost;
+  const arcaneBind=effectPercent(profile,'奥术缚指');
+  if(arcaneBind&&effectState.manaSpent>=20){
+    effectState.manaSpent%=20;
+    effectState.nextAttackBonus=Math.max(effectState.nextAttackBonus,arcaneBind);
+    floatText(hero.x,hero.y-52,'奥术缚指','#b9a4ff');
+  }
+  const secretEcho=effectState.skillCasts%4===0?effectPercent(profile,'秘文回响'):0;
   cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(skill==='heal'?bonus.potionCooldown/100:1);
   hero.cast=.3;
   const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
@@ -631,8 +640,17 @@ function cast(skill){
     hero.invuln=.4;puff(hero.x,hero.y,'#aa97ec',21,4,170);
     for(let t=0;t<18;t++)moveWithCollision(hero,bx*(950+rank*85),by*(950+rank*85),1/60,dungeon,hero.radius);
     puff(hero.x,hero.y,'#c8b1fe',21,4,170);
+    const quickBlade=effectPercent(profile,'快刃残影');
+    if(quickBlade){effectState.nextAttackBonus=Math.max(effectState.nextAttackBonus,quickBlade);floatText(hero.x,hero.y-45,'快刃残影','#cdb8ff');}
   }
-  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
+  if(skill==='heal'){
+    hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');
+    const crown=effectPercent(profile,'灵魂冕冠');
+    if(crown&&tick>=effectState.spiritCrownReady){
+      const restored=hero.maxMana*crown/100;hero.mana=Math.min(hero.maxMana,hero.mana+restored);
+      effectState.spiritCrownReady=tick+12;floatText(hero.x,hero.y-48,'灵魂冕冠 +'+Math.round(restored)+' 法力','#a9d8ff');
+    }
+  }
   if(skill==='chain'){
     const candidates=enemies.map(e=>({e,dist:distance(hero,e)})).filter(x=>x.dist<600).sort((a,b)=>a.dist-b.dist);
     let last={x:hero.x,y:hero.y};
@@ -662,6 +680,13 @@ function cast(skill){
     }
     announce('烈焰地径已铺开',true);
   }
+  if(secretEcho){
+    const echoTarget=enemies.includes(target)?target:nearest(700);
+    if(echoTarget){
+      dealDamage(echoTarget,bonus.power*secretEcho/100,'arcane',{proc:true});
+      floatText(echoTarget.x,echoTarget.y-58,'秘文回响','#d6b4ff');puff(echoTarget.x,echoTarget.y,'#9c78d2',14,4,150);
+    }
+  }
   updateHud();
 }
 function movementVector() {
@@ -674,7 +699,12 @@ function update(dt){
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
-  if(l>.02){const moveScale=stats(profile).moveSpeed/100;moveWithCollision(hero,v.x*250*moveScale,v.y*250*moveScale,dt,dungeon,hero.radius);hero.walk+=dt*12*moveScale;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
+  if(l>.02){
+    const baseMove=stats(profile).moveSpeed/100;
+    const bloodPct=tick<=effectState.bloodUntil?effectPercent(profile,'血路行者')*effectState.bloodStacks:0;
+    const moveScale=baseMove*(1+bloodPct/100);
+    moveWithCollision(hero,v.x*250*moveScale,v.y*250*moveScale,dt,dungeon,hero.radius);hero.walk+=dt*12*moveScale;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);
+  }
   enterChamber(roomAt(dungeon,hero.x,hero.y));
   if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
   if(pointers.size || keys.has('1'))cast('fire');
