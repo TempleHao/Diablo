@@ -324,7 +324,7 @@ function inspectItem(item){
   const alternative={...profile,equipped:{...profile.equipped}};
   equip(alternative,item.id,target);
   const before=stats(profile),after=stats(alternative);
-  const keys=[['power','法术强度'],['hp','生命'],['mana','法力'],['armor','护甲'],['crit','暴击率'],['haste','施法速度'],['fire','火焰增伤'],['cold','冰霜增伤']];
+  const keys=[['power','法术强度'],['hp','生命'],['mana','法力'],['armor','护甲'],['crit','暴击率'],['haste','施法速度'],['fire','火焰增伤'],['cold','冰霜增伤'],['resistFire','火抗'],['resistCold','冰抗'],['moveSpeed','移动速度'],['manaCost','法力消耗'],['potionCooldown','药剂冷却']];
   const differences=keys.filter(([key])=>before[key]!==after[key]);
   if(differences.length){
     const heading=document.createElement('h4');heading.textContent='穿戴后属性变化';panel.append(heading);
@@ -332,7 +332,7 @@ function inspectItem(item){
     for(const [key,label] of differences){
       const d=after[key]-before[key],line=document.createElement('span');
       line.className=d>=0?'score-up':'score-down';
-      line.textContent=label+' '+(d>0?'+':'')+d+(key==='crit'||key==='haste'||key==='fire'||key==='cold'?'%':'');
+      line.textContent=label+' '+(d>0?'+':'')+d+(['crit','haste','fire','cold','resistFire','resistCold','moveSpeed','manaCost','potionCooldown'].includes(key)?'%':'');
       grid.append(line);
     }
     panel.append(grid);
@@ -544,11 +544,12 @@ function nearest(range=800){let best=null,d=range;for(const e of enemies){const 
 function cast(skill){
   const rule=SKILLS[skill];
   if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
-  if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
   const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
-  hero.mana-=rule.mana;
-  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02));
+  const manaCost=rule.mana*(bonus.manaCost/100);
+  if(hero.mana<manaCost){announce('法力不足');return;}
+  hero.mana-=manaCost;
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(skill==='heal'?bonus.potionCooldown/100:1);
   hero.cast=.3;
   const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
     Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
@@ -620,7 +621,7 @@ function update(dt){
   for(const key in cooldowns)cooldowns[key]=Math.max(0,cooldowns[key]-dt);
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
-  if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);hero.walk+=dt*12;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
+  if(l>.02){const moveScale=stats(profile).moveSpeed/100;moveWithCollision(hero,v.x*250*moveScale,v.y*250*moveScale,dt,dungeon,hero.radius);hero.walk+=dt*12*moveScale;if(!manualAim)hero.angle=Math.atan2(v.y,v.x);}
   enterChamber(roomAt(dungeon,hero.x,hero.y));
   if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
   if(pointers.size || keys.has('1'))cast('fire');
