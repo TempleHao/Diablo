@@ -147,8 +147,9 @@ function build() {
   currentRoom=null;enteredRooms=new Set(expedition.enteredRooms);
   $('portal-panel').hidden=true;$('portal-open').hidden=!bossDefeated;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region){
-    const x=dungeon.start.x+(i%3-1)*38,y=dungeon.start.y-45-Math.floor(i/3)*36;
-    const pos=walkable(x,y,17,dungeon)?{x,y}:dungeon.start;
+    const fallback={x:dungeon.start.x+(i%3-1)*38,y:dungeon.start.y-45-Math.floor(i/3)*36};
+    const saved=Number.isFinite(pending.x)&&Number.isFinite(pending.y)?{x:pending.x,y:pending.y}:fallback;
+    const pos=walkable(saved.x,saved.y,17,dungeon)?saved:(walkable(fallback.x,fallback.y,17,dungeon)?fallback:dungeon.start);
     drops.push({...pos,item:pending.item,age:0,persistent:true});
   }
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
@@ -484,7 +485,7 @@ function dealDamage(e,damage,school='physical'){
       const x=e.x+Math.cos(angle)*rad,y=e.y+Math.sin(angle)*rad;
       const point=walkable(x,y,17,dungeon)?{x,y}:{x:e.x,y:e.y};
       drops.push({...point,item,age:0,persistent:true});
-      profile.pendingLoot.push({item,region});
+      profile.pendingLoot.push({item,region,x:point.x,y:point.y});
       puff(point.x,point.y,palette.rare[item.rarity],23,5,170);
     }
     persist();
@@ -832,7 +833,7 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
       enterChamber(bossRoom);
       const e=boss;if(!e)throw new Error('boss chamber did not spawn its guardian');
       e.hp=1;dealDamage(e,10000,'fire');
-      return {state,bossDefeated,drops:drops.map(d=>({name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent})),
+      return {state,bossDefeated,drops:drops.map(d=>({id:d.item.id,name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent,x:d.x,y:d.y})),
         pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
     }
   };
