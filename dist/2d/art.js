@@ -1,6 +1,8 @@
 import {drawMage} from './mage-portrait.js';
 import {drawAnimatedPixelMage} from './pixel-mage-demo.js';
-import {drawEquipmentIcon} from './equipment-icons.js';
+import {drawEquipmentIcon,iconSource} from './equipment-icons.js';
+import {RARITY_COLORS} from './systems.js';
+import {drawGlow,drawEllipseGlow} from './fx.js';
 /**
  * 余烬纪事 · 2D 美术层
  * Sprite art: 0x72 DungeonTileset II v1.7 (CC0 1.0).
@@ -42,8 +44,11 @@ function gradientSpot(ctx,x,y,r,inner,outer='transparent'){
 }
 function fixture(ctx,x,y,r=1){
   ctx.save();ctx.translate(x,y);
-  const pulse=.93+Math.sin(performance.now()*.004+x)*.07;
-  gradientSpot(ctx,0,-15,120*pulse,'#fca45242','#d7632000');
+  const now=performance.now()*.001,pulse=.9+Math.sin(now*9+x)*.06+Math.sin(now*23+y)*.04;
+  ctx.globalCompositeOperation='lighter';
+  drawEllipseGlow(ctx,0,-6,120*pulse,80*pulse,'#ff8a3a',.28);
+  drawGlow(ctx,0,-15,26*pulse,'#ffb35a',.7);
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
   ctx.fillStyle='#1d1b1c';ctx.fillRect(-3,-4,6,19);
   ctx.fillStyle='#f9a447';ctx.beginPath();ctx.ellipse(0,-15,5,10*pulse,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#fff3bb';ctx.beginPath();ctx.ellipse(0,-12,2,4*pulse,0,0,Math.PI*2);ctx.fill();
@@ -55,11 +60,13 @@ export function floor(ctx,cam,vw,vh,worldW,worldH,tick,region=0,seed=0){
   const S=48, left=Math.max(0,Math.floor(cam.x/S)-1),right=Math.min(Math.ceil(worldW/S),Math.ceil((cam.x+vw)/S)+1);
   const top=Math.max(0,Math.floor(cam.y/S)-1),bottom=Math.min(Math.ceil(worldH/S),Math.ceil((cam.y+vh)/S)+1);
   for(let y=top;y<bottom;y++)for(let x=left;x<right;x++){
-    const v=hash(x,y,501 ^ seed ^ ((region+1)*733)),tex=FRAME.floor[(v+region*2)%8];
+    const v=hash(x,y,501 ^ seed ^ ((region+1)*733)),pick=v%100;
+    // 大部分用干净石板，少量裂纹石板，避免满屏高对比裂纹
+    const tex=FRAME.floor[pick<68?0:pick<80?2:pick<88?4:pick<93?1:pick<97?3:5+(v>>8)%3];
     sprite(ctx,[tex[0],tex[1],16,16],x*S,y*S,S+1,S+1);
     // Keep pixel-art intact; irregular soot patches and scattered rubble are transparent overlays.
     if(v%15===0){ctx.fillStyle='#090d1180';ctx.fillRect(x*S+7,y*S+7,18,6);}
-    if(v%21===0)sprite(ctx,FRAME.skull,x*S+12,y*S+12,25,25);
+    if(v%67===0)sprite(ctx,FRAME.skull,x*S+12,y*S+12,25,25);
     if(v%9===0){ctx.fillStyle='#10131855';ctx.fillRect(x*S+6,y*S+3,6,17);}
   }
   const tints=['#18100b25','#18190e48','#380f102d','#0b364238','#29112e3c','#1c232b52','#24381e4b','#13324850','#401a104f'];
@@ -173,7 +180,7 @@ export function enemy(ctx,e,tick,scale=.72){
     :e.kind==='cultist'?{type:'cultist',width:66,height:94,off:-76}
     :{type:'wretch',width:59,height:59,off:-47};
   ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
-  if(e.kind==='boss')gradientSpot(ctx,0,-45,117,'#a64d8933','#983b8600');
+  if(e.kind==='boss'){ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,-45,120,'#a64d89',.35);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}
   shadow(ctx,0,6,cfg.width*.36,12,.73);
   if(ready){
     const previous=prevEnemyPos.get(e.id);
@@ -182,6 +189,8 @@ export function enemy(ctx,e,tick,scale=.72){
     const frame=frameFor(cfg.type,walking,tick+e.phase*.1);
     // Boss eye line and oversized arms remain part of the source animation.
     sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);
+    // 受击闪白
+    if(e.flash>0){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,e.flash*8);sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);ctx.restore();}
     if(e.slow>0){ctx.fillStyle='#93d9f027';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);}
   }else{ctx.fillStyle='#92665e';ctx.fillRect(-17,-37,34,37);}
   if(e.hp<e.maxHp){
@@ -206,17 +215,45 @@ function spiderEnemy(ctx,e,tick,scale=.72){
     ctx.lineTo(side*reach,-23+leg*7+step*(leg%2?1:-1));
     ctx.lineTo(side*(reach+20),-4+leg*9);ctx.stroke();
   }
-  ctx.fillStyle='#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#202127';ctx.beginPath();ctx.ellipse(0,-26,13,14,0,0,Math.PI*2);ctx.fill();
+  const hit=e.flash>0;
+  ctx.fillStyle=hit?'#f6d0d0':'#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=hit?'#e0e0e8':'#202127';ctx.beginPath();ctx.ellipse(0,-26,13,14,0,0,Math.PI*2);ctx.fill();
   for(const x of [-8,8]){ctx.fillStyle='#fc613d';ctx.beginPath();ctx.arc(x,-31,3,0,Math.PI*2);ctx.fill();}
   if(e.hp<e.maxHp){ctx.fillStyle='#160e12';ctx.fillRect(-25,-54,50,5);ctx.fillStyle='#e06e62';ctx.fillRect(-25,-54,50*Math.max(0,e.hp/e.maxHp),5);}
   ctx.restore();
 }
+// 掉落物：图鉴图标裁成柔和椭圆（去掉方形深色底），按图鉴编号缓存。
+const groundIcons=new Map();
+function groundIcon(item){
+  const src=iconSource(item);if(!src?.ready)return null;
+  const key=item.cid;let c=groundIcons.get(key);if(c)return c;
+  c=document.createElement('canvas');c.width=src.w;c.height=src.h;
+  const g=c.getContext('2d');g.drawImage(src.img,src.sx,src.sy,src.w,src.h,0,0,src.w,src.h);
+  g.globalCompositeOperation='destination-in';
+  const m=g.createRadialGradient(src.w/2,src.h/2,src.h*.3,src.w/2,src.h/2,src.h*.56);
+  m.addColorStop(0,'#000');m.addColorStop(1,'rgba(0,0,0,0)');
+  g.save();g.translate(src.w/2,src.h/2);g.scale(src.w/src.h,1);g.translate(-src.w/2,-src.h/2);g.fillStyle=m;g.fillRect(0,0,src.w,src.h);g.restore();
+  groundIcons.set(key,c);return c;
+}
 export function loot(ctx,d,tick){
-  const col=['#bcc6d0','#72c2f3','#f5bb69','#ee9566','#88d8a0'][d.item.rarity]||'#bfc4c5';
-  const bob=Math.sin(tick*2.7+d.x*.01)*4;
-  gradientSpot(ctx,d.x,d.y,57,col+'67',col+'00');
-  ctx.globalAlpha=.44;ctx.fillStyle=col;ctx.fillRect(d.x-2,d.y-68,4,60);ctx.globalAlpha=1;
+  const col=RARITY_COLORS[d.item.rarity]||'#bfc4c5',tier=d.item.rarity|0;
+  const bob=Math.sin(tick*2.7+d.x*.01)*3;
+  ctx.save();ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,d.x,d.y,44+tier*6,24+tier*3,col,.35+tier*.06);ctx.restore();
+  // 光柱：品质越高越亮越高
+  const beamH=46+tier*12;
+  const beam=ctx.createLinearGradient(0,d.y-beamH,0,d.y);
+  beam.addColorStop(0,col+'00');beam.addColorStop(1,col+(tier>=2?'88':'55'));
+  ctx.fillStyle=beam;ctx.fillRect(d.x-(tier>=3?3:2),d.y-beamH,tier>=3?6:4,beamH);
+  ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+4,20,6,0,0,Math.PI*2);ctx.stroke();
+  const icon=groundIcon(d.item);
+  if(icon){
+    const w=50,h=w*icon.height/icon.width;
+    ctx.save();ctx.imageSmoothingEnabled=true;
+    ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(d.x,d.y+3,16,5,0,0,Math.PI*2);ctx.fill();
+    ctx.drawImage(icon,d.x-w/2,d.y-h+4+bob,w,h);
+    ctx.restore();
+    return;
+  }
   const frames={
     weapon:FRAME.weapon,offhand:[323,10,10,21],head:[304,336,16,16],
     robe:[368,345,16,23],shoulders:[323,41,10,22],gloves:[307,39,10,24],
@@ -226,7 +263,6 @@ export function loot(ctx,d,tick){
   const f=frames[d.item.slot]||FRAME.chest;
   const w=d.item.slot==='weapon'?22:36,h=d.item.slot==='weapon'?56:39;
   sprite(ctx,f,d.x-w/2,d.y-h+bob,w,h);
-  ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+5,w/2,6,0,0,Math.PI*2);ctx.stroke();
 }
 export function drawItemIcon(canvas,item){return drawEquipmentIcon(canvas,item);}
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}

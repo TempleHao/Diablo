@@ -1,6 +1,8 @@
+import {ICON_SIZE} from './equipment-catalog.js';
+import {catalogEntry} from './systems.js';
 // Hand-drawn, type-correct fantasy equipment silhouettes.
 // Original Canvas vector art: no external sprites or third-party licensing.
-const rarityColors=['#b9b5aa','#7fbeef','#e1bb62','#ff994d','#8bc999'];
+const rarityColors=['#c9c6bd','#5aa6ff','#b86cff','#ff8c2e','#dcb25e'];
 const colors={metal:'#bdc4c6',edge:'#364048',gold:'#b88743',leather:'#70503a',cloth:'#763e42',ember:'#f4a65c',gem:'#63c9e7'};
 const path=(ctx,pts,close=true)=>{ctx.beginPath();ctx.moveTo(...pts[0]);for(const p of pts.slice(1))ctx.lineTo(...p);if(close)ctx.closePath();};
 const fill=(ctx,pts,color,stroke=colors.edge)=>{path(ctx,pts);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.stroke();}};
@@ -35,9 +37,8 @@ function resolve(item){
 }
 const shapes={staff,sword,dagger,shield,book,helmet,shoulders,chest,gloves,belt,pants,boots,ring,amulet,relic};
 export function iconType(item){return resolve(item);}
-// v0.3.6: compact equipment miniatures on sculpted dark-stone plaques.
-// Each material silhouette remains slot-correct; no unrelated icon substitution.
-export function drawEquipmentIcon(canvas,item){
+// 旧版程序绘制图标：只用于旧存档里的腿甲/遗物（图鉴里没有对应图标）。
+export function drawLegacyIcon(canvas,item){
  const ctx=canvas.getContext('2d');
  const size=80;canvas.width=size;canvas.height=size;
  const name=String(item?.name||''),tier=Math.max(0,Math.min(4,Math.floor(item?.rarity||0)));
@@ -81,4 +82,51 @@ export function drawEquipmentIcon(canvas,item){
  }
  ctx.restore();
  return resolve(item);
+}
+
+// v0.4：黑铁遗珍图鉴图标。每个品质一张 10 列图集（art/equipment/N|M|E|L|U.webp）。
+const CODES='NMELU',atlases=[],pending=new Set();
+function atlas(r){
+  if(typeof Image==='undefined')return null;
+  if(!atlases[r]){
+    const img=new Image();img.decoding='async';
+    img.onload=()=>{for(const job of [...pending])if(job.r===r){pending.delete(job);if(job.canvas.isConnected!==false)paint(job.canvas,job.item,img);}};
+    img.src=new URL('./art/equipment/'+CODES[r]+'.webp',import.meta.url).href;
+    atlases[r]=img;
+  }
+  return atlases[r];
+}
+export function iconSource(item){
+  const entry=catalogEntry(item);if(!entry)return null;
+  const img=atlas(entry.r);if(!img)return null;
+  const {w,h,cols}=ICON_SIZE;
+  return {img,sx:(entry.i%cols)*w,sy:Math.floor(entry.i/cols)*h,w,h,ready:img.complete&&img.naturalWidth>0};
+}
+function paint(canvas,item,img){
+  const src=iconSource(item);if(!src)return;
+  const ctx=canvas.getContext('2d'),S=canvas.width;
+  const tier=Math.max(0,Math.min(4,item.rarity|0)),frame=rarityColors[tier];
+  ctx.clearRect(0,0,S,S);
+  ctx.fillStyle='#0b0e14';ctx.fillRect(0,0,S,S);
+  const g=ctx.createRadialGradient(S/2,S*.52,2,S/2,S/2,S*.62);
+  g.addColorStop(0,frame+(tier>=2?'40':'22'));g.addColorStop(1,'#0b0e1400');
+  ctx.fillStyle=g;ctx.fillRect(0,0,S,S);
+  const dw=S-6,dh=dw*src.h/src.w;
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,src.sx,src.sy,src.w,src.h,3,(S-dh)/2,dw,dh);
+  ctx.strokeStyle='#05060a';ctx.lineWidth=3;ctx.strokeRect(1.5,1.5,S-3,S-3);
+  ctx.strokeStyle=frame;ctx.lineWidth=tier>=3?2.5:1.5;ctx.strokeRect(2.5,2.5,S-5,S-5);
+}
+/** 画装备图标；图鉴图标未加载完时先画占位，加载完自动补画。返回图标类型。 */
+export function drawEquipmentIcon(canvas,item){
+  if(!item||item.legacy||!catalogEntry(item))return drawLegacyIcon(canvas,item);
+  canvas.width=96;canvas.height=96;
+  const src=iconSource(item);
+  if(src.ready)paint(canvas,item,src.img);
+  else{
+    const ctx=canvas.getContext('2d');ctx.fillStyle='#0b0e14';ctx.fillRect(0,0,96,96);
+    ctx.strokeStyle=rarityColors[item.rarity|0];ctx.strokeRect(2.5,2.5,91,91);
+    pending.add({canvas,item,r:catalogEntry(item).r});
+  }
+  return 'catalog';
 }

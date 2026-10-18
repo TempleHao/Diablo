@@ -1,40 +1,49 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
+import {CATALOG} from './equipment-catalog.js';
+// v0.4：装备槽与「黑铁遗珍」装备库对齐（法师可用 11 槽）。双手法杖占用副手。
 export const SLOTS = Object.freeze([
   ['head','头盔','⛑'],['shoulders','肩甲','♜'],['robe','胸甲','♟'],
-  ['gloves','手套','♧'],['belt','腰带','▤'],['pants','腿甲','♙'],
-  ['boots','靴子','♢'],['weapon','主手','⚔'],['offhand','副手','◈'],
-  ['amulet','护符','❖'],['ring1','戒指 I','◇'],['ring2','戒指 II','◇'],['charm','遗物','✦']
+  ['gloves','手套','♧'],['belt','腰带','▤'],['boots','靴子','♢'],
+  ['weapon','武器','⚔'],['offhand','副手','◈'],
+  ['amulet','项链','❖'],['ring1','戒指 I','◇'],['ring2','戒指 II','◇']
 ]);
 export const SLOT_IDS=SLOTS.map(x=>x[0]);
+// 旧版存档里的腿甲/遗物：保留在背包里可以分解，但不能再穿戴。
+export const LEGACY_SLOTS=Object.freeze({pants:'腿甲（旧版）',charm:'遗物（旧版）'});
 export const MAX_ITEMS=80;
-export const RARITIES=['普通','魔法','稀有','传奇','套装'];
-export const BASES={
-  head:['旧皮兜帽','夜行头冠','灰烬面罩','凋零战盔','圣痕面甲','寒铁王冠'],shoulders:['旅者披肩','铜棘护肩','监牢铁肩','守夜肩甲','风暴披肩','兽骨护肩'],
-  robe:['行旅布袍','锁链法衣','刻印重甲','暗纹战袍','铁壁胸铠','秘银护胸'],gloves:['粗革手套','幽影指套','烬纹手甲','符咒护手','骑士护腕','蚀骨指套'],
-  belt:['破旧皮带','符文腰封','守卫束带','猎魔腰带','锁环革带','隐秘腰封'],pants:['褐布护腿','疾行裹腿','守誓腿甲','夜行腿铠','魂铁长裤','荆刺护腿'],
-  boots:['磨损长靴','暗影足具','灰烬战靴','铁制战靴','秘银行靴','雾隐短靴'],
-  weapon:['焦木法杖','灼魂魔杖','仪式秘杖','白骨长剑','凶魂匕首','远古战剑','月蚀法杖','缚魂魔杖','誓约长剑','碎星仪杖'],
-  offhand:['裂纹秘典','黑铁圆盾','古旧法器','灾厄魔典','骑士之盾','镶金法典'],amulet:['石制护符','霜痕吊坠','断昼徽章','荆棘项链','曜石护符','月银吊坠'],
-  ring1:['无名铜戒','烬火戒指','银色指环','誓火宝戒','寒玉戒','骸骨法戒'],ring2:['无名铜戒','烬火戒指','银色指环','誓火宝戒','寒玉戒','骸骨法戒'],
-  charm:['破碎圣印','先知之眼','炉心遗物','黑曜宝珠','永燃符石','噩梦刻印']
-};
+export const RARITIES=['普通','魔法','史诗','传奇','暗金'];
+export const RARITY_COLORS=Object.freeze(['#c9c6bd','#5aa6ff','#b86cff','#ff8c2e','#dcb25e']);
+export const CATALOG_BY_ID=new Map(CATALOG.map(c=>[c.id,c]));
+const slotGroup=slot=>slot==='ring2'?'ring1':slot;
+// POOL[品质][装备槽] -> 目录记录
+const POOL=[0,1,2,3,4].map(r=>{const m={};for(const c of CATALOG)if(c.r===r)(m[c.s]||=[]).push(c);return m;});
+export const catalogPool=(rarity,slot)=>POOL[rarity]?.[slotGroup(slot)]||[];
+export const catalogEntry=item=>CATALOG_BY_ID.get(item?.cid)||null;
+const hashId=str=>{let h=2166136261;for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
+// 首领专属装备：名称固定，图标取同类型传奇图标。
+export const BOSS_ITEM_ICONS=Object.freeze({
+  '炉誓秘杖':'EQ-L-034','典守之狱衣':'EQ-L-062','血印誓约护符':'EQ-L-091','渊丝禁忌秘典':'EQ-L-099',
+  '失名者的最后祷言':'EQ-L-100','守魂者的夜行头冠':'EQ-L-050','朽化荆棘战靴':'EQ-L-080',
+  '永霜寒玉戒':'EQ-L-090','黑曜焚世长杖':'EQ-L-036'
+});
+export const BASES=Object.freeze(Object.fromEntries(SLOT_IDS.map(s=>[s,catalogPool(0,s).map(c=>c.sub)])));
 export const AFFIXES={
-  power:{name:'法术强度',min:2,max:11,slots:['weapon','offhand','amulet','ring1','ring2','charm','gloves']},
-  hp:{name:'最大生命',min:8,max:36,slots:['head','shoulders','robe','gloves','belt','pants','boots','amulet','ring1','ring2','charm']},
-  mana:{name:'最大法力',min:6,max:24,slots:['head','robe','offhand','belt','amulet','ring1','ring2','charm']},
-  armor:{name:'护甲',min:3,max:18,slots:['head','shoulders','robe','gloves','belt','pants','boots','offhand']},
-  crit:{name:'暴击率 %',min:1,max:5,slots:['weapon','gloves','amulet','ring1','ring2','charm']},
-  critDmg:{name:'暴击伤害 %',min:5,max:17,slots:['weapon','gloves','amulet','ring1','ring2','charm']},
+  power:{name:'法术强度',min:2,max:11,slots:['weapon','offhand','amulet','ring1','ring2','gloves']},
+  hp:{name:'最大生命',min:8,max:36,slots:['head','shoulders','robe','gloves','belt','boots','amulet','ring1','ring2']},
+  mana:{name:'最大法力',min:6,max:24,slots:['head','robe','offhand','belt','amulet','ring1','ring2']},
+  armor:{name:'护甲',min:3,max:18,slots:['head','shoulders','robe','gloves','belt','boots','offhand']},
+  crit:{name:'暴击率 %',min:1,max:5,slots:['weapon','gloves','amulet','ring1','ring2']},
+  critDmg:{name:'暴击伤害 %',min:5,max:17,slots:['weapon','gloves','amulet','ring1','ring2']},
   haste:{name:'施法速度 %',min:2,max:9,slots:['weapon','gloves','offhand','amulet','ring1','ring2']},
-  fire:{name:'火焰增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2','charm']},
-  cold:{name:'冰霜增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2','charm']},
+  fire:{name:'火焰增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  cold:{name:'冰霜增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
   resistFire:{name:'火焰抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
   resistCold:{name:'冰霜抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
   resistDark:{name:'暗影抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
-  regen:{name:'每秒法力恢复',min:1,max:5,slots:['offhand','amulet','ring1','ring2','charm']},
-  lifesteal:{name:'击中回复生命',min:1,max:4,slots:['weapon','gloves','ring1','ring2','charm']},
-  skillFire:{name:'火系技能等级',min:1,max:1,slots:['weapon','amulet','charm']},
-  skillCold:{name:'冰系技能等级',min:1,max:1,slots:['weapon','amulet','charm']}
+  regen:{name:'每秒法力恢复',min:1,max:5,slots:['offhand','amulet','ring1','ring2']},
+  lifesteal:{name:'击中回复生命',min:1,max:4,slots:['weapon','gloves','ring1','ring2']},
+  skillFire:{name:'火系技能等级',min:1,max:1,slots:['weapon','amulet','offhand']},
+  skillCold:{name:'冰系技能等级',min:1,max:1,slots:['weapon','amulet','offhand']}
 };
 export const SETS={
   dragonflame:{name:'龙焰法衣',slots:['head','robe','gloves'],two:'火焰增伤 +15%',three:'每第三次火系命中附加爆炎',special:{fire:15}},
@@ -67,52 +76,72 @@ export const REGION_DATA=[
 const safeNum=(x,max=9999)=>Math.max(0,Math.min(max,Math.floor(Number.isFinite(x)?x:0)));
 const validId=x=>typeof x==='string'&&x.length>0&&x.length<=100;
 export function normalizeItem(item) {
-  if(!item||typeof item!=='object'||!validId(item.id)||!SLOT_IDS.includes(item.slot))return null;
+  if(!item||typeof item!=='object'||!validId(item.id))return null;
+  const legacy=Object.hasOwn(LEGACY_SLOTS,item.slot);
+  if(!legacy&&!SLOT_IDS.includes(item.slot))return null;
   if(typeof item.name!=='string'||item.name.length>64)return null;
   if(['power','hp','mana','armor','value'].some(k=>!Number.isFinite(item[k]??0)))return null;
   const rarity=Number.isInteger(item.rarity)?Math.max(0,Math.min(4,item.rarity)):0;
   const seen=new Set(),affixes=[];
   if(Array.isArray(item.affixes))for(const entry of item.affixes.slice(0,12)){
-    if(entry&&Object.hasOwn(AFFIXES,entry.key)&&AFFIXES[entry.key].slots.includes(item.slot)&&!seen.has(entry.key)){
+    if(entry&&Object.hasOwn(AFFIXES,entry.key)&&(legacy||AFFIXES[entry.key].slots.includes(item.slot))&&!seen.has(entry.key)){
       affixes.push({key:entry.key,value:safeNum(entry.value,1000)});seen.add(entry.key);
     }
   }
-  const setId=rarity===4&&Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
+  const setId=!legacy&&rarity===4&&Object.hasOwn(SETS,item.setId)&&SETS[item.setId].slots.includes(item.slot)?item.setId:null;
+  // 图鉴记录：必须与装备槽一致；缺失时（旧存档）按 ID 稳定挑选同槽同品质记录并改用其名称。
+  let name=item.name,entry=null;
+  if(!legacy){
+    const given=CATALOG_BY_ID.get(item.cid);
+    const boss=CATALOG_BY_ID.get(BOSS_ITEM_ICONS[name]);
+    if(given&&given.s===slotGroup(item.slot))entry=given;
+    else if(boss&&boss.s===slotGroup(item.slot))entry=boss;
+    else{
+      const pool=catalogPool(rarity,item.slot);
+      entry=pool[hashId(item.id)%pool.length];
+      name=entry.n;
+    }
+  }
   return {
-    id:item.id,slot:item.slot,name:item.name,rarity,ilvl:safeNum(item.ilvl||1,60),
+    id:item.id,slot:item.slot,name,rarity,ilvl:safeNum(item.ilvl||1,60),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
     armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
+    cid:entry?.id||null,hands:entry?.h===2?2:1,legacy,
     favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
 export function getSlotForItem(item,target){
-  if(!item)return null;
+  if(!item||item.legacy||!SLOT_IDS.includes(item.slot))return null;
   if(['ring1','ring2'].includes(item.slot))return ['ring1','ring2'].includes(target)?target:item.slot;
   return item.slot===target||target==null?item.slot:null;
 }
+const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold'};
 export function makeLoot(rng,level,id,{boss=false}={}){
   const n=Math.max(1,Math.min(60,level));
   const roll=rng();
   const rarity=boss&&roll<.10?4:roll<.035?3:roll<.20?2:roll<.56?1:0;
-  const setId=rarity===4?(rng()<.5?'dragonflame':'warden'):null;
-  const slot=setId?SETS[setId].slots[Math.floor(rng()*3)]:SLOT_IDS[Math.floor(rng()*SLOT_IDS.length)];
-  const base=BASES[slot];
-  const name=base[Math.floor(rng()*base.length)];
-  const affixMax=rarity===0?0:rarity===1?2:rarity===2?4:5;
-  const count=affixMax? Math.max(1,Math.min(affixMax,Math.floor(rng()*affixMax)+1)):0;
+  const setId=rarity===4&&rng()<.5?(rng()<.5?'dragonflame':'warden'):null;
+  const groups=SLOT_IDS.filter(s=>s!=='ring2');
+  const slot=setId?SETS[setId].slots[Math.floor(rng()*3)]:groups[Math.floor(rng()*groups.length)];
+  const pool=catalogPool(rarity,slot),entry=pool[Math.floor(rng()*pool.length)];
+  const affixMax=[0,2,4,5,5][rarity],affixMin=[0,1,2,3,setId?2:4][rarity];
+  const count=affixMax?Math.max(affixMin,Math.min(affixMax,Math.floor(rng()*affixMax)+1)):0;
   const choices=Object.keys(AFFIXES).filter(k=>AFFIXES[k].slots.includes(slot));
+  // 图鉴元素倾向（火/霜）优先出对应增伤词缀，让名字、图标和属性一致。
+  const lean=ELEMENT[entry.aff];
+  if(lean&&choices.includes(lean)){choices.splice(choices.indexOf(lean),1);choices.unshift(lean);}
   const affixes=[];
   for(let i=0;i<count&&choices.length;i++){
-    const index=Math.floor(rng()*choices.length);
+    const index=i===0&&lean&&choices[0]===lean?0:Math.floor(rng()*choices.length);
     const key=choices.splice(index,1)[0],rule=AFFIXES[key];
     const scaling=1+Math.floor(n/7)*.23;
     affixes.push({key,value:Math.max(1,Math.round((rule.min+rng()*(rule.max-rule.min))*scaling))});
   }
-  const armorSlot=['head','shoulders','robe','gloves','belt','pants','boots','offhand'].includes(slot);
-  const weaponSlot=slot==='weapon';
+  const armorSlot=['head','shoulders','robe','gloves','belt','boots','offhand'].includes(slot);
+  const weaponSlot=slot==='weapon',twoHand=entry.h===2;
   return normalizeItem({
-    id,slot,rarity,ilvl:n,name:(setId?SETS[setId].name+' · ':rarity===3?'远古 · ':'')+name,
-    power:weaponSlot?Math.round((6+n*2.5)*(1+rarity*.27)):0,
+    id,slot,rarity,ilvl:n,name:entry.n,cid:entry.id,
+    power:weaponSlot?Math.round((6+n*2.5)*(1+rarity*.27)*(twoHand?1.4:1)):0,
     hp:slot==='robe'?Math.round(10+n*2.6):0,
     mana:slot==='offhand'?Math.round(10+n*1.4):0,
     armor:armorSlot?Math.round((7+n*1.1)*(1+rarity*.19)):0,
@@ -125,6 +154,7 @@ export function equipmentBonus(profile) {
   for(const slot of SLOT_IDS){
     const item=itemById.get(profile.equipped[slot]);
     if(!item||getSlotForItem(item,slot)!==slot)continue;
+    if(slot==='offhand'&&itemById.get(profile.equipped.weapon)?.hands===2)continue;
     for(const key of ['power','hp','mana','armor'])extra[key]=(extra[key]||0)+(item[key]||0);
     for(const affix of item.affixes||[])extra[affix.key]=(extra[affix.key]||0)+affix.value;
     if(item.setId)totals[item.setId]=(totals[item.setId]||0)+1;

@@ -231,3 +231,13 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 .skin-choice select{min-height:43px;width:100%;border:1px solid #9e7d52;border-radius:2px;background:linear-gradient(#313844,#10171d);color:#f1d9ab;font-size:14px;padding:7px 10px}
 .inv-gear-column .skin-choice{max-width:none;margin:9px 0 5px}
 @media(max-width:700px){.skin-choice{max-width:100%;width:100%}.skin-choice select{font-size:15px}}
+/* v0.4 图鉴装备图标：原画缩放，不用像素放大 */
+.rarity-0{color:#d6d3cb!important}.rarity-1{color:#6cb2ff!important}.rarity-2{color:#c387ff!important}.rarity-3{color:#ff9a45!important}.rarity-4{color:#e2bb6a!important}
+.equipment-icon,.item-thumbnail,.item-preview,.compare-icon{image-rendering:auto;border-radius:3px}
+.equipment-icon{width:46px;height:46px}.item-thumbnail,.inv-bag-column .item-detail .item-thumbnail{width:56px;height:56px}
+.item-preview{width:96px;height:96px}.compare-icon{width:64px;height:64px}
+@media(max-width:760px){.equipment-icon{width:40px;height:40px}.item-thumbnail,.inv-bag-column .item-detail .item-thumbnail{width:50px;height:50px}.item-preview{width:72px;height:72px}}
+.item-effect{clear:both;margin:10px 0;padding:9px 11px;border:1px solid currentColor;border-left-width:3px;background:#0d1016}
+.item-effect strong{display:block;font-size:13px}.item-effect p{margin:6px 0 0;color:#cfc6b8!important;font-size:12px;line-height:1.6}
+.item-effect .item-drawback{color:#e48c7c!important}.item-effect small{display:block;margin-top:6px;color:#7f7a72!important;font-size:10px}
+.item-lore{font-size:11px;font-style:italic;color:#9b9384;line-height:1.6;margin:8px 0}

@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 密集战斗与五色法师 v0.3.6</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 图鉴装备与光照 v0.4.0</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -30,7 +30,7 @@
     <p class="lead">断昼之后，最后的火种在黑暗里微微颤动。</p>
     <p>你是灰烬边境的持灯者。深入地窟，击败徘徊的空潮仆从，夺回失落的炉心。装备与成长将随每一次远征保留。</p>
     <label class="skin-choice"><span>选择法师形象</span><select id="mage-skin-start" aria-label="法师外观皮肤"><option value="arcane">星辉奥术 · 蓝</option><option value="flame">赤焰术士 · 红</option><option value="light">晨曦圣辉 · 白</option><option value="shadow">虚空秘法 · 紫</option><option value="nature">翠绿自然 · 绿</option></select></label>
-    <div class="features"><span>✧ 九张探索地图</span><span>✧ 13 槽装备与词缀</span><span>✧ 十一项技能</span></div>
+    <div class="features"><span>✧ 九张探索地图</span><span>✧ 350 件图鉴装备</span><span>✧ 十一项技能</span></div>
     <button class="primary" id="modal-primary" type="button">进入灰烬地窟 <span>→</span></button>
     <button class="subtle" id="modal-secondary" type="button" hidden>继续游戏</button>
     <small class="fineprint">单人试玩原型 · Boss 可掉专属装备 · 点击行囊查看物品图片 · 写实 2.5D 仍在开发</small>
@@ -46,7 +46,7 @@
     </nav>
     <div class="inv-workspace">
       <section class="inv-gear-column" aria-label="角色装备">
-        <div class="paper-doll-head"><strong>角色装备 · 13 槽</strong><small>点击装备槽查看当前物品</small></div>
+        <div class="paper-doll-head"><strong>角色装备 · 11 槽</strong><small>点击装备槽查看当前物品</small></div>
         <label class="skin-choice"><span>选择法师形象</span><select id="mage-skin-inventory" aria-label="法师外观皮肤"><option value="arcane">星辉奥术 · 蓝</option><option value="flame">赤焰术士 · 红</option><option value="light">晨曦圣辉 · 白</option><option value="shadow">虚空秘法 · 紫</option><option value="nature">翠绿自然 · 绿</option></select></label>
         <div class="equipment" id="equipment"></div>
       </section>
@@ -83,6 +83,7 @@
               <option value="weapon">武器 / 副手</option>
               <option value="armor">防具</option>
               <option value="accessory">饰品</option>
+              <option value="legacy">旧版装备</option>
             </select>
           </label>
           <label>排序

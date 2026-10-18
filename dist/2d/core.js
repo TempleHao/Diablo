@@ -105,6 +105,7 @@ export function sanitizeSave(raw){
     const item=p.inventory.find(i=>i.id===id);
     if(item&&getSlotForItem(item,slot)===slot&&!used.has(id)){p.equipped[slot]=id;used.add(id);}
   }
+  if(p.inventory.find(i=>i.id===p.equipped.weapon)?.hands===2)p.equipped.offhand=null;
   return p;
 }
 export function stats(p){return calculateStats(p);}
@@ -119,7 +120,12 @@ export function equip(p,id,target=null){
   const item=p.inventory.find(i=>i.id===id);if(!item)return false;
   const slot=getSlotForItem(item,target);if(!slot)return false;
   for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
-  p.equipped[slot]=id;return true;
+  p.equipped[slot]=id;
+  // 双手法杖占用副手：穿双手武器卸下副手；穿副手时卸下双手武器。
+  const weapon=p.inventory.find(i=>i.id===p.equipped.weapon);
+  if(slot==='weapon'&&item.hands===2)p.equipped.offhand=null;
+  if(slot==='offhand'&&weapon?.hands===2)p.equipped.weapon=null;
+  return true;
 }
 export function upgradeSkill(p,key){
   if(!Object.hasOwn(SKILLS,key)||p.level<SKILLS[key].unlocked||p.skillPoints<1)return false;

@@ -1,7 +1,7 @@
 // Demo environment pass inspired by ruined-cathedral dungeon references.
 // Overlay follows ACTUAL collidable masonry, not a fake non-colliding maze.
 const mix=(x,y,s)=>((Math.imul(x+7187,73856093)^Math.imul(y+1921,19349663)^(s|0))>>>0);
-export function drawDungeonDetail(ctx,dungeon,cam,vw,vh,tick){
+export function drawDungeonDetail(ctx,dungeon,cam,vw,vh,tick,staticOnly=false){
  if(!dungeon)return;
  const seed=dungeon.seed|0;
  ctx.save();
@@ -38,7 +38,8 @@ export function drawDungeonDetail(ctx,dungeon,cam,vw,vh,tick){
    }
  }
  // Torch halos are local lights only; no giant full-screen bloom.
- for(const torch of dungeon.torches){
+ // 静态模式（地面分块缓存）不画会闪烁的火把光晕，交给光照层。
+ if(!staticOnly)for(const torch of dungeon.torches){
    if(torch.x<cam.x-140||torch.x>cam.x+vw+140||torch.y<cam.y-140||torch.y>cam.y+vh+140)continue;
    const pulse=1+Math.sin(tick*5+torch.x*.01)*.07;
    const g=ctx.createRadialGradient(torch.x,torch.y-14,4,torch.x,torch.y-14,110*pulse);

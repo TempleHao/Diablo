@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {REGION_DATA, BASES, makeLoot} from '../dist/2d/systems.js';
+import {REGION_DATA, BASES, makeLoot, catalogEntry} from '../dist/2d/systems.js';
 import {BOSS_POOLS,rollBossRewards} from '../dist/2d/boss-loot.js';
 import {freshSave,sanitizeSave,makeDungeon,mulberry32} from '../dist/2d/core.js';
 import {pickRandomDestination,destinationOptions,validateDestination} from '../dist/2d/travel.js';
@@ -56,13 +56,15 @@ test('weapons and jewelry icons always match their functional silhouette',()=>{
  assert.equal(iconType(sample('amulet','霜痕吊坠')),'amulet');
  assert.equal(iconType(sample('robe','刻印重甲')),'chest');
 });
-test('equip bases expanded beyond previous placeholder item names',()=>{
- assert.ok(Object.values(BASES).every(names=>names.length>=6));
- const all=new Set(Object.values(BASES).flat());
- assert.ok(all.size>=70);
- const r=mulberry32(2026);
- for(let k=0;k<120;k++){
-  const item=makeLoot(r,15,'u-'+k);
-  assert.ok(BASES[item.slot].some(base=>item.name.includes(base)));
+test('equipment names come from the 350-entry caster catalog and stay slot-correct',()=>{
+ const r=mulberry32(2026),names=new Set();
+ for(let k=0;k<400;k++){
+  const item=makeLoot(r,15,'u-'+k),entry=catalogEntry(item);
+  assert.ok(entry,'every drop references a catalog record');
+  assert.equal(entry.n,item.name);assert.equal(entry.r,item.rarity);
+  assert.equal(entry.s,item.slot==='ring2'?'ring1':item.slot);
+  names.add(item.name);
  }
+ assert.ok(names.size>=150,'drops should be rich, got '+names.size);
+ assert.ok(Object.values(BASES).every(list=>list.length>=3));
 });

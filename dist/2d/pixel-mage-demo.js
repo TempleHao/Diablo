@@ -1,42 +1,25 @@
 /**
- * TEST ONLY. Small pixel-art character from user-provided visual reference.
- * This asset is never a substitute for the final dark/realistic 2.5D art track.
- * Programmatic secondary animation makes walking/casting responsive without
- * pretending that a single illustration is a true hand-drawn walk cycle.
+ * 法师角色贴图：使用用户提供的五色法师原画（art/mage-skins.webp）。
+ * 五个外观是五张独立原画，不再靠程序换色。
+ * 一张静态原画配合程序化次级动画（呼吸、步伐、施法前倾），测试版够用；
+ * 真正的逐帧行走/施法序列需要另外绘制。
  */
-const mage=typeof Image==='undefined'?null:new Image();
+const sheet=typeof Image==='undefined'?null:new Image();
 let ready=false,failed=false;
 export const SKIN_LABELS=Object.freeze({arcane:'奥术 · 星辉蓝',flame:'烈焰 · 赤红',light:'圣辉 · 象牙白',shadow:'暗影 · 紫晶',nature:'自然 · 翠绿'});
-const skinCanvases=new Map();
-function skinCanvas(skin){
-  if(!ready||!mage)return null;
-  if(!SKIN_LABELS[skin])skin='arcane';
-  if(skin==='arcane')return mage;
-  if(skinCanvases.has(skin))return skinCanvases.get(skin);
-  const canvas=document.createElement('canvas');canvas.width=mage.naturalWidth;canvas.height=mage.naturalHeight;
-  const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(mage,0,0);
-  const image=context.getImageData(0,0,canvas.width,canvas.height),a=image.data;
-  for(let i=0;i<a.length;i+=4){
-    const [r,g,b]=[a[i],a[i+1],a[i+2]];
-    if(a[i+3]<12)continue;
-    const blue=(b>r*1.16&&b>g*1.05&&b>56),highlight=(b>110&&b>r*1.07&&g>70);
-    if(!blue)continue;
-    if(skin==='flame'){a[i]=Math.min(255,Math.round(b*.88+25));a[i+1]=Math.round(g*.51);a[i+2]=Math.round(r*.55);}
-    if(skin==='light'){const gray=Math.round(r*.16+g*.34+b*.5);a[i]=Math.min(255,gray+50);a[i+1]=Math.min(255,gray+47);a[i+2]=Math.min(255,gray+40);}
-    if(skin==='shadow'){a[i]=Math.round(b*.7);a[i+1]=Math.round(g*.5);a[i+2]=Math.min(255,Math.round(b*.88+15));}
-    if(skin==='nature'){a[i]=Math.round(r*.64);a[i+1]=Math.min(255,Math.round(b*.8+13));a[i+2]=Math.round(g*.66);}
-    if(highlight&&skin==='flame'){a[i]=Math.min(255,a[i]+20);a[i+1]=Math.min(255,a[i+1]+10);}
-  }
-  context.putImageData(image,0,0);skinCanvases.set(skin,canvas);return canvas;
+const SKINS=['arcane','flame','light','shadow','nature'];
+// 贴图格：173×200，脚底中心在 x=92、y=200；法杖宝石大约在 (145,42)。
+const CELL={w:173,h:200,footX:92,gemX:145,gemY:42};
+export const SKIN_GLOW=Object.freeze({arcane:'#6cb8ff',flame:'#ff8a3d',light:'#ffd77a',shadow:'#b46cff',nature:'#6fe07a'});
+const DRAW_H=124,K=DRAW_H/CELL.h;
+if(sheet){
+  sheet.decoding='async';
+  sheet.addEventListener('load',()=>{ready=true;});
+  sheet.addEventListener('error',()=>{failed=true;});
+  sheet.src=new URL('./art/mage-skins.webp',import.meta.url).href;
 }
-
-if(mage){
-  mage.decoding='async';
-  mage.addEventListener('load',()=>{ready=true;});
-  mage.addEventListener('error',()=>{failed=true;});
-  mage.src=new URL('./art/ember-mage-test-blue.webp',import.meta.url).href;
-}
-export const status=()=>({ready,failed,width:mage?.naturalWidth??0,height:mage?.naturalHeight??0});
+export const status=()=>({ready,failed,width:sheet?.naturalWidth??0,height:sheet?.naturalHeight??0});
+export const skinIndex=skin=>Math.max(0,SKINS.indexOf(skin));
 export const animationPose=(actor,tick)=>{
   const moving=!!actor.moving;
   const phase=Number.isFinite(actor.walk)?actor.walk:0;
@@ -44,71 +27,52 @@ export const animationPose=(actor,tick)=>{
   return {
     mode:(actor.invuln>0.3)?'hurt':actor.cast>0?'cast':moving?'run':'idle',
     moving,
-    bob:moving?-1.8*Math.abs(Math.sin(phase)):-.65*Math.sin(tick*2),
-    lean:moving?Math.sin(phase)*.055:Math.sin(tick*1.7)*.013,
+    bob:moving?-2.2*Math.abs(Math.sin(phase)):-.8*Math.sin(tick*2.2),
+    lean:moving?Math.sin(phase)*.045:Math.sin(tick*1.7)*.012,
     stride,phase
   };
 };
+/** 把法师画到 ctx；x/y 为脚底。返回当前动作名。 */
 export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   if(!ready){
     if(fallback)fallback(ctx,actor,tick,gear,scale);
     return 'fallback';
   }
-  const pose=animationPose(actor,tick),picture=skinCanvas(actor.skin||'arcane');
+  const skin=SKINS.includes(actor.skin)?actor.skin:'arcane';
+  const sx=skinIndex(skin)*CELL.w,pose=animationPose(actor,tick);
   ctx.save();ctx.translate(actor.x,actor.y);ctx.scale(scale,scale);
-  ctx.fillStyle='#04071099';ctx.beginPath();ctx.ellipse(0,4,29,8,0,0,Math.PI*2);ctx.fill();
-  // Readable orientation from existing angle; back view is a temporary mirror,
-  // the final art track requires genuine multi-direction sprites.
-  const facingLeft=Math.cos(actor.angle)<-.15;
-  if(facingLeft)ctx.scale(-1,1);
-  ctx.rotate(pose.lean);
-  const imageW=88,imageH=120;
-  const draw=(dx,dy,alpha=1,filter='none')=>{
-    ctx.save();ctx.globalAlpha=alpha;ctx.filter=filter;
-    ctx.imageSmoothingEnabled=false;
-    const bottom=imageH-33;
-    if(pose.moving){
-      // Real, separately transformed lower-body layer: alternating foot travel,
-      // not simply translating an unchanging still picture.
-      ctx.drawImage(picture,0,0,imageW,bottom,dx-imageW/2,dy-imageH+3,imageW,bottom);
-      ctx.save();ctx.translate(pose.stride*1.8,Math.abs(pose.stride)*-.65);
-      ctx.drawImage(picture,0,bottom,imageW,33,dx-imageW/2,dy-imageH+3+bottom,imageW,33);
-      ctx.restore();
-    }else ctx.drawImage(picture,0,0,imageW,imageH,dx-imageW/2,dy-imageH+3,imageW,imageH);
-    ctx.restore();
-  };
-  // Rapid caster lean + short-lived trail, independent of the world collider.
+  // 接地阴影
+  ctx.fillStyle='rgba(2,4,10,.55)';ctx.beginPath();ctx.ellipse(0,3,30,8,0,0,Math.PI*2);ctx.fill();
+  // 原画朝左；向右移动时水平翻转。
+  if(Math.cos(actor.angle||0)>.15)ctx.scale(-1,1);
+  ctx.rotate(pose.lean+(pose.mode==='cast'?-.06:0));
+  ctx.translate(0,pose.bob);
+  if(pose.mode==='hurt')ctx.globalAlpha=.55+.45*Math.abs(Math.sin(tick*30));
+  const w=CELL.w*K,h=DRAW_H,left=-CELL.footX*K;
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
   if(pose.moving){
-    const stride=pose.stride;
-    ctx.save();ctx.translate(-stride*2,-1.5);
-    draw(-3,-pose.bob,0.16,'brightness(1.4) saturate(1.5)');
+    // 上半身固定，下摆（约底部 22%）单独左右摆动，形成步伐感。
+    const split=Math.round(CELL.h*.78);
+    const squash=1-Math.abs(Math.sin(pose.phase))*.025;
+    ctx.save();ctx.scale(1,squash);
+    ctx.drawImage(sheet,sx,0,CELL.w,split,left,-h,w,split*K);
     ctx.restore();
+    ctx.drawImage(sheet,sx,split,CELL.w,CELL.h-split,left+pose.stride*1.6,-h+split*K*squash,w,(CELL.h-split)*K);
+  }else{
+    ctx.drawImage(sheet,sx,0,CELL.w,CELL.h,left,-h,w,h);
   }
-  ctx.save();
-  ctx.translate(pose.moving?pose.stride*.8:0,pose.bob);
-  if(pose.mode==='cast')ctx.rotate(-.10);
-  if(pose.mode==='hurt'){ctx.globalAlpha=.60+.35*Math.sin(tick*35)**2;}
-  if(pose.moving)ctx.scale(1+Math.sin(pose.phase)*.025,1-Math.abs(Math.sin(pose.phase))*.028);
-  draw(0,0,1);
+  ctx.globalAlpha=1;
+  // 法杖宝石：施法时亮起
+  const gx=(CELL.gemX-CELL.footX)*K,gy=-(CELL.h-CELL.gemY)*K;
+  const glow=SKIN_GLOW[skin];
+  const cast=pose.mode==='cast'?Math.min(1,(actor.cast||0)/.3):0;
+  const pulse=.35+.15*Math.sin(tick*4)+cast*.65;
+  ctx.globalCompositeOperation='lighter';
+  ctx.globalAlpha=pulse;
+  const r=10+cast*16;
+  const g=ctx.createRadialGradient(gx,gy,0,gx,gy,r);
+  g.addColorStop(0,'#ffffff');g.addColorStop(.25,glow);g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.fillRect(gx-r,gy-r,r*2,r*2);
   ctx.restore();
-  if(pose.mode==='cast'){
-    const phase=tick*9,radius=19+Math.sin(phase)*3;
-    const x=-27,y=-53;
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.strokeStyle='#78dcffb9';ctx.lineWidth=2.2;
-    ctx.shadowBlur=15;ctx.shadowColor='#7b8eff';
-    ctx.beginPath();ctx.arc(x,y,radius,-1.2,.7);ctx.stroke();
-    for(let i=0;i<4;i++){
-      const a=tick*4+i*Math.PI/2;
-      ctx.fillStyle=i%2?'#d9faff':'#8f8aff';
-      ctx.fillRect(x+Math.cos(a)*(radius+7),y+Math.sin(a)*(radius+7),3,3);
-    }
-    ctx.restore();
-  }
-  // Small footstep glints tick with real walking input.
-  if(pose.moving){
-    const pulse=Math.abs(Math.sin(pose.phase));
-    ctx.fillStyle='#a6d5ef'+Math.round(pulse*80).toString(16).padStart(2,'0');
-    ctx.beginPath();ctx.ellipse(-pose.stride*.45,0,5+pulse*4,1.8,0,0,Math.PI*2);ctx.fill();
-  }
-  ctx.restore();return pose.mode;
+  return pose.mode;
 }

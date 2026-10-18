@@ -3,10 +3,11 @@ import assert from 'node:assert/strict';
 import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes} from '../dist/2d/systems.js';
 import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats,upgradeSkill} from '../dist/2d/core.js';
 const i=(id,slot,affixes=[],setId=null)=>normalizeItem({id,slot,name:'测试装备',rarity:setId?4:2,ilvl:12,power:0,hp:0,mana:0,armor:0,affixes,setId});
-test('full paper doll includes 13 separate body and accessory slots',()=>{
-  assert.equal(SLOTS.length,13);
-  assert.equal(new Set(SLOT_IDS).size,13);
-  for(const slot of ['head','shoulders','robe','gloves','belt','pants','boots','weapon','offhand','amulet','ring1','ring2','charm'])assert.ok(SLOT_IDS.includes(slot));
+test('paper doll matches the equipment catalog: 11 slots, no legs or relic',()=>{
+  assert.equal(SLOTS.length,11);
+  assert.equal(new Set(SLOT_IDS).size,11);
+  for(const slot of ['head','shoulders','robe','gloves','belt','boots','weapon','offhand','amulet','ring1','ring2'])assert.ok(SLOT_IDS.includes(slot));
+  assert.ok(!SLOT_IDS.includes('pants')&&!SLOT_IDS.includes('charm'));
 });
 test('all eligible affix values affect genuine combat statistics',()=>{
   const p=freshSave();const item=i('staff','weapon',[{key:'power',value:31},{key:'crit',value:8},{key:'haste',value:9},{key:'fire',value:18},{key:'skillFire',value:1}]);
@@ -47,7 +48,7 @@ test('loot across levels produces slot, affix, and rarity variety',()=>{
     for(const a of x.affixes)assert.ok(AFFIXES[a.key].slots.includes(x.slot));
     assert.ok(formatAffixes(x).length>=0);
   }
-  assert.equal(slots.size,13);assert.equal(rarities.size,5);assert.ok(types.size>=12);
+  assert.equal(slots.size,10);assert.equal(rarities.size,5);assert.ok(types.size>=12);
 });
 test('all regions generate deterministic playable yet distinct dungeons',()=>{
   const signatures=new Set();

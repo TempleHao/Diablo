@@ -3,7 +3,7 @@
  * Pure, deterministic and independently testable; no asset dependencies.
  * Dedicated drops do not require paid assets or cloud services.
  */
-import { makeLoot, normalizeItem } from './systems.js';
+import { makeLoot, normalizeItem, BOSS_ITEM_ICONS } from './systems.js';
 
 export const BOSS_POOLS=Object.freeze([
   {id:'ashen-priest',name:'灰烬司祭',item:'炉誓秘杖',slot:'weapon',
@@ -14,7 +14,7 @@ export const BOSS_POOLS=Object.freeze([
     stats:{power:23,mana:18},affixes:[{key:'fire',value:13},{key:'critDmg',value:13},{key:'skillFire',value:1}]},
   {id:'rift-broodmother',name:'裂隙蛛母',item:'渊丝禁忌秘典',slot:'offhand',
     stats:{mana:54,armor:9},affixes:[{key:'cold',value:13},{key:'regen',value:4},{key:'power',value:13}]},
-  {id:'nameless-ember',name:'失名者',item:'失名者的最后祷言',slot:'charm',
+  {id:'nameless-ember',name:'失名者',item:'失名者的最后祷言',slot:'offhand',
     stats:{hp:23,mana:24},affixes:[{key:'fire',value:13},{key:'cold',value:12},{key:'skillCold',value:1}]},
   {id:'tomb-sentinel',name:'墓穴守魂者',item:'守魂者的夜行头冠',slot:'head',
     stats:{hp:44,armor:36},affixes:[{key:'hp',value:25},{key:'resistCold',value:13}]},
@@ -35,7 +35,7 @@ export function rollBossRewards(rng,level,region,previousKills,newId){
     const scale=1+Math.floor(Math.max(1,level)/8)*.14;
     const stats=Object.fromEntries(Object.entries(pool.stats).map(([key,val])=>[key,Math.round(val*scale)]));
     const item=normalizeItem({
-      id:newId(),name:pool.item,slot:pool.slot,rarity:3,ilvl:Math.min(60,Math.max(1,level)),
+      id:newId(),name:pool.item,cid:BOSS_ITEM_ICONS[pool.item],slot:pool.slot,rarity:3,ilvl:Math.min(60,Math.max(1,level)),
       power:0,hp:0,mana:0,armor:0,value:450+Math.max(1,level)*18,...stats,
       affixes:pool.affixes.map(a=>({key:a.key,value:Math.max(1,Math.round(a.value*scale))}))
     });

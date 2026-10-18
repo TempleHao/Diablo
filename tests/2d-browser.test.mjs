@@ -19,8 +19,10 @@ try{
     const page=await context.newPage(),errs=[];
     // Dedicated visual regression character: no fixture is shipped in the game itself.
     await page.addInitScript(()=>{
+      // v0.4：带图鉴编号（cid），名字保持不变、图标与类型对应。
+      const CID={staff:'EQ-L-032',helmet:'EQ-U-047',robe:'EQ-U-055',gloves:'EQ-E-069',ring:'EQ-E-088',amulet:'EQ-E-091',focus:'EQ-E-099'};
       const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
-        id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId
+        id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId,cid:CID[id]
       });
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
         version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
@@ -67,8 +69,9 @@ try{
       return mod.status();
     });
     assert.equal(sprite.ready,true,'demo mage image must load before character draw');
-    assert.equal(sprite.width,88,'reference mage image width differs');
-    assert.equal(sprite.height,120,'reference mage image height differs');
+    // v0.4：五色法师原画图集，5 格 × 173px，高 200px。
+    assert.equal(sprite.width,865,'mage skin sheet width differs');
+    assert.equal(sprite.height,200,'mage skin sheet height differs');
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const idle=await page.screenshot({type:'jpeg',quality:75});
       console.log((viewport.width===1365?'MAGE_IDLE_DESKTOP_BASE64:':viewport.width===390?'MAGE_IDLE_MOBILE_BASE64:':'MAGE_IDLE_LANDSCAPE_BASE64:')+idle.toString('base64'));
@@ -118,7 +121,7 @@ try{
     }
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
-    assert.equal(await page.locator('.equipment-slot').count(),13,'paper doll must show 13 slots');
+    assert.equal(await page.locator('.equipment-slot').count(),11,'paper doll must show 11 slots');
     if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
     assert.equal(await page.inputValue('#mage-skin-inventory'),'flame','equipment appearance must sync with start screen');
     await page.selectOption('#mage-skin-inventory','shadow');
@@ -172,7 +175,7 @@ try{
       assert.ok(viewportOverflow.scroll<=viewportOverflow.width+2,'mobile document horizontal overflow: '+JSON.stringify(viewportOverflow));
       await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
       assert.equal(await page.locator('#inventory').getAttribute('data-mobile-view'),'gear');
-      assert.equal(await page.locator('.equipment-slot:visible').count(),13);
+      assert.equal(await page.locator('.equipment-slot:visible').count(),11);
       await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
     }
     assert.ok(overflow.scroll<=overflow.client+3,'inventory must not overflow horizontally: '+JSON.stringify(overflow));
