@@ -4,10 +4,11 @@ import { BOSS_POOLS, rollBossRewards } from './boss-loot.js';
 import {destinationOptions,pickRandomDestination,validateDestination} from './travel.js';
 import {ENCOUNTER_COUNT,WAVE_SIZE,WAVE_COUNT,MAX_LIVE_ENEMIES,encounterWave,nextWaveForKills,shouldSummonBoss} from './encounters.js';
 import {emitVfx,tickVfx,paintVfx} from './spell-vfx.js';
+import {buildsOf,buildById} from './builds.js';
 import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDecals,shakeOffset} from './fx.js';
 import {drawDungeonDetail} from './dungeon-detail.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, RARITY_COLORS, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore, catalogEntry, isBow } from './systems.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -138,6 +139,32 @@ function renderLoadout(){
     };
     row.append(num,keyBtn,select);box.append(row);
   });
+}
+const AFFIX_LABEL=k=>({power:CLASSES[profile.heroClass].power,hp:'生命',mana:CLASSES[profile.heroClass].resource,armor:'护甲'})[k]||AFFIXES[k]?.name.replace(' %','')||k;
+function renderBuildGuide(){
+  const box=$('build-guide');if(!box)return;box.replaceChildren();
+  const cls=profile.heroClass,list=buildsOf(cls),cur=buildById(cls,profile.builds?.[cls]);
+  const tabs=document.createElement('div');tabs.className='build-tabs';
+  for(const b of list){const t=document.createElement('button');t.type='button';t.textContent=b.name;t.className=b.id===cur.id?'is-active':'';
+    t.onclick=()=>{profile.builds=profile.builds||{};profile.builds[cls]=b.id;persist();renderBuildGuide();};tabs.append(t);}
+  const desc=document.createElement('p');desc.className='build-desc';desc.textContent=cur.desc;
+  const skills=document.createElement('div');skills.className='build-skills';
+  cur.skills.forEach((k,i)=>{const sk=SKILLS[k],el=document.createElement('span');el.className='skill-'+sk.school+(profile.level<sk.unlocked?' locked':'');
+    el.title=sk.name+(profile.level<sk.unlocked?'（'+sk.unlocked+' 级解锁）':'');el.textContent=sk.icon;const n=document.createElement('small');n.textContent=sk.name;el.append(n);skills.append(el);});
+  const top=Object.entries(cur.weights).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k])=>AFFIX_LABEL(k));
+  const aff=document.createElement('p');aff.className='build-line';aff.textContent='词条优先：'+top.join(' > ');
+  const wpn=document.createElement('p');wpn.className='build-line';wpn.textContent='推荐武器：'+cur.weapons.join('、');
+  const tips=document.createElement('ul');tips.className='build-tips';for(const t of cur.tips){const li=document.createElement('li');li.textContent=t;tips.append(li);}
+  const actions=document.createElement('div');actions.className='build-actions';
+  const eq=document.createElement('button');eq.type='button';eq.className='primary';eq.textContent='一键穿戴（按「'+cur.name+'」）';
+  eq.onclick=()=>{let n=0;applyEquipmentChange(()=>{n=autoEquip(profile,cur.id);});announce(n?'一键穿戴完成 · 更换 '+n+' 个部位':'当前已是此流派的最佳搭配',true);};
+  const sk=document.createElement('button');sk.type='button';sk.textContent='套用推荐技能栏';
+  sk.onclick=()=>{profile.activeSkills=[...cur.skills];persist();renderSkillBar();renderInventory();announce('技能栏已套用「'+cur.name+'」',true);};
+  const spent=skillsOf(cls).reduce((n,k)=>n+(profile.skillRanks[k]||0),0);
+  const rs=document.createElement('button');rs.type='button';rs.textContent='洗点（返还 '+spent+' 点）';rs.disabled=!spent;
+  rs.onclick=()=>{if(!confirm('重置'+CLASSES[cls].name+'的全部技能点？测试版免费，其他职业不受影响。'))return;const n=respec(profile);persist();renderInventory();renderSkillBar();announce('洗点完成 · 返还 '+n+' 技能点',true);};
+  actions.append(eq,sk,rs);
+  box.append(tabs,desc,skills,aff,wpn,tips,actions);
 }
 function finishRebind(k){
   const slot=capturingSlot;capturingSlot=null;
@@ -534,6 +561,7 @@ function renderInventory(){
     actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
   }
   inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
+  renderBuildGuide();
   renderLoadout();
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
   const C=CLASSES[profile.heroClass];

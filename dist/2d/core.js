@@ -1,4 +1,5 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient } from './systems.js';
+import {buildById} from './builds.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
@@ -55,7 +56,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroClass:'mage',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS],loadouts:{}};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroClass:'mage',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS],loadouts:{},builds:{}};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -65,6 +66,7 @@ export function sanitizeSave(raw){
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
   p.heroClass=CLASS_IDS.includes(raw.heroClass)?raw.heroClass:'mage';
+  if(raw.builds&&typeof raw.builds==='object')for(const c of CLASS_IDS)if(typeof raw.builds[c]==='string'&&buildById(c,raw.builds[c]).id===raw.builds[c])p.builds[c]=raw.builds[c];
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
   // 每个职业各自的技能栏与按键；顶层 activeSkills/keybinds 是当前职业的。
@@ -153,6 +155,47 @@ export function switchClass(p,cls){
   p.keybinds=sanitizeKeybinds(l?.keybinds);
   p.skillPoints=pointsFor(p,cls);
   return true;
+}
+/** 洗点：返还当前职业全部技能点（测试版免费）。返回返还点数。 */
+export function respec(p,cls=p.heroClass){
+  let refunded=0;
+  for(const k of skillsOf(cls)){refunded+=p.skillRanks[k]||0;delete p.skillRanks[k];}
+  if(cls===p.heroClass)p.skillPoints=pointsFor(p,cls);
+  return refunded;
+}
+/** 按流派权重给装备打分：基础属性 + 词条 × 权重，擅长武器/推荐武器额外加分。 */
+export function buildScore(item,cls,build){
+  if(!item||item.legacy)return -1;
+  const w=build.weights,e=catalogEntry(item);
+  let s=(item.power||0)*(w.power||1)+(item.hp||0)*.22*(w.hp||1)+(item.mana||0)*.17*(w.mana||1)+(item.armor||0)*.33*(w.armor||1);
+  for(const a of item.affixes||[])s+=a.value*(w[a.key]??.3);
+  if(e){
+    if(item.slot==='weapon'||item.slot==='offhand'){
+      if(build.weapons.includes(e.sub))s*=1.35;else if(proficient(cls,e.sub))s*=1.15;else s*=.75;
+    }
+    if(e.cls===CLASSES[cls]?.catalog)s*=1.08;
+  }
+  return s;
+}
+/** 一键穿戴：每个部位穿上流派评分最高的装备；武器副手按组合比较（双手 / 弓 + 箭袋 / 单手 + 副手）。 */
+export function autoEquip(p,buildId){
+  const cls=p.heroClass,build=buildById(cls,buildId||p.builds?.[cls]);
+  const usable=p.inventory.filter(i=>!i.legacy);
+  const best=(slot)=>usable.filter(i=>getSlotForItem(i,slot)===slot||(slot.startsWith('ring')&&i.slot.startsWith('ring'))).sort((a,b)=>buildScore(b,cls,build)-buildScore(a,cls,build));
+  const next=emptyEquipment();
+  for(const slot of ['head','shoulders','robe','gloves','belt','boots','amulet']){const it=best(slot)[0];if(it)next[slot]=it.id;}
+  const rings=best('ring1');if(rings[0])next.ring1=rings[0].id;if(rings[1])next.ring2=rings[1].id;
+  const weapons=best('weapon'),offs=best('offhand');
+  let top={score:-1,w:null,o:null};
+  for(const w of [null,...weapons.slice(0,12)])for(const o of [null,...offs.slice(0,12)]){
+    if(!offhandAllowed(w,o))continue;
+    const sc=(w?buildScore(w,cls,build):0)+(o?buildScore(o,cls,build):0);
+    if(sc>top.score)top={score:sc,w,o};
+  }
+  next.weapon=top.w?.id||null;next.offhand=top.o?.id||null;
+  const changed=SLOT_IDS.filter(s=>p.equipped[s]!==next[s]).length;
+  p.equipped=next;p.builds=p.builds||{};p.builds[cls]=build.id;
+  return changed;
 }
 export function stats(p){return calculateStats(p);}
 export function expRequired(level){return level*45+15;}

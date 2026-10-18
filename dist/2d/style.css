@@ -285,3 +285,20 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 @media(max-width:760px){.status-panel{top:70px;left:8px;right:8px;width:auto;max-height:calc(100dvh - 260px)}.buffbar{bottom:178px;left:auto;right:8px;transform:none}.buffbar .buff{width:28px;height:32px}}
 
 body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden])) .eventlog{visibility:hidden}
+/* v0.5.1 流派指南 */
+.build-guide{border:1px solid #6a5438;background:#0f1319;padding:10px 12px;margin-bottom:14px}
+.build-tabs{display:flex;gap:6px;margin-bottom:8px}
+.build-tabs button{flex:1;border:1px solid #6a5438;background:#1b1e25;padding:7px;color:#cbbda5;font-size:12px}
+.build-tabs button.is-active{background:#5a3f22;color:#fff2d6;border-color:#d0a16b}
+.build-desc{margin:4px 0 8px;color:#e4d6bd;font-size:12px;line-height:1.6}
+.build-skills{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;margin-bottom:8px}
+.build-skills span{display:flex;flex-direction:column;align-items:center;border:1px solid #4e4232;background:#151a22;padding:4px 2px;font-size:18px;color:#e8dcc8}
+.build-skills span small{font-size:9px;color:#a89c88;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.build-skills span.locked{opacity:.45}
+.build-skills .skill-fire{color:#ff9d53}.build-skills .skill-cold{color:#92dafc}.build-skills .skill-lightning{color:#c9c6ff}.build-skills .skill-holy{color:#ffd76a}.build-skills .skill-poison{color:#9fe58a}.build-skills .skill-shadow{color:#c9a8ff}.build-skills .skill-arcane{color:#c9a8ff}
+.build-line{margin:3px 0;color:#c8b896;font-size:11px}
+.build-tips{margin:6px 0 8px 16px;padding:0;color:#a69c8c;font-size:11px;line-height:1.6}
+.build-actions{display:flex;gap:6px;flex-wrap:wrap}
+.build-actions button{border:1px solid #7f6644;background:#22252b;padding:8px 10px;font-size:12px;color:#e4d6bd}
+.build-actions .primary{width:auto;max-width:none;margin:0;flex:1 1 220px;padding:9px;letter-spacing:1px}
+@media(max-width:760px){.build-skills{grid-template-columns:repeat(5,minmax(0,1fr))}}

@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 七职业 · 状态面板 v0.5.0</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-status" type="button">状态 <kbd>C</kbd></button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 流派指南 · 一键穿戴 · 洗点 v0.5.1</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-status" type="button">状态 <kbd>C</kbd></button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -100,6 +100,8 @@
         <small class="fineprint">单击查看与对比，双击直接装备；手机点选后按“穿戴”。</small>
       </section>
     </div>
+    <div class="panel-subhead"><strong>流派指南（Build）</strong><span>选流派 → 一键穿戴 / 套用技能栏</span></div>
+    <div id="build-guide" class="build-guide"></div>
     <div class="panel-subhead"><strong>技能栏与按键</strong><span>点按键可改键，下拉框换技能</span></div>
     <div id="skill-loadout" class="skill-loadout"></div>
     <div class="panel-subhead"><strong id="skill-catalog-title">技能图鉴</strong><span>随角色等级解锁，用技能点升级</span></div>
