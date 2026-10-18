@@ -4,7 +4,7 @@ import {SKILLS,SKILL_SCHOOLS,ACTIVE_LIMIT,DEFAULT_ACTIVE,DEFAULT_KEYS,bindableKe
 import {freshSave,sanitizeSave,rebindKey,sanitizeKeybinds,equip,mulberry32} from '../dist/2d/core.js';
 
 test('31 skills across four schools, each with valid numbers',()=>{
-  const list=Object.values(SKILLS);
+  const list=Object.values(SKILLS).filter(s=>s.cls==='mage');
   assert.equal(list.length,31);
   for(const school of Object.keys(SKILL_SCHOOLS))assert.ok(list.filter(s=>s.school===school).length>=6,school);
   for(const s of list){assert.ok(s.cooldown>0&&s.mana>=0&&s.unlocked>=1&&s.unlocked<=60&&s.icon&&s.desc);assert.equal(s.key,undefined,'keys belong to bar slots, not skills');}

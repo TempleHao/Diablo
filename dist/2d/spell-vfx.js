@@ -9,7 +9,9 @@ const COLORS={
  meteor:['#ffecb5','#ff842a','#bc2e18'],blink:['#f8daff','#aa7af7','#5f54c9'],
  heal:['#f2ffd9','#b7ec9a','#68cb82'],armor:['#d8faff','#8ccbea','#6196d4'],
  shard:['#e3ffff','#a9e1ff','#71bcfa'],death:['#ffd0a0','#c4553a','#5a1a1a'],
- void:['#f0c8ff','#b46cf0','#6a2fa8']
+ void:['#f0c8ff','#b46cf0','#6a2fa8'],
+ physical:['#ffffff','#e8e0d0','#a89c88'],poison:['#e0ffd0','#7dff6a','#3a9a3a'],
+ holy:['#fffbe8','#ffd76a','#c8962a'],shadow:['#f0e0ff','#a56cf0','#4a2a7a']
 };
 const ICY=new Set(['ice','shard','nova','storm','armor']);
 const RISE=new Set(['fire','meteor','inferno','heal','death']);

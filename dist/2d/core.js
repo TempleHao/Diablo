@@ -1,4 +1,4 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf } from './systems.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
@@ -55,7 +55,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroSkin:'arcane',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS]};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroClass:'mage',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS],loadouts:{}};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -64,14 +64,14 @@ export function sanitizeSave(raw){
     const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
-  p.heroSkin=['arcane','flame','light','shadow','nature'].includes(raw.heroSkin)?raw.heroSkin:'arcane';
+  p.heroClass=CLASS_IDS.includes(raw.heroClass)?raw.heroClass:'mage';
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
-  if(Array.isArray(raw.activeSkills)){
-    const chosen=[...new Set(raw.activeSkills.filter(k=>typeof k==='string'&&Object.hasOwn(SKILLS,k)))].slice(0,ACTIVE_LIMIT);
-    const fill=[...DEFAULT_ACTIVE,...Object.keys(SKILLS)].filter((k,i,a)=>a.indexOf(k)===i&&!chosen.includes(k));
-    p.activeSkills=[...chosen,...fill].slice(0,ACTIVE_LIMIT);
+  // 每个职业各自的技能栏与按键；顶层 activeSkills/keybinds 是当前职业的。
+  if(raw.loadouts&&typeof raw.loadouts==='object')for(const c of CLASS_IDS){
+    const l=raw.loadouts[c];if(l&&typeof l==='object')p.loadouts[c]={activeSkills:sanitizeActive(c,l.activeSkills),keybinds:sanitizeKeybinds(l.keybinds)};
   }
+  p.activeSkills=sanitizeActive(p.heroClass,raw.activeSkills);
   p.keybinds=sanitizeKeybinds(raw.keybinds);
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
   if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
@@ -92,15 +92,16 @@ export function sanitizeSave(raw){
     }
   }
   p.pendingLoot=p.pendingLoot.filter(d=>!p.inventory.some(i=>i.id===d.item.id));
-  let pointsSpent=0;
-  if(raw.skillRanks&&typeof raw.skillRanks==='object'){
-    for(const key of Object.keys(SKILLS)){
+  // 技能点按职业分别计算：每个职业都有 (等级-1) 点。
+  if(raw.skillRanks&&typeof raw.skillRanks==='object')for(const c of CLASS_IDS){
+    let spent=0;
+    for(const key of skillsOf(c)){
       const candidate=Math.min(8,Math.max(0,Math.floor(Number(raw.skillRanks[key])||0)));
-      const permitted=Math.min(candidate,Math.max(0,p.level-1-pointsSpent));
-      if(permitted&&p.level>=SKILLS[key].unlocked){p.skillRanks[key]=permitted;pointsSpent+=permitted;}
+      const permitted=Math.min(candidate,Math.max(0,p.level-1-spent));
+      if(permitted&&p.level>=SKILLS[key].unlocked){p.skillRanks[key]=permitted;spent+=permitted;}
     }
   }
-  p.skillPoints=Math.max(0,p.level-1-pointsSpent);
+  p.skillPoints=pointsFor(p,p.heroClass);
   const used=new Set();
   for(const slot of SLOT_IDS){
     const id=raw.equipped?.[slot];
@@ -130,6 +131,29 @@ export function rebindKey(p,slot,key){
   if(other>=0&&other!==slot)p.keybinds[other]=p.keybinds[slot];
   p.keybinds[slot]=key;return true;
 }
+export function sanitizeActive(cls,raw){
+  const own=new Set(skillsOf(cls));
+  const chosen=Array.isArray(raw)?[...new Set(raw.filter(k=>typeof k==='string'&&own.has(k)))].slice(0,ACTIVE_LIMIT):[];
+  const fill=[...defaultActive(cls),...own].filter((k,i,a)=>a.indexOf(k)===i&&!chosen.includes(k));
+  return [...chosen,...fill].slice(0,ACTIVE_LIMIT);
+}
+export function pointsFor(p,cls){
+  let spent=0;for(const k of skillsOf(cls))spent+=p.skillRanks?.[k]||0;
+  return Math.max(0,p.level-1-spent);
+}
+/** 切换职业：等级、装备共用；技能栏、按键、技能点各职业分开。 */
+export function switchClass(p,cls){
+  if(!CLASS_IDS.includes(cls))return false;
+  if(cls===p.heroClass)return true;
+  p.loadouts=p.loadouts||{};
+  p.loadouts[p.heroClass]={activeSkills:[...p.activeSkills],keybinds:[...p.keybinds]};
+  p.heroClass=cls;
+  const l=p.loadouts[cls];
+  p.activeSkills=sanitizeActive(cls,l?.activeSkills);
+  p.keybinds=sanitizeKeybinds(l?.keybinds);
+  p.skillPoints=pointsFor(p,cls);
+  return true;
+}
 export function stats(p){return calculateStats(p);}
 export function expRequired(level){return level*45+15;}
 export function gainXp(p,amount){
@@ -149,7 +173,7 @@ export function equip(p,id,target=null){
   return true;
 }
 export function upgradeSkill(p,key){
-  if(!Object.hasOwn(SKILLS,key)||p.level<SKILLS[key].unlocked||p.skillPoints<1)return false;
+  if(!Object.hasOwn(SKILLS,key)||SKILLS[key].cls!==(p.heroClass||'mage')||p.level<SKILLS[key].unlocked||p.skillPoints<1)return false;
   const rank=p.skillRanks[key]||0;
   if(rank>=8)return false;
   p.skillRanks[key]=rank+1;p.skillPoints--;return true;

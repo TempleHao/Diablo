@@ -59,7 +59,7 @@ test('tempering increases real equipped stats and spends material exactly once',
  assert.equal(reload.inventory[0].affixes[0].value,result.affixes[0].value);
 });
 test('11 skills defined, max seven button slots saved, no duplicates or invalid IDs',()=>{
- assert.equal(Object.keys(SKILLS).length,31);
+ assert.equal(Object.values(SKILLS).filter(s=>s.cls==='mage').length,31);
  for(const k of ['chain','storm','ward','inferno'])assert.ok(SKILLS[k].cooldown>0&&SKILLS[k].unlocked>=4);
  const p=sanitizeSave({version:2,level:19,inventory:[],activeSkills:['storm','chain','ward','inferno','fire','fire','invalid','blink']});
  assert.equal(p.activeSkills.length,10);

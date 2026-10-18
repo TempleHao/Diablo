@@ -52,16 +52,17 @@ try{
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('[data-skill]').count(),10,'ten ability slots must render');
-    assert.equal(await page.locator('#mage-skin-start option').count(),5,'five mage palette selections');
-    await page.selectOption('#mage-skin-start','flame');
-    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'flame','appearance persists');
+    assert.equal(await page.locator('#class-start option').count(),7,'seven classes selectable');
+    await page.selectOption('#class-start','barbarian');
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroClass),'barbarian','class persists');
+    await page.selectOption('#class-start','mage');
     await page.click('#modal-primary');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
     const density=await page.evaluate(()=>window.__ember2dQA.encounterInfo());
     assert.equal(density.total,36,'threefold population in actual game');
     assert.equal(density.alive,12,'twelve spawn in first encounter');
-    assert.equal(density.skin,'flame');
+    assert.equal(density.cls,'mage');
     assert.equal(density.waves,3);
     const sprite=await page.evaluate(async()=>{
       const mod=await import('./pixel-mage-demo.js');
@@ -70,8 +71,8 @@ try{
     });
     assert.equal(sprite.ready,true,'demo mage image must load before character draw');
     // v0.4：五色法师原画图集，5 格 × 173px，高 200px。
-    assert.equal(sprite.width,865,'mage skin sheet width differs');
-    assert.equal(sprite.height,200,'mage skin sheet height differs');
+    assert.equal(sprite.width,190*7,'hero sheet width differs');
+    assert.equal(sprite.height,200,'hero sheet height differs');
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const idle=await page.screenshot({type:'jpeg',quality:75});
       console.log((viewport.width===1365?'MAGE_IDLE_DESKTOP_BASE64:':viewport.width===390?'MAGE_IDLE_MOBILE_BASE64:':'MAGE_IDLE_LANDSCAPE_BASE64:')+idle.toString('base64'));
@@ -123,9 +124,7 @@ try{
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),11,'paper doll must show 11 slots');
     if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
-    assert.equal(await page.inputValue('#mage-skin-inventory'),'flame','equipment appearance must sync with start screen');
-    await page.selectOption('#mage-skin-inventory','shadow');
-    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'shadow');
+    assert.equal(await page.inputValue('#class-inventory'),'mage','class select syncs with start screen');
     if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
     assert.equal(await page.locator('.catalog-skill').count(),31,'spell catalogue shows all 31 skills');
     assert.equal(await page.locator('#abilitybar [data-skill]').count(),10,'ten action bar slots');

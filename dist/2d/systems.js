@@ -1,5 +1,8 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
 import {CATALOG} from './equipment-catalog.js';
+import {CLASSES,CLASS_IDS,CLASS_BY_CATALOG,proficient,attackMode} from './classes.js';
+import {CLASS_SKILLS} from './class-skills.js';
+export {CLASSES,CLASS_IDS,proficient,attackMode};
 // v0.4：装备槽与「黑铁遗珍」装备库对齐（11 槽）。v0.4.1 起全部 500 件装备都可穿戴。
 // 双手武器占用副手；弓弩例外，可以配箭袋。
 export const SLOTS = Object.freeze([
@@ -43,10 +46,22 @@ export const AFFIXES={
   armor:{name:'护甲',min:3,max:18,slots:['head','shoulders','robe','gloves','belt','boots','offhand']},
   crit:{name:'暴击率 %',min:1,max:5,slots:['weapon','gloves','amulet','ring1','ring2']},
   critDmg:{name:'暴击伤害 %',min:5,max:17,slots:['weapon','gloves','amulet','ring1','ring2']},
-  haste:{name:'施法速度 %',min:2,max:9,slots:['weapon','gloves','offhand','amulet','ring1','ring2']},
+  haste:{name:'攻击/施法速度 %',min:2,max:9,slots:['weapon','gloves','offhand','amulet','ring1','ring2']},
   fire:{name:'火焰增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
   cold:{name:'冰霜增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
   lightning:{name:'雷电增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  physical:{name:'物理增伤 %',min:3,max:13,slots:['weapon','gloves','amulet','ring1','ring2']},
+  poison:{name:'毒素增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  holy:{name:'神圣增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  shadow:{name:'暗影增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  move:{name:'移动速度 %',min:2,max:8,slots:['boots']},
+  sk_amazon:{name:'亚马逊技能等级',min:1,max:1,cls:'amazon',slots:['weapon','offhand','amulet','head']},
+  sk_assassin:{name:'刺客技能等级',min:1,max:1,cls:'assassin',slots:['weapon','offhand','amulet','head']},
+  sk_barbarian:{name:'野蛮人技能等级',min:1,max:1,cls:'barbarian',slots:['weapon','offhand','amulet','head']},
+  sk_druid:{name:'德鲁伊技能等级',min:1,max:1,cls:'druid',slots:['weapon','offhand','amulet','head']},
+  sk_necro:{name:'死灵法师技能等级',min:1,max:1,cls:'necro',slots:['weapon','offhand','amulet','head']},
+  sk_paladin:{name:'圣骑士技能等级',min:1,max:1,cls:'paladin',slots:['weapon','offhand','amulet','head']},
+  sk_mage:{name:'法师技能等级',min:1,max:1,cls:'mage',slots:['weapon','offhand','amulet','head']},
   resistFire:{name:'火焰抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
   resistCold:{name:'冰霜抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
   resistDark:{name:'暗影抗性 %',min:3,max:12,slots:['head','robe','shoulders','belt','boots','ring1','ring2']},
@@ -98,10 +113,14 @@ export const SKILLS={
   slowtime:{name:'时间减缓',school:'arcane',icon:'⌛',mana:36,cooldown:14,unlocked:13,desc:'5 秒的时间泡：敌人和敌方弹道大幅变慢'},
   blackhole:{name:'黑洞',school:'arcane',icon:'●',mana:44,cooldown:12,unlocked:15,desc:'把附近敌人吸向中心并持续伤害'}
 };
+for(const s of Object.values(SKILLS)){s.cls='mage';s.tree=s.school;}
+Object.assign(SKILLS,CLASS_SKILLS);
+export const skillsOf=cls=>Object.keys(SKILLS).filter(k=>SKILLS[k].cls===cls);
 export const ACTIVE_LIMIT=10;
 export const DEFAULT_ACTIVE=Object.freeze(['fire','shard','nova','meteor','chain','ward','heal','armor','storm','blink']);
+export const defaultActive=cls=>[...(CLASSES[cls]||CLASSES.mage).defaults];
 export const DEFAULT_KEYS=Object.freeze(['1','2','3','4','5','q','e','r','f',' ']);
-export const RESERVED_KEYS=Object.freeze(['w','a','s','d','b','t','escape','arrowup','arrowdown','arrowleft','arrowright','tab','enter','meta','control','alt','shift']);
+export const RESERVED_KEYS=Object.freeze(['w','a','s','d','b','t','c','escape','arrowup','arrowdown','arrowleft','arrowright','tab','enter','meta','control','alt','shift']);
 /** 允许绑定的按键：数字、字母（除保留键）、空格、常见符号与 F1-F12。 */
 export function bindableKey(k){
   if(typeof k!=='string')return false;k=k.toLowerCase();
@@ -167,24 +186,29 @@ export function getSlotForItem(item,target){
   if(['ring1','ring2'].includes(item.slot))return ['ring1','ring2'].includes(target)?target:item.slot;
   return item.slot===target||target==null?item.slot:null;
 }
-const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning'};
-export function makeLoot(rng,level,id,{boss=false}={}){
+const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
+export function makeLoot(rng,level,id,{boss=false,cls=null}={}){
   const n=Math.max(1,Math.min(60,level));
   const roll=rng();
   const rarity=boss&&roll<.10?4:roll<.035?3:roll<.20?2:roll<.56?1:0;
   const setId=rarity===4&&rng()<.5?(rng()<.5?'dragonflame':'warden'):null;
   const groups=SLOT_IDS.filter(s=>s!=='ring2');
   const slot=setId?SETS[setId].slots[Math.floor(rng()*3)]:groups[Math.floor(rng()*groups.length)];
-  const pool=catalogPool(rarity,slot),entry=pool[Math.floor(rng()*pool.length)];
+  let pool=catalogPool(rarity,slot);
+  // 掉落偏向当前职业：60% 只在“偏好职业”为当前职业或全职业的装备里挑
+  if(cls&&CLASSES[cls]&&rng()<.6){const mine=pool.filter(c=>c.cls===CLASSES[cls].catalog||c.cls==='全职业');if(mine.length)pool=mine;}
+  const entry=pool[Math.floor(rng()*pool.length)],owner=CLASS_BY_CATALOG[entry.cls];
   const affixMax=[0,2,4,5,5][rarity],affixMin=[0,1,2,3,setId?2:4][rarity];
   const count=affixMax?Math.max(affixMin,Math.min(affixMax,Math.floor(rng()*affixMax)+1)):0;
-  const choices=Object.keys(AFFIXES).filter(k=>AFFIXES[k].slots.includes(slot));
+  // 职业技能词条只出现在该职业偏好的装备上；元素等级词条只出现在法师装备上
+  const choices=Object.keys(AFFIXES).filter(k=>AFFIXES[k].slots.includes(slot)&&(!AFFIXES[k].cls||AFFIXES[k].cls===owner)&&(!k.startsWith('skill')||owner==='mage'));
+  if(owner&&rarity>=2&&choices.includes('sk_'+owner)){choices.splice(choices.indexOf('sk_'+owner),1);choices.unshift('sk_'+owner);}
   // 图鉴元素倾向（火/霜）优先出对应增伤词缀，让名字、图标和属性一致。
   const lean=ELEMENT[entry.aff];
-  if(lean&&choices.includes(lean)){choices.splice(choices.indexOf(lean),1);choices.unshift(lean);}
+  if(lean&&choices.includes(lean)){choices.splice(choices.indexOf(lean),1);choices.splice(choices[0]?.startsWith('sk_')?1:0,0,lean);}
   const affixes=[];
   for(let i=0;i<count&&choices.length;i++){
-    const index=i===0&&lean&&choices[0]===lean?0:Math.floor(rng()*choices.length);
+    const index=(choices[0]?.startsWith('sk_')||choices[0]===lean)&&i<2?0:Math.floor(rng()*choices.length);
     const key=choices.splice(index,1)[0],rule=AFFIXES[key];
     const scaling=1+Math.floor(n/7)*.23;
     affixes.push({key,value:Math.max(1,Math.round((rule.min+rng()*(rule.max-rule.min))*scaling))});
@@ -221,12 +245,18 @@ export function equipmentBonus(profile) {
 export function calculateStats(profile){
   const {extra,sets}=equipmentBonus(profile);
   const value=(k,d=0)=>(extra[k]||0)+d;
-  return {power:17+profile.level*3+value('power'),hp:105+(profile.level-1)*13+value('hp'),
-    mana:100+value('mana'),armor:value('armor'),
-    crit:Math.min(70,5+value('crit')),critDmg:50+value('critDmg'),
+  const cls=CLASSES[profile.heroClass]?profile.heroClass:'mage',C=CLASSES[cls];
+  const weapon=profile.inventory.find(i=>i.id===profile.equipped?.weapon),wsub=catalogEntry(weapon)?.sub||null;
+  const off=profile.inventory.find(i=>i.id===profile.equipped?.offhand),osub=catalogEntry(off)?.sub||null;
+  return {cls,power:17+profile.level*3+value('power'),hp:C.hp+(profile.level-1)*C.hpLv+value('hp'),
+    mana:C.mana+value('mana'),armor:C.armor+value('armor'),
+    crit:Math.min(70,5+C.crit+value('crit')),critDmg:50+value('critDmg'),
+    weapon:wsub,attack:attackMode(cls,wsub),proficient:proficient(cls,wsub),offProficient:proficient(cls,osub),
+    physical:value('physical'),poison:value('poison'),holy:value('holy'),shadow:value('shadow'),
+    move:Math.min(40,value('move')),classSkill:value('sk_'+cls),
     haste:Math.min(70,value('haste')),fire:value('fire'),cold:value('cold'),lightning:value('lightning'),
     resistFire:Math.min(75,value('resistFire')),resistCold:Math.min(75,value('resistCold')),
-    resistDark:Math.min(75,value('resistDark')),regen:7+value('regen'),
+    resistDark:Math.min(75,value('resistDark')),regen:C.regen+value('regen'),
     lifesteal:value('lifesteal'),skillFire:value('skillFire'),skillCold:value('skillCold'),sets};
 }
 export function formatAffixes(item){

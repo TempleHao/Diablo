@@ -1,25 +1,30 @@
 /**
- * 法师角色贴图：使用用户提供的五色法师原画（art/mage-skins.webp）。
- * 五个外观是五张独立原画，不再靠程序换色。
- * 一张静态原画配合程序化次级动画（呼吸、步伐、施法前倾），测试版够用；
- * 真正的逐帧行走/施法序列需要另外绘制。
+ * 职业角色贴图：art/heroes.webp，7 格（亚马逊、刺客、野蛮人、德鲁伊、死灵法师、圣骑士、法师），
+ * 每格 190×200，脚底中心在格子正中下方。都是用户提供的原画。
+ * 一张静态原画配合程序化动画（落地步伐、呼吸、施法发光），不是逐帧动作。
  */
 const sheet=typeof Image==='undefined'?null:new Image();
 let ready=false,failed=false;
-export const SKIN_LABELS=Object.freeze({arcane:'奥术 · 星辉蓝',flame:'烈焰 · 赤红',light:'圣辉 · 象牙白',shadow:'暗影 · 紫晶',nature:'自然 · 翠绿'});
-const SKINS=['arcane','flame','light','shadow','nature'];
-// 贴图格：173×200，脚底中心在 x=92、y=200；法杖宝石大约在 (145,42)。
-const CELL={w:173,h:200,footX:92,gemX:145,gemY:42};
-export const SKIN_GLOW=Object.freeze({arcane:'#6cb8ff',flame:'#ff8a3d',light:'#ffd77a',shadow:'#b46cff',nature:'#6fe07a'});
+const CELL={w:190,h:200,footX:95};
+// face：原画朝向（-1 朝左，1 朝右）；glow：武器发光点（格内坐标）；color：施法光色
+export const HERO_ART=Object.freeze({
+  amazon:{index:0,face:1,glow:[57,8],color:'#ffe2a0'},
+  assassin:{index:1,face:-1,glow:[160,100],color:'#ff5a4a'},
+  barbarian:{index:2,face:1,glow:[132,32],color:'#ff9a5a'},
+  druid:{index:3,face:1,glow:[136,26],color:'#7dff7a'},
+  necro:{index:4,face:1,glow:[131,22],color:'#c06cff'},
+  paladin:{index:5,face:1,glow:[26,22],color:'#ffd77a'},
+  mage:{index:6,face:-1,glow:[148,42],color:'#ffe9a8'}
+});
 const DRAW_H=124,K=DRAW_H/CELL.h;
 if(sheet){
   sheet.decoding='async';
   sheet.addEventListener('load',()=>{ready=true;});
   sheet.addEventListener('error',()=>{failed=true;});
-  sheet.src=new URL('./art/mage-skins.webp',import.meta.url).href;
+  sheet.src=new URL('./art/heroes.webp',import.meta.url).href;
 }
 export const status=()=>({ready,failed,width:sheet?.naturalWidth??0,height:sheet?.naturalHeight??0});
-export const skinIndex=skin=>Math.max(0,SKINS.indexOf(skin));
+export const heroArt=cls=>HERO_ART[cls]||HERO_ART.mage;
 // 走路用分步节奏（每步 4 个关键姿势，约 8 帧/秒）而不是连续正弦：
 // 落地帧身体下沉、迈出的脚在前；过渡帧另一只脚抬起。没有上下漂浮和左右摇摆。
 export const animationPose=(actor,tick)=>{
@@ -37,18 +42,19 @@ export const animationPose=(actor,tick)=>{
   };
 };
 /** 把法师画到 ctx；x/y 为脚底。返回当前动作名。 */
-export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
+export function drawHero(ctx,actor,tick,gear,scale=1,fallback){
   if(!ready){
     if(fallback)fallback(ctx,actor,tick,gear,scale);
     return 'fallback';
   }
-  const skin=SKINS.includes(actor.skin)?actor.skin:'arcane';
-  const sx=skinIndex(skin)*CELL.w,pose=animationPose(actor,tick);
+  const art=heroArt(actor.cls);
+  const sx=art.index*CELL.w,pose=animationPose(actor,tick);
   ctx.save();ctx.translate(actor.x,actor.y);ctx.scale(scale,scale);
   // 接地阴影
   ctx.fillStyle='rgba(2,4,10,.55)';ctx.beginPath();ctx.ellipse(0,3,30,8,0,0,Math.PI*2);ctx.fill();
-  // 原画朝左；向右移动时水平翻转。
-  if(Math.cos(actor.angle||0)>.15)ctx.scale(-1,1);
+  // 按原画朝向与移动方向决定是否水平翻转
+  const facing=Math.cos(actor.angle||0)>.15?1:Math.cos(actor.angle||0)<-.15?-1:art.face;
+  if(facing!==art.face)ctx.scale(-1,1);
   ctx.rotate(pose.mode==='cast'?-.05:0);
   ctx.translate(0,Math.round(pose.bob));
   if(pose.mode==='hurt')ctx.globalAlpha=.55+.45*Math.abs(Math.sin(tick*30));
@@ -67,8 +73,8 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   }
   ctx.globalAlpha=1;
   // 法杖宝石：施法时亮起
-  const gx=(CELL.gemX-CELL.footX)*K,gy=-(CELL.h-CELL.gemY)*K;
-  const glow=SKIN_GLOW[skin];
+  const gx=(art.glow[0]-CELL.footX)*K,gy=-(CELL.h-art.glow[1])*K;
+  const glow=art.color;
   const cast=pose.mode==='cast'?Math.min(1,(actor.cast||0)/.3):0;
   const pulse=.35+.15*Math.sin(tick*4)+cast*.65;
   ctx.globalCompositeOperation='lighter';
@@ -80,3 +86,5 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   ctx.restore();
   return pose.mode;
 }
+
+export const drawAnimatedPixelMage=drawHero;

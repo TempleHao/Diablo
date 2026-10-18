@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ENCOUNTER_COUNT,WAVE_SIZE,WAVE_COUNT,MAX_LIVE_ENEMIES,encounterWave,nextWaveForKills,shouldSummonBoss} from '../dist/2d/encounters.js';
-import {SKIN_LABELS,animationPose} from '../dist/2d/pixel-mage-demo.js';
+import {HERO_ART,animationPose} from '../dist/2d/pixel-mage-demo.js';
 import {freshSave,sanitizeSave} from '../dist/2d/core.js';
 import {REGION_DATA} from '../dist/2d/systems.js';
 import {emitVfx,tickVfx} from '../dist/2d/spell-vfx.js';
@@ -26,14 +26,14 @@ test('reinforcements trigger only at 12 and 24 kills, boss only at 36',()=>{
  assert.equal(shouldSummonBoss(36,null),true);
  assert.equal(shouldSummonBoss(36,{}),false);
 });
-test('five mage appearances persist without changing old save format',()=>{
- assert.deepEqual(Object.keys(SKIN_LABELS),['arcane','flame','light','shadow','nature']);
- assert.equal(freshSave().heroSkin,'arcane');
- for(const heroSkin of Object.keys(SKIN_LABELS)){
-  const p=freshSave();p.heroSkin=heroSkin;
-  assert.equal(sanitizeSave(JSON.parse(JSON.stringify(p))).heroSkin,heroSkin);
+test('seven class choices persist and reject invalid values',()=>{
+ assert.deepEqual(Object.keys(HERO_ART).sort(),['amazon','assassin','barbarian','druid','mage','necro','paladin']);
+ assert.equal(freshSave().heroClass,'mage');
+ for(const heroClass of Object.keys(HERO_ART)){
+  const p=freshSave();p.heroClass=heroClass;
+  assert.equal(sanitizeSave(JSON.parse(JSON.stringify(p))).heroClass,heroClass);
  }
- assert.equal(sanitizeSave({version:2,heroSkin:'<script>alert(1)</script>'}).heroSkin,'arcane');
+ assert.equal(sanitizeSave({version:2,heroClass:'<script>alert(1)</script>'}).heroClass,'mage');
 });
 test('visual effect pool is bounded and expires without runaway particle costs',()=>{
  const fx=[];
@@ -44,8 +44,8 @@ test('visual effect pool is bounded and expires without runaway particle costs',
  assert.equal(fx.length,0);
 });
 test('moving actor retains real stride and position independent from equipped palette',()=>{
- for(const skin of Object.keys(SKIN_LABELS)){
-  const actor={moving:true,skin,walk:Math.PI/2,invuln:0,cast:0,x:200,y:150};
+ for(const cls of Object.keys(HERO_ART)){
+  const actor={moving:true,cls,walk:Math.PI/2,invuln:0,cast:0,x:200,y:150};
   const pose=animationPose(actor,1);
   assert.equal(pose.mode,'run');
   assert.equal(actor.x,200);assert.equal(actor.y,150);

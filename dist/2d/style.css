@@ -267,3 +267,21 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 .catalog-text strong{display:block;font-size:12px;font-weight:600;color:#ecdcc0}
 .catalog-text small{display:block;font-size:10px;color:#a29a8c;margin-top:3px;line-height:1.45}
 @media(max-width:760px){.skill-loadout{grid-template-columns:1fr}.skill-catalog{grid-template-columns:1fr}}
+/* v0.5 状态面板与增益栏 */
+.status-panel{position:absolute;z-index:6;top:86px;left:max(14px,2vw);width:300px;max-height:calc(100dvh - 240px);overflow:auto;background:#0c1016;border:1px solid #7a6446;padding:12px 14px;box-shadow:0 10px 40px #000a;font-size:12px}
+.status-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.status-head strong{color:#f0d6a6;font-size:14px;letter-spacing:1px}
+.status-head button{border:1px solid #6a5438;background:#1b1e25;padding:2px 8px;color:#cbbda5}
+.status-panel h4{margin:10px 0 4px;font-size:11px;letter-spacing:2px;color:#c49a5c;border-bottom:1px solid #5a473344;padding-bottom:3px}
+.status-panel dl{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:0}
+.status-panel dt{color:#a69c8c}.status-panel dd{margin:0;color:#f2e2c4;text-align:right;font-variant-numeric:tabular-nums}
+.status-buffs{margin:4px 0;color:#d8c8a8;line-height:1.6}
+.buffbar{position:absolute;z-index:4;bottom:138px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none}
+.buffbar .buff{width:34px;height:38px;border:1px solid #6a5438;background:#12161dcc;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.buffbar .buff b{font-size:16px;line-height:1;color:#f0d6a6}.buffbar .buff small{font-size:9px;color:#d8c8a8}
+.buffbar .skill-fire b{color:#ff9d53}.buffbar .skill-cold b{color:#92dafc}.buffbar .skill-lightning b{color:#c9c6ff}.buffbar .skill-holy b{color:#ffd76a}.buffbar .skill-poison b{color:#9fe58a}.buffbar .skill-shadow b{color:#c9a8ff}
+.abilitybar .skill-physical .ability-icon{color:#e8dcc8}.abilitybar .skill-poison .ability-icon{color:#9fe58a}.abilitybar .skill-holy .ability-icon{color:#ffd76a}.abilitybar .skill-shadow .ability-icon{color:#c9a8ff}
+.catalog-skill.skill-physical .catalog-icon{color:#e8dcc8}.catalog-skill.skill-poison .catalog-icon{color:#9fe58a}.catalog-skill.skill-holy .catalog-icon{color:#ffd76a}.catalog-skill.skill-shadow .catalog-icon{color:#c9a8ff}
+@media(max-width:760px){.status-panel{top:70px;left:8px;right:8px;width:auto;max-height:calc(100dvh - 260px)}.buffbar{bottom:178px;left:auto;right:8px;transform:none}.buffbar .buff{width:28px;height:32px}}
+
+body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden])) .eventlog{visibility:hidden}
