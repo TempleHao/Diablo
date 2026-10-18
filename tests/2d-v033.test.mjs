@@ -12,7 +12,7 @@ test('legacy save adds materials and default-disabled automatic salvage',()=>{
  const profile=sanitizeSave(old);
  assert.deepEqual(profile.materials,{dust:0,crystal:0,core:0});
  assert.equal(profile.autoSalvage,-1);
- assert.deepEqual(profile.activeSkills,['fire','nova','shard','armor','meteor','blink','heal']);
+ assert.deepEqual(profile.activeSkills,['fire','shard','nova','meteor','chain','ward','heal','armor','storm','blink']);
  assert.equal(profile.level,9);
 });
 test('auto dismantling never removes equipped, favorites, legendary or set gear',()=>{
@@ -59,11 +59,11 @@ test('tempering increases real equipped stats and spends material exactly once',
  assert.equal(reload.inventory[0].affixes[0].value,result.affixes[0].value);
 });
 test('11 skills defined, max seven button slots saved, no duplicates or invalid IDs',()=>{
- assert.equal(Object.keys(SKILLS).length,11);
+ assert.equal(Object.keys(SKILLS).length,31);
  for(const k of ['chain','storm','ward','inferno'])assert.ok(SKILLS[k].cooldown>0&&SKILLS[k].unlocked>=4);
  const p=sanitizeSave({version:2,level:19,inventory:[],activeSkills:['storm','chain','ward','inferno','fire','fire','invalid','blink']});
- assert.equal(p.activeSkills.length,7);
- assert.equal(new Set(p.activeSkills).size,7);
+ assert.equal(p.activeSkills.length,10);
+ assert.equal(new Set(p.activeSkills).size,10);
  for(const key of p.activeSkills)assert.ok(SKILLS[key]);
  assert.equal(p.activeSkills[0],'storm');
  const again=sanitizeSave(JSON.parse(JSON.stringify(p)));

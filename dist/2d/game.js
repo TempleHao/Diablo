@@ -6,18 +6,17 @@ import {ENCOUNTER_COUNT,WAVE_SIZE,WAVE_COUNT,MAX_LIVE_ENEMIES,encounterWave,next
 import {emitVfx,tickVfx,paintVfx} from './spell-vfx.js';
 import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDecals,shakeOffset} from './fx.js';
 import {drawDungeonDetail} from './dungeon-detail.js';
-import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, RARITY_COLORS, LEGACY_SLOTS, SKILLS, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore, catalogEntry } from './systems.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, RARITY_COLORS, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore, catalogEntry, isBow } from './systems.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
   boss: $('boss-ui'), bossHp: $('boss-meter'), title: $('quest-title'), progress: $('quest-progress'), log: $('eventlog') };
 const skillData = SKILLS;
-const ACTIVE_LIMIT=7;
 const keys = new Set(), pointers = new Set(), joystick = { id:null, x:0, y:0 };
 let vw = 0, vh = 0, dpr = 1, cam = {x:0,y:0}, profile, dungeon, rng, hero;
 let enemies = [], missiles = [], drops = [], particles = [], texts = [], hazards = [], vfx = [], state = 'intro', tick = 0, last = 0;
-let decals = [], hitStop = 0, hudTimer = 0, floorChunks = new Map(), floorKey = '';
+let decals = [], summons = [], hasteUntil = 0, bladesUntil = 0, bladesTimer = 0, thunderUntil = 0, thunderTimer = 0, heldSlots = new Set(), capturingSlot = null, hitStop = 0, hudTimer = 0, floorChunks = new Map(), floorKey = '';
 const shake = {amount:0}, lighting = new Lighting();
 let kills = 0, total = ENCOUNTER_COUNT, boss = null, frameIndex = 0, nextId = 1, manualAim = null, messageTimes = new Map();
 
@@ -39,15 +38,57 @@ for(const id of ['mage-skin-start','mage-skin-inventory']){
 
 function renderSkillBar(){
   const bar=$('abilitybar');bar.replaceChildren();
-  for(const key of profile.activeSkills){
-    const meta=SKILLS[key];if(!meta)continue;
-    const button=document.createElement('button');button.type='button';button.dataset.skill=key;
+  profile.activeSkills.forEach((key,slot)=>{
+    const meta=SKILLS[key];if(!meta)return;
+    const button=document.createElement('button');button.type='button';button.dataset.skill=key;button.dataset.slot=String(slot);
     button.className='skill-'+meta.school;
+    const kbd=document.createElement('kbd');kbd.className='slot-key';kbd.textContent=keyLabel(profile.keybinds[slot]||'')+(slot===0?' · 左键':slot===1?' · 右键':'');
     const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
     const label=document.createElement('b');label.textContent=meta.name;
-    const shortcut=document.createElement('small');shortcut.textContent=meta.key+' · '+(meta.mana?meta.mana+' 法力':'即时');
-    const cooldown=document.createElement('i');button.append(icon,label,shortcut,cooldown);bar.append(button);
-  }
+    const cost=document.createElement('small');cost.textContent=meta.mana?meta.mana+' 法力':'无消耗';
+    const cooldown=document.createElement('i');button.append(kbd,icon,label,cost,cooldown);bar.append(button);
+  });
+  const tip=document.querySelector('.tip');
+  if(tip)tip.textContent='WASD 移动 · 鼠标瞄准 · 左键/右键 = 第 1/2 格技能 · 技能键可在行囊（B）里自定义 · B 背包';
+}
+// 技能栏与按键设置：每格可换技能、可改按键（点按钮后按下新键；Esc 取消）。
+function renderLoadout(){
+  const box=$('skill-loadout');if(!box)return;box.replaceChildren();
+  profile.activeSkills.forEach((key,slot)=>{
+    const row=document.createElement('div');row.className='loadout-row';
+    const num=document.createElement('span');num.className='loadout-num';num.textContent=(slot+1)+(slot===0?' · 左键':slot===1?' · 右键':'');
+    const keyBtn=document.createElement('button');keyBtn.type='button';keyBtn.className='key-bind'+(capturingSlot===slot?' is-capturing':'');
+    keyBtn.textContent=capturingSlot===slot?'按下新按键…':keyLabel(profile.keybinds[slot]);
+    keyBtn.setAttribute('aria-label','第 '+(slot+1)+' 格按键：'+keyLabel(profile.keybinds[slot])+'，点击修改');
+    keyBtn.onclick=()=>{capturingSlot=capturingSlot===slot?null:slot;renderLoadout();};
+    const select=document.createElement('select');select.className='skill-slot';select.setAttribute('aria-label','第 '+(slot+1)+' 格技能');
+    for(const [school,label] of Object.entries(SKILL_SCHOOLS)){
+      const group=document.createElement('optgroup');group.label=label;
+      for(const [id,sk] of Object.entries(SKILLS)){
+        if(sk.school!==school)continue;
+        const opt=document.createElement('option');opt.value=id;
+        const locked=profile.level<sk.unlocked;
+        opt.textContent=sk.icon+' '+sk.name+(locked?'（'+sk.unlocked+' 级）':'');opt.disabled=locked&&id!==key;
+        group.append(opt);
+      }
+      select.append(group);
+    }
+    select.value=key;
+    select.onchange=()=>{
+      const id=select.value,prev=profile.activeSkills.indexOf(id);
+      if(prev>=0&&prev!==slot)profile.activeSkills[prev]=profile.activeSkills[slot];
+      profile.activeSkills[slot]=id;
+      persist();renderSkillBar();renderLoadout();updateHud();announce(SKILLS[id].name+' 已放入第 '+(slot+1)+' 格',true);
+    };
+    row.append(num,keyBtn,select);box.append(row);
+  });
+}
+function finishRebind(k){
+  const slot=capturingSlot;capturingSlot=null;
+  if(k==='escape'){renderLoadout();return;}
+  if(rebindKey(profile,slot,k)){persist();renderSkillBar();announce('第 '+(slot+1)+' 格按键改为 '+keyLabel(k),true);}
+  else announce('这个键不能用（WASD、B、T、Esc 等已被占用）',true);
+  renderLoadout();
 }
 renderSkillBar();
 const regionSelect=$('region-select');
@@ -155,7 +196,7 @@ function build() {
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0,moving:false};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];vfx=[];decals=[];hitStop=0;shake.amount=0;kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];vfx=[];decals=[];summons=[];hasteUntil=0;bladesUntil=0;thunderUntil=0;heldSlots.clear();hitStop=0;shake.amount=0;kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
   $('portal-panel').hidden=true;$('portal-open').hidden=true;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
     drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
@@ -177,7 +218,7 @@ function spawn(kind,location=null) {
   return e;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
-function clearInput(){keys.clear();pointers.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
+function clearInput(){keys.clear();pointers.clear();heldSlots.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
   clearInput();state=kind==='victory'?'victory':kind==='death'?'death':'paused';
@@ -194,7 +235,7 @@ function showModal(kind) {
     main.textContent='重新整备 →';main.onclick=begin;
   } else if(kind==='help') {
     title.innerHTML='操作<span>指南</span>';lead.textContent='移动、瞄准、拾取，开始你的远征。';
-    paragraphs[1].textContent='WASD 移动，鼠标瞄准，左键或数字 1 余烬箭；2 霜环、3 冰晶箭、4 冰甲、Q 陨火、空格闪现、E 恢复药剂。B 打开 13 槽装备与词缀背包。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
+    paragraphs[1].textContent='WASD 移动，鼠标瞄准；左键、右键分别施放技能栏第 1、2 格，其余格子按对应按键（默认 1-5、Q、E、R、F、空格），按住可连续施放。按 B 打开行囊，在“技能栏与按键”里换技能、改按键。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
     main.textContent='返回游戏 →';main.onclick=()=>{if(previousState==='intro'){location.reload();return;}if(['victory','death'].includes(previousState)){showModal(previousState);return;}if(previousState==='paused'){showModal('pause');return;}hideModal();state='playing';}; 
   } else {
     title.innerHTML='旅程<span>暂停</span>';lead.textContent='火种不灭，旅途未完。';
@@ -309,6 +350,7 @@ function inspectItem(item){
     if(info.cost){const c=document.createElement('p');c.className='item-drawback';c.textContent='代价：'+info.cost;fx.append(c);}
     fx.append(note);panel.append(fx);
   }
+  if(info?.cls){const fit=document.createElement('small');fit.className='item-class';fit.textContent='偏好职业：'+info.cls+(info.h===2?' · 双手'+(isBow(item)?'（可配箭袋）':''):'');panel.append(fit);}
   if(info?.lore){const lore=document.createElement('p');lore.className='item-lore';lore.textContent=info.lore;panel.append(lore);}
   if(item.legacy){const old=document.createElement('p');old.className='score-down';old.textContent='旧版装备槽已取消：不能穿戴，可以分解换材料。';panel.append(old);}
   if(item.setId){
@@ -344,7 +386,7 @@ function inspectItem(item){
   const alternative={...profile,equipped:{...profile.equipped}};
   equip(alternative,item.id,target);
   const before=stats(profile),after=stats(alternative);
-  const keys=[['power','法术强度'],['hp','生命'],['mana','法力'],['armor','护甲'],['crit','暴击率'],['haste','施法速度'],['fire','火焰增伤'],['cold','冰霜增伤']];
+  const keys=[['power','法术强度'],['hp','生命'],['mana','法力'],['armor','护甲'],['crit','暴击率'],['haste','施法速度'],['fire','火焰增伤'],['cold','冰霜增伤'],['lightning','雷电增伤']];
   const differences=keys.filter(([key])=>before[key]!==after[key]);
   if(differences.length){
     const heading=document.createElement('h4');heading.textContent='穿戴后属性变化';panel.append(heading);
@@ -352,7 +394,7 @@ function inspectItem(item){
     for(const [key,label] of differences){
       const d=after[key]-before[key],line=document.createElement('span');
       line.className=d>=0?'score-up':'score-down';
-      line.textContent=label+' '+(d>0?'+':'')+d+(key==='crit'||key==='haste'||key==='fire'||key==='cold'?'%':'');
+      line.textContent=label+' '+(d>0?'+':'')+d+(key==='crit'||key==='haste'||key==='fire'||key==='cold'||key==='lightning'?'%':'');
       grid.append(line);
     }
     panel.append(grid);
@@ -381,7 +423,7 @@ function renderInventory(){
   const statsNow=stats(profile),statFields=[
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
-    ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],
+    ['火焰加成',statsNow.fire+'%'],['冰霜加成',statsNow.cold+'%'],['雷电加成',statsNow.lightning+'%'],
     ['火抗',statsNow.resistFire+'%'],['冰抗',statsNow.resistCold+'%'],
     ['未分配技能点',profile.skillPoints],['已净化',profile.clears]
   ];
@@ -392,7 +434,8 @@ function renderInventory(){
     const node=document.createElement('button');node.type='button';node.className='slot equipment-slot'+(profile.equipped[slot]===selectedItemId?' is-selected':'');
     const name=document.createElement('small');name.textContent=glyph+' '+label;const title=document.createElement('b');
     const item=profile.inventory.find(i=>i.id===profile.equipped[slot]);
-    const blocked=slot==='offhand'&&!item&&profile.inventory.find(i=>i.id===profile.equipped.weapon)?.hands===2;
+    const wpn=profile.inventory.find(i=>i.id===profile.equipped.weapon);
+    const blocked=slot==='offhand'&&!item&&wpn?.hands===2&&!isBow(wpn);
     title.textContent=item?.name||(blocked?'双手武器占用':'空位');if(item)title.classList.add('rarity-'+item.rarity);
     if(item){const icon=document.createElement('canvas');icon.className='equipment-icon';icon.setAttribute('aria-hidden','true');Art.drawItemIcon(icon,item);node.append(icon);}
     node.append(name,title);
@@ -435,36 +478,27 @@ function renderInventory(){
     actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
   }
   inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
+  renderLoadout();
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
-  for(const [key,skill] of Object.entries(SKILLS)){
-    const btn=document.createElement('button');btn.type='button';
-    const rank=profile.skillRanks[key]||0,locked=profile.level<skill.unlocked;
-    btn.className='catalog-skill '+(locked?'unavailable':'');
-    btn.textContent=skill.icon+' '+skill.name+' · 等级 '+rank+'/8 · '+skill.desc+
-      (locked?'（'+skill.unlocked+' 级解锁）':profile.skillPoints>0&&rank<8?' · 点击升级':'');
-    btn.disabled=locked||profile.skillPoints<=0||rank>=8;
-    btn.onclick=()=>{
-      if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
-    };
-    const slot=document.createElement('select');slot.className='skill-slot';
-    slot.setAttribute('aria-label',skill.name+' 装入快捷栏位置');
-    for(let i=0;i<ACTIVE_LIMIT;i++){const opt=document.createElement('option');opt.value=String(i);opt.textContent=(i+1)+' 号位 · '+SKILLS[profile.activeSkills[i]].name;slot.append(opt);}
-    if(!profile.activeSkills.includes(key)){
-      const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='加入快捷栏…';
-      slot.prepend(placeholder);slot.value='';
-    }else slot.value=String(profile.activeSkills.indexOf(key));
-    slot.disabled=locked;
-    slot.onchange=()=>{
-      if(profile.level<skill.unlocked)return;
-      if(slot.value==='')return;
-      const idx=Number(slot.value),prev=profile.activeSkills.indexOf(key),displaced=profile.activeSkills[idx];
-      profile.activeSkills[idx]=key;
-      if(prev>=0&&prev!==idx)profile.activeSkills[prev]=displaced;
-      persist();renderSkillBar();renderInventory();updateHud();
-      announce(skill.name+' 已加入快捷栏',true);
-    };
-    const cell=document.createElement('div');cell.className='skill-catalog-entry';cell.append(btn,slot);
-    skillPanel.append(cell);
+  for(const [school,label] of Object.entries(SKILL_SCHOOLS)){
+    const head=document.createElement('h4');head.className='skill-school skill-'+school;head.textContent=label+'系';skillPanel.append(head);
+    for(const [key,skill] of Object.entries(SKILLS)){
+      if(skill.school!==school)continue;
+      const btn=document.createElement('button');btn.type='button';
+      const rank=profile.skillRanks[key]||0,locked=profile.level<skill.unlocked;
+      btn.className='catalog-skill skill-'+school+(locked?' unavailable':'');
+      const icon=document.createElement('span');icon.className='catalog-icon';icon.textContent=skill.icon;
+      const text=document.createElement('span');text.className='catalog-text';
+      const name=document.createElement('strong');name.textContent=skill.name+' · '+rank+'/8'+(profile.activeSkills.includes(key)?' · 第 '+(profile.activeSkills.indexOf(key)+1)+' 格':'');
+      const desc=document.createElement('small');
+      desc.textContent=skill.desc+' · '+(skill.mana?skill.mana+' 法力':'无消耗')+' · 冷却 '+skill.cooldown+' 秒'+(locked?' · '+skill.unlocked+' 级解锁':profile.skillPoints>0&&rank<8?' · 点击升级':'');
+      text.append(name,desc);btn.append(icon,text);
+      btn.disabled=locked||profile.skillPoints<=0||rank>=8;
+      btn.onclick=()=>{
+        if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
+      };
+      skillPanel.append(btn);
+    }
   }
 }
 $('export-save').onclick=()=>{
@@ -519,7 +553,7 @@ function injury(amount){
 function dealDamage(e,damage,school='physical'){
   if(!enemies.includes(e))return;
   const bonus=stats(profile);
-  const bonusDamage=school==='fire'?bonus.fire:school==='cold'?bonus.cold:0;
+  const bonusDamage=school==='fire'?bonus.fire:school==='cold'?bonus.cold:school==='lightning'?bonus.lightning:0;
   damage*=1+bonusDamage/100;
   if(school==='fire')damage*=1+bonus.skillFire*.09;
   if(school==='cold')damage*=1+bonus.skillCold*.09;
@@ -528,7 +562,7 @@ function dealDamage(e,damage,school='physical'){
   damage=Math.max(1,Math.round(damage));
   if(bonus.lifesteal)hero.hp=Math.min(hero.maxHp,hero.hp+bonus.lifesteal);
   e.hp-=damage;e.flash=.11;
-  if(crit||e.hp<=0)emitVfx(vfx,school==='fire'?'fire':school==='cold'?'ice':'arcane',e.x,e.y-20,{max:crit?12:7});
+  if(crit||e.hp<=0)emitVfx(vfx,school==='fire'?'fire':school==='cold'?'ice':school==='lightning'?'chain':'arcane',e.x,e.y-20,{max:crit?12:7});
   if(crit){shake.amount=Math.max(shake.amount,2.5);}
   floatText(e.x,e.y-38,(crit?'✦ ':'')+damage,crit?'#ffe29b':school==='cold'?'#bfe9ff':'#f1ca90',crit);puff(e.x,e.y-18,e.kind==='boss'?'#c88ae2':'#eaa161',4,3);
   if(e.hp>0)return;
@@ -573,40 +607,102 @@ function dropItem(x,y,rare=false) {
   drops.push({x,y,item,age:0});floatText(x,y-38,item.name,palette.rare[item.rarity]);
 }
 function nearest(range=800){let best=null,d=range;for(const e of enemies){const m=distance(hero,e);if(m<d){best=e;d=m;}}return best;}
+// ---------- 施法 ----------
+function shoot(o){missiles.push({friendly:true,hits:0,pierce:1,hitR:11,hitIds:new Set(),...o});}
+function freezeEnemy(e,t){e.frozen=Math.max(e.frozen||0,e.kind==='boss'?t*.5:t);e.slow=Math.max(e.slow,t+.6);}
+function blast(x,y,r,dmg,school,{freeze=0,slow=0}={}){
+  for(const e of [...enemies])if(Math.hypot(e.x-x,e.y-y)<r+e.radius){if(freeze)freezeEnemy(e,freeze);if(slow)e.slow=Math.max(e.slow,slow);dealDamage(e,dmg,school);}
+}
+const hasted=()=>hasteUntil>tick;
+const TRAIL={ember:'#ff8a3a',fireball:'#ff9a40',firebolt:'#ff8a3a',shard:'#a9e4ff',iceshard:'#bfeaff',spike:'#9fdcff',orb:'#cdf2ff',cbolt:'#d8d0ff',ball:'#bfc8ff',mm:'#c89cff',arc:'#a9a0ff'};
+const AREA_TICK={storm:{every:.55,mult:.31,school:'cold',slow:1.05},inferno:{every:.55,mult:.42,school:'fire'},firewall:{every:.5,mult:.5,school:'fire'},blackhole:{every:.4,mult:.35,school:'arcane',slow:.6}};
+function nearestTo(p,range){let best=null,d=range;for(const e of enemies){const m=Math.hypot(e.x-p.x,e.y-p.y);if(m<d){best=e;d=m;}}return best;}
+function missileEnd(m){
+  if(m.explode){
+    const x=m.explode;blast(m.x,m.y,x.r,x.damage,m.school,{freeze:x.freeze||0});
+    hazards.push({x:m.x,y:m.y,r:0,max:x.r,life:.35,type:'burst',fx:x.fx});
+    emitVfx(vfx,x.fx==='ice'?'ice':'fire',m.x,m.y-16,{max:16,speed:1.6});
+    addDecal(decals,m.x,m.y,x.r*.8,x.fx==='ice'?'frost':'scorch',3);shake.amount=Math.max(shake.amount,x.fx==='ice'?2:3);
+  }
+  if(m.burst)for(let k=0;k<m.burst;k++){const t=k/m.burst*Math.PI*2;shoot({x:m.x,y:m.y,vx:Math.cos(t)*460,vy:Math.sin(t)*460,life:.5,kind:'iceshard',school:'cold',damage:m.shardDamage*1.3,slow:1.4});}
+}
+function updateBuffsAndSummons(dt){
+  for(let i=summons.length-1;i>=0;i--){
+    const h=summons[i];h.life-=dt;
+    if(h.life<=0){summons.splice(i,1);puff(h.x,h.y-20,'#ff8a3a',10,3);continue;}
+    if((h.timer-=dt)<=0){
+      const t=nearestTo(h,520);
+      if(t){h.timer=.75;const a=Math.atan2(t.y-h.y,t.x-h.x);
+        shoot({x:h.x+Math.cos(a)*14,y:h.y+Math.sin(a)*14,vx:Math.cos(a)*560,vy:Math.sin(a)*560,life:1,kind:'firebolt',school:'fire',damage:stats(profile).power*.38*(1+h.rank*.12)});}
+      else h.timer=.2;
+    }
+  }
+  if(bladesUntil>tick&&(bladesTimer-=dt)<=0){
+    bladesTimer=.3;const r=1+(profile.skillRanks.blades||0)*.12;
+    for(const e of [...enemies]){const d=distance(e,hero);if(d<115+e.radius&&d>20){e.slow=Math.max(e.slow,.8);dealDamage(e,stats(profile).power*.45*r,'cold');}}
+  }
+  if(thunderUntil>tick&&(thunderTimer-=dt)<=0){
+    const rank=profile.skillRanks.thunder||0;thunderTimer=Math.max(.6,1-rank*.04);
+    const near=enemies.filter(e=>distance(e,hero)<480);
+    if(near.length){const e=near[Math.floor(rng()*near.length)];
+      hazards.push({x:e.x,y:e.y,type:'strike',r:0,max:1,life:.3});shake.amount=Math.max(shake.amount,2);
+      dealDamage(e,stats(profile).power*1.6*(1+rank*.12),'lightning');}
+  }
+}
 function cast(skill){
   const rule=SKILLS[skill];
   if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
   if(hero.mana<rule.mana){announce('法力不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
-  const bonus=stats(profile),rank=profile.skillRanks[skill]||0;
+  if(skill==='manasurge'&&hero.mana>=hero.maxMana)return;
+  const bonus=stats(profile),rank=profile.skillRanks[skill]||0,P=bonus.power,R=1+rank*.12;
   hero.mana-=rule.mana;
-  emitVfx(vfx,skill,hero.x,hero.y-40,{max:vw<=700?12:20,angle:hero.angle});
-  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02));
+  emitVfx(vfx,skill,hero.x,hero.y-40,{max:vw<=700?10:16,angle:hero.angle});
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(hasted()?.75:1);
   hero.cast=.3;
   const target=nearest(),angle=manualAim&&distance(hero,manualAim)>20?
     Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x):target?
     Math.atan2(target.y-hero.y,target.x-hero.x):hero.angle;
   const dx=Math.cos(angle),dy=Math.sin(angle);hero.angle=angle;
-  if(skill==='fire'||skill==='shard'){
-    const frost=skill==='shard',speed=frost?570:680;
-    missiles.push({x:hero.x+dx*25,y:hero.y+dy*25,vx:dx*speed,vy:dy*speed,life:frost?1.2:1.1,
-      kind:frost?'shard':'ember',damage:bonus.power*(frost?.82:1)*(1+rank*.13),hits:0,hitIds:new Set()});
-    puff(hero.x+dx*27,hero.y+dy*27,frost?'#9bdcf2':'#ffad6e',6,3,100);
-  }
-  if(skill==='nova'){
-    emitVfx(vfx,'nova',hero.x,hero.y,{max:32});
+  const ox=hero.x+dx*25,oy=hero.y+dy*25;
+  const aimPoint=(range)=>manualAim&&distance(hero,manualAim)<range?{...manualAim}:target&&distance(hero,target)<range?{x:target.x,y:target.y}:{x:hero.x+dx*range*.55,y:hero.y+dy*range*.55};
+  switch(skill){
+  case 'fire':shoot({x:ox,y:oy,vx:dx*680,vy:dy*680,life:1.1,kind:'ember',school:'fire',damage:P*(1+rank*.13)});break;
+  case 'shard':shoot({x:ox,y:oy,vx:dx*570,vy:dy*570,life:1.2,kind:'shard',school:'cold',damage:P*.82*(1+rank*.13),pierce:2,slow:1.5});break;
+  case 'fireball':shoot({x:ox,y:oy,vx:dx*520,vy:dy*520,life:1.15,kind:'fireball',school:'fire',damage:P*.9*R,hitR:16,explode:{r:85,damage:P*1.15*R,fx:'fire'}});break;
+  case 'glacial':shoot({x:ox,y:oy,vx:dx*600,vy:dy*600,life:1.1,kind:'spike',school:'cold',damage:P*1.2*R,hitR:14,explode:{r:85,damage:P*.6*R,fx:'ice',freeze:1.2+rank*.1}});break;
+  case 'frozenorb':shoot({x:ox,y:oy,vx:dx*240,vy:dy*240,life:1.6,kind:'orb',school:'cold',damage:0,pierce:Infinity,noHit:true,emit:.055,emitT:0,spin:0,shardDamage:P*.34*R,burst:14});break;
+  case 'cbolt':for(let i=0;i<5;i++){const t=angle+(rng()-.5)*1.5,sp=280+rng()*170;shoot({x:ox,y:oy,vx:Math.cos(t)*sp,vy:Math.sin(t)*sp,life:.95,kind:'cbolt',school:'lightning',damage:P*.45*R,wobble:1});}break;
+  case 'ballz':shoot({x:ox,y:oy,vx:dx*190,vy:dy*190,life:2.6,kind:'ball',school:'lightning',damage:P*.42*R,pierce:Infinity,tickHit:.3,hitR:46,hitMap:new Map()});break;
+  case 'mmissile':for(let i=-1;i<=1;i++){const t=angle+i*.5;shoot({x:ox,y:oy,vx:Math.cos(t)*430,vy:Math.sin(t)*430,life:1.5,kind:'mm',school:'arcane',damage:P*.55*R,homing:7});}break;
+  case 'barrage':for(let i=-3;i<=3;i++){const t=angle+i*.17;shoot({x:ox,y:oy,vx:Math.cos(t)*540,vy:Math.sin(t)*540,life:.9,kind:'arc',school:'arcane',damage:P*.6*R});}break;
+  case 'nova':
+    emitVfx(vfx,'nova',hero.x,hero.y,{max:28});
     hazards.push({x:hero.x,y:hero.y,r:0,max:196,life:.45,type:'nova'});addDecal(decals,hero.x,hero.y,190,'frost',2.5);shake.amount=Math.max(shake.amount,3);
-    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,bonus.power*(1.3+rank*.18),'cold');}
-    puff(hero.x,hero.y,'#91deff',27,4,270);
-  }
-  if(skill==='armor'){armorUntil=tick+7+rank*.5;announce('冰甲已激活',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);}
-  if(skill==='meteor'){
-    const dest=target||{x:hero.x+dx*220,y:hero.y+dy*220};
-    emitVfx(vfx,'meteor',dest.x,dest.y,{max:32});
+    for(const e of [...enemies])if(distance(hero,e)<196){e.slow=3;dealDamage(e,P*(1.3+rank*.18),'cold');}
+    break;
+  case 'firenova':
+    hazards.push({x:hero.x,y:hero.y,r:0,max:210,life:.5,type:'fnova'});addDecal(decals,hero.x,hero.y,170,'scorch',4);shake.amount=Math.max(shake.amount,4);
+    emitVfx(vfx,'fire',hero.x,hero.y-10,{max:30,speed:2});blast(hero.x,hero.y,210,P*1.2*R,'fire');break;
+  case 'lnova':
+    hazards.push({x:hero.x,y:hero.y,r:0,max:200,life:.4,type:'lnova'});shake.amount=Math.max(shake.amount,3);
+    emitVfx(vfx,'chain',hero.x,hero.y-20,{max:24,speed:2});blast(hero.x,hero.y,200,P*1.05*R,'lightning');break;
+  case 'deepfreeze':
+    hazards.push({x:hero.x,y:hero.y,r:0,max:260,life:.7,type:'freeze'});addDecal(decals,hero.x,hero.y,250,'frost',4);shake.amount=Math.max(shake.amount,6);hitStop=Math.max(hitStop,.05);
+    blast(hero.x,hero.y,260,P*.8*R,'cold',{freeze:2+rank*.1});announce('极寒冻结！',true);break;
+  case 'lightning':{
+    const len=560,x2=hero.x+dx*len,y2=hero.y+dy*len;
+    hazards.push({x:hero.x,y:hero.y,x2,y2,type:'beam',r:0,max:1,life:.25});
+    for(const e of [...enemies]){const t=clamp(((e.x-hero.x)*dx+(e.y-hero.y)*dy)/len,0,1),px=hero.x+dx*len*t,py=hero.y+dy*len*t;if(Math.hypot(e.x-px,e.y-py)<e.radius+22&&t>0)dealDamage(e,P*1.3*R,'lightning');}
+    break;}
+  case 'armor':armorUntil=tick+7+rank*.5;announce('冰甲已激活',true);puff(hero.x,hero.y,'#8bcdf9',22,4,150);break;
+  case 'meteor':{
+    const dest=aimPoint(600);
+    emitVfx(vfx,'meteor',dest.x,dest.y,{max:20});
     hazards.push({x:dest.x,y:dest.y,r:0,max:125,life:1.0,type:'meteor',triggered:false,rank,seed:Math.random()*6});
-    announce('陨火坠落！',true);
-  }
-  if(skill==='blink'){
+    break;}
+  case 'armageddon':hazards.push({x:hero.x,y:hero.y,r:0,max:1,life:6,type:'rain',timer:0,rank});announce('末日火雨降临！',true);break;
+  case 'blink':{
     const v=movementVector(),mag=Math.hypot(v.x,v.y);
     const bx=mag>.05?v.x/mag:dx,by=mag>.05?v.y/mag:dy;
     hero.invuln=.4;puff(hero.x,hero.y-30,'#aa97ec',14,4,170);
@@ -614,12 +710,13 @@ function cast(skill){
     for(let t=0;t<18;t++)moveWithCollision(hero,bx*(950+rank*85),by*(950+rank*85),1/60,dungeon,hero.radius);
     hazards.push({x:from.x,y:from.y,x2:hero.x,y2:hero.y,type:'blink',r:0,max:1,life:.35});
     emitVfx(vfx,'blink',hero.x,hero.y-34,{max:16});
-  }
-  if(skill==='heal'){hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');}
-  if(skill==='chain'){
+    break;}
+  case 'heal':hero.hp=Math.min(hero.maxHp,hero.hp+hero.maxHp*(.48+rank*.035));puff(hero.x,hero.y,'#b4eba0',24,5,130);floatText(hero.x,hero.y-25,'治愈','#b1edaf');break;
+  case 'manasurge':hero.mana=Math.min(hero.maxMana,hero.mana+hero.maxMana*(.45+rank*.03));emitVfx(vfx,'ward',hero.x,hero.y-30,{max:20});floatText(hero.x,hero.y-25,'法力涌动','#9cc8ff');break;
+  case 'haste':hasteUntil=tick+6+rank*.3;announce('迅捷 · 移速与冷却提升',true);break;
+  case 'chain':{
     const candidates=enemies.map(e=>({e,dist:distance(hero,e)})).filter(x=>x.dist<600).sort((a,b)=>a.dist-b.dist);
-    let last={x:hero.x,y:hero.y};
-    const victims=[];
+    let last={x:hero.x,y:hero.y};const victims=[];
     for(const {e} of candidates){
       if(victims.length>=3+Math.floor(rank/3))break;
       if(distance(last,e)>390)continue;
@@ -627,26 +724,39 @@ function cast(skill){
       last={x:e.x,y:e.y};
     }
     for(const v of victims)emitVfx(vfx,'chain',v.x,v.y,{max:9});
-    for(let n=0;n<victims.length;n++)dealDamage(victims[n],bonus.power*(1.2+rank*.12)*Math.pow(.8,n),'arcane');
+    for(let n=0;n<victims.length;n++)dealDamage(victims[n],P*(1.2+rank*.12)*Math.pow(.8,n),'lightning');
     if(!victims.length){announce('附近没有连锁目标');puff(hero.x+dx*55,hero.y+dy*55,'#b29eff',14,4,100);}
-  }
-  if(skill==='storm'){
-    const center=target&&distance(hero,target)<520?target:{x:hero.x+dx*190,y:hero.y+dy*190};
-    emitVfx(vfx,'storm',center.x,center.y,{max:32});
-    hazards.push({x:center.x,y:center.y,r:120,max:120,life:4,kind:'storm',type:'storm',rank,timer:0});addDecal(decals,center.x,center.y,130,'frost',4.4);
-    announce('冰暴领域已展开',true);
-  }
-  if(skill==='ward'){
+    break;}
+  case 'thunder':thunderUntil=tick+10;thunderTimer=.2;announce('雷暴环绕 · 10 秒',true);break;
+  case 'storm':{
+    const c=aimPoint(520);
+    emitVfx(vfx,'storm',c.x,c.y,{max:24});
+    hazards.push({x:c.x,y:c.y,r:120,max:120,life:4,type:'storm',rank,timer:0});addDecal(decals,c.x,c.y,130,'frost',4.4);
+    break;}
+  case 'blades':bladesUntil=tick+6;bladesTimer=0;announce('冰刃环绕',true);break;
+  case 'ward':
     wardHp=Math.round(24+bonus.hp*(.20+rank*.045));
-    emitVfx(vfx,'ward',hero.x,hero.y,{max:24});
-    puff(hero.x,hero.y,'#b8d7ff',22,5,130);announce('奥术护盾 · 吸收 '+wardHp+' 伤害',true);
-  }
-  if(skill==='inferno'){
+    emitVfx(vfx,'ward',hero.x,hero.y,{max:20});
+    puff(hero.x,hero.y,'#b8d7ff',22,5,130);announce('奥术护盾 · 吸收 '+wardHp+' 伤害',true);break;
+  case 'inferno':
     for(let n=1;n<=5;n++){
       const x=hero.x+dx*n*55,y=hero.y+dy*n*55;
       if(walkable(x,y,10,dungeon)){emitVfx(vfx,'fire',x,y,{max:6});hazards.push({x,y,r:43,max:43,life:4,type:'inferno',rank,timer:0,seed:n*1.7});addDecal(decals,x,y,46,'scorch',5);}
     }
-    announce('烈焰地径已铺开',true);
+    break;
+  case 'firewall':{
+    const cx=hero.x+dx*170,cy=hero.y+dy*170,px=-dy,py=dx;
+    for(let n=-3;n<=3;n++){const x=cx+px*n*36,y=cy+py*n*36;
+      if(walkable(x,y,8,dungeon)){hazards.push({x,y,r:36,max:36,life:5,type:'firewall',rank,timer:0,seed:n*2.3});addDecal(decals,x,y,40,'scorch',5.5);}}
+    break;}
+  case 'hydra':{
+    summons.push({x:hero.x+dx*45,y:hero.y+dy*45,life:8,timer:.3,rank,seed:rng()*6});
+    while(summons.length>2)summons.shift();
+    emitVfx(vfx,'fire',hero.x+dx*45,hero.y+dy*45,{max:20});break;}
+  case 'slowtime':hazards.push({x:hero.x,y:hero.y,r:0,max:230,life:5,type:'slowtime'});announce('时间减缓',true);break;
+  case 'blackhole':{
+    const c=aimPoint(480);
+    hazards.push({x:c.x,y:c.y,r:0,max:170,life:3.5,type:'blackhole',rank,timer:0});shake.amount=Math.max(shake.amount,3);break;}
   }
   updateHud();
 }
@@ -662,12 +772,14 @@ function update(dt){
   hero.invuln=Math.max(0,hero.invuln-dt);hero.cast=Math.max(0,hero.cast-dt);hero.mana=Math.min(hero.maxMana,hero.mana+dt*stats(profile).regen);
   const v=movementVector(), l=Math.hypot(v.x,v.y);
   const oldX=hero.x,oldY=hero.y;
-  if(l>.02){moveWithCollision(hero,v.x*250,v.y*250,dt,dungeon,hero.radius);
+  const speed=250*(hasted()?1.35:1);
+  if(l>.02){moveWithCollision(hero,v.x*speed,v.y*speed,dt,dungeon,hero.radius);
     if(!manualAim)hero.angle=Math.atan2(v.y,v.x);
   }
   hero.moving=l>.02&&Math.hypot(hero.x-oldX,hero.y-oldY)>.08;
   if(hero.moving){
-    const previousStride=hero.walk;hero.walk+=dt*13;
+    const previousStride=hero.walk;hero.walk+=dt*13*(hasted()?1.3:1);
+    if(hasted()&&rng()<.5)particles.push({x:hero.x+(rng()-.5)*14,y:hero.y-20-rng()*50,vx:-v.x*40,vy:-v.y*40,life:.3,max:.3,color:'#c6a8ff',size:4});
     // A small timed footstep is a visible animation cue, not a fake input event.
     if(Math.floor(previousStride/Math.PI)!==Math.floor(hero.walk/Math.PI)){
       const x=hero.x-Math.cos(hero.angle)*9,y=hero.y-Math.sin(hero.angle)*7;
@@ -675,11 +787,18 @@ function update(dt){
     }
   }
   if(portal&&distance(hero,portal)<105&&!$('portal-panel').dataset.suppressed&&state==='playing'&&!boss){$('portal-open').hidden=false;}
-  if(pointers.size || keys.has('1'))cast('fire');
+  // 按住技能键 / 鼠标 / 触屏技能按钮：持续施放（受冷却限制）
+  for(let i=0;i<profile.activeSkills.length;i++)if(heldSlots.has(i)||keys.has(profile.keybinds[i]))cast(profile.activeSkills[i]);
+  const slowZones=hazards.filter(h=>h.type==='slowtime');
+  const inSlow=o=>slowZones.some(h=>Math.hypot(o.x-h.x,o.y-h.y)<h.max);
+  updateBuffsAndSummons(dt);
   for(const e of [...enemies]){
-    e.phase+=dt*3;e.attack-=dt;e.slow=Math.max(0,e.slow-dt);if(e.flash>0)e.flash-=dt;
+    if(e.flash>0)e.flash-=dt;
+    if(e.frozen>0){e.frozen-=dt;continue;}
+    const slowed=inSlow(e),tf=slowed?.35:1;
+    e.phase+=dt*3*tf;e.attack-=dt*tf;e.slow=Math.max(0,e.slow-dt);
     const dx=hero.x-e.x,dy=hero.y-e.y,d=Math.max(1,Math.hypot(dx,dy));
-    const speed=e.speed*(e.slow? .38:1);
+    const speed=e.speed*(e.slow? .38:1)*tf;
     const isRanged=['archer','cultist'].includes(e.kind), isBoss=e.kind==='boss';
     if(d>(isRanged?310:isBoss?72:34)){
       const vx=dx/d*speed,vy=dy/d*speed;
@@ -698,22 +817,34 @@ function update(dt){
       else if(isBoss&&d<90){injury(19+profile.clears*3);e.attack=1.35;}
     }
   }
-  for(const m of [...missiles]){
-    m.x+=m.vx*dt;m.y+=m.vy*dt;m.life-=dt;
+  for(let i=missiles.length-1;i>=0;i--){
+    const m=missiles[i];if(!m)continue;
+    const tf=!m.friendly&&inSlow(m)?.3:1;
+    if(m.homing){const t=nearestTo(m,420);if(t){const want=Math.atan2(t.y-m.y,t.x-m.x),cur=Math.atan2(m.vy,m.vx),sp=Math.hypot(m.vx,m.vy);
+      let diff=((want-cur+Math.PI*3)%(Math.PI*2))-Math.PI;const na=cur+clamp(diff,-m.homing*dt,m.homing*dt);m.vx=Math.cos(na)*sp;m.vy=Math.sin(na)*sp;}}
+    if(m.wobble){const cur=Math.atan2(m.vy,m.vx)+(rng()-.5)*9*dt,sp=Math.hypot(m.vx,m.vy);m.vx=Math.cos(cur)*sp;m.vy=Math.sin(cur)*sp;}
+    m.x+=m.vx*dt*tf;m.y+=m.vy*dt*tf;m.life-=dt*tf;
     // 飞行拖尾：少量光晕粒子
-    if((m.trail=(m.trail||0)-dt)<=0){m.trail=.025;const c=m.kind==='ember'?(rng()<.5?'#ff8a3a':'#ffd27a'):m.kind==='shard'?'#a9e4ff':'#b98cf0';
-      particles.push({x:m.x-m.vx*.012+(rng()-.5)*6,y:m.y-28+(rng()-.5)*6,vx:-m.vx*.08,vy:(m.kind==='ember'?-30:0)+(rng()-.5)*20,life:.32,max:.32,color:c,size:m.kind==='ember'?5:4});}
-    if(m.life<=0||!walkable(m.x,m.y,7,dungeon)){missiles.splice(missiles.indexOf(m),1);continue;}
-    if(m.kind==='ember'||m.kind==='shard'){
-      const e=enemies.find(q=>!m.hitIds?.has(q.id)&&distance(q,m)<q.radius+11);
-      if(e){
-        dealDamage(e,m.damage,m.kind==='shard'?'cold':'fire');
-        if(m.kind==='shard')e.slow=Math.max(e.slow,1.5);
-        puff(m.x,m.y,m.kind==='shard'?'#b4e9ff':'#ffba6e',10,3);
-        m.hitIds?.add(e.id);m.hits=(m.hits||0)+1;
-        if(m.kind==='ember'||m.hits>=2)missiles.splice(missiles.indexOf(m),1);
-      }
-    }else if(distance(hero,m)<hero.radius+9){injury(m.damage);puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(missiles.indexOf(m),1);}
+    if((m.trail=(m.trail||0)-dt)<=0){m.trail=m.kind==='orb'||m.kind==='ball'?.04:.025;const c=TRAIL[m.kind]||'#b98cf0';
+      particles.push({x:m.x-m.vx*.012+(rng()-.5)*6,y:m.y-28+(rng()-.5)*6,vx:-m.vx*.08,vy:(m.school==='fire'?-30:0)+(rng()-.5)*20,life:.32,max:.32,color:c,size:m.kind==='fireball'?7:m.kind==='ember'?5:4});}
+    if(m.emit&&(m.emitT-=dt)<=0){m.emitT=m.emit;m.spin=(m.spin||0)+1.1;
+      shoot({x:m.x,y:m.y,vx:Math.cos(m.spin)*430,vy:Math.sin(m.spin)*430,life:.55,kind:'iceshard',school:'cold',damage:m.shardDamage,slow:1.2});}
+    const dead=m.life<=0||!walkable(m.x,m.y,7,dungeon);
+    if(dead){missileEnd(m);missiles.splice(i,1);continue;}
+    if(!m.friendly){if(distance(hero,m)<hero.radius+9){injury(m.damage);puff(m.x,m.y,'#a28ae2',9,3);missiles.splice(i,1);}continue;}
+    if(m.noHit)continue;
+    if(m.tickHit){
+      for(const e of [...enemies])if(distance(e,m)<e.radius+m.hitR&&(m.hitMap.get(e.id)||0)<=tick){m.hitMap.set(e.id,tick+m.tickHit);dealDamage(e,m.damage,m.school);}
+      continue;
+    }
+    const e=enemies.find(q=>!m.hitIds.has(q.id)&&distance(q,m)<q.radius+m.hitR);
+    if(e){
+      dealDamage(e,m.damage,m.school);
+      if(m.slow)e.slow=Math.max(e.slow,m.slow);
+      puff(m.x,m.y-20,TRAIL[m.kind]||'#ffba6e',6,3);
+      m.hitIds.add(e.id);m.hits++;
+      if(m.hits>=m.pierce){missileEnd(m);missiles.splice(i,1);}
+    }
   }
   for(const d of [...drops]){
     d.age+=dt;
@@ -738,16 +869,28 @@ function update(dt){
       shake.amount=Math.max(shake.amount,10);hitStop=Math.max(hitStop,.06);
       for(const e of [...enemies])if(distance(e,h)<125)dealDamage(e,stats(profile).power*(2.8+(h.rank||0)*.36),'fire');
     }
-    if((h.type==='storm'||h.type==='inferno')&&h.life>0){
+    const tickRule=AREA_TICK[h.type];
+    if(tickRule&&h.life>0){
+      if(h.type==='blackhole')for(const e of enemies){const ddx=h.x-e.x,ddy=h.y-e.y,dd=Math.hypot(ddx,ddy);if(dd<280&&dd>12&&e.kind!=='boss')moveWithCollision(e,ddx/dd*190,ddy/dd*190,dt,dungeon,e.radius);}
       h.timer-=dt;
       if(h.timer<=0){
-        h.timer=.55;
+        h.timer=tickRule.every;
         for(const e of [...enemies]){
           if(distance(e,h)>h.max+e.radius)continue;
-          if(h.type==='storm')e.slow=Math.max(e.slow,1.05);
-          dealDamage(e,stats(profile).power*(h.type==='storm'?.31:.42)*(1+(h.rank||0)*.12),h.type==='storm'?'cold':'fire');
+          if(tickRule.slow)e.slow=Math.max(e.slow,tickRule.slow);
+          dealDamage(e,stats(profile).power*tickRule.mult*(1+(h.rank||0)*.12),tickRule.school);
         }
       }
+    }
+    if(h.type==='rain'&&h.life>0&&(h.timer-=dt)<=0){
+      h.timer=.3;
+      const near=enemies.filter(e=>distance(e,hero)<440);
+      const t=near.length&&rng()<.75?near[Math.floor(rng()*near.length)]:{x:hero.x+(rng()-.5)*640,y:hero.y+(rng()-.5)*420};
+      hazards.push({x:t.x+(rng()-.5)*30,y:t.y+(rng()-.5)*20,r:0,max:62,life:.5,type:'minimet',triggered:false,rank:h.rank,seed:rng()*6});
+    }
+    if(h.type==='minimet'&&!h.triggered&&h.life<.12){
+      h.triggered=true;blast(h.x,h.y,62,stats(profile).power*1.1*(1+(h.rank||0)*.12),'fire');
+      emitVfx(vfx,'fire',h.x,h.y-8,{max:12,speed:1.5});addDecal(decals,h.x,h.y,50,'scorch',3);shake.amount=Math.max(shake.amount,2.5);
     }
     if(h.life<=0)hazards.splice(hazards.indexOf(h),1);
   }
@@ -817,7 +960,32 @@ function missileDraw(m){
   ctx.globalAlpha=.35;ellipse(m.x,m.y,9,3,'#000');ctx.globalAlpha=1;
   ctx.save();ctx.globalCompositeOperation='lighter';
   const x=m.x,y=m.y-lift;
-  if(m.kind==='ember'){
+  if(m.kind==='fireball'){
+    drawGlow(ctx,x,y,44,'#ff5a14',.55);drawGlow(ctx,x,y,20,'#ffd27a',1,true);
+    for(let i=1;i<=5;i++)drawGlow(ctx,x-Math.cos(ang)*i*10,y-Math.sin(ang)*i*10+Math.sin(tick*18+i)*3,16-i*2.2,'#ff7a2a',.65-i*.1);
+  }else if(m.kind==='firebolt'){
+    drawGlow(ctx,x,y,18,'#ff6a1f',.6);drawGlow(ctx,x,y,8,'#ffe0a0',1,true);
+  }else if(m.kind==='iceshard'){
+    const sp=shardSprite('#cff4ff');ctx.translate(x,y);ctx.rotate(ang+Math.PI/2);ctx.globalAlpha=1;if(sp)ctx.drawImage(sp,-3,-8,6,16);
+  }else if(m.kind==='spike'){
+    drawGlow(ctx,x,y,30,'#4fb0ff',.55);
+    ctx.translate(x,y);ctx.rotate(ang);ctx.globalAlpha=1;
+    ctx.fillStyle='#8fd8ff';ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(-6,-10);ctx.lineTo(-20,0);ctx.lineTo(-6,10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#f2fdff';ctx.beginPath();ctx.moveTo(20,0);ctx.lineTo(-3,-4);ctx.lineTo(-13,0);ctx.lineTo(-3,4);ctx.closePath();ctx.fill();
+  }else if(m.kind==='orb'){
+    drawGlow(ctx,x,y,40,'#5ab8ff',.6);drawGlow(ctx,x,y,16,'#e8fbff',1,true);
+    const sp=shardSprite('#dff7ff');for(let i=0;i<4;i++){const a=tick*7+i*Math.PI/2;ctx.save();ctx.translate(x+Math.cos(a)*14,y+Math.sin(a)*14);ctx.rotate(a);ctx.globalAlpha=.9;if(sp)ctx.drawImage(sp,-3,-7,6,14);ctx.restore();}
+  }else if(m.kind==='cbolt'){
+    drawGlow(ctx,x,y,16,'#8f8cff',.7);drawGlow(ctx,x,y,6,'#ffffff',1,true);
+    ctx.globalAlpha=.9;ctx.strokeStyle='#e8e4ff';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x-6,y);for(let i=0;i<3;i++)ctx.lineTo(x+(Math.random()-.5)*16,y+(Math.random()-.5)*16);ctx.stroke();
+  }else if(m.kind==='ball'){
+    drawGlow(ctx,x,y,48,'#6f7cff',.55);drawGlow(ctx,x,y,18,'#f2f0ff',1,true);
+    ctx.globalAlpha=.85;ctx.strokeStyle='#dcd8ff';ctx.lineWidth=1.4;
+    for(let k=0;k<3;k++){ctx.beginPath();ctx.moveTo(x,y);let px=x,py=y;const a=Math.random()*6.28;for(let j=1;j<=3;j++){px=x+Math.cos(a)*j*11+(Math.random()-.5)*8;py=y+Math.sin(a)*j*11+(Math.random()-.5)*8;ctx.lineTo(px,py);}ctx.stroke();}
+  }else if(m.kind==='mm'||m.kind==='arc'){
+    drawGlow(ctx,x,y,22,m.kind==='mm'?'#b46cff':'#7f86ff',.65);drawGlow(ctx,x,y,8,'#f4ecff',1,true);
+    for(let i=1;i<=3;i++)drawGlow(ctx,x-Math.cos(ang)*i*8,y-Math.sin(ang)*i*8,8-i*1.8,m.kind==='mm'?'#c89cff':'#a9a0ff',.5-i*.12);
+  }else if(m.kind==='ember'){
     drawGlow(ctx,x,y,30,'#ff6a1f',.55);
     drawGlow(ctx,x,y,14,'#ffd27a',1,true);
     for(let i=1;i<=4;i++)drawGlow(ctx,x-Math.cos(ang)*i*9,y-Math.sin(ang)*i*9+Math.sin(tick*20+i)*2,11-i*1.6,'#ff7a2a',.6-i*.1);
@@ -928,10 +1096,86 @@ function drawHazard(h){
     }
     return;
   }
+  if(T==='fnova'||T==='lnova'||T==='freeze'||T==='burst'){
+    const dur=T==='fnova'?.5:T==='freeze'?.7:T==='burst'?.35:.4,p=1-clamp(h.life/dur,0,1),r=h.max*Math.sqrt(p),a=1-p;
+    const col=T==='fnova'?'#ff6a1f':T==='lnova'?'#8f8cff':T==='freeze'||h.fx==='ice'?'#59b6ff':'#ff7a2a';
+    const edge=T==='fnova'||(T==='burst'&&h.fx!=='ice')?'#ffd8a0':T==='lnova'?'#efeaff':'#d6f4ff';
+    drawEllipseGlow(ctx,h.x,h.y,r*1.1,r*.65,col,.4*a);
+    ctx.globalAlpha=a;ctx.strokeStyle=edge;ctx.lineWidth=2+7*a;
+    if(T==='lnova'){ctx.beginPath();for(let i=0;i<=40;i++){const t=i/40*Math.PI*2,rr=r+(Math.random()-.5)*16;const x=h.x+Math.cos(t)*rr,y=h.y+Math.sin(t)*rr*.58;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
+      for(let i=0;i<6;i++){const t=Math.random()*6.28;ctx.lineWidth=1.5;bolt(h.x,h.y-20,h.x+Math.cos(t)*r,h.y+Math.sin(t)*r*.58,18,5);ctx.stroke();}}
+    else{ctx.beginPath();ctx.ellipse(h.x,h.y,Math.max(2,r),Math.max(2,r*.58),0,0,Math.PI*2);ctx.stroke();}
+    if(T==='freeze'){ctx.fillStyle='#effcff';ctx.beginPath();for(let i=0;i<32;i++){const t=i/32*Math.PI*2,cx=h.x+Math.cos(t)*r*.9,cy=h.y+Math.sin(t)*r*.52,len=14+10*((i*5)%3);ctx.moveTo(cx-5,cy);ctx.lineTo(cx,cy-len);ctx.lineTo(cx+5,cy);}ctx.fill();}
+    if(T==='fnova')for(let i=0;i<14;i++){const t=i/14*Math.PI*2+tick;drawGlow(ctx,h.x+Math.cos(t)*r,h.y+Math.sin(t)*r*.58-8,12*a+4,'#ff9a40',a*.8);}
+    return;
+  }
+  if(T==='beam'||T==='strike'){
+    const a=clamp(h.life/(T==='beam'?.25:.3),0,1);
+    const x1=T==='beam'?h.x:h.x+(Math.random()-.5)*20,y1=T==='beam'?h.y-40:h.y-420,x2=T==='beam'?h.x2:h.x,y2=T==='beam'?h.y2-40:h.y-10;
+    ctx.globalAlpha=.45*a;ctx.strokeStyle='#8f8cff';ctx.lineWidth=12;bolt(x1,y1,x2,y2,30,T==='beam'?14:9);ctx.stroke();
+    ctx.globalAlpha=a;ctx.strokeStyle='#f6f4ff';ctx.lineWidth=3;bolt(x1,y1,x2,y2,24,T==='beam'?14:9);ctx.stroke();
+    drawGlow(ctx,x2,y2,T==='strike'?70:40,'#bfc0ff',a*.9,true);
+    return;
+  }
+  if(T==='firewall'){
+    const a=clamp(h.life,0,1);
+    drawEllipseGlow(ctx,h.x,h.y,42,22,'#ff4a12',.45*a);
+    for(let i=0;i<6;i++){const ph=tick*3.4+h.seed+i*1.1,rise=ph%1,x=h.x+Math.sin(i*1.9+h.seed)*14,y=h.y-rise*70;
+      drawGlow(ctx,x+Math.sin(ph*5)*3,y,(20-rise*12),rise<.35?'#ffd27a':'#ff5a1a',a*(1-rise),rise<.2);}
+    return;
+  }
+  if(T==='minimet'){
+    if(!h.triggered){const p=clamp((.5-h.life)/.38,0,1),sx=h.x+110*(1-p),sy=h.y-300*(1-p)-10;
+      drawEllipseGlow(ctx,h.x,h.y,40*p+10,22*p+6,'#ff5a1a',.35*p);
+      for(let i=3;i>=0;i--)drawGlow(ctx,sx+i*9,sy-i*22,15-i*3,i<1?'#ffd27a':'#ff6a1f',.8-i*.15,i===0);}
+    else{const a=clamp(h.life/.12,0,1);drawGlow(ctx,h.x,h.y-10,90*(1.3-a*.3),'#ff7a2a',.8*a,true);}
+    return;
+  }
+  if(T==='slowtime'){
+    const a=clamp(h.life,0,1),R=h.max,p=clamp((5-h.life)/.3,0,1);
+    drawEllipseGlow(ctx,h.x,h.y-20,R*p,R*.62*p,'#9b8cff',.18*a);
+    ctx.globalAlpha=.5*a;ctx.strokeStyle='#cfc4ff';ctx.lineWidth=2;ctx.setLineDash([14,10]);ctx.lineDashOffset=tick*20;
+    ctx.beginPath();ctx.ellipse(h.x,h.y,R*p,R*.58*p,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    for(let i=0;i<8;i++){const t=tick*.4+i*.785;drawGlow(ctx,h.x+Math.cos(t)*R*.8,h.y+Math.sin(t)*R*.46-10,5,'#e6e0ff',.6*a);}
+    return;
+  }
+  if(T==='blackhole'){
+    const a=clamp(h.life*2,0,1),R=h.max;
+    drawEllipseGlow(ctx,h.x,h.y,R*1.1,R*.66,'#6a2fa8',.35*a);
+    for(let i=0;i<16;i++){const k=((tick*.9+i/16)%1),t=i*2.4+tick*3,rr=R*(1-k);
+      drawGlow(ctx,h.x+Math.cos(t)*rr,h.y+Math.sin(t)*rr*.58-10,4+3*(1-k),'#c89cff',a*k);}
+    ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.9*a;ctx.fillStyle='#05020a';
+    ctx.beginPath();ctx.ellipse(h.x,h.y-10,26,18,0,0,Math.PI*2);ctx.fill();
+    ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a;ctx.strokeStyle='#d6a8ff';ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(h.x,h.y-10,28+Math.sin(tick*9)*2,20,0,0,Math.PI*2);ctx.stroke();
+    return;
+  }
+  if(T==='rain')return;
   // void 等其它：紫色冲击圈
   const a=clamp(h.life/.6,0,1);
   drawEllipseGlow(ctx,h.x,h.y,h.r*1.1,h.r*.66,'#a05ae0',.35*a);
   ctx.globalAlpha=.8*a;ctx.strokeStyle='#d6a8ff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(h.x,h.y,Math.max(2,h.r),Math.max(2,h.r*.58),0,0,Math.PI*2);ctx.stroke();
+}
+const GROUND_FX=new Set(['storm','inferno','nova','meteor','firewall','slowtime','blackhole','fnova','freeze']);
+function drawSummons(){
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  for(const h of summons){
+    const a=clamp(h.life,0,1);
+    drawEllipseGlow(ctx,h.x,h.y,34,18,'#ff4a12',.45*a);
+    for(let i=0;i<3;i++){const t=tick*2+h.seed+i*2.1,hx=h.x+Math.cos(i*2.1-1.6)*12,hy=h.y-28-Math.sin(t)*4-i*3;
+      drawGlow(ctx,hx,hy,14,'#ff7a2a',.8*a);drawGlow(ctx,hx,hy,6,'#ffe0a0',a,true);}
+    for(let i=0;i<3;i++){const rise=((tick*1.5+i/3+h.seed)%1);drawGlow(ctx,h.x+(i-1)*8,h.y-rise*40,8-rise*5,'#ff9a40',a*(1-rise));}
+  }
+  // 冰刃环绕
+  if(bladesUntil>tick){
+    const sp=shardSprite('#d6f5ff'),k=characterScale();
+    drawEllipseGlow(ctx,hero.x,hero.y,110,64,'#5ab8ff',.12);
+    for(let i=0;i<5;i++){const a=tick*5+i*1.2566,x=hero.x+Math.cos(a)*88,y=hero.y-18+Math.sin(a)*48;
+      ctx.save();ctx.translate(x,y);ctx.rotate(a+Math.PI/2);ctx.globalAlpha=.95;if(sp)ctx.drawImage(sp,-5,-14,10,28);ctx.restore();drawGlow(ctx,x,y,12,'#9fdcff',.5);}
+  }
+  // 雷暴：头顶电光
+  if(thunderUntil>tick){const k=characterScale();drawGlow(ctx,hero.x,hero.y-120*k,30+Math.random()*6,'#8f8cff',.45);
+    if(Math.random()<.3){ctx.globalAlpha=.8;ctx.strokeStyle='#e8e4ff';ctx.lineWidth=1.3;bolt(hero.x-10,hero.y-125*k,hero.x+(Math.random()-.5)*40,hero.y-80*k,10,4);ctx.stroke();}}
+  ctx.restore();
 }
 const AMBIENT=[.74,.76,.77,.78,.77,.78,.74,.76,.77];
 function lightPass(){
@@ -939,13 +1183,20 @@ function lightPass(){
   lighting.light(hero.x,hero.y-30,mobileMode()?280:330,1);
   lighting.light(hero.x,hero.y-30,150,.6);
   for(const t of dungeon.torches)lighting.light(t.x,t.y-10,230+Math.sin(tick*7+t.x)*10,.9);
-  for(const m of missiles)lighting.light(m.x,m.y-20,m.kind==='ember'?120:90,.7);
+  for(const m of missiles)if(m.friendly||m.kind)lighting.light(m.x,m.y-20,m.kind==='fireball'||m.kind==='orb'||m.kind==='ball'?150:m.kind==='iceshard'?40:100,.7);
+  for(const h of summons)lighting.light(h.x,h.y-20,140,.75);
   for(const h of hazards){
     if(h.type==='meteor')lighting.light(h.x,h.y,h.triggered?320:150,h.triggered?1:.5);
     else if(h.type==='storm')lighting.light(h.x,h.y,200,.55);
     else if(h.type==='inferno')lighting.light(h.x,h.y-10,120,.6);
     else if(h.type==='nova')lighting.light(h.x,h.y,260,.7*clamp(h.life/.45,0,1));
     else if(h.type==='chain')lighting.light(h.x2,h.y2-30,130,.8);
+    else if(h.type==='firewall')lighting.light(h.x,h.y-20,110,.6);
+    else if(h.type==='fnova'||h.type==='lnova'||h.type==='freeze'||h.type==='burst')lighting.light(h.x,h.y,h.max*1.3,.8*clamp(h.life*2,0,1));
+    else if(h.type==='beam')lighting.light((h.x+h.x2)/2,(h.y+h.y2)/2,300,.8);
+    else if(h.type==='strike')lighting.light(h.x,h.y,200,.9);
+    else if(h.type==='minimet')lighting.light(h.x,h.y,h.triggered?160:70,.7);
+    else if(h.type==='blackhole'||h.type==='slowtime')lighting.light(h.x,h.y,h.max,.35);
   }
   for(const e of vfx)if(e.age<.3)lighting.light(e.x,e.y,110,.6*(1-e.age/.3));
   for(const d of drops)lighting.light(d.x,d.y-10,60+(d.item.rarity|0)*14,.7);
@@ -965,7 +1216,8 @@ function render(){
   Art.scenery(ctx,cam,vw,vh,WIDTH,HEIGHT,tick,profile.region,dungeon.seed);
   // 地面法术（冰暴、火径、预警圈）画在角色下面
   ctx.save();ctx.globalCompositeOperation='lighter';
-  for(const h of hazards)if(h.type==='storm'||h.type==='inferno'||h.type==='nova'||(h.type==='meteor'&&!h.triggered)){ctx.globalAlpha=1;drawHazard(h);}
+  for(const h of hazards)if(GROUND_FX.has(h.type)&&!h.triggered){ctx.globalAlpha=1;drawHazard(h);}
+  drawSummons();
   ctx.restore();
   // Painter's order: stonework and props occlude actors when they stand behind them.
   const layers=[];
@@ -981,7 +1233,7 @@ function render(){
   for(const layer of layers)layer.render();
   for(const m of missiles)missileDraw(m);
   ctx.save();ctx.globalCompositeOperation='lighter';
-  for(const h of hazards)if(!(h.type==='storm'||h.type==='inferno'||h.type==='nova'||(h.type==='meteor'&&!h.triggered))){ctx.globalAlpha=1;drawHazard(h);}
+  for(const h of hazards)if(!(GROUND_FX.has(h.type)&&!h.triggered)){ctx.globalAlpha=1;drawHazard(h);}
   ctx.restore();
   paintVfx(ctx,vfx,tick);
   ctx.save();ctx.globalCompositeOperation='lighter';
@@ -1033,36 +1285,46 @@ function aimAt(clientX,clientY) {
   hero.angle=Math.atan2(manualAim.y-hero.y,manualAim.x-hero.x);
 }
 canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&hero)aimAt(e.clientX,e.clientY);});
-canvas.addEventListener('pointerdown',e=>{if(state!=='playing'||e.pointerType!=='mouse'||e.button!==0)return;aimAt(e.clientX,e.clientY);pointers.add(e.pointerId);cast('fire');});
+canvas.addEventListener('pointerdown',e=>{
+  if(state!=='playing'||e.pointerType!=='mouse'||(e.button!==0&&e.button!==2))return;
+  aimAt(e.clientX,e.clientY);const slot=e.button===0?0:1;
+  heldSlots.add(slot);mouseSlots.set(e.button,slot);cast(profile.activeSkills[slot]);
+});
+const mouseSlots=new Map();
+window.addEventListener('mouseup',e=>{if(mouseSlots.has(e.button)){heldSlots.delete(mouseSlots.get(e.button));mouseSlots.delete(e.button);}});
 window.addEventListener('pointerup',e=>pointers.delete(e.pointerId));
 window.addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
 $('abilitybar').addEventListener('pointerdown',e=>{
   const button=e.target.closest('button[data-skill]');
   if(!button||state!=='playing')return;
   e.preventDefault();
-  const skill=button.dataset.skill;button.setPointerCapture(e.pointerId);
-  if(skill==='fire'){manualAim=null;pointers.add(e.pointerId);}
-  cast(skill);
+  const slot=Number(button.dataset.slot);button.setPointerCapture(e.pointerId);
+  if(e.pointerType!=='mouse')manualAim=null; // 触屏：自动瞄准最近的敌人
+  heldSlots.add(slot);touchSlots.set(e.pointerId,slot);
+  cast(profile.activeSkills[slot]);
 });
-$('abilitybar').addEventListener('pointerup',e=>pointers.delete(e.pointerId));
-$('abilitybar').addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
+const touchSlots=new Map();
+function releaseTouch(e){if(touchSlots.has(e.pointerId)){heldSlots.delete(touchSlots.get(e.pointerId));touchSlots.delete(e.pointerId);}}
+$('abilitybar').addEventListener('pointerup',releaseTouch);
+$('abilitybar').addEventListener('pointercancel',releaseTouch);
 window.addEventListener('keydown',e=>{
   const tag=document.activeElement?.tagName;
   if(['INPUT','TEXTAREA'].includes(tag)||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
-  if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
+  if(capturingSlot!==null){e.preventDefault();finishRebind(k);return;}
+  if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)||/^f\d+$/.test(k)||k==="'"||k==='/')e.preventDefault();
   if(k==='escape'){if(!$('portal-panel').hidden)closePortalMenu();else if(!$('inventory').hidden)closeInventory();else onPause();return;}
   if(k==='b'){if(!$('inventory').hidden)closeInventory();else showInventory();return;}
   if(k==='t'){openPortalMenu();return;}
   if(state!=='playing'||!$('inventory').hidden)return;
   keys.add(k);
   if(!e.repeat){
-    const byKey=Object.fromEntries(profile.activeSkills.map(id=>[SKILLS[id].key==='空格'?' ':SKILLS[id].key.toLowerCase(),id]));
-    if(byKey[k]){if(k==='1')manualAim=null;cast(byKey[k]);}
+    const slot=profile.keybinds.indexOf(k);
+    if(slot>=0)cast(profile.activeSkills[slot]);
   }
 });
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
-window.addEventListener('blur',clearInput);
+window.addEventListener('blur',()=>{clearInput();heldSlots.clear();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();if(state==='playing'&&$('inventory').hidden)showModal('pause');}});
 const base=$('joystick'),stick=$('stick');
 function joyMove(e){

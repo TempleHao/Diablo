@@ -12,13 +12,16 @@ test('idle animation floats gently instead of being one rigid still image',()=>{
   assert.equal(a.mode,'idle');assert.equal(b.mode,'idle');
   assert.notEqual(a.bob,b.bob);
 });
-test('walking creates alternating stride, squash and lean without changing physics position',()=>{
+test('walking is a grounded 4-pose step cycle: alternating feet, dip on contact, no float',()=>{
   const actor={x:450,y:490,moving:true,walk:0,cast:0,invuln:0,angle:0};
-  const left=animationPose({...actor,walk:Math.PI/2},1);
-  const right=animationPose({...actor,walk:Math.PI*1.5},1);
-  assert.equal(left.mode,'run');assert.equal(right.mode,'run');
-  assert.ok(left.stride>1);assert.ok(right.stride< -1);
-  assert.ok(left.lean>0&&right.lean<0);
+  const poses=[0,1,2,3].map(k=>animationPose({...actor,walk:k*Math.PI/2+.1},1));
+  assert.ok(poses.every(p=>p.mode==='run'));
+  assert.ok(poses[0].stride>1&&poses[2].stride< -1,'feet alternate');
+  assert.ok(poses[0].bob>0&&poses[2].bob>0,'body dips on foot contact');
+  assert.equal(poses[1].lift,1);assert.equal(poses[3].lift,-1);
+  assert.ok(poses.every(p=>Math.abs(p.bob)<=2),'no floating');
+  // same pose for the whole step (discrete, not a continuous sine wobble)
+  assert.deepEqual(animationPose({...actor,walk:.2},1),{...animationPose({...actor,walk:1.4},1),phase:.2});
   assert.equal(actor.x,450);assert.equal(actor.y,490);
 });
 test('cast and hit animations have priority over running and return to idle',()=>{

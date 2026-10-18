@@ -241,3 +241,29 @@ body{font-kerning:normal;-webkit-font-smoothing:antialiased;text-rendering:optim
 .item-effect strong{display:block;font-size:13px}.item-effect p{margin:6px 0 0;color:#cfc6b8!important;font-size:12px;line-height:1.6}
 .item-effect .item-drawback{color:#e48c7c!important}.item-effect small{display:block;margin-top:6px;color:#7f7a72!important;font-size:10px}
 .item-lore{font-size:11px;font-style:italic;color:#9b9384;line-height:1.6;margin:8px 0}
+.item-class{display:block;clear:both;color:#9c9384;font-size:11px;margin:6px 0}
+/* v0.4.1 技能栏 10 格、自定义按键、四系技能图鉴 */
+.abilitybar button .slot-key{position:absolute;top:2px;left:3px;font-size:9px;color:#d9c39b;background:#0d0f14cc;padding:0 3px;border-radius:2px;line-height:1.4;white-space:nowrap}
+.abilitybar .skill-lightning .ability-icon{color:#c9c6ff;text-shadow:0 0 16px #6f6cff}
+@media(max-width:760px){.abilitybar{grid-template-columns:repeat(5,44px)}.abilitybar button .slot-key{display:none}}
+@media(max-width:420px){.abilitybar{grid-template-columns:repeat(5,42px)}}
+@media(max-height:550px) and (pointer:coarse){.abilitybar button .slot-key{display:none}}
+.skill-loadout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;margin-bottom:14px}
+.loadout-row{display:grid;grid-template-columns:64px 74px 1fr;align-items:center;gap:6px;font-size:12px}
+.loadout-num{color:#a89478;font-size:11px}
+.key-bind{border:1px solid #8a6f4a;background:#1d2027;padding:6px 4px;font-weight:700;color:#f0d6a6;min-height:32px}
+.key-bind:hover{background:#3b3026}
+.key-bind.is-capturing{background:#6b4a22;color:#fff;animation:pulseKey .8s infinite alternate}
+@keyframes pulseKey{from{box-shadow:0 0 0 0 #e7b06a}to{box-shadow:0 0 0 3px #e7b06a55}}
+.loadout-row select{min-width:0;width:100%;background:#12161d;color:#e4d6bd;border:1px solid #5c4b36;padding:6px 4px;font-size:12px}
+.skill-catalog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.skill-school{grid-column:1/-1;margin:10px 0 2px;font-size:13px;letter-spacing:2px;border-bottom:1px solid #5a473355;padding-bottom:4px}
+.skill-school.skill-fire{color:#ff9d53}.skill-school.skill-cold{color:#92dafc}.skill-school.skill-lightning{color:#c9c6ff}.skill-school.skill-arcane{color:#c9a8ff}
+.catalog-skill{display:flex;align-items:center;gap:9px;text-align:left;border:1px solid #5d4b3655;background:#121820;padding:8px 9px}
+.catalog-skill:not(:disabled):hover{background:#2a241d}
+.catalog-skill.unavailable{opacity:.5}
+.catalog-icon{font-size:22px;width:28px;text-align:center;flex:none}
+.catalog-skill.skill-fire .catalog-icon{color:#ff9d53}.catalog-skill.skill-cold .catalog-icon{color:#92dafc}.catalog-skill.skill-lightning .catalog-icon{color:#c9c6ff}.catalog-skill.skill-arcane .catalog-icon{color:#c9a8ff}
+.catalog-text strong{display:block;font-size:12px;font-weight:600;color:#ecdcc0}
+.catalog-text small{display:block;font-size:10px;color:#a29a8c;margin-top:3px;line-height:1.45}
+@media(max-width:760px){.skill-loadout{grid-template-columns:1fr}.skill-catalog{grid-template-columns:1fr}}

@@ -31,7 +31,7 @@ jobs:
           node --check dist/2d/dungeon-detail.js
           node --check dist/2d/fx.js
           node --check dist/2d/equipment-catalog.js
-          node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-demo-mage-motion.test.mjs tests/2d-v036.test.mjs tests/2d-v040.test.mjs
+          node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-demo-mage-motion.test.mjs tests/2d-v036.test.mjs tests/2d-v040.test.mjs tests/2d-v041.test.mjs
       - name: Browser runtime smoke tests
         run: |
           sudo apt-get update -qq

@@ -1,4 +1,4 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, SKILLS, REGION_DATA } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey } from './systems.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
@@ -55,7 +55,7 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroSkin:'arcane',activeSkills:['fire','nova','shard','armor','meteor','blink','heal']};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroSkin:'arcane',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS]};
 }
 export function sanitizeSave(raw){
   const p=freshSave();
@@ -68,9 +68,11 @@ export function sanitizeSave(raw){
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
   if(Array.isArray(raw.activeSkills)){
-    const chosen=[...new Set(raw.activeSkills.filter(k=>typeof k==='string'&&Object.hasOwn(SKILLS,k)))].slice(0,7);
-    p.activeSkills=[...chosen,...Object.keys(SKILLS).filter(k=>!chosen.includes(k))].slice(0,7);
+    const chosen=[...new Set(raw.activeSkills.filter(k=>typeof k==='string'&&Object.hasOwn(SKILLS,k)))].slice(0,ACTIVE_LIMIT);
+    const fill=[...DEFAULT_ACTIVE,...Object.keys(SKILLS)].filter((k,i,a)=>a.indexOf(k)===i&&!chosen.includes(k));
+    p.activeSkills=[...chosen,...fill].slice(0,ACTIVE_LIMIT);
   }
+  p.keybinds=sanitizeKeybinds(raw.keybinds);
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
   if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
   if(Array.isArray(raw.regionVisits))p.regionVisits=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.regionVisits[i])?Math.floor(raw.regionVisits[i]):0,0,1000000));
@@ -105,8 +107,28 @@ export function sanitizeSave(raw){
     const item=p.inventory.find(i=>i.id===id);
     if(item&&getSlotForItem(item,slot)===slot&&!used.has(id)){p.equipped[slot]=id;used.add(id);}
   }
-  if(p.inventory.find(i=>i.id===p.equipped.weapon)?.hands===2)p.equipped.offhand=null;
+  if(!offhandAllowed(p.inventory.find(i=>i.id===p.equipped.weapon),p.inventory.find(i=>i.id===p.equipped.offhand)))p.equipped.offhand=null;
   return p;
+}
+/** 技能栏按键：每格一个、不可重复、不可占用移动/菜单键；无效时回到默认。 */
+export function sanitizeKeybinds(raw){
+  const out=[...DEFAULT_KEYS];
+  if(!Array.isArray(raw))return out;
+  const used=new Set();
+  for(let i=0;i<ACTIVE_LIMIT;i++){
+    const k=typeof raw[i]==='string'?raw[i].toLowerCase():null;
+    if(k&&bindableKey(k)&&!used.has(k)){out[i]=k;used.add(k);}else out[i]=null;
+  }
+  for(let i=0;i<ACTIVE_LIMIT;i++)if(out[i]===null){out[i]=DEFAULT_KEYS.find(k=>!used.has(k))||'';if(out[i])used.add(out[i]);}
+  return out;
+}
+/** 把第 slot 格改成按键 key；若别的格已用该键则互换。 */
+export function rebindKey(p,slot,key){
+  key=String(key||'').toLowerCase();
+  if(!Number.isInteger(slot)||slot<0||slot>=ACTIVE_LIMIT||!bindableKey(key))return false;
+  const other=p.keybinds.indexOf(key);
+  if(other>=0&&other!==slot)p.keybinds[other]=p.keybinds[slot];
+  p.keybinds[slot]=key;return true;
 }
 export function stats(p){return calculateStats(p);}
 export function expRequired(level){return level*45+15;}
@@ -121,10 +143,9 @@ export function equip(p,id,target=null){
   const slot=getSlotForItem(item,target);if(!slot)return false;
   for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
   p.equipped[slot]=id;
-  // 双手法杖占用副手：穿双手武器卸下副手；穿副手时卸下双手武器。
-  const weapon=p.inventory.find(i=>i.id===p.equipped.weapon);
-  if(slot==='weapon'&&item.hands===2)p.equipped.offhand=null;
-  if(slot==='offhand'&&weapon?.hands===2)p.equipped.weapon=null;
+  // 双手武器占用副手（弓弩可配箭袋）：穿上新的那件，卸下冲突的另一件。
+  const weapon=p.inventory.find(i=>i.id===p.equipped.weapon),off=p.inventory.find(i=>i.id===p.equipped.offhand);
+  if(!offhandAllowed(weapon,off)){if(slot==='weapon')p.equipped.offhand=null;else p.equipped.weapon=null;}
   return true;
 }
 export function upgradeSkill(p,key){

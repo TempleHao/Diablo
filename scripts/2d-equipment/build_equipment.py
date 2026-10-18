@@ -1,9 +1,7 @@
 """Build 2D equipment atlases + catalog module from the 黑铁遗珍 package.
 
 Icons are re-cropped from the five original 1254x1254 sheets (the package's
-pre-cut PNGs are offset by a row-fraction and clip item bottoms). Only
-caster-usable records are shipped: mage weapons (staffs/wands/sceptres),
-offhands, armour and jewellery = 70 per rarity.
+pre-cut PNGs are offset by a row-fraction and clip item bottoms). All 500 records are shipped (100 per rarity).
 """
 import json, os, sys
 from PIL import Image
@@ -17,16 +15,13 @@ OUT = os.environ.get('OUT_DIR', 'dist/2d')
 CAT = json.load(open(os.environ.get('CATALOG_JSON', 'assets-source/2d-equipment/equipment_catalog_500.json')))['items']
 CASTER = {'魔杖', '权杖', '法杖', '晶杖', '自然法杖', '骨杖'}
 SLOT = {'头部': 'head', '肩部': 'shoulders', '胸部': 'robe', '手部': 'gloves', '腰部': 'belt', '脚部': 'boots',
-        '主手': 'weapon', '双手': 'weapon', '副手': 'offhand', '项链': 'amulet', '戒指': 'ring1'}
+        '主手': 'weapon', '双手': 'weapon', '副手': 'offhand', '箭袋': 'offhand', '项链': 'amulet', '戒指': 'ring1'}
 RAR = 'NMELU'
 ICON_W, ICON_H, COLS = 104, 88, 10
 
 
 def usable(i):
-    if i['slot'] == '箭袋':
-        return False
-    if i['slot'] in ('主手', '双手'):
-        return i['subtype'] in CASTER
+    # v0.4.1：全部装备都可穿戴（为以后接入其他职业）
     return True
 
 
@@ -110,15 +105,15 @@ for ri, code in enumerate(RAR):
         atlas.paste(fit(cell, bg), ((n % COLS) * ICON_W, (n // COLS) * ICON_H))
         records.append({
             'id': it['id'], 'n': it['name'], 'r': ri, 's': SLOT[it['slot']], 'sub': it['subtype'],
-            'h': 2 if it['slot'] == '双手' else 1, 'aff': it['affinity'],
+            'h': 2 if it['slot'] == '双手' else 1, 'aff': it['affinity'], 'cls': it['preferred_class'],
             'eff': it['effect_name'] or '', 'desc': it['effect_description'] or '', 'cost': it['drawback'] or '',
             'lore': it['lore'] if code == 'U' else '', 'i': n,
         })
     atlas.save(f'{OUT}/art/equipment/{code}.webp', quality=88, method=6)
     print(code, len(items), atlas.size, os.path.getsize(f'{OUT}/art/equipment/{code}.webp'))
 
-js = ('/* 自动生成：scripts/2d-equipment/build_equipment.py。黑铁遗珍装备库的法师可用部分（每品质 70 件，共 350 件）。\n'
-      ' * 字段：id 编号, n 名称, r 品质(0普通 1魔法 2史诗 3传奇 4暗金), s 装备槽, sub 类型, h 手数, aff 元素倾向,\n'
+js = ('/* 自动生成：scripts/2d-equipment/build_equipment.py。黑铁遗珍装备库全部装备（每品质 100 件，共 500 件）。\n'
+      ' * 字段：id 编号, n 名称, r 品质(0普通 1魔法 2史诗 3传奇 4暗金), s 装备槽, sub 类型, h 手数, aff 元素倾向, cls 偏好职业,\n'
       ' * eff/desc 传奇与暗金特效（设定文本）, cost 代价, lore 暗金传记, i 图集序号（art/equipment/<品质>.webp，10 列，104×88）。 */\n'
       'export const ICON_SIZE=Object.freeze({w:%d,h:%d,cols:%d});\n' % (ICON_W, ICON_H, COLS) +
       'export const CATALOG=Object.freeze(' + json.dumps(records, ensure_ascii=False, separators=(',', ':')) + '.map(Object.freeze));\n')

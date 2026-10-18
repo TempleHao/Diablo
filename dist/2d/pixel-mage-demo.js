@@ -20,15 +20,19 @@ if(sheet){
 }
 export const status=()=>({ready,failed,width:sheet?.naturalWidth??0,height:sheet?.naturalHeight??0});
 export const skinIndex=skin=>Math.max(0,SKINS.indexOf(skin));
+// 走路用分步节奏（每步 4 个关键姿势，约 8 帧/秒）而不是连续正弦：
+// 落地帧身体下沉、迈出的脚在前；过渡帧另一只脚抬起。没有上下漂浮和左右摇摆。
 export const animationPose=(actor,tick)=>{
   const moving=!!actor.moving;
   const phase=Number.isFinite(actor.walk)?actor.walk:0;
-  const stride=moving?Math.sin(phase)*1.7:0;
+  const step=moving?((Math.floor(phase/(Math.PI/2))%4)+4)%4:0;
+  const stride=moving?[2.6,0,-2.6,0][step]:0;
   return {
     mode:(actor.invuln>0.3)?'hurt':actor.cast>0?'cast':moving?'run':'idle',
-    moving,
-    bob:moving?-2.2*Math.abs(Math.sin(phase)):-.8*Math.sin(tick*2.2),
-    lean:moving?Math.sin(phase)*.045:Math.sin(tick*1.7)*.012,
+    moving,step,
+    bob:moving?[1.6,-.6,1.6,-.6][step]:-.6*Math.sin(tick*2.2),
+    lift:moving?[0,1,0,-1][step]:0, // 1=右脚抬起，-1=左脚抬起
+    lean:moving?stride*.004:0,
     stride,phase
   };
 };
@@ -45,19 +49,19 @@ export function drawAnimatedPixelMage(ctx,actor,tick,gear,scale=1,fallback){
   ctx.fillStyle='rgba(2,4,10,.55)';ctx.beginPath();ctx.ellipse(0,3,30,8,0,0,Math.PI*2);ctx.fill();
   // 原画朝左；向右移动时水平翻转。
   if(Math.cos(actor.angle||0)>.15)ctx.scale(-1,1);
-  ctx.rotate(pose.lean+(pose.mode==='cast'?-.06:0));
-  ctx.translate(0,pose.bob);
+  ctx.rotate(pose.mode==='cast'?-.05:0);
+  ctx.translate(0,Math.round(pose.bob));
   if(pose.mode==='hurt')ctx.globalAlpha=.55+.45*Math.abs(Math.sin(tick*30));
   const w=CELL.w*K,h=DRAW_H,left=-CELL.footX*K;
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
   if(pose.moving){
-    // 上半身固定，下摆（约底部 22%）单独左右摆动，形成步伐感。
-    const split=Math.round(CELL.h*.78);
-    const squash=1-Math.abs(Math.sin(pose.phase))*.025;
-    ctx.save();ctx.scale(1,squash);
+    // 上半身整体；下摆与靴子按脚底中线分成左右两半，分别前后/抬起。
+    const split=Math.round(CELL.h*.8),lowH=CELL.h-split,midX=CELL.footX;
     ctx.drawImage(sheet,sx,0,CELL.w,split,left,-h,w,split*K);
-    ctx.restore();
-    ctx.drawImage(sheet,sx,split,CELL.w,CELL.h-split,left+pose.stride*1.6,-h+split*K*squash,w,(CELL.h-split)*K);
+    const y0=-h+split*K;
+    const legL={dx:pose.stride*1.2,dy:pose.lift<0?-2.2:0},legR={dx:-pose.stride*1.2,dy:pose.lift>0?-2.2:0};
+    ctx.drawImage(sheet,sx,split,midX,lowH,left+legL.dx,y0+legL.dy,midX*K,lowH*K);
+    ctx.drawImage(sheet,sx+midX,split,CELL.w-midX,lowH,left+midX*K+legR.dx,y0+legR.dy,(CELL.w-midX)*K,lowH*K);
   }else{
     ctx.drawImage(sheet,sx,0,CELL.w,CELL.h,left,-h,w,h);
   }

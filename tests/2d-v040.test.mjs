@@ -8,22 +8,20 @@ import {rollBossRewards,BOSS_POOLS} from '../dist/2d/boss-loot.js';
 import {emitVfx,tickVfx} from '../dist/2d/spell-vfx.js';
 import {addDecal,tickDecals,shakeOffset} from '../dist/2d/fx.js';
 
-const CASTER=new Set(['魔杖','权杖','法杖','晶杖','自然法杖','骨杖']);
 
-test('catalog ships 70 caster-usable items per rarity with valid atlas cells',()=>{
-  assert.equal(CATALOG.length,350);
-  assert.equal(new Set(CATALOG.map(c=>c.id)).size,350);
+test('catalog ships all 500 items (100 per rarity) with valid atlas cells',()=>{
+  assert.equal(CATALOG.length,500);
+  assert.equal(new Set(CATALOG.map(c=>c.id)).size,500);
   assert.deepEqual(RARITIES,['普通','魔法','史诗','传奇','暗金']);
   for(let r=0;r<5;r++){
     const tier=CATALOG.filter(c=>c.r===r);
-    assert.equal(tier.length,70);
-    assert.deepEqual(tier.map(c=>c.i).sort((a,b)=>a-b),[...Array(70).keys()]);
+    assert.equal(tier.length,100);
+    assert.deepEqual(tier.map(c=>c.i).sort((a,b)=>a-b),[...Array(100).keys()]);
     const file=new URL('../dist/2d/art/equipment/'+'NMELU'[r]+'.webp',import.meta.url);
     assert.ok(existsSync(file)&&statSync(file).size>20000,'atlas '+r);
   }
   for(const c of CATALOG){
     assert.ok(SLOT_IDS.includes(c.s),c.id);
-    if(c.s==='weapon')assert.ok(CASTER.has(c.sub),'mage-only weapon '+c.sub);
     assert.ok(c.h===1||c.h===2);
   }
   assert.ok(ICON_SIZE.w>0&&ICON_SIZE.cols===10);
@@ -31,7 +29,7 @@ test('catalog ships 70 caster-usable items per rarity with valid atlas cells',()
 test('every slot and rarity has a catalog pool',()=>{
   for(let r=0;r<5;r++)for(const s of SLOT_IDS)assert.ok(catalogPool(r,s).length>=3,r+' '+s);
 });
-test('two-hand staff blocks the offhand both ways',()=>{
+test('two-hand weapon blocks the offhand both ways',()=>{
   const p=freshSave();
   const staff=normalizeItem({id:'st',slot:'weapon',name:'x',cid:catalogPool(0,'weapon').find(c=>c.h===2).id,rarity:0,power:40,hp:0,mana:0,armor:0});
   const book=normalizeItem({id:'bk',slot:'offhand',name:'x',cid:catalogPool(0,'offhand')[0].id,rarity:0,power:0,hp:0,mana:20,armor:5});

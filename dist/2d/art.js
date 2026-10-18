@@ -191,7 +191,13 @@ export function enemy(ctx,e,tick,scale=.72){
     sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);
     // 受击闪白
     if(e.flash>0){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,e.flash*8);sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);ctx.restore();}
-    if(e.slow>0){ctx.fillStyle='#93d9f027';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);}
+    if(e.frozen>0){
+      // 冻结：整体泛白发蓝，脚下冰块
+      ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);ctx.restore();
+      ctx.fillStyle='#8fd4ff40';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);
+      ctx.fillStyle='#bfe9ffaa';ctx.beginPath();ctx.ellipse(0,4,cfg.width*.42,13,0,0,Math.PI*2);ctx.fill();
+    }
+    else if(e.slow>0){ctx.fillStyle='#93d9f027';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);}
   }else{ctx.fillStyle='#92665e';ctx.fillRect(-17,-37,34,37);}
   if(e.hp<e.maxHp){
     const barWidth=e.kind==='boss'?118:e.kind==='brute'?74:58;
@@ -205,7 +211,7 @@ export function enemy(ctx,e,tick,scale=.72){
 const prevEnemyPos=new Map();
 function spiderEnemy(ctx,e,tick,scale=.72){
   ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
-  const step=Math.sin(tick*17+e.phase)*7;
+  const step=e.frozen>0?0:Math.sin(tick*17+e.phase)*7;
   ctx.fillStyle='#05070bb9';ctx.beginPath();ctx.ellipse(0,13,37,13,0,0,Math.PI*2);ctx.fill();
   ctx.lineWidth=5;ctx.strokeStyle='#483747';
   for(const side of [-1,1])for(let leg=0;leg<4;leg++){
@@ -215,8 +221,8 @@ function spiderEnemy(ctx,e,tick,scale=.72){
     ctx.lineTo(side*reach,-23+leg*7+step*(leg%2?1:-1));
     ctx.lineTo(side*(reach+20),-4+leg*9);ctx.stroke();
   }
-  const hit=e.flash>0;
-  ctx.fillStyle=hit?'#f6d0d0':'#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
+  const hit=e.flash>0,ice=e.frozen>0;
+  ctx.fillStyle=hit?'#f6d0d0':ice?'#9fd4f0':'#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
   ctx.fillStyle=hit?'#e0e0e8':'#202127';ctx.beginPath();ctx.ellipse(0,-26,13,14,0,0,Math.PI*2);ctx.fill();
   for(const x of [-8,8]){ctx.fillStyle='#fc613d';ctx.beginPath();ctx.arc(x,-31,3,0,Math.PI*2);ctx.fill();}
   if(e.hp<e.maxHp){ctx.fillStyle='#160e12';ctx.fillRect(-25,-54,50,5);ctx.fillStyle='#e06e62';ctx.fillRect(-25,-54,50*Math.max(0,e.hp/e.maxHp),5);}

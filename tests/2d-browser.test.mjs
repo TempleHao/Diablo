@@ -51,7 +51,7 @@ try{
     });
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
-    assert.equal(await page.locator('[data-skill]').count(),7,'seven abilities must render');
+    assert.equal(await page.locator('[data-skill]').count(),10,'ten ability slots must render');
     assert.equal(await page.locator('#mage-skin-start option').count(),5,'five mage palette selections');
     await page.selectOption('#mage-skin-start','flame');
     assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'flame','appearance persists');
@@ -127,9 +127,16 @@ try{
     await page.selectOption('#mage-skin-inventory','shadow');
     assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroSkin),'shadow');
     if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
-    assert.equal(await page.locator('.catalog-skill').count(),11,'expanded spell catalogue should show all eleven skills');
-    assert.equal(await page.locator('[data-skill]').count(),7,'only seven loadout slots visible on mobile');
-    assert.equal(await page.locator('.skill-slot').count(),11,'skills may be assigned to the action bar');
+    assert.equal(await page.locator('.catalog-skill').count(),31,'spell catalogue shows all 31 skills');
+    assert.equal(await page.locator('#abilitybar [data-skill]').count(),10,'ten action bar slots');
+    assert.equal(await page.locator('.skill-slot').count(),10,'each action bar slot can pick a skill');
+    assert.equal(await page.locator('.key-bind').count(),10,'each action bar slot has a rebindable key');
+    await page.locator('.key-bind').nth(2).click();
+    await page.keyboard.press('g');
+    const binds=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).keybinds);
+    assert.equal(binds[2],'g','slot 3 key rebound to G');
+    await page.locator('.key-bind').nth(0).click();await page.keyboard.press('w');
+    assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).keybinds))[0],'1','movement keys cannot be bound');
     assert.ok(await page.locator('.item-thumbnail').count()>0,'bag should include actual item icon canvases');
     assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
@@ -157,10 +164,10 @@ try{
     const temperReady=await page.locator('#inv-temper').isEnabled();
     assert.equal(typeof temperReady,'boolean');
     assert.ok((await page.locator('#temper-cost').innerText()).includes('淬炼花费'));
-    const spellRow=page.locator('.skill-catalog-entry').filter({hasText:'冰暴领域'});
-    await spellRow.locator('select').selectOption('0');
-    assert.equal(await page.locator('button[data-skill="storm"]').count(),1);
-    assert.equal(await page.locator('[data-skill]').count(),7);
+    // 第 1 格换成雷霆新星（技能栏下拉框）
+    await page.locator('#skill-loadout .skill-slot').first().selectOption('lnova');
+    assert.equal(await page.locator('button[data-skill="lnova"]').count(),1);
+    assert.equal(await page.locator('#abilitybar [data-skill]').count(),10);
     assert.equal(await page.locator('#portal-open').isVisible(),false,'portal button must not cover the inventory');
     if(viewport.isMobile){
       await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
