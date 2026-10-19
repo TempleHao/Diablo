@@ -71,8 +71,8 @@ try{
     });
     assert.equal(sprite.ready,true,'demo mage image must load before character draw');
     // v0.4：五色法师原画图集，5 格 × 173px，高 200px。
-    assert.equal(sprite.width,190*7,'hero sheet width differs');
-    assert.equal(sprite.height,200,'hero sheet height differs');
+    // v0.6：身体 + 武器分层图集
+    assert.ok(sprite.width>=512&&sprite.height>=200,'hero rig atlas loaded');
     if(process.env.SCREENSHOT_FOR_REVIEW==='1'){
       const idle=await page.screenshot({type:'jpeg',quality:75});
       console.log((viewport.width===1365?'MAGE_IDLE_DESKTOP_BASE64:':viewport.width===390?'MAGE_IDLE_MOBILE_BASE64:':'MAGE_IDLE_LANDSCAPE_BASE64:')+idle.toString('base64'));
@@ -194,11 +194,13 @@ try{
       console.log((viewport.isMobile?'CRAFT_MOBILE_BASE64:':'CRAFT_DESKTOP_BASE64:')+craftShot.toString('base64'));
     }
     if(viewport.isMobile){
-      await page.locator('.item-detail').filter({hasText:'冻土秘银指环'}).click();
+      // v0.6 起名字由命名规则生成：从存档里读出这枚戒指当前的名字
+      const ringName=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).inventory.find(i=>i.id==='ring').name);
+      await page.locator('.item-detail').filter({hasText:ringName}).click();
       assert.equal(await page.locator('#ring-choice').isVisible(),true,'mobile must choose which ring to replace');
       await page.selectOption('#ring-target','ring1');
       const now=await page.locator('#compare-pair').innerText();
-      assert.ok(now.includes('冻土秘银指环'),'ring comparison must show equipped jewelry');
+      assert.ok(now.includes(ringName),'ring comparison must show equipped jewelry');
       await page.selectOption('#ring-target','ring2');
       assert.ok((await page.locator('#compare-pair').innerText()).includes('空槽位'),'second ring empty slot should show in comparison');
       const selectedBefore=await page.locator('#mobile-item-name').innerText();

@@ -2,6 +2,8 @@ import {drawMage} from './mage-portrait.js';
 import {drawAnimatedPixelMage,drawHero} from './pixel-mage-demo.js';
 import {drawEquipmentIcon,iconSource} from './equipment-icons.js';
 import {RARITY_COLORS} from './systems.js';
+import {SPRITES} from './sprite-data.js';
+import {TIER,ELITE_MOD_NAMES,SCHOOL_COLOR} from './monsters.js';
 import {drawGlow,drawEllipseGlow} from './fx.js';
 /**
  * 余烬纪事 · 2D 美术层
@@ -171,63 +173,6 @@ export function hero(ctx,p,tick,gear,scale=.65){
     c.restore();
   });
 }
-let prevHeroWalk=0;
-export function enemy(ctx,e,tick,scale=.72){
-  if(e.kind==='spider'){spiderEnemy(ctx,e,tick,scale);return;}
-  const cfg=e.kind==='boss'?{type:'boss',width:136,height:154,off:-123}
-    :e.kind==='brute'?{type:'brute',width:113,height:127,off:-100}
-    :e.kind==='archer'?{type:'archer',width:64,height:93,off:-76}
-    :e.kind==='cultist'?{type:'cultist',width:66,height:94,off:-76}
-    :{type:'wretch',width:59,height:59,off:-47};
-  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
-  if(e.kind==='boss'){ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,-45,120,'#a64d89',.35);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;}
-  shadow(ctx,0,6,cfg.width*.36,12,.73);
-  if(ready){
-    const previous=prevEnemyPos.get(e.id);
-    const dx=e.x-(previous?.x ?? e.x),dy=e.y-(previous?.y ?? e.y);
-    const walking=Math.hypot(dx,dy)>.5;
-    const frame=frameFor(cfg.type,walking,tick+e.phase*.1);
-    // Boss eye line and oversized arms remain part of the source animation.
-    sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);
-    // 受击闪白
-    if(e.flash>0){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(1,e.flash*8);sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);ctx.restore();}
-    if(e.frozen>0){
-      // 冻结：整体泛白发蓝，脚下冰块
-      ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;sprite(ctx,frame,-cfg.width/2,cfg.off,cfg.width,cfg.height);ctx.restore();
-      ctx.fillStyle='#8fd4ff40';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);
-      ctx.fillStyle='#bfe9ffaa';ctx.beginPath();ctx.ellipse(0,4,cfg.width*.42,13,0,0,Math.PI*2);ctx.fill();
-    }
-    else if(e.slow>0){ctx.fillStyle='#93d9f027';ctx.fillRect(-cfg.width/2,cfg.off,cfg.width,cfg.height);}
-  }else{ctx.fillStyle='#92665e';ctx.fillRect(-17,-37,34,37);}
-  if(e.hp<e.maxHp){
-    const barWidth=e.kind==='boss'?118:e.kind==='brute'?74:58;
-    ctx.fillStyle='#160e12';ctx.fillRect(-barWidth/2,cfg.off-13,barWidth,6);
-    ctx.fillStyle=e.kind==='boss'?'#c982bb':'#ca7364';ctx.fillRect(-barWidth/2,cfg.off-13,barWidth*Math.max(0,e.hp/e.maxHp),6);
-  }
-  if(e.slow>0){ctx.strokeStyle='#92dafa8c';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,7,cfg.width*.41,12,0,0,Math.PI*2);ctx.stroke();}
-  ctx.restore();
-  prevEnemyPos.set(e.id,{x:e.x,y:e.y});
-}
-const prevEnemyPos=new Map();
-function spiderEnemy(ctx,e,tick,scale=.72){
-  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));ctx.scale(scale,scale);
-  const step=e.frozen>0?0:Math.sin(tick*17+e.phase)*7;
-  ctx.fillStyle='#05070bb9';ctx.beginPath();ctx.ellipse(0,13,37,13,0,0,Math.PI*2);ctx.fill();
-  ctx.lineWidth=5;ctx.strokeStyle='#483747';
-  for(const side of [-1,1])for(let leg=0;leg<4;leg++){
-    const angle=(leg-1.5)*.33, reach=22+leg*4;
-    const x0=side*11,y0=-12+leg*4;
-    ctx.beginPath();ctx.moveTo(x0,y0);
-    ctx.lineTo(side*reach,-23+leg*7+step*(leg%2?1:-1));
-    ctx.lineTo(side*(reach+20),-4+leg*9);ctx.stroke();
-  }
-  const hit=e.flash>0,ice=e.frozen>0;
-  ctx.fillStyle=hit?'#f6d0d0':ice?'#9fd4f0':'#48232d';ctx.beginPath();ctx.ellipse(0,-8,22,17,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=hit?'#e0e0e8':'#202127';ctx.beginPath();ctx.ellipse(0,-26,13,14,0,0,Math.PI*2);ctx.fill();
-  for(const x of [-8,8]){ctx.fillStyle='#fc613d';ctx.beginPath();ctx.arc(x,-31,3,0,Math.PI*2);ctx.fill();}
-  if(e.hp<e.maxHp){ctx.fillStyle='#160e12';ctx.fillRect(-25,-54,50,5);ctx.fillStyle='#e06e62';ctx.fillRect(-25,-54,50*Math.max(0,e.hp/e.maxHp),5);}
-  ctx.restore();
-}
 // 掉落物：图鉴图标裁成柔和椭圆（去掉方形深色底），按图鉴编号缓存。
 const groundIcons=new Map();
 function groundIcon(item){
@@ -273,62 +218,156 @@ export function loot(ctx,d,tick){
 export function drawItemIcon(canvas,item){return drawEquipmentIcon(canvas,item);}
 export function preload(){return new Promise((res,rej)=>{if(ready)return res();if(failed)return rej(new Error('sprites failed'));atlas.addEventListener('load',res,{once:true});atlas.addEventListener('error',rej,{once:true});});}
 
-// ───── 随从与陷阱（v0.5） ─────
+
+// ═════════ 怪物与召唤物（v0.6，art/monsters.webp） ═════════
+const mons=typeof Image==='undefined'?null:new Image();let monsReady=false;
+if(mons){mons.decoding='async';mons.onload=()=>{monsReady=true;};mons.src=new URL('./art/monsters.webp',import.meta.url).href;}
+export const monsterArtStatus=()=>({ready:monsReady});
 const tintCache=new Map();
-function tinted(frame,tint){
-  const key=frame.join(',')+tint;let c=tintCache.get(key);if(c)return c;
-  if(!ready)return null;
-  c=document.createElement('canvas');c.width=frame[2];c.height=frame[3];
-  const g=c.getContext('2d');g.drawImage(atlas,frame[0],frame[1],frame[2],frame[3],0,0,frame[2],frame[3]);
-  g.globalCompositeOperation='source-atop';g.globalAlpha=.55;g.fillStyle=tint;g.fillRect(0,0,frame[2],frame[3]);
-  tintCache.set(key,c);return c;
+/** 某张怪物贴图的纯色剪影（用于受击闪白、冻结、属性蓄力发光）。 */
+function silhouette(key,color){
+  const id=key+color;let c=tintCache.get(id);if(c)return c;if(!monsReady)return null;
+  const f=SPRITES[key];c=document.createElement('canvas');c.width=f[2];c.height=f[3];
+  const g=c.getContext('2d');g.drawImage(mons,f[0],f[1],f[2],f[3],0,0,f[2],f[3]);
+  g.globalCompositeOperation='source-in';g.fillStyle=color;g.fillRect(0,0,f[2],f[3]);
+  tintCache.set(id,c);return c;
 }
-const ALLY_SPRITE={wretch:{type:'wretch',w:52,h:52,off:-42},cultist:{type:'cultist',w:58,h:84,off:-68},brute:{type:'brute',w:100,h:112,off:-88},archer:{type:'archer',w:58,h:84,off:-68},spider:{type:'wretch',w:52,h:52,off:-42},boss:{type:'brute',w:100,h:112,off:-88}};
-export function ally(ctx,a,U,tick,scale=.7){
-  const fade=Math.min(1,a.life/1.2,1);
-  ctx.save();ctx.translate(Math.round(a.x),Math.round(a.y));
-  // 友方光圈
-  ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,26,10,U.color||U.tint||'#7dff9a',.35*fade);ctx.globalCompositeOperation='source-over';
-  ctx.strokeStyle=(U.color||U.tint||'#7dff9a')+'aa';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,3,20,7,0,0,Math.PI*2);ctx.stroke();
-  ctx.globalAlpha=fade*(U.alpha||1);
-  const flip=a.facingLeft?-1:1;
-  if(U.hero){ctx.restore();ctx.save();ctx.globalAlpha=fade*(U.alpha||.55);drawHero(ctx,{x:a.x,y:a.y,cls:U.hero,angle:a.facingLeft?Math.PI:0,moving:a.moving,walk:a.phase,cast:0,invuln:0},tick,{},scale*.95);ctx.restore();return;}
-  if(U.beast==='wolf'||U.beast==='bear'){
-    const k=(U.big||1)*scale,step=a.moving?Math.sin(a.phase*2)*3:0;
-    ctx.scale(flip*k,k);ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,4,30,7,0,0,7);ctx.fill();
-    ctx.fillStyle=U.color;
-    ctx.beginPath();ctx.ellipse(0,-20,U.beast==='bear'?30:26,U.beast==='bear'?17:11,0,0,7);ctx.fill();
-    ctx.beginPath();ctx.ellipse(U.beast==='bear'?26:24,-28,U.beast==='bear'?13:10,U.beast==='bear'?11:8,-.2,0,7);ctx.fill();
-    if(U.beast==='wolf'){ctx.beginPath();ctx.moveTo(30,-32);ctx.lineTo(42,-27);ctx.lineTo(30,-24);ctx.fill();ctx.beginPath();ctx.moveTo(-24,-22);ctx.lineTo(-40,-30+step);ctx.lineTo(-26,-17);ctx.fill();}
-    for(const [lx,ph] of [[-16,0],[-8,1],[10,0],[18,1]]){ctx.fillRect(lx-2.5,-12+(ph?step:-step)*.6,5,14);}
-    ctx.fillStyle='#ffdd66';ctx.fillRect(U.beast==='bear'?30:28,-31,2.5,2.5);
-    ctx.restore();return;
+function spriteAt(ctx,key,alpha=1){const f=SPRITES[key];if(!f||!monsReady)return;ctx.globalAlpha=alpha;ctx.drawImage(mons,f[0],f[1],f[2],f[3],-f[4],-f[3],f[2],f[3]);}
+function silAt(ctx,key,color,alpha){const c=silhouette(key,color),f=SPRITES[key];if(!c)return;ctx.globalAlpha=alpha;ctx.drawImage(c,-f[4],-f[3]);}
+const easeOut=t=>1-(1-t)*(1-t);
+/**
+ * 怪物：待机呼吸；行走按 AI 类型（跳步、重踏、疾走、悬浮扑翼）；
+ * 普攻先后仰蓄力（身体泛起属性色），再前冲出手；法师蓄力时手上聚光；受击闪白抖动；冻结/眩晕叠加效果。
+ */
+export function enemy(ctx,e,tick,k=1){
+  const M=e.mon;if(!M)return;
+  const T=TIER[M.tier],key=M.sprite,f=SPRITES[key];if(!f)return;
+  const sc=T.scale*k*(M.tier==='boss'?1:.9);e.drawScale=sc;
+  const ai=M.ai,fly=ai==='fly'||M.fly,ph=e.phase||0,frozen=e.frozen>0,col=SCHOOL_COLOR[M.school]||'#ff5a4a';
+  ctx.save();ctx.translate(Math.round(e.x),Math.round(e.y));
+  // 地面阴影与精英/首领光环
+  const shw=f[2]*sc*.42;
+  if(M.tier==='elite'||M.tier==='boss'){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,shw*1.5,shw*.5,M.tier==='boss'?'#c0306a':col,.35+.1*Math.sin(tick*4));ctx.globalCompositeOperation='source-over';}
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.ellipse(0,3,shw,shw*.28,0,0,Math.PI*2);ctx.fill();
+  if(e.spawnT>0){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,0,shw*1.6,shw*.6,'#b46cff',e.spawnT*1.4);ctx.globalCompositeOperation='source-over';}
+  // 动作参数
+  let bob=0,tilt=0,sx=1,sy=1,lunge=0,charge=0;
+  const A=e.act,moving=e.moving&&!frozen;
+  if(fly){bob=-14-Math.sin(ph*2.2)*5;sy=1+Math.sin(ph*7)*.06;sx=1-Math.sin(ph*7)*.04;}
+  else if(moving){
+    const step=Math.abs(Math.sin(ph*(ai==='swarm'?3.4:ai==='tank'?1.6:2.4)));
+    bob=-step*(ai==='tank'?3:ai==='swarm'?2:4.5);tilt=Math.sin(ph*(ai==='tank'?1.6:2.4))*(ai==='tank'?.04:.07);
+    if(ai==='tank'){sy=1-(1-step)*.05;sx=1+(1-step)*.04;}
+  }else{sy=1+Math.sin(ph*1.6)*.022;sx=1-Math.sin(ph*1.6)*.012;}
+  if(A&&!frozen){
+    const w=A.wind||.3,t=A.t||0;
+    if(t<w){charge=t/w;tilt-=.16*charge;sy*=1+.05*charge;sx*=1-.03*charge;lunge=-5*charge;}
+    else{const q=Math.min(1,(t-w)/.18);lunge=easeOut(q<.5?q*2:2-q*2)*16;tilt+=.14*(1-q);sy*=1-.07*(1-q);sx*=1+.06*(1-q);}
+    if(A.type==='charge'&&t>=w){lunge=0;tilt=.18;}
   }
-  if(U.beast==='raven'){
-    const fl=Math.sin(a.phase*3)*8;ctx.translate(0,-40);ctx.scale(flip*scale*1.2,scale*1.2);ctx.fillStyle=U.color;
-    ctx.beginPath();ctx.ellipse(0,0,9,5,0,0,7);ctx.fill();ctx.beginPath();ctx.moveTo(-2,-1);ctx.lineTo(-16,-6-fl);ctx.lineTo(-4,3);ctx.fill();ctx.beginPath();ctx.moveTo(2,-1);ctx.lineTo(16,-6-fl);ctx.lineTo(4,3);ctx.fill();
-    ctx.fillStyle='#ff4040';ctx.fillRect(6,-2,2,2);ctx.restore();return;
-  }
-  if(U.device){
-    const c=U.color,pulse=.6+.4*Math.sin(tick*6+a.phase);
-    ctx.globalCompositeOperation='lighter';
-    if(U.device==='spirit'){drawGlow(ctx,0,-40,26,c,.6*pulse);drawGlow(ctx,0,-40,10,'#ffffff',.9,true);for(let i=0;i<3;i++){const t=tick*2+i*2.1;drawGlow(ctx,Math.cos(t)*16,-40+Math.sin(t)*8,4,c,.8);}}
-    else if(U.device==='vine'){for(let i=0;i<5;i++){const t=i*1.26+Math.sin(tick*2+i)*.2;drawGlow(ctx,Math.cos(t)*14,-6-Math.abs(Math.sin(t))*18,6,c,.6*pulse);}drawGlow(ctx,0,-14,14,c,.4);}
-    else{ctx.globalCompositeOperation='source-over';ctx.fillStyle='#2a2c34';ctx.fillRect(-8,-26,16,26);ctx.fillStyle=U.device==='totem'?'#8a6a48':'#5a5e68';ctx.fillRect(-6,-34,12,10);
-      ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,-30,16,a.shotColor||c,.7*pulse);}
-    ctx.restore();return;
-  }
-  const spec=ALLY_SPRITE[a.reviveKind||U.sprite]||ALLY_SPRITE.wretch;
-  const frame=frameFor(spec.type,a.moving,tick+a.phase*.1);
-  const img=tinted(frame,U.tint||'#7dff9a');
-  ctx.scale(flip*scale,scale);
-  ctx.globalAlpha=fade*(U.alpha||1);
-  if(img)ctx.drawImage(img,-spec.w/2,spec.off,spec.w,spec.h);
-  if(a.hp<a.maxHp){ctx.globalAlpha=1;ctx.fillStyle='#0d1410';ctx.fillRect(-22,spec.off-10,44,5);ctx.fillStyle='#6fdc7a';ctx.fillRect(-22,spec.off-10,44*Math.max(0,a.hp/a.maxHp),5);}
+  if(e.flash>0){ctx.translate((Math.random()-.5)*3,0);}
+  const dir=e.face||1,artFace=M.face||0;
+  ctx.translate(lunge*dir,bob);
+  ctx.rotate(tilt*dir);
+  ctx.scale(sx*sc*(artFace&&artFace!==dir?-1:1),sy*sc);
+  // 本体
+  spriteAt(ctx,key,e.spawnT>0?1-e.spawnT:1);
+  ctx.globalCompositeOperation='lighter';
+  if(charge>0&&A?.type!=='ranged')silAt(ctx,key,col,.35*charge+.12*Math.sin(tick*30)*charge);
+  if(e.flash>0)silAt(ctx,key,'#ffffff',Math.min(.85,e.flash*8));
+  if(frozen)silAt(ctx,key,'#5ab8ff',.45);
+  else if(e.slow>0)silAt(ctx,key,'#5ab8ff',.14);
+  if(e.poisonUntil>tick)silAt(ctx,key,'#5aff4a',.14+.06*Math.sin(tick*8));
+  if(e.ampUntil>tick||e.curseUntil>tick)silAt(ctx,key,'#c04060',.12);
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
   ctx.restore();
+  // 法师/远程蓄力：手上聚光
+  const H=f[3]*sc;
+  if(A&&(A.type==='ranged'||A.type==='cast')&&A.t<(A.wind||.4)){
+    const q=A.t/(A.wind||.4);ctx.save();ctx.globalCompositeOperation='lighter';
+    drawGlow(ctx,e.x+dir*f[2]*sc*.28,e.y-H*.62+bob,10+q*20,col,.4+q*.6,true);ctx.restore();
+  }
+  if(frozen){ctx.save();ctx.fillStyle='#cfefffcc';ctx.beginPath();ctx.ellipse(e.x,e.y+2,shw*1.1,shw*.4,0,0,Math.PI*2);ctx.fill();ctx.restore();}
+  if(e.stun>0){ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<3;i++){const a=tick*5+i*2.1;drawGlow(ctx,e.x+Math.cos(a)*16,e.y-H-6+Math.sin(a)*5,5,'#ffe08a',.9);}ctx.restore();}
+  // 血条与名字
+  const top=e.y-H+bob-10;
+  if(M.tier==='elite'||M.tier==='boss'||e.hp<e.maxHp){
+    const bw=M.tier==='boss'?110:M.tier==='elite'?72:46;
+    ctx.fillStyle='#160e12';ctx.fillRect(e.x-bw/2,top,bw,5);
+    ctx.fillStyle=M.tier==='boss'?'#c982bb':M.tier==='elite'?'#e8b04a':'#ca7364';ctx.fillRect(e.x-bw/2,top,bw*Math.max(0,e.hp/e.maxHp),5);
+  }
+  if(M.tier==='elite'){
+    ctx.save();ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#000c';
+    const label=M.name+' · '+M.mods.map(m=>ELITE_MOD_NAMES[m]).join('/');
+    ctx.strokeText(label,e.x,top-5);ctx.fillStyle='#f0c060';ctx.fillText(label,e.x,top-5);ctx.restore();
+  }
 }
-export function corpse(ctx,c){
-  if(!ready)return;
-  ctx.save();ctx.globalAlpha=Math.min(.75,c.life/2);
-  sprite(ctx,FRAME.skull,c.x-11,c.y-14,22,22);ctx.restore();
+/** 死亡：倒地（朝受击反方向旋转压扁）、褪色、溶解成火星。 */
+export function enemyDeath(ctx,e,t,k=1){
+  const M=e.mon;if(!M||!monsReady)return;const f=SPRITES[M.sprite];
+  const sc=TIER[M.tier].scale*k*(M.tier==='boss'?1:.9),q=Math.min(1,t/.45),dir=e.face||1,artFace=M.face||0;
+  ctx.save();ctx.translate(e.x,e.y);ctx.rotate(-dir*Math.PI/2*easeOut(q)*(M.ai==='fly'||M.fly?.3:.85));
+  ctx.scale(sc*(artFace&&artFace!==dir?-1:1),sc*(1-q*.25));
+  spriteAt(ctx,M.sprite,1-q*.35);
+  ctx.globalCompositeOperation='lighter';silAt(ctx,M.sprite,'#ff8a4a',(1-q)*.5);
+  ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+}
+/** 尸体：倒卧的暗色剪影，逐渐淡出（死灵法师可以利用）。 */
+export function corpse(ctx,c,k=1){
+  if(!monsReady||!c.sprite||!SPRITES[c.sprite])return;
+  const tier=c.sprite.replace(/\d+$/,''),sc=(TIER[tier]?.scale||.62)*k*.9;
+  ctx.save();ctx.translate(c.x,c.y);ctx.rotate(-(c.face||1)*Math.PI/2*.85);ctx.scale(sc,sc*.75);
+  spriteAt(ctx,c.sprite,Math.min(.6,c.life/3));
+  ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.55*Math.min(1,c.life/3);ctx.fillStyle='#10060a';const f=SPRITES[c.sprite];ctx.fillRect(-f[4],-f[3],f[2],f[3]);
+  ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+}
+// ───── 召唤物 ─────
+const ALLY_ART={skeleton:'summon0',skelarcher:'summon1',skelmage:'summon2',claygolem:'summon3',bloodgolem:'summon3',firegolem:'summon3',
+  revive:'summon4',wolf:'summon5',direwolf:'summon6',raven:'summon7',spirit_oak:'summon8',grizzly:'summon9'};
+const ALLY_TINT={claygolem:'#b08a5c',bloodgolem:'#ff3a3a',firegolem:'#ff8a2a',revive:'#7dff9a'};
+const ALLY_SCALE={skeleton:.55,skelarcher:.55,skelmage:.55,claygolem:.75,bloodgolem:.75,firegolem:.75,revive:.6,wolf:.52,direwolf:.62,raven:.42,spirit_oak:.62,grizzly:.8,valkyrie:.6};
+/** 召唤物：从地面浮现、行走起伏、攻击前冲、乌鸦扑翼、怨灵漂浮、到期淡出。 */
+export function ally(ctx,a,U,tick,k=1){
+  const key=ALLY_ART[a.unit]||(a.unit==='spirit'&&a.skill==='橡木智者'?'summon8':null);
+  if(!key||!monsReady)return legacyAlly(ctx,a,U,tick,k);
+  const f=SPRITES[key],sc=(ALLY_SCALE[a.unit]||ALLY_SCALE.spirit_oak)*k,age=a.dur-a.life,born=Math.min(1,age/.45),fade=Math.min(1,a.life/.8);
+  const dir=a.facingLeft?-1:1,artFace={summon0:-1,summon1:1,summon4:1,summon5:1,summon6:1,summon7:1,summon9:1}[key]||1;
+  const fly=a.unit==='raven'||a.unit==='revive',ph=a.phase||0;
+  let bob=0,tilt=0,sx=1,sy=1,lunge=0;
+  if(a.unit==='raven'){bob=-46-Math.sin(ph*1.5)*6;sy=.75+Math.abs(Math.sin(ph*4))*.35;}
+  else if(a.unit==='revive'){bob=-10-Math.sin(ph*1.2)*5;sx=1+Math.sin(ph*1.7)*.04;}
+  else if(a.moving){const st=Math.abs(Math.sin(ph*2.2));bob=-st*4;tilt=Math.sin(ph*2.2)*.06;}
+  else{sy=1+Math.sin(ph*1.4)*.025;}
+  if(a.atkAnim>0){const q=1-a.atkAnim/.25;lunge=Math.sin(q*Math.PI)*12;tilt+=.12*Math.sin(q*Math.PI);}
+  ctx.save();ctx.translate(Math.round(a.x),Math.round(a.y));
+  ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,26,10,U.color||U.tint||'#7dff9a',.3*fade);ctx.globalCompositeOperation='source-over';
+  if(!fly){ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,3,f[2]*sc*.35,f[2]*sc*.1,0,0,Math.PI*2);ctx.fill();}
+  ctx.translate(lunge*dir,bob*(fly?1:born));ctx.rotate(tilt*dir);
+  ctx.scale(sx*sc*(artFace!==dir?-1:1),sy*sc);
+  // 出场：自下而上浮现
+  if(born<1){ctx.save();ctx.beginPath();ctx.rect(-f[4]-4,-f[3]*born,f[2]+8,f[3]*born+4);ctx.clip();}
+  spriteAt(ctx,key,fade*(a.unit==='revive'?.82:1));
+  if(born<1)ctx.restore();
+  ctx.globalCompositeOperation='lighter';
+  if(ALLY_TINT[a.unit])silAt(ctx,key,ALLY_TINT[a.unit],.28);
+  if(born<1)silAt(ctx,key,'#d8b0ff',(1-born)*.7);
+  ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  if(a.hp<a.maxHp&&!U.turret){const top=a.y-f[3]*sc+bob-6;ctx.fillStyle='#0d1410';ctx.fillRect(a.x-20,top,40,4);ctx.fillStyle='#6fdc7a';ctx.fillRect(a.x-20,top,40*Math.max(0,a.hp/a.maxHp),4);}
+}
+// 没有专属贴图的随从（女武神、影分身、诱饵、陷阱、图腾、灵体）
+function legacyAlly(ctx,a,U,tick,scale){
+  const fade=Math.min(1,a.life/1.2);
+  ctx.save();ctx.translate(Math.round(a.x),Math.round(a.y));
+  ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,26,10,U.color||U.tint||'#7dff9a',.35*fade);ctx.globalCompositeOperation='source-over';
+  ctx.globalAlpha=fade*(U.alpha||1);
+  if(U.hero){ctx.restore();ctx.save();ctx.globalAlpha=fade*(U.alpha||.55);drawHero(ctx,{x:a.x,y:a.y,cls:U.hero,angle:a.facingLeft?Math.PI:0,moving:a.moving,walk:a.phase,cast:0,invuln:0,swing:a.atkAnim>0?{t0:tick-(.25-a.atkAnim),dur:.25}:null},tick,{},scale*.62);ctx.restore();return;}
+  if(a.unit==='valkyrie'&&monsReady){ctx.restore();ctx.save();ctx.globalAlpha=fade*.85;drawHero(ctx,{x:a.x,y:a.y,cls:'amazon',angle:a.facingLeft?Math.PI:0,moving:a.moving,walk:a.phase,cast:0,invuln:0,swing:a.atkAnim>0?{t0:tick-(.25-a.atkAnim),dur:.25}:null},tick,{},scale*.7);
+    ctx.globalCompositeOperation='lighter';drawGlow(ctx,a.x,a.y-60,30,'#ffe08a',.35);ctx.restore();return;}
+  const c=U.color||'#9fd8ff',pulse=.6+.4*Math.sin(tick*6+(a.phase||0));
+  ctx.globalCompositeOperation='lighter';
+  if(U.device==='spirit'){drawGlow(ctx,0,-40,26,c,.6*pulse);drawGlow(ctx,0,-40,10,'#ffffff',.9,true);for(let i=0;i<3;i++){const t=tick*2+i*2.1;drawGlow(ctx,Math.cos(t)*16,-40+Math.sin(t)*8,4,c,.8);}}
+  else if(U.device==='vine'){for(let i=0;i<5;i++){const t=i*1.26+Math.sin(tick*2+i)*.2;drawGlow(ctx,Math.cos(t)*14,-6-Math.abs(Math.sin(t))*18,6,c,.6*pulse);}drawGlow(ctx,0,-14,14,c,.4);}
+  else{ctx.globalCompositeOperation='source-over';ctx.fillStyle='#2a2c34';ctx.fillRect(-8,-26,16,26);ctx.fillStyle=U.device==='totem'?'#8a6a48':'#5a5e68';ctx.fillRect(-6,-34,12,10);
+    ctx.globalCompositeOperation='lighter';drawGlow(ctx,0,-30,16,c,.7*pulse);}
+  ctx.restore();
 }

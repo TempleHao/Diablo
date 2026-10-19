@@ -49,6 +49,12 @@ export function walkable(x, y, radius, dungeon) {
   if (x < radius + TILE || y < radius + TILE || x > WIDTH - radius - TILE || y > HEIGHT - radius - TILE) return false;
   return !dungeon.blocks.some(b => hitsRect(x, y, radius, b));
 }
+/** 闪现落点：目标可走就落在目标；否则从目标往回每 8 像素找第一个可走点，所以能穿墙落到墙后。 */
+export function blinkLanding(from,to,radius,dungeon){
+  const len=Math.hypot(to.x-from.x,to.y-from.y)||1;
+  for(let d=len;d>=0;d-=8){const x=from.x+(to.x-from.x)*d/len,y=from.y+(to.y-from.y)*d/len;if(walkable(x,y,radius,dungeon))return {x,y};}
+  return {x:from.x,y:from.y};
+}
 export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   // 逐轴滑墙，快速闪现用分段调用避免穿墙。
   const nx = entity.x + vx * dt, ny = entity.y + vy * dt;

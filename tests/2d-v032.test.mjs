@@ -56,12 +56,12 @@ test('weapons and jewelry icons always match their functional silhouette',()=>{
  assert.equal(iconType(sample('amulet','霜痕吊坠')),'amulet');
  assert.equal(iconType(sample('robe','刻印重甲')),'chest');
 });
-test('equipment names come from the 350-entry caster catalog and stay slot-correct',()=>{
+test('equipment names follow the v0.6 naming rules and stay slot-correct',()=>{
  const r=mulberry32(2026),names=new Set();
  for(let k=0;k<400;k++){
   const item=makeLoot(r,15,'u-'+k),entry=catalogEntry(item);
   assert.ok(entry,'every drop references a catalog record');
-  assert.equal(entry.n,item.name);assert.equal(entry.r,item.rarity);
+  assert.equal(entry.r,item.rarity);assert.ok(item.name.length>=2&&item.name.length<=14,item.name);
   assert.equal(entry.s,item.slot==='ring2'?'ring1':item.slot);
   names.add(item.name);
  }

@@ -9,10 +9,10 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(__file__))
 from grid import cells_from
 
-UP = os.environ.get('SHEETS_DIR', 'assets-source/2d-equipment/')  # 五张 1254x1254 原始图鉴：<名称>.webp
+UP = os.environ.get('SHEETS_DIR', 'assets-source/2d/')  # 五张 1254x1254 原始图鉴：<名称>.webp
 SHEETS = {'N': 'common', 'M': 'magic', 'E': 'epic', 'L': 'legendary', 'U': 'unique'}
 OUT = os.environ.get('OUT_DIR', 'dist/2d')
-CAT = json.load(open(os.environ.get('CATALOG_JSON', 'assets-source/2d-equipment/equipment_catalog_500.json')))['items']
+CAT = json.load(open(os.environ.get('CATALOG_JSON', 'assets-source/2d/equipment_catalog_500.json')))['items']
 CASTER = {'魔杖', '权杖', '法杖', '晶杖', '自然法杖', '骨杖'}
 SLOT = {'头部': 'head', '肩部': 'shoulders', '胸部': 'robe', '手部': 'gloves', '腰部': 'belt', '脚部': 'boots',
         '主手': 'weapon', '双手': 'weapon', '副手': 'offhand', '箭袋': 'offhand', '项链': 'amulet', '戒指': 'ring1'}

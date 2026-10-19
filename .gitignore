@@ -7,3 +7,4 @@ assets-source/ash-archivist/*.png
 preview.png
 gameplay.png
 mobile.png
+__pycache__/

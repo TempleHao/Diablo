@@ -56,7 +56,7 @@ test('legacy saves: items get catalog names and icons, legs/relic stay in bag un
   assert.ok(legs.legacy&&relic.legacy);assert.equal(legs.affixes.length,1);
   assert.equal(save.equipped.weapon,'c');
   assert.equal(Object.hasOwn(save.equipped,'pants'),false);
-  assert.ok(catalogEntry(weapon));assert.equal(weapon.name,catalogEntry(weapon).n);assert.equal(weapon.power,66);
+  assert.ok(catalogEntry(weapon));assert.notEqual(weapon.name,'白骨长剑','old placeholder names are replaced');assert.equal(weapon.power,66);
   assert.equal(boss.name,'血印誓约护符');assert.equal(boss.cid,BOSS_ITEM_ICONS['血印誓约护符']);
   assert.equal(equip(save,'a'),false);
   // stable across reloads

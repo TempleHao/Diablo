@@ -1,7 +1,8 @@
 /* 余烬纪事：装备、词缀与职业构筑（纯规则，无 DOM 依赖）。 */
 import {CATALOG} from './equipment-catalog.js';
-import {CLASSES,CLASS_IDS,CLASS_BY_CATALOG,proficient,attackMode} from './classes.js';
+import {CLASSES,CLASS_IDS,CLASS_BY_CATALOG,proficient,attackMode,WEAPON_TYPES} from './classes.js';
 import {CLASS_SKILLS} from './class-skills.js';
+import {nameItem,BASES as NAME_BASES,baseIndex} from './naming.js';
 export {CLASSES,CLASS_IDS,proficient,attackMode};
 // v0.4：装备槽与「黑铁遗珍」装备库对齐（11 槽）。v0.4.1 起全部 500 件装备都可穿戴。
 // 双手武器占用副手；弓弩例外，可以配箭袋。
@@ -78,7 +79,7 @@ export const SETS={
 export const SKILL_SCHOOLS=Object.freeze({fire:'火焰',cold:'冰霜',lightning:'雷电',arcane:'奥术'});
 export const SKILLS={
   // 火焰
-  fire:{name:'余烬箭',school:'fire',icon:'✹',mana:0,cooldown:.28,unlocked:1,desc:'射出灼热火弹，基础攻击'},
+  fire:{name:'余烬箭',school:'fire',icon:'✹',mana:0,cooldown:.3,unlocked:1,desc:'射出灼热火弹，基础攻击'},
   fireball:{name:'火球',school:'fire',icon:'☀',mana:10,cooldown:.7,unlocked:2,desc:'命中或飞尽时爆炸，范围火焰伤害'},
   meteor:{name:'陨火',school:'fire',icon:'☄',mana:42,cooldown:8,unlocked:3,desc:'预警后陨石坠落，大范围重击'},
   firenova:{name:'烈焰新星',school:'fire',icon:'✺',mana:26,cooldown:5,unlocked:5,desc:'以自身为中心爆发火环并点燃地面'},
@@ -173,6 +174,11 @@ export function normalizeItem(item) {
       name=entry.n;
     }
   }
+  // v0.6 命名规则（naming.js）：首领专属保留原名；套装 =「套装名·基底」；其余按品质规则生成
+  if(entry&&!BOSS_ITEM_ICONS[name]){
+    const ilvl=safeNum(item.ilvl||1,60),maxes=Object.fromEntries(Object.keys(AFFIXES).map(k=>[k,affixMax(k,ilvl,rarity)]));
+    name=setId?SETS[setId].name+'·'+NAME_BASES[baseIndex(entry.id)].n:nameItem({id:item.id,cid:entry.id,ilvl,affixes},rarity,maxes);
+  }
   return {
     id:item.id,slot:item.slot,name,rarity,ilvl:safeNum(item.ilvl||1,60),
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
@@ -186,6 +192,12 @@ export function getSlotForItem(item,target){
   if(['ring1','ring2'].includes(item.slot))return ['ring1','ring2'].includes(target)?target:item.slot;
   return item.slot===target||target==null?item.slot:null;
 }
+// 词缀成长：固定数值类（生命、法力、护甲、强度、回复、吸血）随物品等级线性成长；
+// 百分比类（暴击、增伤、抗性、攻速、移速）成长平缓，避免高等级时百分比堆爆；品质再给小幅加成。
+const PCT_AFFIX=new Set(['crit','critDmg','haste','fire','cold','lightning','physical','poison','holy','shadow','resistFire','resistCold','resistDark','move']);
+export const RARITY_AFFIX_MULT=Object.freeze([1,1,1.08,1.16,1.25]);
+export const affixScale=(key,ilvl)=>PCT_AFFIX.has(key)?1+Math.max(1,ilvl)/60*.7:1+(Math.max(1,ilvl)-1)*.055;
+export const affixMax=(key,ilvl,rarity)=>Math.round(AFFIXES[key].max*affixScale(key,ilvl)*RARITY_AFFIX_MULT[rarity|0]);
 const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
 export function makeLoot(rng,level,id,{boss=false,cls=null}={}){
   const n=Math.max(1,Math.min(60,level));
@@ -210,7 +222,7 @@ export function makeLoot(rng,level,id,{boss=false,cls=null}={}){
   for(let i=0;i<count&&choices.length;i++){
     const index=(choices[0]?.startsWith('sk_')||choices[0]===lean)&&i<2?0:Math.floor(rng()*choices.length);
     const key=choices.splice(index,1)[0],rule=AFFIXES[key];
-    const scaling=1+Math.floor(n/7)*.23;
+    const scaling=affixScale(key,n)*RARITY_AFFIX_MULT[rarity];
     affixes.push({key,value:Math.max(1,Math.round((rule.min+rng()*(rule.max-rule.min))*scaling))});
   }
   const quiver=entry.sub==='箭囊';
@@ -218,7 +230,8 @@ export function makeLoot(rng,level,id,{boss=false,cls=null}={}){
   const weaponSlot=slot==='weapon',twoHand=entry.h===2;
   return normalizeItem({
     id,slot,rarity,ilvl:n,name:entry.n,cid:entry.id,
-    power:weaponSlot?Math.round((6+n*2.5)*(1+rarity*.27)*(twoHand?1.4:1)):quiver?Math.round((3+n*.9)*(1+rarity*.2)):0,
+    // 武器强度按攻速归一：慢武器单次更痛、快武器出手更多（÷√攻速），双手 ×1.4
+    power:weaponSlot?Math.round((6+n*2.5)*(1+rarity*.27)*(twoHand?1.4:1)/Math.sqrt(WEAPON_TYPES[entry.sub]?.speed||1)):quiver?Math.round((3+n*.9)*(1+rarity*.2)):0,
     hp:slot==='robe'?Math.round(10+n*2.6):0,
     mana:slot==='offhand'&&!quiver?Math.round(10+n*1.4):0,
     armor:armorSlot?Math.round((7+n*1.1)*(1+rarity*.19)):0,

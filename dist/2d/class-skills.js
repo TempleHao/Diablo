@@ -35,7 +35,7 @@ export const CLASS_SKILLS={
   ama_valkyrie:S('amazon','passive','女武神','♛','holy',15,40,25,'summon','召唤持矛女武神作战 20 秒',{unit:'valkyrie',n:1,max:1,dur:20,m:1.3,hp:3}),
 
   // ───────── 刺客 ─────────
-  asn_basic:S('assassin','martial','普通攻击','⚔','physical',1,0,.4,'basic','随武器变化：爪刃连击、投掷飞刀'),
+  asn_basic:S('assassin','martial','普通攻击','⚔','physical',1,0,.45,'basic','随武器变化：爪刃连击、投掷飞刀'),
   asn_tiger:S('assassin','martial','虎击','♞','physical',1,4,.5,'melee','重击并蓄力，下一次攻击伤害提高',{m:1.3,range:85,arc:1,charge:'tiger'}),
   asn_dragonclaw:S('assassin','martial','龙爪','⋔','physical',2,5,.45,'melee','两次快速爪击',{m:.75,range:85,arc:1,hits:2,life:.03}),
   asn_dragontail:S('assassin','martial','龙尾','✺','fire',4,8,1.2,'melee','回旋踢，命中点火焰爆炸',{m:1,range:80,arc:1.2,splash:{r:90,m:1.1,school:'fire'}}),
@@ -62,7 +62,7 @@ export const CLASS_SKILLS={
   asn_wakeinferno:S('assassin','trap','烈焰之网','▦','fire',18,28,9,'area','大片火网持续灼烧',{m:.45,r:150,dur:5,tick:.35,fx:'fire'}),
 
   // ───────── 野蛮人 ─────────
-  bar_basic:S('barbarian','combat','普通攻击','⚔','physical',1,0,.5,'basic','随武器变化：剑斧锤重击'),
+  bar_basic:S('barbarian','combat','普通攻击','⚔','physical',1,0,.45,'basic','随武器变化：剑斧锤重击'),
   bar_bash:S('barbarian','combat','猛击','✊','physical',1,4,.7,'melee','重击并击退敌人',{m:1.6,range:95,arc:1.1,knock:55,rage:3}),
   bar_double:S('barbarian','combat','双手挥击','⚔','physical',2,4,.5,'melee','左右两次挥砍',{m:.8,range:95,arc:1.3,hits:2,rage:2}),
   bar_leap:S('barbarian','combat','跳跃','⤴','physical',3,10,3,'leap','跃向目标位置，落地震退敌人',{m:1.2,range:360,r:110,knock:60}),
@@ -73,7 +73,7 @@ export const CLASS_SKILLS={
   bar_stomp:S('barbarian','combat','震地','⊚','physical',16,24,6,'nova','重踏地面，震晕周围敌人',{m:1.4,r:180,stun:1.6,fx:'earth'}),
   bar_concentrate:S('barbarian','combat','专注打击','◉','physical',4,6,.8,'melee','稳定重击，出手时减伤 30%',{m:1.4,range:95,arc:1,onHitBuff:{dur:1.5,mods:{dr:.3}}}),
   bar_howl:S('barbarian','cry','嚎叫','≀','physical',1,8,8,'nova','怒吼击退周围敌人',{m:.2,r:200,knock:110,fx:'shout'}),
-  bar_findpotion:S('barbarian','cry','寻找补给','✚','physical',2,0,16,'heal','回复 40% 生命与 30% 怒气',{hp:.4,mana:.3}),
+  bar_findpotion:S('barbarian','cry','寻找补给','✚','physical',2,0,16,'heal','回复 40% 生命与 30% 怒气',{healHp:.4,healMana:.3}),
   bar_taunt:S('barbarian','cry','嘲讽','☄','physical',4,8,10,'curse','激怒敌群：减速并伤害降低',{r:240,dur:6,slow:.4,weaken:.3}),
   bar_shout:S('barbarian','cry','呐喊','📢','physical',5,12,18,'buff','10 秒护甲 +80%',{dur:10,mods:{armorPct:.8}}),
   bar_warcry:S('barbarian','cry','战吼','✪','physical',8,16,6,'nova','震耳战吼，伤害并眩晕周围敌人',{m:1.1,r:210,stun:1.8,fx:'shout'}),
@@ -143,7 +143,7 @@ export const CLASS_SKILLS={
   nec_confuse:S('necro','curse','迷乱','✺','shadow',9,12,12,'curse','敌人陷入混乱：停止攻击 3 秒',{r:150,dur:3,stun:3,atTarget:true}),
 
   // ───────── 圣骑士 ─────────
-  pal_basic:S('paladin','combat','普通攻击','⚒','physical',1,0,.5,'basic','随武器变化：锤剑重击'),
+  pal_basic:S('paladin','combat','普通攻击','⚒','physical',1,0,.45,'basic','随武器变化：锤剑重击'),
   pal_zeal:S('paladin','combat','狂热','≡','physical',1,4,.5,'melee','连续四次快速打击',{m:.5,range:95,arc:1,hits:4}),
   pal_smite:S('paladin','combat','惩击','⛨','physical',2,4,1,'melee','盾击敌人，必定眩晕',{m:1.2,range:80,arc:1,stun:1.2,knock:30}),
   pal_holybolt:S('paladin','combat','圣光弹','✚','holy',3,8,.8,'proj','神圣光弹，并为附近随从回血',{m:1.3,kind:'holy',speed:560,pierce:2}),
