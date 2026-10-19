@@ -21,19 +21,23 @@ if(sheet){
 export const status=()=>({ready,failed,width:sheet?.naturalWidth??0,height:sheet?.naturalHeight??0});
 export const heroArt=cls=>HERO_ART[cls]||HERO_ART.mage;
 export const heroRig=cls=>HERO_RIG[cls]||HERO_RIG.mage;
-// 走路：每步 4 个落地姿势（落地下沉、左右脚交替抬起），没有漂浮和摇摆。
+// v0.7 走路：连续步伐（按走过的距离推进，见 motion.js），站立↔行走按速度平滑混合；
+// 每步落地下沉、离地抬升，左右脚交替抬起，身体随速度前倾。没有漂浮和逐帧跳变。
+import {walkWeight,turnScale} from './motion.js';
 export const animationPose=(actor,tick)=>{
-  const moving=!!actor.moving;
-  const phase=Number.isFinite(actor.walk)?actor.walk:0;
-  const step=moving?((Math.floor(phase/(Math.PI/2))%4)+4)%4:0;
-  const stride=moving?[2.6,0,-2.6,0][step]:0;
+  const mo=actor._mo;
+  const ww=mo?walkWeight(mo,120):actor.moving?1:0;
+  const moving=ww>.05;
+  const phase=mo?mo.stride:Number.isFinite(actor.walk)?actor.walk:0;
+  const sn=Math.sin(phase),step=((Math.floor(phase/(Math.PI/2))%4)+4)%4;
+  const breath=Math.sin((mo?mo.idle:tick)*2.2);
   return {
     mode:(actor.invuln>0.3)?'hurt':actor.cast>0?'cast':moving?'run':'idle',
-    moving,step,
-    bob:moving?[1.6,-.6,1.6,-.6][step]:-.6*Math.sin(tick*2.2),
-    lift:moving?[0,1,0,-1][step]:0,
-    lean:moving?stride*.004:0,
-    stride,phase
+    moving,step,ww,
+    bob:(Math.abs(sn)*2.2-.6)*ww-.6*breath*(1-ww),
+    lift:sn*ww,                         // >0 左脚抬起，<0 右脚抬起（连续值）
+    lean:(mo?mo.lean:0)+(moving?.02*ww:0),
+    stride:sn*2.6*ww,phase,breath
   };
 };
 const ease=t=>t<0?0:t>1?1:t*t*(3-2*t);
@@ -52,7 +56,7 @@ export function swingPose(style,p){
     case 'chop':   return {ang:pick(-70,105,0),push:0,lunge:pick(-5,10,0),tilt:pick(-.12,.12,0),squash:phase===1?1-.08*Math.sin(b*Math.PI):1,hit:phase===1};
     case 'smash':  return {ang:pick(-80,110,0),push:0,lunge:pick(-4,9,0),tilt:pick(-.1,.11,0),squash:phase===1?1-.09*Math.sin(b*Math.PI):1,hit:phase===1};
     case 'claws':  return {ang:pick(-45,75,0),push:pick(-4,10,0),lunge:pick(-3,14,0),tilt:pick(-.05,.1,0),squash:1,hit:phase===1};
-    case 'staff':  return {ang:pick(-18,30,0),push:pick(0,6,0),lunge:pick(-2,4,0),tilt:pick(-.04,.05,0),squash:1,hit:phase===1,raise:pick(-8,-4,0)};
+    case 'staff':  return {ang:pick(-38,42,0),push:pick(-4,10,0),lunge:pick(-5,7,0),tilt:pick(-.09,.07,0),squash:phase===0?1+.04*a:phase===1?1-.05*Math.sin(b*Math.PI):1,hit:phase===1,raise:pick(-16,-6,0)};
     default:       return {ang:0,push:0,lunge:0,tilt:0,squash:1,hit:false};
   }
 }
@@ -66,24 +70,27 @@ export function drawHero(ctx,actor,tick,gear,scale=1,fallback){
   ctx.fillStyle='rgba(2,4,10,.55)';ctx.beginPath();ctx.ellipse(0,3,30,8,0,0,Math.PI*2);ctx.fill();
   ctx.translate(0,-(actor.lift||0)/scale);
   if(cls==='mage'){drawMage(ctx,actor,tick,pose,rig,art);ctx.restore();return pose.mode;}
-  // 朝向：攻击时朝目标，否则朝移动方向
+  // 朝向：攻击时朝目标，否则朝移动方向；转身时做翻面缓动（motion.js）
   const c=Math.cos(actor.angle||0);
   let facing=c>.15?1:c<-.15?-1:(actor.lastFacing||rig.face);
   const whirl=actor.whirl;
   if(whirl)facing=Math.floor(tick/.07)%2?1:-1;
   actor.lastFacing=facing;
   ctx.scale(K,K);
+  if(actor._mo&&!whirl){const tz=Math.abs(turnScale(actor._mo));ctx.scale(tz,1);}
   if(facing!==rig.face)ctx.scale(-1,1);
   // 动作
-  const sw=actor.swing,style=rig.style;
+  const sw0=actor.swing,style=rig.style,sw=sw0&&tick>=sw0.t0?sw0:null;
   let sp={ang:0,push:0,lunge:0,tilt:0,squash:1,hit:false,raise:0},p=1;
   if(sw&&tick-sw.t0<sw.dur){p=(tick-sw.t0)/sw.dur;sp={raise:0,...swingPose(sw.style||style,p)};}
   if(whirl)sp={ang:(tick*1100)%360,push:0,lunge:0,tilt:.06,squash:1,hit:true,raise:0};
   if(actor.leap)sp={ang:-75,push:0,lunge:0,tilt:-.18,squash:1.06,hit:false,raise:0};
   const left=-rig.foot,top=-rig.h;
-  ctx.translate(sp.lunge*rig.face,Math.round(pose.bob/K));
-  ctx.rotate((sp.tilt+(pose.mode==='hurt'?-.12:0))*rig.face);
-  ctx.scale(1+(1-sp.squash)*.6,sp.squash);
+  const hurt=pose.mode==='hurt'?Math.min(1,(actor.invuln-.3)/.3):0;
+  ctx.translate((sp.lunge-hurt*6)*rig.face,pose.bob/K);
+  ctx.rotate((sp.tilt+pose.lean*1.2-hurt*.14)*rig.face);
+  const breathe=1+(pose.breath||0)*.012*(1-(pose.ww||0));
+  ctx.scale((1+(1-sp.squash)*.6)/breathe,sp.squash*breathe);
   if(pose.mode==='hurt')ctx.globalAlpha=.6+.4*Math.abs(Math.sin(tick*30));
   ctx.imageSmoothingEnabled=false;
   // 身体（行走时下摆左右分开迈步）
@@ -92,8 +99,8 @@ export function drawHero(ctx,actor,tick,gear,scale=1,fallback){
     const split=Math.round(b[3]*.8),midX=rig.foot;
     ctx.drawImage(sheet,b[0],b[1],b[2],split,left,top,b[2],split);
     const lowH=b[3]-split,ly=top+split;
-    ctx.drawImage(sheet,b[0],b[1]+split,midX,lowH,left+pose.stride*2,ly+(pose.lift<0?-3.5:0),midX,lowH);
-    ctx.drawImage(sheet,b[0]+midX,b[1]+split,b[2]-midX,lowH,left+midX-pose.stride*2,ly+(pose.lift>0?-3.5:0),b[2]-midX,lowH);
+    ctx.drawImage(sheet,b[0],b[1]+split,midX,lowH,left+pose.stride*2,ly-Math.max(0,-pose.lift)*4,midX,lowH);
+    ctx.drawImage(sheet,b[0]+midX,b[1]+split,b[2]-midX,lowH,left+midX-pose.stride*2,ly-Math.max(0,pose.lift)*4,b[2]-midX,lowH);
   }else drawLayer(ctx,b,left,top);
   // 武器：围绕握点旋转（rig.face 方向为“前”）
   const drawWeapon=(rect,px,py,ang,push,alpha=1,mirror=1)=>{
@@ -142,10 +149,15 @@ export function drawHero(ctx,actor,tick,gear,scale=1,fallback){
 }
 // 法师：v0.5 的白法师原画 + 施法发光
 function drawMage(ctx,actor,tick,pose,rig,art){
-  const facing=Math.cos(actor.angle||0)>.15?1:Math.cos(actor.angle||0)<-.15?-1:rig.face;
+  const c=Math.cos(actor.angle||0),facing=c>.15?1:c<-.15?-1:(actor.lastFacing||rig.face);actor.lastFacing=facing;
+  if(actor._mo){ctx.scale(Math.abs(turnScale(actor._mo)),1);}
   if(facing!==rig.face)ctx.scale(-1,1);
-  ctx.rotate(pose.mode==='cast'?-.05:0);
-  ctx.translate(0,Math.round(pose.bob));
+  // 施法：先后仰抬手（0–40%），再前倾释放；身体轻微拉伸
+  const cp=pose.mode==='cast'?1-Math.min(1,(actor.cast||0)/.3):0,wind=cp<.4?cp/.4:1,rel=cp<.4?0:Math.sin((cp-.4)/.6*Math.PI);
+  ctx.rotate((pose.mode==='cast'?-.08*wind+.1*rel:0)*rig.face+(pose.lean||0)*rig.face);
+  ctx.translate(0,pose.bob);
+  if(pose.mode==='cast')ctx.scale(1-.03*wind+.02*rel,1+.04*wind-.03*rel);
+  else ctx.scale(1/(1+(pose.breath||0)*.012*(1-(pose.ww||0))),1+(pose.breath||0)*.012*(1-(pose.ww||0)));
   if(pose.mode==='hurt')ctx.globalAlpha=.55+.45*Math.abs(Math.sin(tick*30));
   const b=rig.body,w=b[2]*K,h=b[3]*K,left=-rig.foot*K;
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';
@@ -153,8 +165,8 @@ function drawMage(ctx,actor,tick,pose,rig,art){
     const split=Math.round(b[3]*.8),lowH=b[3]-split,midX=rig.foot;
     ctx.drawImage(sheet,b[0],b[1],b[2],split,left,-h,w,split*K);
     const y0=-h+split*K;
-    ctx.drawImage(sheet,b[0],b[1]+split,midX,lowH,left+pose.stride*1.2,y0+(pose.lift<0?-2.2:0),midX*K,lowH*K);
-    ctx.drawImage(sheet,b[0]+midX,b[1]+split,b[2]-midX,lowH,left+midX*K-pose.stride*1.2,y0+(pose.lift>0?-2.2:0),(b[2]-midX)*K,lowH*K);
+    ctx.drawImage(sheet,b[0],b[1]+split,midX,lowH,left+pose.stride*1.2,y0-Math.max(0,-pose.lift)*2.4,midX*K,lowH*K);
+    ctx.drawImage(sheet,b[0]+midX,b[1]+split,b[2]-midX,lowH,left+midX*K-pose.stride*1.2,y0-Math.max(0,pose.lift)*2.4,(b[2]-midX)*K,lowH*K);
   }else ctx.drawImage(sheet,b[0],b[1],b[2],b[3],left,-h,w,h);
   ctx.globalAlpha=1;
   const gx=(art.glow[0]-rig.foot)*K,gy=-(b[3]-art.glow[1])*K;

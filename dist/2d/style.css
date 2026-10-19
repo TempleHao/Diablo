@@ -302,3 +302,105 @@ body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden]
 .build-actions button{border:1px solid #7f6644;background:#22252b;padding:8px 10px;font-size:12px;color:#e4d6bd}
 .build-actions .primary{width:auto;max-width:none;margin:0;flex:1 1 220px;padding:9px;letter-spacing:1px}
 @media(max-width:760px){.build-skills{grid-template-columns:repeat(5,minmax(0,1fr))}}
+/* ───────── v0.7 角色选择（D2 式） ───────── */
+.hero-select{position:fixed;inset:0;z-index:20;background:#07060a;color:#eadfc8;overflow:hidden;font-family:inherit}
+.hero-select[hidden]{display:none}
+.hs-bg{position:absolute;inset:0;background:url("./art/select-bg.webp") center top/auto 74vh no-repeat,#07060a;image-rendering:pixelated}
+.hs-bg::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(180deg,rgba(7,6,10,.15) 0,rgba(7,6,10,0) 30vh,rgba(7,6,10,.55) 60vh,#0b0908 74vh),
+  radial-gradient(ellipse 70% 30% at 45% 86%,rgba(150,80,30,.20),transparent 70%),
+  linear-gradient(0deg,#0d0b0a 0,#0d0b0a00 30%)}
+.hs-title{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.hs-stage{position:absolute;left:28px;right:410px;top:0;bottom:64px;z-index:1}
+.hero-select[data-mode="list"] .hs-stage{left:300px}
+.hs-canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.hs-plates{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-around;gap:4px;padding:0 8px}
+.hs-plate{flex:1;max-width:140px;background:linear-gradient(#211a15f0,#120e0cf0);border:1px solid #5a4632;color:#cdbb9d;padding:6px 4px 7px;display:flex;flex-direction:column;align-items:center;gap:1px;
+  clip-path:polygon(8% 0,92% 0,100% 30%,100% 100%,0 100%,0 30%)}
+.hs-plate b{font-weight:600;font-size:14px;letter-spacing:2px}
+.hs-plate small{font-size:9px;letter-spacing:2px;color:#8c7b63}
+.hs-sigil{color:var(--cc);font-size:15px;text-shadow:0 0 10px var(--cc)}
+.hs-plate.is-active{border-color:var(--cc);color:#fff4dc;background:linear-gradient(#3a2a1ef0,#160f0bf0)}
+.hs-plate.is-active small{color:var(--cc)}
+.hs-side{position:absolute;right:22px;top:64px;width:370px;max-height:calc(100% - 140px);z-index:2;display:flex;flex-direction:column;gap:12px;overflow:auto;padding:10px 4px 12px}
+.hs-info{border:1px solid #6a5235;background:linear-gradient(160deg,rgba(28,22,17,.94),rgba(10,9,10,.96));padding:16px 18px;box-shadow:inset 0 0 0 1px #00000080,0 10px 40px #000a;position:relative}
+.hs-info::before,.hs-info::after{content:"❖";position:absolute;top:-9px;color:#b48a52;font-size:13px}
+.hs-info::before{left:-6px}.hs-info::after{right:-6px}
+.hs-info h2{margin:0;font-family:serif;font-weight:500;letter-spacing:4px;font-size:26px;color:var(--cc);text-shadow:0 0 14px color-mix(in srgb,var(--cc) 40%,transparent)}
+.hs-en{display:block;color:#9e8c70;letter-spacing:1.5px;font-size:11px;margin-top:2px}
+.hs-desc{font-size:13px;line-height:1.75;color:#d3c6ad;margin:10px 0}
+.hs-attrs{display:grid;gap:5px;margin:8px 0}
+.hs-attr{display:flex;align-items:center;gap:10px;font-size:12px;color:#bfae92}
+.hs-attr>span:first-child{width:3em;letter-spacing:2px}
+.hs-bar{display:flex;gap:3px}.hs-bar i{width:14px;height:8px;background:#2b2520;border:1px solid #3d332a}.hs-bar i.on{background:var(--cc);border-color:transparent;box-shadow:0 0 6px color-mix(in srgb,var(--cc) 60%,transparent)}
+.hs-trees{font-size:12px;color:#a8977a;margin:8px 0 6px}
+.hs-skills{display:flex;gap:8px;flex-wrap:wrap}
+.hs-skill{display:flex;flex-direction:column;align-items:center;gap:3px;width:62px;text-align:center}
+.hs-skill small{font-size:10px;color:#c9b894;line-height:1.2}
+.sk-ico{display:inline-block;background-repeat:no-repeat;border:1px solid #5d4a35;box-shadow:inset 0 0 0 1px #000,0 0 8px #000a;flex:none}
+.sk-ico-missing{background:#222}
+.hs-form{display:flex;flex-direction:column;gap:8px}
+.hs-form input{background:#0f0c0b;border:1px solid #6a5235;color:#f1e3c4;padding:11px 12px;font-size:15px;letter-spacing:1px}
+.hs-form input:focus{outline:2px solid #c99657}
+.hs-msg{color:#ff8f7a;min-height:1em}
+.hs-go{max-width:none!important;width:100%;letter-spacing:3px!important}
+.hs-list{position:absolute;left:22px;top:64px;width:260px;bottom:80px;z-index:2;display:flex;flex-direction:column;gap:8px;overflow:auto;padding:10px 4px}
+.hero-select[data-mode="create"] .hs-list{display:none}
+.hs-card{text-align:left;border:1px solid #4d3c2b;background:linear-gradient(90deg,rgba(26,20,16,.95),rgba(12,10,10,.92));padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;border-left:3px solid var(--cc,#8d7)}
+.hs-card b{font-size:15px;letter-spacing:1px}.hs-card small{grid-column:1;color:#a9987c;font-size:11px}
+.hs-card-diff{grid-row:1/3;grid-column:2;align-self:center;font-size:11px;color:#c7a46b;border:1px solid #5c4932;padding:2px 6px}
+.hs-card.is-active{border-color:var(--cc);background:linear-gradient(90deg,rgba(58,40,24,.96),rgba(18,12,10,.94));box-shadow:0 0 16px color-mix(in srgb,var(--cc) 30%,transparent)}
+.hs-new{border-style:dashed;border-left-width:1px;color:#d8b77c;text-align:center;display:block}
+.hs-facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12px;margin:10px 0}.hs-facts dt{color:#9b8a6f}.hs-facts dd{margin:0;color:#e2d3b5}
+.hs-diffs{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
+.hs-diff-label{font-size:12px;color:#a8977a;margin-right:4px}
+.hs-diff{border:1px solid #5d4a35;background:#15110e;color:#cdbb9d;padding:6px 12px;font-size:13px}
+.hs-diff.is-active{border-color:#e0a95e;color:#ffe8bd;background:#3b2617;box-shadow:0 0 12px #c0702a55}
+.hs-note{font-size:11px;color:#9f8f75;line-height:1.6;margin:8px 0 0}
+.hs-bottom{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;justify-content:flex-start;align-items:center;padding:12px 22px 16px;gap:10px}
+.hs-ghost{background:#120f0dcc;border:1px solid #5a4632;color:#cdbb9d;padding:9px 16px}
+.hs-danger{color:#e58f80;border-color:#6d3a32}
+.hs-account{position:absolute;right:22px;top:14px;z-index:3;font-size:11px;color:#a7987e;background:#0c0a0ab3;border:1px solid #3d3227;padding:6px 10px;display:flex;gap:6px;align-items:center;max-width:46vw}
+.hs-account small{color:#76695a}
+.hs-account-dot{width:7px;height:7px;border-radius:50%;background:#7ac27a;box-shadow:0 0 6px #7ac27a}
+.hs-carousel{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.hs-arrow{pointer-events:auto;background:none;border:0;color:#d7b277;font-size:44px;padding:0 10px;text-shadow:0 0 10px #000}
+.hs-thumbs{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
+.hs-thumbs .hs-plate{min-width:62px}
+/* 手机：上图下文，整页滚动 */
+.hero-select.is-mobile{overflow:auto;display:flex;flex-direction:column}
+.hero-select.is-mobile .hs-bg{position:absolute;height:44vh;background-size:auto 40vh;background-position:center -2vh;inset:0 0 auto 0}
+.hero-select.is-mobile .hs-bg::after{background:linear-gradient(180deg,rgba(7,6,10,.1),rgba(7,6,10,0) 20vh,#07060a 40vh)}
+.hero-select.is-mobile .hs-stage{position:relative;left:auto;right:auto;top:auto;bottom:auto;height:30vh;min-height:190px;flex:none;margin-top:26vh}
+.hero-select.is-mobile .hs-thumbs .hs-plate{min-width:50px;padding:5px 2px}.hero-select.is-mobile .hs-thumbs .hs-plate b{font-size:11px;letter-spacing:0;white-space:nowrap}.hero-select.is-mobile .hs-thumbs .hs-plate small{display:none}
+.hero-select.is-mobile .hs-side{position:relative;right:auto;top:auto;width:auto;max-height:none;margin:0 12px;overflow:visible;padding:0}
+.hero-select.is-mobile .hs-list{position:relative;left:auto;top:auto;bottom:auto;width:auto;padding:4px 12px 8px;flex-direction:row;overflow-x:auto;flex:none}
+.hero-select.is-mobile .hs-card{min-width:150px}
+.hero-select.is-mobile .hs-bottom{position:relative;padding:8px 12px}
+.hero-select.is-mobile .hs-account{position:relative;right:auto;top:auto;margin:0 12px 18px;max-width:none;flex-wrap:wrap}
+.hero-select.is-mobile .hs-info h2{font-size:22px}
+.hero-select.is-mobile .hs-plates{display:none}
+.hero-select.is-mobile .hs-carousel{display:flex}
+/* 技能图标在 HUD、构筑、技能图鉴、增益栏 */
+.abilitybar button .ability-icon.sk-ico{width:40px;height:40px;font-size:0;text-shadow:none}
+@media(max-width:900px){.abilitybar button .ability-icon.sk-ico{width:30px;height:30px}}
+.build-skills .build-ico{width:34px;height:34px}
+.catalog-skill .catalog-icon.sk-ico{width:38px;height:38px;font-size:0}
+.loadout-row .loadout-ico{width:26px;height:26px}
+.buffbar .buff-ico{width:22px;height:22px}
+/* 装备：需求等级、套装色、传奇特效、仓库、巅峰 */
+.rarity-set{color:#5fd36b!important}
+.item-req{display:block;color:#a9a08f;font-size:11px;margin-top:2px}.item-req.is-blocked,.is-blocked{color:#ff7a6a!important}
+.item-effect ul{margin:6px 0 0;padding-left:18px;font-size:12px;line-height:1.7;color:#ffcf9a}
+.status-powers{margin:4px 0;padding-left:16px;font-size:11px;line-height:1.6;color:#ffcf9a}
+.stash-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;margin-bottom:12px}
+.stash-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;background:#11161d;border:1px solid #4d3e2c}
+.stash-item small{font-size:10px;line-height:1.3;text-align:center}
+.stash-item .item-thumbnail{width:48px;height:48px}
+.paragon{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:14px}
+.paragon-node{text-align:left;border:1px solid #4d3e2c;background:#121820;padding:7px 9px;display:flex;flex-direction:column;gap:2px}
+.paragon-node strong{font-size:12px;color:#f0d49f;font-weight:500}.paragon-node small{font-size:10px;color:#a39985}
+.paragon-node.has-points{border-color:#c79a55;background:#2a2116}
+.paragon-reset{border:1px solid #6d4b38;background:#1b1412;color:#dca98b;padding:7px}
+.region-picker select option:disabled{color:#777}
+.loadout-row{grid-template-columns:64px 74px 28px 1fr}

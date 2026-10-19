@@ -84,28 +84,29 @@ export function drawLegacyIcon(canvas,item){
  return resolve(item);
 }
 
-// v0.4：黑铁遗珍图鉴图标。每个品质一张 10 列图集（art/equipment/N|M|E|L|U.webp）。
-const CODES='NMELU',atlases=[],pending=new Set();
-function atlas(r){
+// 图鉴图标图集：旧版每个品质一张（N/M/E/L/U，104×88，10 列）；v0.7 职业基底 C-职业（96×96，10 列）、职业传奇 K-职业（112×112，8 列）。
+const atlases=new Map(),pending=new Set();
+const atlasSize=code=>code.startsWith('C-')?{w:96,h:96,cols:10}:code.startsWith('K-')?{w:112,h:112,cols:8}:ICON_SIZE;
+function atlas(code){
   if(typeof Image==='undefined')return null;
-  if(!atlases[r]){
+  if(!atlases.has(code)){
     const img=new Image();img.decoding='async';
-    img.onload=()=>{for(const job of [...pending])if(job.r===r){pending.delete(job);if(job.canvas.isConnected!==false)paint(job.canvas,job.item,img);}};
-    img.src=new URL('./art/equipment/'+CODES[r]+'.webp',import.meta.url).href;
-    atlases[r]=img;
+    img.onload=()=>{for(const job of [...pending])if(job.code===code){pending.delete(job);if(job.canvas.isConnected!==false)paint(job.canvas,job.item,img);}};
+    img.src=new URL('./art/equipment/'+code+'.webp',import.meta.url).href;
+    atlases.set(code,img);
   }
-  return atlases[r];
+  return atlases.get(code);
 }
 export function iconSource(item){
-  const entry=catalogEntry(item);if(!entry)return null;
-  const img=atlas(entry.r);if(!img)return null;
-  const {w,h,cols}=ICON_SIZE;
+  const entry=catalogEntry(item);if(!entry?.a)return null;
+  const img=atlas(entry.a);if(!img)return null;
+  const {w,h,cols}=atlasSize(entry.a);
   return {img,sx:(entry.i%cols)*w,sy:Math.floor(entry.i/cols)*h,w,h,ready:img.complete&&img.naturalWidth>0};
 }
 function paint(canvas,item,img){
   const src=iconSource(item);if(!src)return;
   const ctx=canvas.getContext('2d'),S=canvas.width;
-  const tier=Math.max(0,Math.min(4,item.rarity|0)),frame=rarityColors[tier];
+  const tier=Math.max(0,Math.min(4,item.rarity|0)),frame=item.setId?'#5fd36b':rarityColors[tier];
   ctx.clearRect(0,0,S,S);
   ctx.fillStyle='#0b0e14';ctx.fillRect(0,0,S,S);
   const g=ctx.createRadialGradient(S/2,S*.52,2,S/2,S/2,S*.62);
@@ -126,7 +127,7 @@ export function drawEquipmentIcon(canvas,item){
   else{
     const ctx=canvas.getContext('2d');ctx.fillStyle='#0b0e14';ctx.fillRect(0,0,96,96);
     ctx.strokeStyle=rarityColors[item.rarity|0];ctx.strokeRect(2.5,2.5,91,91);
-    pending.add({canvas,item,r:catalogEntry(item).r});
+    pending.add({canvas,item,code:catalogEntry(item).a});
   }
   return 'catalog';
 }

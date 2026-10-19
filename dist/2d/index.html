@@ -10,7 +10,7 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 新怪物 · 武器动作 · 平衡 v0.6.0</span><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-status" type="button">状态 <kbd>C</kbd></button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 角色选择 · 掉落 · 百级 v0.7.0</span><label class="region-picker">难度 <select id="difficulty-select" aria-label="选择难度"></select></label><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-heroes" type="button">角色</button><button id="btn-status" type="button">状态 <kbd>C</kbd></button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>
@@ -25,14 +25,14 @@
 <aside id="status-panel" class="status-panel" hidden aria-label="角色状态"></aside>
 <div class="joystick" id="joystick" aria-label="触摸摇杆"><span id="stick"></span></div>
 <div class="tip">WASD 移动 · 左键/1 火弹 · 2 霜环 · 3 冰箭 · 4 冰甲 · Q 陨火 · 空格 闪现 · E 药剂 · B 背包</div>
-<div id="scrim" class="scrim">
+<div id="hero-select" hidden></div>
+<div id="scrim" class="scrim" hidden>
   <section class="modal" id="modal" aria-live="polite">
     <div class="crest">✦</div><span class="eyebrow">原创俯视角暗黑 ARPG</span>
     <h1>余烬<span>纪事</span></h1>
     <p class="lead">断昼之后，最后的火种在黑暗里微微颤动。</p>
     <p>选择你的职业：亚马逊、刺客、野蛮人、德鲁伊、死灵法师、圣骑士或法师。深入地窟，击败徘徊的空潮仆从，夺回失落的炉心。装备与成长将随每一次远征保留。</p>
-    <label class="skin-choice"><span>选择职业</span><select id="class-start" aria-label="选择职业"><option value="amazon">亚马逊 · 长矛与弓</option><option value="assassin">刺客 · 爪刃与陷阱</option><option value="barbarian">野蛮人 · 战吼与重武器</option><option value="druid">德鲁伊 · 元素变形召唤</option><option value="necro">死灵法师 · 骷髅骨与诅咒</option><option value="paladin">圣骑士 · 圣光与光环</option><option value="mage">法师 · 火冰雷奥术</option></select></label>
-    <div class="features"><span>✧ 九张探索地图</span><span>✧ 350 件图鉴装备</span><span>✧ 七大职业 · 181 项技能</span><span>✧ 100 种怪物</span></div>
+    <div class="features"><span>✧ 九张地图 × 三个难度</span><span>✧ 1551 件图鉴装备</span><span>✧ 七大职业 · 181 项技能</span><span>✧ 等级上限 100</span></div>
     <button class="primary" id="modal-primary" type="button">进入灰烬地窟 <span>→</span></button>
     <button class="subtle" id="modal-secondary" type="button" hidden>继续游戏</button>
     <small class="fineprint">单人试玩原型 · Boss 可掉专属装备 · 点击行囊查看物品图片 · 写实 2.5D 仍在开发</small>
@@ -49,7 +49,6 @@
     <div class="inv-workspace">
       <section class="inv-gear-column" aria-label="角色装备">
         <div class="paper-doll-head"><strong>角色装备 · 11 槽</strong><small>点击装备槽查看当前物品</small></div>
-        <label class="skin-choice"><span>切换职业（等级与装备共用）</span><select id="class-inventory" aria-label="切换职业"><option value="amazon">亚马逊 · 长矛与弓</option><option value="assassin">刺客 · 爪刃与陷阱</option><option value="barbarian">野蛮人 · 战吼与重武器</option><option value="druid">德鲁伊 · 元素变形召唤</option><option value="necro">死灵法师 · 骷髅骨与诅咒</option><option value="paladin">圣骑士 · 圣光与光环</option><option value="mage">法师 · 火冰雷奥术</option></select></label>
         <div class="equipment" id="equipment"></div>
       </section>
       <section class="inv-details-column" aria-label="装备属性与对比">
@@ -100,6 +99,10 @@
         <small class="fineprint">单击查看与对比，双击直接装备；手机点选后按“穿戴”。</small>
       </section>
     </div>
+    <div class="panel-subhead"><strong>共享仓库</strong><span id="stash-count">0 / 40</span></div>
+    <div id="stash-items" class="stash-items" aria-label="共享仓库：点击物品取回"></div>
+    <div class="panel-subhead"><strong>巅峰天赋</strong><span id="paragon-count"></span></div>
+    <div id="paragon" class="paragon"></div>
     <div class="panel-subhead"><strong>流派指南（Build）</strong><span>选流派 → 一键穿戴 / 套用技能栏</span></div>
     <div id="build-guide" class="build-guide"></div>
     <div class="panel-subhead"><strong>技能栏与按键</strong><span>点按键可改键，下拉框换技能</span></div>

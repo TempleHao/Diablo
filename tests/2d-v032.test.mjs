@@ -36,12 +36,12 @@ test('legacy save keeps owned items, boss victories and expands map slots',()=>{
  old.inventory=[{id:'test',slot:'weapon',name:'测试法杖',rarity:3,power:36,hp:0,mana:0,armor:0,ilvl:10,affixes:[]}];
  old.equipped.weapon='test';
  const restored=sanitizeSave(JSON.parse(JSON.stringify(old)));
- assert.equal(restored.bossKills.length,9);
+ assert.equal(restored.bossKills[0].length,9);
  assert.equal(restored.regionVisits.length,9);
  assert.equal(restored.region,4);
  assert.equal(restored.equipped.weapon,'test');
- assert.equal(restored.bossKills[4],1);
- assert.deepEqual(restored.bossKills.slice(5),[0,0,0,0]);
+ assert.equal(restored.bossKills[0][4],1);
+ assert.deepEqual(restored.bossKills[0].slice(5),[0,0,0,0]);
 });
 test('weapons and jewelry icons always match their functional silhouette',()=>{
  const sample=(slot,name)=>({slot,name,rarity:3});
@@ -61,7 +61,9 @@ test('equipment names follow the v0.6 naming rules and stay slot-correct',()=>{
  for(let k=0;k<400;k++){
   const item=makeLoot(r,15,'u-'+k),entry=catalogEntry(item);
   assert.ok(entry,'every drop references a catalog record');
-  assert.equal(entry.r,item.rarity);assert.ok(item.name.length>=2&&item.name.length<=14,item.name);
+  // v0.7：白/蓝/黄装用基底图鉴（旧 N/M/E 或职业基底），传奇/暗金用对应图鉴
+  if(item.rarity<=2)assert.ok(entry.r<=2,item.name);else if(!item.setId)assert.equal(entry.r,item.rarity);
+  assert.ok(item.name.length>=2&&item.name.length<=14,item.name);
   assert.equal(entry.s,item.slot==='ring2'?'ring1':item.slot);
   names.add(item.name);
  }

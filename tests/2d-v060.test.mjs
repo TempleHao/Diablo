@@ -50,13 +50,21 @@ test('item names: rules per rarity, deterministic, hand-written legendary/unique
   for(let k=0;k<600;k++){
     const it=makeLoot(r,1+k%60,'n'+k,{boss:k%4===0}),e=catalogEntry(it),b=BASES[Number(e.id.slice(-3))];
     if(it.setId)continue;
+    // v0.7 职业图鉴：基底名自带品阶词；职业传奇用图鉴专名
+    if(/^C[BL]-/.test(e.id)){
+      if(it.rarity===0)assert.equal(it.name,e.n);
+      if(it.rarity===1)assert.ok(it.name.includes(e.n),it.name);
+      if(it.rarity===3)assert.equal(it.name,e.n);
+      assert.equal(normalizeItem(JSON.parse(JSON.stringify(it))).name,it.name,'stable across save/load');
+      continue;
+    }
     if(it.rarity===0)assert.ok(it.name.endsWith(b.n)||it.name.endsWith(b.n.slice(1)),it.name);
     if(it.rarity===1)assert.ok(it.name.includes(b.n)||it.name.includes(b.n.slice(1)),it.name);
     if(it.rarity===3)assert.equal(it.name,LEGENDARY[Number(e.id.slice(-3))]);
     if(it.rarity===4)assert.equal(it.name,UNIQUE[Number(e.id.slice(-3))]);
     assert.equal(normalizeItem(JSON.parse(JSON.stringify(it))).name,it.name,'stable across save/load');
   }
-  const pool=catalogPool(1,'weapon'),x={id:'z',cid:pool[0].id,ilvl:30,affixes:[{key:'fire',value:affixMax('fire',30,1)},{key:'haste',value:3}]};
+  const pool=catalogPool(1,'weapon').filter(c=>c.id.startsWith('EQ-')),x={id:'z',cid:pool[0].id,ilvl:30,affixes:[{key:'fire',value:affixMax('fire',30,1)},{key:'haste',value:3}]};
   const nm=nameItem(x,1,{fire:affixMax('fire',30,1)});assert.ok(nm.startsWith('炽焰')&&nm.endsWith('·疾风'),nm);
 });
 test('balance: every damage skill lands on its budget; basic attacks equal; spam DPS across classes within a band',()=>{
@@ -72,9 +80,11 @@ test('balance: every damage skill lands on its budget; basic attacks equal; spam
   assert.ok(budget(8,'big')>budget(1,'single')*1.2);
 });
 test('weapon power is normalised by attack speed: basic-attack DPS within 10% across weapon types',()=>{
+  // v0.7：基底强度看品级（qb = 品级×0.75 + 物品等级×0.25），所以先除以基底强度再比较攻速归一
   const r=mulberry32(3),dps={};
   for(let k=0;k<4000;k++){const it=makeLoot(r,30,'w'+k);if(it.slot!=='weapon'||it.rarity!==1)continue;const e=catalogEntry(it),w=WEAPON_TYPES[e.sub];if(!w||w.mode==='spell')continue;
-    const v=it.power*w.speed/(e.h===2?1.4:1);(dps[e.h+'h']||=[]).push(v);}
+    const qb=Math.max(1,Math.round(e.q*.75+30*.25));
+    const v=it.power*w.speed/(e.h===2?1.4:1)/(6+qb*2.5);(dps[e.h+'h']||=[]).push(v);}
   for(const v of Object.values(dps)){const avg=v.reduce((a,b)=>a+b)/v.length;for(const x of v)assert.ok(x/avg>.8&&x/avg<1.25);}
 });
 test('percent affixes grow gently with item level; flat affixes grow linearly',()=>{

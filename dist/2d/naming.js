@@ -66,10 +66,10 @@ const GRADE={metal:['锈蚀','粗铁','精铁','淬火','精工'],leather:['破�
 const PREFIX={power:['增幅','强能'],hp:['健壮','坚韧'],mana:['灵性','睿智'],armor:['坚固','铁壁'],crit:['锐利','致命'],critDmg:['凶残','屠戮'],
   haste:['灵巧','迅捷'],fire:['微焰','炽焰'],cold:['寒冷','霜冻'],lightning:['静电','雷鸣'],physical:['锋利','残暴'],poison:['腐蚀','剧毒'],
   holy:['虔诚','圣洁'],shadow:['阴影','幽冥'],resistFire:['防火','耐焰'],resistCold:['御寒','抗冻'],resistDark:['辟邪','驱暗'],
-  regen:['涌泉','源泉'],lifesteal:['吸血','嗜血'],move:['轻快','疾行'],skillFire:['焰术','焰术'],skillCold:['冰术','冰术']};
-const SUFFIX={power:'之力',hp:'活力',mana:'冥思',armor:'守护',crit:'鹰眼',critDmg:'屠夫',haste:'疾风',fire:'余烬',cold:'寒冬',lightning:'风暴',
-  physical:'锋刃',poison:'瘟疫',holy:'晨曦',shadow:'暗夜',resistFire:'炎盾',resistCold:'暖炉',resistDark:'护符',regen:'清泉',lifesteal:'水蛭',
-  move:'旅人',skillFire:'焰术',skillCold:'冰术'};
+  regen:['涌泉','源泉'],lifesteal:['吸血','嗜血'],move:['轻快','疾行'],skillFire:['焰术','焰术'],skillCold:['冰术','冰术'],mf:['寻宝','觅金'],allRes:['庇佑','神佑'],cdr:['冥想','禅定'],skillAll:['大师','宗师']};
+const SUFFIX={power:'力量',hp:'活力',mana:'冥思',armor:'守护',crit:'鹰眼',critDmg:'屠夫',haste:'疾风',fire:'余烬',cold:'寒冬',lightning:'风暴',
+  physical:'锋刃',poison:'瘟疫',holy:'晨曦',shadow:'暗夜',resistFire:'炎盾',resistCold:'暖炉',resistDark:'辟邪',regen:'清泉',lifesteal:'水蛭',
+  move:'旅人',skillFire:'焰术',skillCold:'冰术',mf:'财富',allRes:'万象',cdr:'时光',skillAll:'学识'};
 const CLASS_WORD={sk_amazon:['猎手','亚马逊'],sk_assassin:['影刃','刺客'],sk_barbarian:['蛮怒','野蛮人'],sk_druid:['林语','德鲁伊'],
   sk_necro:['骸语','死灵师'],sk_paladin:['圣誓','圣骑士'],sk_mage:['秘法','法师']};
 // 史诗：意象词 + 器称
@@ -83,18 +83,28 @@ const hash=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=M
 export const baseIndex=cid=>{const n=Number(String(cid||'').slice(-3));return n>=1&&n<=100?n:0;};
 /** 词缀数值是否属于“强”档：达到该词缀在此物品等级、品质下最大值的 65%。 */
 function strong(a,ilvl,max){return !!max&&a.value>=max*.65;}
-export function nameItem(item,rarity,affixMax={}){
-  const b=BASES[baseIndex(item.cid)];if(!b)return item.name;
+// v0.7 职业图鉴（CB-/CL-）：用类型与部位推出器称组
+const SUB_GRP={'长枪':'spear','三叉戟':'spear','长弓':'bow','轻弩':'bow','箭囊':'quiver','拳刃':'claw','短剑':'blade','投掷刀':'blade','毒瓶':'vial',
+  '双手斧':'axe','战斧':'axe','钉锤':'mace','重锤':'mace','链锤':'mace','长剑':'blade','自然法杖':'staff','法杖':'staff','魔杖':'staff','骨杖':'staff',
+  '权杖':'staff','镰刀':'scythe','法典':'tome','符文书卷':'tome','法球':'orb','图腾':'totem'};
+const SLOT_GRP={head:'helm',robe:'chest',gloves:'glove',boots:'boot',belt:'belt',ring1:'ring',ring2:'ring',amulet:'amulet',shoulders:'shoulder'};
+EPIC_B.claw=['利爪','撕裂','爪痕'];EPIC_B.vial=['之毒','秘药','毒酿'];EPIC_B.orb=['之眼','星核','法球'];EPIC_B.totem=['图腾','之灵','守望'];
+const classBase=entry=>entry&&/^C[BL]-/.test(entry.id)?{n:entry.n,grp:SUB_GRP[entry.sub]||SLOT_GRP[entry.s]||'amulet'}:null;
+export function nameItem(item,rarity,affixMax={},entry=null){
+  const cb=classBase(entry);
+  const b=cb||BASES[baseIndex(item.cid)];if(!b)return item.name;
   const n=baseIndex(item.cid),h=hash(item.id);
+  if(cb&&rarity>=3)return entry.n;
   if(rarity===4)return UNIQUE[n];
   if(rarity===3)return LEGENDARY[n];
-  if(rarity===2){const g=EPIC_B[b.grp];return EPIC_A[h%EPIC_A.length]+g[(h>>>8)%g.length];}
+  if(rarity===2){const g=EPIC_B[b.grp]||EPIC_B.amulet;return EPIC_A[h%EPIC_A.length]+g[(h>>>8)%g.length];}
   if(rarity===1){
     const [a1,a2]=item.affixes||[];
     const pre=a1?(CLASS_WORD[a1.key]?.[0]||PREFIX[a1.key]?.[strong(a1,item.ilvl,affixMax[a1.key])?1:0]||''):'';
     const suf=a2?(CLASS_WORD[a2.key]?.[1]||SUFFIX[a2.key]||''):'';
     return pre+b.n+(suf?'·'+suf:'');
   }
+  if(cb)return cb.n;
   const band=Math.min(4,Math.floor((item.ilvl||1)/9)),g=GRADE[b.mat][band];
   // 避免「粗铁铁盾」：品相末字与基底首字相同时合并
   return g.at(-1)===b.n[0]?g+b.n.slice(1):g+b.n;

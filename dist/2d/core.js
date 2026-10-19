@@ -1,4 +1,5 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient, sanitizeParagon, paragonPoints, PARAGON, itemPowers } from './systems.js';
+import {DIFFICULTIES,clampDifficulty,difficultyUnlocked,expRequired as expCurve} from './progression.js';
 import {buildById} from './builds.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
@@ -61,17 +62,25 @@ export function moveWithCollision(entity, vx, vy, dt, dungeon, radius = 17) {
   if (walkable(nx, entity.y, radius, dungeon)) entity.x = nx;
   if (walkable(entity.x, ny, radius, dungeon)) entity.y = ny;
 }
+const zeros=()=>Array(REGION_DATA.length).fill(0);
 export function freshSave(){
-  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,bossKills:Array(REGION_DATA.length).fill(0),pendingLoot:[],regionVisits:Array(REGION_DATA.length).fill(0),materials:freshMaterials(),autoSalvage:-1,heroClass:'mage',activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS],loadouts:{},builds:{}};
+  return {version:2,level:1,xp:0,gold:0,essence:0,clears:0,inventory:[],equipped:emptyEquipment(),skillPoints:0,skillRanks:{},region:0,
+    difficulty:0,bossKills:DIFFICULTIES.map(zeros),pendingLoot:[],regionVisits:zeros(),materials:freshMaterials(),autoSalvage:-1,heroClass:'mage',
+    activeSkills:[...DEFAULT_ACTIVE],keybinds:[...DEFAULT_KEYS],loadouts:{},builds:{},paragon:{},pity:{legendary:0,unique:0},name:''};
 }
+/** 技能等级上限：8 级；60 级后每 10 级 +1（100 级时 12）。 */
+export const rankCap=level=>8+Math.floor(Math.max(0,Math.min(MAX_LEVEL,level)-60)/10);
 export function sanitizeSave(raw){
   const p=freshSave();
   if(!raw||typeof raw!=='object'||![1,2].includes(raw.version))return p;
   for(const k of ['level','xp','gold','essence','clears','skillPoints','region']){
-    const n=Number(raw[k]);const cap=k==='level'?60:k==='region'?REGION_DATA.length-1:100000000;
+    const n=Number(raw[k]);const cap=k==='level'?MAX_LEVEL:k==='region'?REGION_DATA.length-1:100000000;
     p[k]=clamp(Number.isFinite(n)?Math.floor(n):0,k==='level'?1:0,cap);
   }
   p.heroClass=CLASS_IDS.includes(raw.heroClass)?raw.heroClass:'mage';
+  if(typeof raw.name==='string')p.name=raw.name.slice(0,16);
+  p.paragon=sanitizeParagon(raw.paragon,p.level);
+  for(const k of ['legendary','unique'])p.pity[k]=clamp(Math.floor(Number(raw.pity?.[k])||0),0,1000);
   if(raw.builds&&typeof raw.builds==='object')for(const c of CLASS_IDS)if(typeof raw.builds[c]==='string'&&buildById(c,raw.builds[c]).id===raw.builds[c])p.builds[c]=raw.builds[c];
   p.materials=sanitizeMaterials(raw.materials);
   p.autoSalvage=Number.isInteger(raw.autoSalvage)&&raw.autoSalvage>=-1&&raw.autoSalvage<=2?raw.autoSalvage:-1;
@@ -82,7 +91,13 @@ export function sanitizeSave(raw){
   p.activeSkills=sanitizeActive(p.heroClass,raw.activeSkills);
   p.keybinds=sanitizeKeybinds(raw.keybinds);
   // Keep Boss progression and unclaimed, already-generated drops across reloads.
-  if(Array.isArray(raw.bossKills))p.bossKills=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.bossKills[i])?Math.floor(raw.bossKills[i]):0,0,1000000));
+  // v0.7：首领击杀按难度分开记录（旧存档的一维数组算作普通难度）
+  if(Array.isArray(raw.bossKills)){
+    const rows=Array.isArray(raw.bossKills[0])?raw.bossKills:[raw.bossKills];
+    p.bossKills=DIFFICULTIES.map((_,d)=>Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(rows[d]?.[i])?Math.floor(rows[d][i]):0,0,1000000)));
+  }
+  p.difficulty=clampDifficulty(raw.difficulty);
+  if(!difficultyUnlocked(p,p.difficulty))p.difficulty=0;
   if(Array.isArray(raw.regionVisits))p.regionVisits=Array.from({length:REGION_DATA.length},(_,i)=>clamp(Number.isFinite(raw.regionVisits[i])?Math.floor(raw.regionVisits[i]):0,0,1000000));
   const pendingIds=new Set();
   if(Array.isArray(raw.pendingLoot))for(const entry of raw.pendingLoot.slice(0,MAX_ITEMS*2)){
@@ -104,7 +119,7 @@ export function sanitizeSave(raw){
   if(raw.skillRanks&&typeof raw.skillRanks==='object')for(const c of CLASS_IDS){
     let spent=0;
     for(const key of skillsOf(c)){
-      const candidate=Math.min(8,Math.max(0,Math.floor(Number(raw.skillRanks[key])||0)));
+      const candidate=Math.min(rankCap(p.level),Math.max(0,Math.floor(Number(raw.skillRanks[key])||0)));
       const permitted=Math.min(candidate,Math.max(0,p.level-1-spent));
       if(permitted&&p.level>=SKILLS[key].unlocked){p.skillRanks[key]=permitted;spent+=permitted;}
     }
@@ -175,6 +190,7 @@ export function buildScore(item,cls,build){
   const w=build.weights,e=catalogEntry(item);
   let s=(item.power||0)*(w.power||1)+(item.hp||0)*.22*(w.hp||1)+(item.mana||0)*.17*(w.mana||1)+(item.armor||0)*.33*(w.armor||1);
   for(const a of item.affixes||[])s+=a.value*(w[a.key]??.3);
+  s+=itemPowers(item).length*30;
   if(e){
     if(item.slot==='weapon'||item.slot==='offhand'){
       if(build.weapons.includes(e.sub))s*=1.35;else if(proficient(cls,e.sub))s*=1.15;else s*=.75;
@@ -186,7 +202,7 @@ export function buildScore(item,cls,build){
 /** 一键穿戴：每个部位穿上流派评分最高的装备；武器副手按组合比较（双手 / 弓 + 箭袋 / 单手 + 副手）。 */
 export function autoEquip(p,buildId){
   const cls=p.heroClass,build=buildById(cls,buildId||p.builds?.[cls]);
-  const usable=p.inventory.filter(i=>!i.legacy);
+  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level);
   const best=(slot)=>usable.filter(i=>getSlotForItem(i,slot)===slot||(slot.startsWith('ring')&&i.slot.startsWith('ring'))).sort((a,b)=>buildScore(b,cls,build)-buildScore(a,cls,build));
   const next=emptyEquipment();
   for(const slot of ['head','shoulders','robe','gloves','belt','boots','amulet']){const it=best(slot)[0];if(it)next[slot]=it.id;}
@@ -204,27 +220,34 @@ export function autoEquip(p,buildId){
   return changed;
 }
 export function stats(p){return calculateStats(p);}
-export function expRequired(level){return level*45+15;}
+export const expRequired=expCurve;
 export function gainXp(p,amount){
   p.xp+=Math.max(0,Math.floor(amount));let advanced=0;
-  while(p.level<60&&p.xp>=expRequired(p.level)){p.xp-=expRequired(p.level);p.level++;advanced++;p.skillPoints=(p.skillPoints||0)+1;}
-  if(p.level===60)p.xp=0;return advanced;
+  while(p.level<MAX_LEVEL&&p.xp>=expRequired(p.level)){p.xp-=expRequired(p.level);p.level++;advanced++;p.skillPoints=(p.skillPoints||0)+1;}
+  if(p.level===MAX_LEVEL)p.xp=0;return advanced;
 }
+/** 巅峰天赋：加点 / 洗点。 */
+export function paragonLeft(p){return paragonPoints(p.level)-Object.values(p.paragon||{}).reduce((a,b)=>a+b,0);}
+export function addParagon(p,key){
+  if(!Object.hasOwn(PARAGON,key)||paragonLeft(p)<1||(p.paragon[key]||0)>=PARAGON[key].max)return false;
+  p.paragon[key]=(p.paragon[key]||0)+1;return true;
+}
+export function resetParagon(p){const n=Object.values(p.paragon||{}).reduce((a,b)=>a+b,0);p.paragon={};return n;}
 export function createItem(rng,level,id){return makeLoot(rng,level,id);}
 export function equip(p,id,target=null){
-  const item=p.inventory.find(i=>i.id===id);if(!item)return false;
+  const item=p.inventory.find(i=>i.id===id);if(!item||(item.req||1)>p.level)return false;
   const slot=getSlotForItem(item,target);if(!slot)return false;
   for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
   p.equipped[slot]=id;
   // 双手武器占用副手（弓弩可配箭袋）：穿上新的那件，卸下冲突的另一件。
   const weapon=p.inventory.find(i=>i.id===p.equipped.weapon),off=p.inventory.find(i=>i.id===p.equipped.offhand);
-  if(!offhandAllowed(weapon,off)){if(slot==='weapon')p.equipped.offhand=null;else p.equipped.weapon=null;}
+  if(!offhandAllowed(weapon,off)){if(slot==='weapon')p.equipped.offhand=null;else if(slot==='offhand')p.equipped.weapon=null;}
   return true;
 }
 export function upgradeSkill(p,key){
   if(!Object.hasOwn(SKILLS,key)||SKILLS[key].cls!==(p.heroClass||'mage')||p.level<SKILLS[key].unlocked||p.skillPoints<1)return false;
   const rank=p.skillRanks[key]||0;
-  if(rank>=8)return false;
+  if(rank>=rankCap(p.level))return false;
   p.skillRanks[key]=rank+1;p.skillPoints--;return true;
 }
 export function salvage(p,id){

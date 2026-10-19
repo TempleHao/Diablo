@@ -108,6 +108,8 @@ for ri, code in enumerate(RAR):
             'h': 2 if it['slot'] == '双手' else 1, 'aff': it['affinity'], 'cls': it['preferred_class'],
             'eff': it['effect_name'] or '', 'desc': it['effect_description'] or '', 'cost': it['drawback'] or '',
             'lore': it['lore'] if code == 'U' else '', 'i': n,
+            # v0.7 品级：传奇 5-95、暗金 15-95，其余沿用图鉴需求等级
+            'q': round(5 + (it['level_required'] - 45) / 54 * 90) if code == 'L' else round(15 + (it['level_required'] - 65) / 35 * 80) if code == 'U' else it['level_required'],
         })
     atlas.save(f'{OUT}/art/equipment/{code}.webp', quality=88, method=6)
     print(code, len(items), atlas.size, os.path.getsize(f'{OUT}/art/equipment/{code}.webp'))

@@ -1,7 +1,8 @@
 import {drawMage} from './mage-portrait.js';
 import {drawAnimatedPixelMage,drawHero} from './pixel-mage-demo.js';
 import {drawEquipmentIcon,iconSource} from './equipment-icons.js';
-import {RARITY_COLORS} from './systems.js';
+import {RARITY_COLORS,SET_COLOR} from './systems.js';
+import {walkWeight,turnScale} from './motion.js';
 import {SPRITES} from './sprite-data.js';
 import {TIER,ELITE_MOD_NAMES,SCHOOL_COLOR} from './monsters.js';
 import {drawGlow,drawEllipseGlow} from './fx.js';
@@ -187,14 +188,16 @@ function groundIcon(item){
   groundIcons.set(key,c);return c;
 }
 export function loot(ctx,d,tick){
-  const col=RARITY_COLORS[d.item.rarity]||'#bfc4c5',tier=d.item.rarity|0;
+  const col=d.item.setId?SET_COLOR:RARITY_COLORS[d.item.rarity]||'#bfc4c5',tier=d.item.rarity|0;
   const bob=Math.sin(tick*2.7+d.x*.01)*3;
   ctx.save();ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,d.x,d.y,44+tier*6,24+tier*3,col,.35+tier*.06);ctx.restore();
   // 光柱：品质越高越亮越高
-  const beamH=46+tier*12;
+  // 传奇 / 暗金 / 套装：高光柱 + 脉动，远处就能看见（D2 式「出货」提示）
+  const big=tier>=3,beamH=big?150+Math.sin(tick*3+d.x)*12:46+tier*12;
   const beam=ctx.createLinearGradient(0,d.y-beamH,0,d.y);
   beam.addColorStop(0,col+'00');beam.addColorStop(1,col+(tier>=2?'88':'55'));
-  ctx.fillStyle=beam;ctx.fillRect(d.x-(tier>=3?3:2),d.y-beamH,tier>=3?6:4,beamH);
+  ctx.fillStyle=beam;ctx.fillRect(d.x-(big?4:2),d.y-beamH,big?8:4,beamH);
+  if(big){ctx.save();ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,d.x,d.y-beamH*.5,16,beamH*.5,col,.18+.08*Math.sin(tick*4));ctx.restore();}
   ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(d.x,d.y+4,20,6,0,0,Math.PI*2);ctx.stroke();
   const icon=groundIcon(d.item);
   if(icon){
@@ -250,26 +253,35 @@ export function enemy(ctx,e,tick,k=1){
   if(M.tier==='elite'||M.tier==='boss'){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,shw*1.5,shw*.5,M.tier==='boss'?'#c0306a':col,.35+.1*Math.sin(tick*4));ctx.globalCompositeOperation='source-over';}
   ctx.fillStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.ellipse(0,3,shw,shw*.28,0,0,Math.PI*2);ctx.fill();
   if(e.spawnT>0){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,0,shw*1.6,shw*.6,'#b46cff',e.spawnT*1.4);ctx.globalCompositeOperation='source-over';}
-  // 动作参数
+  // 动作参数（v0.7：步伐按走过的距离推进、站立与行走平滑过渡、转身翻面缓动、按速度前倾）
   let bob=0,tilt=0,sx=1,sy=1,lunge=0,charge=0;
-  const A=e.act,moving=e.moving&&!frozen;
-  if(fly){bob=-14-Math.sin(ph*2.2)*5;sy=1+Math.sin(ph*7)*.06;sx=1-Math.sin(ph*7)*.04;}
-  else if(moving){
-    const step=Math.abs(Math.sin(ph*(ai==='swarm'?3.4:ai==='tank'?1.6:2.4)));
-    bob=-step*(ai==='tank'?3:ai==='swarm'?2:4.5);tilt=Math.sin(ph*(ai==='tank'?1.6:2.4))*(ai==='tank'?.04:.07);
-    if(ai==='tank'){sy=1-(1-step)*.05;sx=1+(1-step)*.04;}
-  }else{sy=1+Math.sin(ph*1.6)*.022;sx=1-Math.sin(ph*1.6)*.012;}
+  const A=e.act,mo=e._mo,ww=frozen?0:walkWeight(mo,ai==='tank'?60:80),st=mo?mo.stride:ph*2.4,idle=mo?mo.idle*1.6+ph:ph*1.6;
+  if(fly){const fp=(mo?mo.idle:ph)*2.2;bob=-14-Math.sin(fp)*5;sy=1+Math.sin(fp*3.2)*.06;sx=1-Math.sin(fp*3.2)*.04;tilt=(mo?.lean||0)*1.6;}
+  else{
+    // 站立：呼吸（纵向伸缩、横向回缩）
+    const br=Math.sin(idle);sy=1+br*.022*(1-ww);sx=1-br*.012*(1-ww);
+    // 行走：每一步落地下沉、离地时身体略升高；重型怪落地压扁，小怪碎步
+    const step=Math.abs(Math.sin(st)),land=1-step;
+    const amp=ai==='tank'?3:ai==='swarm'?2.2:4.2;
+    bob=-step*amp*ww;tilt=(Math.sin(st)*(ai==='tank'?.035:.06)+(mo?.lean||0))*ww;
+    sy*=1-land*(ai==='tank'?.06:.035)*ww;sx*=1+land*(ai==='tank'?.05:.025)*ww;
+  }
   if(A&&!frozen){
     const w=A.wind||.3,t=A.t||0;
-    if(t<w){charge=t/w;tilt-=.16*charge;sy*=1+.05*charge;sx*=1-.03*charge;lunge=-5*charge;}
-    else{const q=Math.min(1,(t-w)/.18);lunge=easeOut(q<.5?q*2:2-q*2)*16;tilt+=.14*(1-q);sy*=1-.07*(1-q);sx*=1+.06*(1-q);}
-    if(A.type==='charge'&&t>=w){lunge=0;tilt=.18;}
+    // 预备：先慢后快地后仰蓄力（ease-in），出手：快速前冲并带一点过冲，收招：回弹
+    if(t<w){charge=t/w;const c2=charge*charge;tilt-=.18*c2;sy*=1+.06*c2;sx*=1-.035*c2;lunge=-6*c2;}
+    else{const q=Math.min(1,(t-w)/.22),out=q<.35?easeOut(q/.35):1-easeOut((q-.35)/.65)*1.08;lunge=Math.max(-2,out)*17;tilt+=.16*(1-q)*(q<.35?1:.6);sy*=1-.08*(1-q);sx*=1+.07*(1-q);}
+    if(A.type==='charge'&&t>=w){lunge=0;tilt=.2;sx*=1.06;sy*=.95;}
   }
-  if(e.flash>0){ctx.translate((Math.random()-.5)*3,0);}
-  const dir=e.face||1,artFace=M.face||0;
+  // 受击：朝后仰并闪白，不再随机抖动
+  const dir=mo?mo.face:(e.face||1),artFace=M.face||0;
+  if(e.flash>0){const h=Math.min(1,e.flash*9);tilt-=.1*h;lunge-=4*h;sx*=1+.05*h;sy*=1-.05*h;}
+  // 出生：从地面长出
+  if(e.spawnT>0){const g=1-Math.min(1,e.spawnT/.5);sy*=.35+.65*easeOut(g);}
   ctx.translate(lunge*dir,bob);
   ctx.rotate(tilt*dir);
-  ctx.scale(sx*sc*(artFace&&artFace!==dir?-1:1),sy*sc);
+  const flip=mo?Math.abs(turnScale(mo)):1;
+  ctx.scale(sx*sc*flip*(artFace&&artFace!==dir?-1:1),sy*sc);
   // 本体
   spriteAt(ctx,key,e.spawnT>0?1-e.spawnT:1);
   ctx.globalCompositeOperation='lighter';
@@ -331,19 +343,24 @@ export function ally(ctx,a,U,tick,k=1){
   const key=ALLY_ART[a.unit]||(a.unit==='spirit'&&a.skill==='橡木智者'?'summon8':null);
   if(!key||!monsReady)return legacyAlly(ctx,a,U,tick,k);
   const f=SPRITES[key],sc=(ALLY_SCALE[a.unit]||ALLY_SCALE.spirit_oak)*k,age=a.dur-a.life,born=Math.min(1,age/.45),fade=Math.min(1,a.life/.8);
-  const dir=a.facingLeft?-1:1,artFace={summon0:-1,summon1:1,summon4:1,summon5:1,summon6:1,summon7:1,summon9:1}[key]||1;
+  const dir=a._mo?a._mo.face:(a.facingLeft?-1:1),artFace={summon0:-1,summon1:1,summon4:1,summon5:1,summon6:1,summon7:1,summon9:1}[key]||1;
   const fly=a.unit==='raven'||a.unit==='revive',ph=a.phase||0;
   let bob=0,tilt=0,sx=1,sy=1,lunge=0;
-  if(a.unit==='raven'){bob=-46-Math.sin(ph*1.5)*6;sy=.75+Math.abs(Math.sin(ph*4))*.35;}
-  else if(a.unit==='revive'){bob=-10-Math.sin(ph*1.2)*5;sx=1+Math.sin(ph*1.7)*.04;}
-  else if(a.moving){const st=Math.abs(Math.sin(ph*2.2));bob=-st*4;tilt=Math.sin(ph*2.2)*.06;}
-  else{sy=1+Math.sin(ph*1.4)*.025;}
-  if(a.atkAnim>0){const q=1-a.atkAnim/.25;lunge=Math.sin(q*Math.PI)*12;tilt+=.12*Math.sin(q*Math.PI);}
+  const mo=a._mo,ww=walkWeight(mo,70),stp=mo?mo.stride:ph*2.2;
+  if(a.unit==='raven'){bob=-46-Math.sin(ph*1.5)*6;const flap=Math.sin(ph*4);sy=.8+Math.abs(flap)*.3;sx=1+flap*.05;tilt=(mo?.lean||0)*2;}
+  else if(a.unit==='revive'){bob=-10-Math.sin(ph*1.2)*5;sx=1+Math.sin(ph*1.7)*.04;tilt=(mo?.lean||0)*1.5;}
+  else{
+    const br=Math.sin(ph*.7);sy=1+br*.025*(1-ww);
+    const step=Math.abs(Math.sin(stp)),land=1-step,big=a.unit==='grizzly'||a.unit==='claygolem'||a.unit==='bloodgolem'||a.unit==='firegolem';
+    bob=-step*(big?3:4)*ww;tilt=(Math.sin(stp)*(big?.035:.06)+(mo?.lean||0))*ww;sy*=1-land*.04*ww;sx*=1+land*.03*ww;
+  }
+  if(a.atkAnim>0){const q=1-a.atkAnim/.25,wind=q<.3?q/.3:0,hit=q>=.3?Math.sin((q-.3)/.7*Math.PI):0;
+    lunge=-4*wind*wind+hit*14;tilt+=-.1*wind*wind+.14*hit;sy*=1+.04*wind-.05*hit;}
   ctx.save();ctx.translate(Math.round(a.x),Math.round(a.y));
   ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,26,10,U.color||U.tint||'#7dff9a',.3*fade);ctx.globalCompositeOperation='source-over';
   if(!fly){ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,3,f[2]*sc*.35,f[2]*sc*.1,0,0,Math.PI*2);ctx.fill();}
   ctx.translate(lunge*dir,bob*(fly?1:born));ctx.rotate(tilt*dir);
-  ctx.scale(sx*sc*(artFace!==dir?-1:1),sy*sc);
+  ctx.scale(sx*sc*(a._mo?Math.abs(turnScale(a._mo)):1)*(artFace!==dir?-1:1),sy*sc);
   // 出场：自下而上浮现
   if(born<1){ctx.save();ctx.beginPath();ctx.rect(-f[4]-4,-f[3]*born,f[2]+8,f[3]*born+4);ctx.clip();}
   spriteAt(ctx,key,fade*(a.unit==='revive'?.82:1));

@@ -10,9 +10,15 @@ import {heroRig} from './pixel-mage-demo.js';
 import {SKILL_BAL} from './balance.js';
 import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDecals,shakeOffset} from './fx.js';
 import {drawDungeonDetail} from './dungeon-detail.js';
-import { SLOTS, SLOT_IDS, MAX_ITEMS, AFFIXES, RARITIES, RARITY_COLORS, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, itemScore, catalogEntry, isBow, normalizeItem } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints } from './systems.js';
+import {describePower,skillLegend,PROC_FX} from './legendary.js';
+import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor} from './progression.js';
+import {LocalStore,STASH_SIZE} from './storage.js';
+import {createHeroSelect} from './hero-select.js';
+import {skillIcon} from './ui-icons.js';
+import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill } from './core.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -28,21 +34,22 @@ let mouseScreen = null, kills = 0, total = ENCOUNTER_COUNT, boss = null, frameIn
 const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null, selectedRingSlot=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:RARITY_COLORS };
-try { profile = sanitizeSave(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch { profile = freshSave(); }
-// 职业选择：开始界面与行囊里都可以切换。等级与装备共用，技能点、技能栏、按键按职业分别保存。
+// v0.7：多角色（storage.js）。每个角色职业固定；旧版单存档首次打开时迁移成第一个角色。
+const store=new LocalStore();
+store.migrateLegacy();
+let charId=store.active();
+profile=charId?sanitizeSave(store.load(charId)):freshSave();
+/** 新角色的初始存档：职业固定，技能栏用该职业默认配置。 */
+function freshProfile(cls){const p=freshSave();p.heroClass=cls;p.activeSkills=sanitizeActive(cls,null);return p;}
+// 仅本地 QA 用：原地切换职业（正式界面里职业随角色固定）。
 function applyClass(cls,quiet=false){
   if(!switchClass(profile,cls))return;
-  for(const id of ['class-start','class-inventory'])$(id).value=profile.heroClass;
   allies=[];buffs=[];hsCache=null;wardHp=0;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
   if(hero){const s=heroStats();hero.cls=cls;hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=Math.min(hero.hp,s.hp);hero.mana=Math.min(hero.mana,s.mana);}
   document.querySelector('.orb.energy small').textContent=CLASSES[cls].resource;
   persist();renderSkillBar();if(!$('inventory').hidden)renderInventory();renderStatus();
   if(!quiet)announce('职业切换：'+CLASSES[cls].name+' · '+CLASSES[cls].title,true);
-}
-for(const id of ['class-start','class-inventory']){
-  const select=$(id);select.value=profile.heroClass;
-  select.addEventListener('change',()=>applyClass(select.value));
 }
 document.querySelector('.orb.energy small').textContent=CLASSES[profile.heroClass].resource;
 
@@ -52,12 +59,12 @@ function renderStatus(){
   const s=heroStats(),C=CLASSES[profile.heroClass],pct=v=>Math.round(v)+'%';
   const dps=Math.round(s.power*s.dmgMult*(1+s.crit/100*s.critDmg/100)*(s.attack.speed||1)*s.aspdMult/.5);
   const sections=[
-    ['角色',[['职业',C.name],['等级',profile.level],['经验',profile.xp+' / '+expRequired(profile.level)],['已净化',profile.clears],['金币',profile.gold],['技能点',profile.skillPoints]]],
+    ['角色',[['名字',profile.name||'—'],['职业',C.name],['等级',profile.level+' / '+MAX_LEVEL],['经验',profile.level>=MAX_LEVEL?'已满级':profile.xp+' / '+expRequired(profile.level)],['难度',DIFFICULTIES[profile.difficulty|0].name],['怪物等级',monsterLevel()],['已净化',profile.clears],['金币',profile.gold],['技能点',profile.skillPoints],['巅峰点',paragonLeft(profile)+' / '+paragonPoints(profile.level)]]],
     ['生存',[['生命',Math.ceil(hero?.hp??s.hp)+' / '+s.hp],[C.resource,Math.ceil(hero?.mana??s.mana)+' / '+s.mana],['每秒回复',s.regen.toFixed(1)],['护甲',s.armor],['护甲减伤',pct(Math.min(60,s.armor/(s.armor+200)*100))],['额外减伤',pct(s.mods.dr*100)],['护盾',Math.ceil(wardHp)],['移动速度',pct(s.moveMult*100)]]],
-    ['输出',[[C.power,s.power],['伤害加成',pct((s.dmgMult-1)*100)],['暴击率',pct(s.crit)],['暴击伤害',pct(s.critDmg)],['攻击/施法速度',pct(s.aspdMult*100)],['吸血',(s.lifesteal?s.lifesteal+'/击 ':'')+(s.mods.lifePct?pct(s.mods.lifePct*100):'')||'0'],['估算每秒伤害',dps],['职业技能等级','+'+s.classSkill]]],
+    ['输出',[[C.power,s.power],['伤害加成',pct((s.dmgMult-1)*100)],['暴击率',pct(s.crit)],['暴击伤害',pct(s.critDmg)],['攻击/施法速度',pct(s.aspdMult*100)],['吸血',(s.lifesteal?s.lifesteal+'/击 ':'')+(s.mods.lifePct?pct(s.mods.lifePct*100):'')||'0'],['估算每秒伤害',dps],['技能等级加成','+'+s.classSkill],['冷却缩减',pct(s.cdr)],['寻宝几率',pct(s.mf)]]],
     ['武器',[['武器',s.weapon||'空手'],['攻击方式',{melee:'近战',bow:'射箭',throw:'投掷',spell:'法术弹'}[s.attack.mode]],['攻速倍率','×'+(s.attack.speed||1)],['擅长武器',s.weapon?(s.proficient?'是 · 伤害 +15%':'否'):'—'],['擅长副手',s.offProficient?'是':'—']]],
     ['元素加成',[['火焰',pct(s.fire)],['冰霜',pct(s.cold)],['雷电',pct(s.lightning)],['毒素',pct(s.poison)],['神圣',pct(s.holy)],['暗影',pct(s.shadow)],['物理',pct(s.physical)]]],
-    ['抗性',[['火焰抗性',pct(s.resistFire)],['冰霜抗性',pct(s.resistCold)],['暗影抗性',pct(s.resistDark)]]]
+    ['抗性'+(s.resPenalty?'（难度 '+s.resPenalty+'%）':''),[['火焰抗性',pct(s.resistFire)],['冰霜抗性',pct(s.resistCold)],['暗影抗性',pct(s.resistDark)]]]
   ];
   panel.replaceChildren();
   const head=document.createElement('div');head.className='status-head';
@@ -76,7 +83,9 @@ function renderStatus(){
   list.textContent=active.length?active.map(b=>(SKILLS[b.id]?.name||b.id.replace(/^hit_/,''))+(b.dur<59?' '+Math.ceil(b.until-tick)+'秒':'')).join(' · '):'无';
   panel.append(list);
   const sets=Object.entries(s.sets||{}).filter(([,n])=>n>0);
-  if(sets.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='套装：'+sets.map(([id,n])=>SETS[id].name+' '+n+'/3').join(' · ');panel.append(p);}
+  if(sets.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='套装：'+sets.map(([id,n])=>SETS[id].name+' '+n+'/'+SETS[id].size).join(' · ');panel.append(p);}
+  const powers=[];for(const id of Object.values(profile.equipped)){const it=profile.inventory.find(i=>i.id===id);if(it&&(it.req||1)<=profile.level)for(const pw of itemPowers(it))powers.push(it.name+'：'+describePower(pw));}
+  if(powers.length){const h2=document.createElement('h4');h2.textContent='传奇特效';panel.append(h2);const ul=document.createElement('ul');ul.className='status-powers';for(const t of powers){const li=document.createElement('li');li.textContent=t;ul.append(li);}panel.append(ul);}
   if(allies.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='随从/陷阱：'+allies.length+' 个';panel.append(p);}
 }
 function toggleStatus(force){
@@ -93,7 +102,7 @@ function renderBuffBar(){
   const key=list.map(b=>b.id+':'+(b.left??Math.ceil(b.until-tick))).join('|');
   if(bar.dataset.key===key)return;bar.dataset.key=key;bar.replaceChildren();
   for(const b of list){const sk=SKILLS[b.id];const el=document.createElement('span');el.className='buff skill-'+(sk?.school||'arcane');
-    const i=document.createElement('b');i.textContent=sk?.icon||b.icon;const t=document.createElement('small');
+    const i=sk?skillIcon(b.id,0,'buff-ico'):document.createElement('b');if(!sk)i.textContent=b.icon;const t=document.createElement('small');
     t.textContent=b.left??(b.dur>=59?'∞':Math.ceil(b.until-tick)+'s');el.title=sk?.name||b.label;el.append(i,t);bar.append(el);}
 }
 function renderSkillBar(){
@@ -103,7 +112,7 @@ function renderSkillBar(){
     const button=document.createElement('button');button.type='button';button.dataset.skill=key;button.dataset.slot=String(slot);
     button.className='skill-'+meta.school;
     const kbd=document.createElement('kbd');kbd.className='slot-key';kbd.textContent=keyLabel(profile.keybinds[slot]||'')+(slot===0?' · 左键':slot===1?' · 右键':'');
-    const icon=document.createElement('span');icon.className='ability-icon';icon.textContent=meta.icon;
+    const icon=skillIcon(key,0,'ability-icon');
     const label=document.createElement('b');label.textContent=meta.name;
     const cost=document.createElement('small');cost.textContent=meta.mana?meta.mana+' '+CLASSES[profile.heroClass].resource:'无消耗';
     const cooldown=document.createElement('i');button.append(kbd,icon,label,cost,cooldown);bar.append(button);
@@ -129,7 +138,7 @@ function renderLoadout(){
         if(sk.cls!==profile.heroClass||sk.tree!==tree)continue;
         const opt=document.createElement('option');opt.value=id;
         const locked=profile.level<sk.unlocked;
-        opt.textContent=sk.icon+' '+sk.name+(locked?'（'+sk.unlocked+' 级）':'');opt.disabled=locked&&id!==key;
+        opt.textContent=sk.name+(locked?'（'+sk.unlocked+' 级）':'');opt.disabled=locked&&id!==key;
         group.append(opt);
       }
       select.append(group);
@@ -141,7 +150,7 @@ function renderLoadout(){
       profile.activeSkills[slot]=id;
       persist();renderSkillBar();renderLoadout();updateHud();announce(SKILLS[id].name+' 已放入第 '+(slot+1)+' 格',true);
     };
-    row.append(num,keyBtn,select);box.append(row);
+    row.append(num,keyBtn,skillIcon(key,0,'loadout-ico'),select);box.append(row);
   });
 }
 const AFFIX_LABEL=k=>({power:CLASSES[profile.heroClass].power,hp:'生命',mana:CLASSES[profile.heroClass].resource,armor:'护甲'})[k]||AFFIXES[k]?.name.replace(' %','')||k;
@@ -154,7 +163,7 @@ function renderBuildGuide(){
   const desc=document.createElement('p');desc.className='build-desc';desc.textContent=cur.desc;
   const skills=document.createElement('div');skills.className='build-skills';
   cur.skills.forEach((k,i)=>{const sk=SKILLS[k],el=document.createElement('span');el.className='skill-'+sk.school+(profile.level<sk.unlocked?' locked':'');
-    el.title=sk.name+(profile.level<sk.unlocked?'（'+sk.unlocked+' 级解锁）':'');el.textContent=sk.icon;const n=document.createElement('small');n.textContent=sk.name;el.append(n);skills.append(el);});
+    el.title=sk.name+(profile.level<sk.unlocked?'（'+sk.unlocked+' 级解锁）':'');el.append(skillIcon(k,0,'build-ico'));const n=document.createElement('small');n.textContent=sk.name;el.append(n);skills.append(el);});
   const top=Object.entries(cur.weights).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k])=>AFFIX_LABEL(k));
   const aff=document.createElement('p');aff.className='build-line';aff.textContent='词条优先：'+top.join(' > ');
   const wpn=document.createElement('p');wpn.className='build-line';wpn.textContent='推荐武器：'+cur.weapons.join('、');
@@ -181,6 +190,23 @@ renderSkillBar();
 const regionSelect=$('region-select');
 REGION_DATA.forEach((region,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=region.name;regionSelect.append(option);});
 regionSelect.value=String(profile.region);
+const difficultySelect=$('difficulty-select');
+DIFFICULTIES.forEach(D=>{const o=document.createElement('option');o.value=String(D.id);o.textContent=D.name;difficultySelect.append(o);});
+/** 区域与难度下拉：显示区域等级，未解锁的难度不可选。 */
+function refreshWorldPickers(){
+  const D=DIFFICULTIES[profile.difficulty|0];
+  [...regionSelect.options].forEach((o,i)=>{o.textContent=REGION_DATA[i].name+' · Lv '+D.area[i];});
+  [...difficultySelect.options].forEach((o,i)=>{const ok=difficultyUnlocked(profile,i);o.disabled=!ok;o.textContent=DIFFICULTIES[i].name+(ok?'':'（'+DIFFICULTIES[i].unlockLevel+' 级）');});
+  regionSelect.value=String(profile.region);difficultySelect.value=String(profile.difficulty|0);
+}
+difficultySelect.addEventListener('change',()=>{
+  const next=Number(difficultySelect.value);
+  if(next===(profile.difficulty|0))return;
+  if(!difficultyUnlocked(profile,next)){refreshWorldPickers();announce('该难度尚未解锁',true);return;}
+  if(state==='playing'&&!confirm('切换难度将重新开始当前远征。继续吗？')){refreshWorldPickers();return;}
+  profile.difficulty=next;refreshWorldPickers();build();persist();if(state==='victory'||state==='death')state='intro';
+  announce('难度：'+DIFFICULTIES[next].name+' · 怪物等级 '+monsterLevel(),true);
+});
 regionSelect.addEventListener('change',()=>{
   const next=Number(regionSelect.value);
   if(next===profile.region)return;
@@ -215,7 +241,7 @@ $('portal-next').onclick=()=>travelTo(Number($('portal-destination').value));
 $('portal-random').onclick=()=>travelTo(pickRandomDestination(rng,profile.region));
 $('portal-panel').addEventListener('pointerdown',e=>{if(e.target===$('portal-panel'))closePortalMenu();});
 
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(profile)); } catch { announce('浏览器无法保存。请在行囊内导出角色备份。', true); } }
+function persist() { if(!charId)return; if(!store.save(charId,profile))announce('浏览器无法保存。请在行囊内导出角色备份。', true); }
 function resize() { vw = window.innerWidth; vh = window.innerHeight; dpr = Math.min(devicePixelRatio || 1, vw<=760||vh<=550 ? 1.5 : 2); canvas.width = Math.round(vw*dpr); canvas.height = Math.round(vh*dpr); }
 window.addEventListener('resize', resize); resize();
 function announce(message, urgent=false) {
@@ -293,18 +319,18 @@ function build() {
   ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 '+total+' 名怪物，穿过三波守卫迎战首领';
   updateHud();
 }
-// 怪物等级：角色等级 + 每两次净化 +1；各项属性随等级成长（数值说明见 docs/2D-BALANCE.md）
-function monsterLevel(){return profile.level+Math.floor(profile.clears/2);}
+// v0.7 怪物等级：由难度与区域决定（progression.js），在难度上限内随角色成长；各项属性随等级成长（见 docs/2D-BALANCE.md）
+function monsterLevel(boss=false){return areaMonsterLevel(profile,boss);}
 function monsterStats(mon){
-  const T=TIER[mon.tier],L=monsterLevel();
-  return {hp:Math.round(T.hp*mon.hp*(1+(L-1)*.16)*(1+profile.clears*.06)),dmg:T.dmg*mon.dmg*(1+(L-1)*.085),
-    speed:T.speed*mon.spd,radius:T.radius*(mon.ai==='tank'?1.2:mon.ai==='swarm'?.85:1),xp:Math.round(T.xp*(1+(L-1)*.04))};
+  const T=TIER[mon.tier],boss=mon.tier==='boss',L=monsterLevel(boss),D=DIFFICULTIES[profile.difficulty|0];
+  return {level:L,hp:Math.round(T.hp*mon.hp*(1+(L-1)*.16)*D.hp),dmg:T.dmg*mon.dmg*(1+(L-1)*.085)*D.dmg,
+    speed:T.speed*mon.spd,radius:T.radius*(mon.ai==='tank'?1.2:mon.ai==='swarm'?.85:1),xp:Math.round(T.xp*(1+(L-1)*.04)*D.xp*xpFactor(profile.level,L))};
 }
 function spawn(kind,location=null) {
   const p=location||randomPoint();
-  const id=kind==='boss'?bossFor(profile.region,profile.bossKills[profile.region]||0):MONSTERS[kind]?kind:REGION_MONSTERS[profile.region].normal[0];
+  const id=kind==='boss'?bossFor(profile.region,profile.bossKills[profile.difficulty|0][profile.region]||0):MONSTERS[kind]?kind:REGION_MONSTERS[profile.region].normal[0];
   const mon=MONSTERS[id],st=monsterStats(mon),isBoss=mon.tier==='boss';
-  const e={id:nextId++,x:p.x,y:p.y,kind:isBoss?'boss':id,mid:id,mon,tier:mon.tier,elite:mon.tier==='elite',hp:st.hp,maxHp:st.hp,dmg:st.dmg,xp:st.xp,
+  const e={id:nextId++,x:p.x,y:p.y,kind:isBoss?'boss':id,mid:id,mon,tier:mon.tier,elite:mon.tier==='elite',level:st.level,hp:st.hp,maxHp:st.hp,dmg:st.dmg,xp:st.xp,
     speed:st.speed,radius:st.radius,attack:.6+rng()*1.2,slow:0,phase:rng()*6.28,windup:0,act:null,modT:2+rng()*2,moveT:2.5,moveI:0,spawnT:0};
   enemies.push(e);
   if(isBoss){boss=e;ui.boss.hidden=false;ui.boss.querySelector('span').textContent=mon.name;announce('地窟深处，'+mon.name+'已苏醒！',true);}
@@ -328,7 +354,7 @@ function showModal(kind) {
     main.textContent='重新整备 →';main.onclick=begin;
   } else if(kind==='help') {
     title.innerHTML='操作<span>指南</span>';lead.textContent='移动、瞄准、拾取，开始你的远征。';
-    paragraphs[1].textContent='WASD 移动，技能自动锁定鼠标附近或最近的敌人；左键、右键分别施放技能栏第 1、2 格，其余格子按对应按键（默认 1-5、Q、E、R、F、空格），按住可连续施放。按 B 打开行囊，可切换职业、在“技能栏与按键”里换技能和改按键；按 C 打开角色状态面板。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
+    paragraphs[1].textContent='WASD 移动，技能自动锁定鼠标附近或最近的敌人；左键、右键分别施放技能栏第 1、2 格，其余格子按对应按键（默认 1-5、Q、E、R、F、空格），按住可连续施放。按 B 打开行囊，在“技能栏与按键”里换技能和改按键，60 级后在“巅峰天赋”里加点；按 C 打开角色状态面板。顶栏可切换难度（普通 / 噩梦 / 地狱）和区域，点“角色”回到角色选择。手机使用摇杆和技能按钮。靠近光柱自动拾取。';
     main.textContent='返回游戏 →';main.onclick=()=>{if(previousState==='intro'){location.reload();return;}if(['victory','death'].includes(previousState)){showModal(previousState);return;}if(previousState==='paused'){showModal('pause');return;}hideModal();state='playing';}; 
   } else {
     title.innerHTML='旅程<span>暂停</span>';lead.textContent='火种不灭，旅途未完。';
@@ -424,31 +450,32 @@ function slotLabel(item){
 function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
   if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('compare-pair').replaceChildren();$('ring-choice').hidden=true;$('mobile-item-name').textContent='点选背包中的装备';$('mobile-equip').disabled=true;$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
-  const title=document.createElement('h3');title.className='rarity-'+item.rarity;title.textContent=item.name;
-  const meta=document.createElement('small');meta.textContent=RARITIES[item.rarity]+' · 物品等级 '+item.ilvl+' · '+slotLabel(item);
+  const title=document.createElement('h3');title.className='rarity-'+item.rarity+(item.setId?' rarity-set':'');title.textContent=item.name;
+  const meta=document.createElement('small');meta.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · 物品等级 '+item.ilvl+' · '+slotLabel(item);
+  const tooLow=(item.req||1)>profile.level;
+  const reqLine=document.createElement('small');reqLine.className='item-req'+(tooLow?' is-blocked':'');reqLine.textContent='需求等级 '+(item.req||1)+(tooLow?'（当前 '+profile.level+' 级，不能穿戴）':'');
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
-  panel.append(preview,title,meta);
+  panel.append(preview,title,meta,reqLine);
   if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
   if(!list.childElementCount){const li=document.createElement('li');li.textContent='基础装备 · 无额外词缀';list.append(li);}
   panel.append(list);
   const info=catalogEntry(item);
-  if(info?.eff){
+  const powers=itemPowers(item);
+  if(powers.length){
     const fx=document.createElement('div');fx.className='item-effect rarity-'+item.rarity;
-    const h=document.createElement('strong');h.textContent='✦ '+info.eff;
-    const d=document.createElement('p');d.textContent=info.desc;
-    const note=document.createElement('small');note.textContent='特效为图鉴设定，暂未接入战斗；当前生效的是上方词缀。';
-    fx.append(h,d);
-    if(info.cost){const c=document.createElement('p');c.className='item-drawback';c.textContent='代价：'+info.cost;fx.append(c);}
-    fx.append(note);panel.append(fx);
+    const h=document.createElement('strong');h.textContent='✦ 传奇特效';fx.append(h);
+    const ul=document.createElement('ul');for(const pw of powers){const li=document.createElement('li');li.textContent=describePower(pw);ul.append(li);}fx.append(ul);
+    if(info?.owner&&info.owner!==profile.heroClass){const n=document.createElement('small');n.textContent='这是'+CLASSES[info.owner].name+'的传奇：技能相关特效只对该职业生效，可以放进共享仓库转给对应角色。';fx.append(n);}
+    panel.append(fx);
   }
   if(info?.cls){const fit=document.createElement('small');fit.className='item-class';fit.textContent='偏好职业：'+info.cls+(info.h===2?' · 双手'+(isBow(item)?'（可配箭袋）':''):'');panel.append(fit);}
   if(info?.lore&&item.rarity===4){const lore=document.createElement('p');lore.className='item-lore';lore.textContent=loreFor(info,item.name);panel.append(lore);}
   if(item.legacy){const old=document.createElement('p');old.className='score-down';old.textContent='旧版装备槽已取消：不能穿戴，可以分解换材料。';panel.append(old);}
   if(item.setId){
     const set=SETS[item.setId],count=Object.values(profile.equipped).map(id=>profile.inventory.find(i=>i.id===id)).filter(i=>i?.setId===item.setId).length;
-    const p=document.createElement('p');p.className='set-description';p.textContent=set.name+'（已装备 '+count+'/3） · 2 件：'+set.two+' · 3 件：'+set.three;panel.append(p);
+    const p=document.createElement('p');p.className='set-description';p.textContent=set.name+'（已装备 '+count+'/'+set.size+'）'+Object.entries(set.text).map(([n,t])=>' · '+n+' 件：'+t).join('');panel.append(p);
   }
   const isRing=item.slot.startsWith('ring');
   const target=isRing?(selectedRingSlot||Object.keys(profile.equipped).find(k=>k.startsWith('ring')&&profile.equipped[k]===item.id)||(!profile.equipped.ring1?'ring1':'ring2')):item.slot;
@@ -494,9 +521,9 @@ function inspectItem(item){
   }
   const quick=$('inv-quick-equip');
   const wornHere=profile.equipped[target]===item.id;
-  quick.disabled=!!item.legacy;
-  quick.textContent=item.legacy?'旧版装备 · 只能分解':wornHere?'卸下 '+item.name:'直接穿戴 '+item.name;
-  if(item.legacy)$('mobile-equip').disabled=true;
+  quick.disabled=!!item.legacy||tooLow&&!wornHere;
+  quick.textContent=item.legacy?'旧版装备 · 只能分解':wornHere?'卸下 '+item.name:tooLow?'需要 '+item.req+' 级':'直接穿戴 '+item.name;
+  if(item.legacy||tooLow&&!wornHere)$('mobile-equip').disabled=true;
   $('mobile-equip').textContent=wornHere?'卸下装备':'穿戴 / 替换';
   const cost=temperCost(item);
   $('inv-temper').disabled=!canTemper(profile,item.id);
@@ -511,6 +538,48 @@ function inspectItem(item){
 }
 $('inv-filter').onchange=()=>renderInventory();
 $('inv-sort').onchange=()=>renderInventory();
+// ───── 共享仓库（所有角色共用，storage.js） ─────
+function depositStash(id){
+  const item=profile.inventory.find(i=>i.id===id);if(!item||Object.values(profile.equipped).includes(id))return;
+  const stash=store.stash();if(stash.length>=STASH_SIZE){announce('共享仓库已满（'+STASH_SIZE+' 格）',true);return;}
+  stash.push(item);if(!store.saveStash(stash)){announce('仓库保存失败',true);return;}
+  profile.inventory.splice(profile.inventory.indexOf(item),1);if(selectedItemId===id)selectedItemId=null;
+  persist();renderInventory();announce('已存入共享仓库：'+item.name,true);
+}
+function withdrawStash(id){
+  const stash=store.stash(),i=stash.findIndex(x=>x?.id===id);if(i<0)return;
+  if(profile.inventory.length>=MAX_ITEMS){announce('背包已满',true);return;}
+  const item=normalizeItem(stash[i]);stash.splice(i,1);
+  if(item&&!profile.inventory.some(x=>x.id===item.id))profile.inventory.push(item);
+  store.saveStash(stash);persist();renderInventory();if(item)announce('已取回：'+item.name,true);
+}
+function renderStash(){
+  const box=$('stash-items');if(!box)return;box.replaceChildren();
+  const stash=store.stash().map(normalizeItem).filter(Boolean);
+  $('stash-count').textContent=stash.length+' / '+STASH_SIZE;
+  if(!stash.length){const p=document.createElement('p');p.className='empty';p.textContent='仓库是空的。在背包里点「存仓」，其他角色就能取用。';box.append(p);return;}
+  for(const item of stash){
+    const b=document.createElement('button');b.type='button';b.className='stash-item';b.title=item.name+' · 点击取回';
+    const img=document.createElement('canvas');img.className='item-thumbnail';Art.drawItemIcon(img,item);
+    const n=document.createElement('small');n.className='rarity-'+item.rarity+(item.setId?' rarity-set':'');n.textContent=item.name;
+    b.append(img,n);b.onclick=()=>withdrawStash(item.id);box.append(b);
+  }
+}
+// ───── 巅峰天赋（60 级后每级 1 点） ─────
+function renderParagon(){
+  const box=$('paragon');if(!box)return;box.replaceChildren();
+  const total=paragonPoints(profile.level),left=paragonLeft(profile);
+  $('paragon-count').textContent=profile.level<=60?'61 级解锁':'剩余 '+left+' / '+total+' 点';
+  for(const [k,P] of Object.entries(PARAGON)){
+    const v=profile.paragon?.[k]||0,b=document.createElement('button');b.type='button';b.className='paragon-node'+(v?' has-points':'');
+    b.disabled=left<1||v>=P.max;
+    const name=document.createElement('strong');name.textContent=P.name+' '+v+'/'+P.max;
+    const d=document.createElement('small');d.textContent=P.desc+' / 点'+(v?' · 当前 +'+v*P.per+(k==='dmg'||k==='hp'||k==='crit'||k==='critDmg'||k==='haste'||k==='cdr'||k==='res'||k==='armor'||k==='regen'||k==='move'||k==='mf'?'%':''):'');
+    b.append(name,d);b.onclick=()=>{if(addParagon(profile,k)){hsCache=null;applyEquipmentChange(()=>{});}};box.append(b);
+  }
+  const reset=document.createElement('button');reset.type='button';reset.className='paragon-reset';reset.textContent='重置巅峰点';reset.disabled=!Object.keys(profile.paragon||{}).length;
+  reset.onclick=()=>{if(confirm('返还全部巅峰点？')){resetParagon(profile);hsCache=null;applyEquipmentChange(()=>{});}};box.append(reset);
+}
 function renderInventory(){
   refreshCraftingPanel();
   const statsNow=stats(profile),statFields=[
@@ -552,7 +621,9 @@ function renderInventory(){
     const node=document.createElement('div');node.className='item'+(selectedItemId===item.id?' is-selected':'');
     const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
     const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
-    const desc=document.createElement('small');desc.textContent=RARITIES[item.rarity]+' · '+slotLabel(item)+' · '+(item.affixes?.length||0)+' 条词缀';
+    const desc=document.createElement('small');const low=(item.req||1)>profile.level;
+    desc.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · '+slotLabel(item)+' · '+(itemPowers(item).length?'传奇特效 · ':'')+(item.affixes?.length||0)+' 条词缀'+(low?' · 需 '+item.req+' 级':'');if(low)desc.classList.add('is-blocked');
+    if(item.setId)title.classList.add('rarity-set');
     const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
     const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
     detail.append(img,labels);detail.onclick=()=>selectEquipmentItem(item);
@@ -560,7 +631,7 @@ function renderInventory(){
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const actions=document.createElement('div');actions.className='item-actions';
     const worn=Object.values(profile.equipped).includes(item.id);
-    const use=document.createElement('button');use.textContent=worn?'已装备':item.legacy?'旧版':'装备';use.disabled=worn||!!item.legacy;
+    const use=document.createElement('button');use.textContent=worn?'已装备':item.legacy?'旧版':low?item.req+' 级':'装备';use.disabled=worn||!!item.legacy||low;
     use.onclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const favorite=document.createElement('button');favorite.textContent=item.favorite?'★ 保留':'☆ 收藏';
@@ -568,9 +639,12 @@ function renderInventory(){
     favorite.onclick=()=>{item.favorite=!item.favorite;persist();renderInventory();};
     const recycle=document.createElement('button');recycle.textContent='分解';recycle.disabled=worn||item.favorite;
     recycle.onclick=()=>{if(selectedItemId===item.id)selectedItemId=null;applyEquipmentChange(()=>dismantle(profile,item.id));};
-    actions.append(use,favorite,recycle);node.append(detail,actions);bag.append(node);
+    const toStash=document.createElement('button');toStash.textContent='存仓';toStash.disabled=worn;toStash.title='放进共享仓库（所有角色共用）';
+    toStash.onclick=()=>depositStash(item.id);
+    actions.append(use,favorite,toStash,recycle);node.append(detail,actions);bag.append(node);
   }
   inspectItem(profile.inventory.find(i=>i.id===selectedItemId)||null);
+  renderStash();renderParagon();
   renderBuildGuide();
   renderLoadout();
   const skillPanel=$('skill-catalog');skillPanel.replaceChildren();
@@ -583,13 +657,14 @@ function renderInventory(){
       const btn=document.createElement('button');btn.type='button';
       const rank=profile.skillRanks[key]||0,locked=profile.level<skill.unlocked;
       btn.className='catalog-skill skill-'+school+(locked?' unavailable':'');
-      const icon=document.createElement('span');icon.className='catalog-icon';icon.textContent=skill.icon;
+      const icon=skillIcon(key,0,'catalog-icon');
       const text=document.createElement('span');text.className='catalog-text';
-      const name=document.createElement('strong');name.textContent=skill.name+' · '+rank+'/8'+(profile.activeSkills.includes(key)?' · 第 '+(profile.activeSkills.indexOf(key)+1)+' 格':'');
+      const cap=rankCap(profile.level),bonusRank=skillLegend(statsNow.legend,key).rank+statsNow.classSkill;
+      const name=document.createElement('strong');name.textContent=skill.name+' · '+rank+'/'+cap+(bonusRank?'（+'+bonusRank+'）':'')+(profile.activeSkills.includes(key)?' · 第 '+(profile.activeSkills.indexOf(key)+1)+' 格':'');
       const desc=document.createElement('small');
-      desc.textContent=skill.desc+' · '+(skill.mana?skill.mana+' '+CLASSES[profile.heroClass].resource:'无消耗')+' · 冷却 '+skill.cooldown+' 秒'+(locked?' · '+skill.unlocked+' 级解锁':profile.skillPoints>0&&rank<8?' · 点击升级':'');
+      desc.textContent=skill.desc+' · '+(skill.mana?skill.mana+' '+CLASSES[profile.heroClass].resource:'无消耗')+' · 冷却 '+skill.cooldown+' 秒'+(locked?' · '+skill.unlocked+' 级解锁':profile.skillPoints>0&&rank<cap?' · 点击升级':'');
       text.append(name,desc);btn.append(icon,text);
-      btn.disabled=locked||profile.skillPoints<=0||rank>=8;
+      btn.disabled=locked||profile.skillPoints<=0||rank>=cap;
       btn.onclick=()=>{
         if(upgradeSkill(profile,key)){persist();renderInventory();announce(skill.name+' 已升至 '+profile.skillRanks[key]+' 级',true);}
       };
@@ -618,7 +693,7 @@ function updateHud(){
   const s=stats(profile), xpNeeded=expRequired(profile.level);
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
-  ui.xp.style.width=(profile.level===60?100:profile.xp/xpNeeded*100)+'%';
+  ui.xp.style.width=(profile.level>=MAX_LEVEL?100:profile.xp/xpNeeded*100)+'%';
   ui.progress.textContent=boss?'击败 '+(boss.mon?.name||BOSS_POOLS[profile.region].name)+'，收集专属战利品':bossDefeated?'首领已击败 · 继续拾取装备 / B 查看背包 / 暂停手动重刷':'徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
@@ -648,7 +723,8 @@ function heroStats(){
   s.crit=Math.min(95,s.crit+m.crit);s.critDmg+=m.critDmg;
   for(const k of ['resistFire','resistCold','resistDark'])s[k]=Math.min(75,s[k]+m.resist);
   s.regen=s.regen*(1+m.regenPct);s.moveMult=1+m.speed+s.move/100;s.aspdMult=1+m.aspd+s.haste/100;
-  s.dmgMult=(1+m.dmg)*(s.proficient?1.15:1);
+  m.dr+=(s.legend?.dr||0)/100;
+  s.dmgMult=(1+m.dmg+(s.dmgPct||0)/100)*(s.proficient?1.15:1);
   s.form=buffs.find(b=>b.until>tick&&b.mods?.form)?.mods.form||null;
   hsCache=s;hsTick=tick;return s;
 }
@@ -663,17 +739,42 @@ function injury(amount,src=null){
   const finalDamage=mitigated-absorbed;
   if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
   hero.hp=Math.max(0,hero.hp-finalDamage);hero.invuln=.6;
+  for(const [i,pr] of defense.legend.procs.entries())if(pr.on==='hurt'&&(procReady[i]||0)<=tick&&rng()*100<pr.chance){procReady[i]=tick+.8;procCast(pr,{x:hero.x,y:hero.y});}
   puff(hero.x,hero.y,absorbed?'#85bae9':'#e46455',13,4,145);
   if(finalDamage)floatText(hero.x,hero.y-30,Math.round(finalDamage),'#ff9990');
   if(hero.hp<=0){persist();showModal('death');announce('持灯者倒下，但成长得以保留',true);}
 }
 const SCHOOL_STAT={fire:'fire',cold:'cold',lightning:'lightning',physical:'physical',poison:'poison',holy:'holy',shadow:'shadow'};
 const ELEMENTAL=new Set(['fire','cold','lightning','poison']);
+// ───── 传奇特效的触发技能 ─────
+const procReady=[];
+function procCast(pr,at){
+  if(state!=='playing'||!hero)return;
+  const sc=pr.school,P=heroStats().power*pr.mult,o={proc:true};
+  const hit=(r,mult=1,extra=null)=>{for(const e of [...enemies])if(Math.hypot(e.x-at.x,e.y-at.y)<r+e.radius){if(extra)extra(e);dealDamage(e,P*mult,sc==='arcane'?'arcane':sc,o);}};
+  floatText(at.x,at.y-52,PROC_FX[sc],FX_COLOR[sc]||'#fff');
+  switch(sc){
+    case 'lightning':{let last=at;const done=new Set();
+      for(let k=0;k<5;k++){let best=null,bd=320;for(const e of enemies){if(done.has(e))continue;const d=Math.hypot(e.x-last.x,e.y-last.y);if(d<bd){bd=d;best=e;}}
+        if(!best)break;done.add(best);hazards.push({x:last.x,y:last.y,x2:best.x,y2:best.y,type:'chain',r:0,max:1,life:.22});dealDamage(best,P*.8,'lightning',o);last={x:best.x,y:best.y};}
+      break;}
+    case 'poison':garea(at.x,at.y,{r:110,dur:3,tick:.5,m:pr.mult*.3,fx:'poison'},heroStats().power,1,'poison',0);break;
+    default:{
+      const r=sc==='physical'?130:150;
+      hit(r,1,sc==='cold'?e=>freezeEnemy(e,.8):sc==='physical'?e=>{const d=Math.hypot(e.x-at.x,e.y-at.y)||1;if(e.kind!=='boss')for(let k=0;k<4;k++)moveWithCollision(e,(e.x-at.x)/d*600,(e.y-at.y)/d*600,1/60,dungeon,e.radius);}:null);
+      hazards.push({x:at.x,y:at.y,r:0,max:r,life:.45,type:'gnova',fx:sc==='cold'?'ice':sc,color:FX_COLOR[sc]});
+      if(sc==='fire')addDecal(decals,at.x,at.y,r*.7,'scorch',3);
+      shake.amount=Math.max(shake.amount,2.5);
+    }
+  }
+}
 function dealDamage(e,damage,school='physical',opts={}){
   if(!enemies.includes(e))return;
   const bonus=heroStats();
-  const bonusDamage=SCHOOL_STAT[school]?bonus[SCHOOL_STAT[school]]||0:0;
+  const LGD=bonus.legend;
+  const bonusDamage=(SCHOOL_STAT[school]?bonus[SCHOOL_STAT[school]]||0:0)+(LGD.elem[school]||0);
   damage*=1+bonusDamage/100;
+  if(LGD.berserk&&hero.hp<hero.maxHp*.35)damage*=1+LGD.berserk/100;
   if(school==='fire')damage*=1+bonus.skillFire*.09;
   if(school==='cold')damage*=1+bonus.skillCold*.09;
   if(!opts.minion)damage*=bonus.dmgMult;
@@ -681,6 +782,13 @@ function dealDamage(e,damage,school='physical',opts={}){
   if(e.elemAmpUntil>tick&&ELEMENTAL.has(school))damage*=1+(e.elemAmp||0);
   if(hero.tiger&&opts.melee){damage*=1+hero.tiger*.25;hero.tiger=0;}
   const crit=!opts.noCrit&&rng()*100<bonus.crit;if(crit)damage*=1+bonus.critDmg/100;
+  // 传奇触发：命中 / 暴击时几率释放元素特效（每个特效 0.5 秒内只触发一次；触发出的伤害不会再触发）
+  if(!opts.dot&&!opts.proc&&!opts.minion&&LGD.procs.length){
+    for(const [i,pr] of LGD.procs.entries()){
+      if((pr.on==='hit'||pr.on==='crit'&&crit)&&(procReady[i]||0)<=tick&&rng()*100<pr.chance){procReady[i]=tick+.5;const at={x:e.x,y:e.y};pending.push({t:tick+.06,fn:()=>procCast(pr,at)});}
+    }
+  }
+  if(LGD.leech&&!opts.dot)healHero(damage*LGD.leech/100);
   if(opts.melee&&bonus.mods.venom)applyPoison(e,bonus.power*bonus.mods.venom,3);
   if(opts.life)healHero(damage*opts.life);
   if(bonus.mods.lifePct&&!opts.dot)healHero(damage*bonus.mods.lifePct);
@@ -704,13 +812,20 @@ function dealDamage(e,damage,school='physical',opts={}){
   if(e.kind==='boss'){shake.amount=14;hitStop=.12;}
   puff(e.x,e.y-14,e.kind==='boss'?'#e89bff':'#e8904b',12,5,200);
   const bossDied=e.kind==='boss';const advanced=gainXp(profile,e.xp||(bossDied?170:22));
-  profile.gold+=bossDied?150:3+Math.floor(rng()*9);
-  if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;announce('等级提升 · '+profile.level+'级！',true);}
-  if(!bossDied&&rng()<(e.elite?.74:.42))dropItem(e.x,e.y,!!e.elite);
+  const goldLv=1+(e.level||1)/25;
+  profile.gold+=Math.round((bossDied?150:3+Math.floor(rng()*9))*goldLv);
+  const L=heroStats().legend;
+  if(L.heal)healHero(hero.maxHp*L.heal/100);
+  for(const pr of L.procs)if(pr.on==='kill'&&rng()*100<pr.chance)procCast(pr,e);
+  if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;hsCache=null;
+    announce('等级提升 · '+profile.level+'级！'+(profile.level>60?' · 获得巅峰点':''),true);refreshWorldPickers();}
+  if(!bossDied)for(const item of rollDrops(rng,{source:e.elite?'elite':'normal',level:e.level||monsterLevel(),mf:heroStats().mf,cls:profile.heroClass,difficulty:profile.difficulty|0,newId:()=>'ember2d-'+Date.now()+'-'+nextId++}))dropItem(e.x+(rng()-.5)*30,e.y+(rng()-.5)*20,item);
   if(bossDied){
-    const region=profile.region,previousKills=profile.bossKills[region]||0;
-    const reward=rollBossRewards(rng,profile.level,region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++));
-    profile.bossKills[region]=previousKills+1;
+    const region=profile.region,dif=profile.difficulty|0,previousKills=profile.bossKills[dif][region]||0;
+    const reward=rollBossRewards(rng,e.level||monsterLevel(true),region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++),{cls:profile.heroClass,mf:heroStats().mf,difficulty:dif,pity:profile.pity});
+    profile.bossKills[dif][region]=previousKills+1;profile.pity=reward.pity;
+    if(region===8&&previousKills===0&&dif<2)announce(DIFFICULTIES[dif+1].name+'难度已解锁！',true);
+    refreshWorldPickers();
     profile.essence+=reward.materials;profile.clears++;
     boss=null;bossDefeated=true;portal={x:e.x,y:e.y};ui.boss.hidden=true;$('portal-open').hidden=false;
     for(const [index,item] of reward.drops.entries()){
@@ -722,7 +837,8 @@ function dealDamage(e,damage,school='physical',opts={}){
       puff(point.x,point.y,palette.rare[item.rarity],23,5,170);
     }
     persist();
-    announce((reward.firstKill?'首杀奖励！':'首领战利品！')+' '+reward.drops.length+' 件装备 · '+reward.materials+' 精华'+(reward.exclusive?' · 专属传奇！':''),true);
+    announce((reward.firstKill?'首杀奖励！':'首领战利品！')+' '+reward.drops.length+' 件装备 · '+reward.materials+' 精华'+(reward.exclusive?' · 专属传奇！':'')+(reward.forced?' · 保底触发':''),true);
+    for(const item of reward.drops)if(item.rarity>=3&&!item.name.includes(BOSS_POOLS[region].item))announce((item.setId?'套装':RARITIES[item.rarity])+'掉落：'+item.name,true);
     ui.title.textContent='首领已击败 · 传送阵已开启';
     ui.progress.textContent='专属奖励已掉落 · 传送阵可选择下一图或随机远征';
   }else{
@@ -733,10 +849,9 @@ function dealDamage(e,damage,school='physical',opts={}){
     persist();
   }
 }
-function dropItem(x,y,rare=false) {
-  let item=makeLoot(rng,profile.level,'ember2d-'+Date.now()+'-'+nextId++,{boss:rare,cls:profile.heroClass});
-  if(rare&&item.rarity<2)item=normalizeItem({...item,rarity:2});
-  drops.push({x,y,item,age:0});floatText(x,y-38,item.name,palette.rare[item.rarity]);
+function dropItem(x,y,item) {
+  drops.push({x,y,item,age:0});floatText(x,y-38,item.name,item.setId?SET_COLOR:palette.rare[item.rarity],item.rarity>=3);
+  if(item.rarity>=3){announce((item.setId?'套装':RARITIES[item.rarity])+'掉落：'+item.name,true);shake.amount=Math.max(shake.amount,3);}
 }
 // 瞄准规则（锁敌）：1 鼠标附近 140px 内有敌人 → 锁定它；2 否则锁定 650px 内最近的敌人；
 // 3 附近没有敌人 → 朝鼠标方向；4 都没有 → 朝角色面向。鼠标位置每次施法时按当前镜头换算，不会过期。
@@ -797,22 +912,29 @@ function updateBuffsAndSummons(dt){
 function cast(skill){
   const rule=SKILLS[skill];
   if(!rule||state!=='playing'||!$('inventory').hidden||!$('portal-panel').hidden||cooldowns[skill]>0||profile.level<rule.unlocked)return;
-  if(hero.mana<rule.mana){announce(CLASSES[profile.heroClass].resource+'不足');return;}
+  const bonus=heroStats(),LG=skillLegend(bonus.legend,skill),cost=Math.round(rule.mana*LG.cost);
+  if(hero.mana<cost){announce(CLASSES[profile.heroClass].resource+'不足');return;}
   if(skill==='heal'&&hero.hp>=hero.maxHp)return;
   if(skill==='manasurge'&&hero.mana>=hero.maxMana)return;
   // 平衡系数（balance.js）：把技能伤害对齐到统一预算
-  const B=SKILL_BAL[skill]||1,bonus=heroStats(),rank=(profile.skillRanks[skill]||0)+bonus.classSkill,P=bonus.power*B,R=1+rank*.12;
-  hero.mana-=rule.mana;
+  // 传奇特效（legendary.js）：额外技能等级、技能伤害、冷却、消耗、投射物；召唤物伤害与上限
+  const minion=['summon','turret'].includes(rule.a)||skill==='hydra';
+  const B=SKILL_BAL[skill]||1,rank=(profile.skillRanks[skill]||0)+bonus.classSkill+LG.rank,P=bonus.power*B*LG.dmg*(minion?1+bonus.legend.minionPct/100:1),R=1+rank*.12;
+  const cdMult=LG.cd*(1-bonus.cdr/100);
+  hero.mana-=cost;
   if(rule.cls!=='mage'){
     const {target,angle}=pickTarget();hero.angle=angle;hero.cast=.25;
     const cd=rule.a==='basic'?rule.cooldown/(bonus.attack.speed||1)/bonus.aspdMult
-      :rule.cooldown*(1-Math.min(.16,rank*.02))/(rule.a==='melee'?bonus.aspdMult:1+bonus.haste/140)*(hasted()?.75:1);
+      :rule.cooldown*(1-Math.min(.16,rank*.02))/(rule.a==='melee'?bonus.aspdMult:1+bonus.haste/140)*(hasted()?.75:1)*cdMult;
     cooldowns[skill]=cd;
-    castGeneric(skill,rule,{target,angle,P,R,rank,bonus,B});
+    let def=rule;
+    if(LG.proj&&rule.a==='proj')def={...rule,n:(rule.n||1)+LG.proj,spread:rule.spread||.14};
+    if(minion&&bonus.legend.minionMax&&rule.max)def={...def,max:rule.max+bonus.legend.minionMax};
+    castGeneric(skill,def,{target,angle,P,R,rank,bonus,B});
     updateHud();return;
   }
   emitVfx(vfx,skill,hero.x,hero.y-40,{max:vw<=700?10:16,angle:hero.angle});
-  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(hasted()?.75:1);
+  cooldowns[skill]=rule.cooldown*(1-bonus.haste/140)*(1-Math.min(.16,rank*.02))*(hasted()?.75:1)*cdMult;
   hero.cast=.3;
   const {target,angle}=pickTarget();
   const dx=Math.cos(angle),dy=Math.sin(angle);hero.angle=angle;
@@ -1158,6 +1280,7 @@ function updateEnemies(dt,inSlow){
   for(const e of [...enemies]){
     if(e.flash>0)e.flash-=dt;
     e.spawnT=Math.max(0,(e.spawnT||0)-dt);
+    stepMotion(e,dt,e.face||1,{stepLen:e.tier==='boss'?46:e.mon?.ai==='tank'?40:e.mon?.ai==='swarm'?22:30});
     if(e.poisonUntil>tick&&(e.poisonTick-=dt)<=0){e.poisonTick=.5;dealDamage(e,e.poisonDps*.5,'poison',{dot:true,noCrit:true});if(!enemies.includes(e))continue;}
     if(e.frozen>0){e.frozen-=dt;continue;}
     if(e.stun>0){e.stun-=dt;e.act=null;continue;}
@@ -1201,16 +1324,18 @@ function updateEnemies(dt,inSlow){
     const speed=e.speed*(e.slow? .38:1)*tf*(e.spawnT>0?0:1);
     const reach=e.radius+(foe.radius||17)+18;
     let mv=0;
+    // v0.7：移动先转向再加速（motion.js steer），起步、拐弯、停下都有过渡
+    const go=(vx,vy)=>{const [sx,sy]=steer(e,vx,vy,dt,M.ai==='tank'?6:M.ai==='swarm'?12:9);moveWithCollision(e,sx,sy,dt,dungeon,e.radius);};
     if(ranged){
-      if(d>330){moveWithCollision(e,dx/d*speed,dy/d*speed,dt,dungeon,e.radius);mv=1;}
-      else if(d<220){moveWithCollision(e,-dx/d*speed*.6,-dy/d*speed*.6,dt,dungeon,e.radius);mv=1;}
-      else{const sx=-dy/d,sy=dx/d,side=(e.id%2?1:-1);moveWithCollision(e,sx*speed*.35*side,sy*speed*.35*side,dt,dungeon,e.radius);mv=.4;}
+      if(d>330){go(dx/d*speed,dy/d*speed);mv=1;}
+      else if(d<220){go(-dx/d*speed*.6,-dy/d*speed*.6);mv=1;}
+      else{const sx=-dy/d,sy=dx/d,side=(e.id%2?1:-1);go(sx*speed*.35*side,sy*speed*.35*side);mv=.4;}
     }else if(d>reach-6){
       const wob=M.ai==='swarm'?Math.sin(e.phase*2.2)*.5:0;
       const vx=dx/d*Math.cos(wob)-dy/d*Math.sin(wob),vy=dy/d*Math.cos(wob)+dx/d*Math.sin(wob);
-      moveWithCollision(e,vx*speed,vy*speed,dt,dungeon,e.radius);mv=1;
+      go(vx*speed,vy*speed);mv=1;
       if(d>250&&e.tier==='boss'&&Math.abs(e.x-WIDTH/2)>800){e.x=clamp(e.x,hero.x-700,hero.x+700);}
-    }
+    }else{const [sx,sy]=steer(e,0,0,dt,14);if(Math.hypot(sx,sy)>12)moveWithCollision(e,sx,sy,dt,dungeon,e.radius);}
     e.moving=mv>.5;
     // 普攻（带预警）
     if(e.attack<=0){
@@ -1262,6 +1387,7 @@ function updateClassSystems(dt){
   // 随从
   for(let i=allies.length-1;i>=0;i--){
     const a=allies[i],U=UNIT[a.unit]||UNIT.skeleton;a.life-=dt;a.phase+=dt*6;if(a.atkAnim>0)a.atkAnim-=dt;
+    stepMotion(a,dt,a.facingLeft?-1:1,{stepLen:U.big?38:26});
     if(a.life<=0||a.hp<=0){allies.splice(i,1);puff(a.x,a.y-10,'#cfc6b0',10,3);continue;}
     if(U.turret){
       if((a.timer-=dt)>0)continue;a.timer=a.every;const sh=a.shot||{};const t=nearestTo(a,460);
@@ -1282,7 +1408,7 @@ function updateClassSystems(dt){
     const goal=t||(distance(a,hero)>120?hero:null);
     if(goal){
       const d=Math.hypot(goal.x-a.x,goal.y-a.y),want=t?(U.ranged?220:(U.reach||34)+(t.radius||0)*.5):80;
-      if(d>want){const sp=(U.speed||140);moveWithCollision(a,(goal.x-a.x)/d*sp,(goal.y-a.y)/d*sp,dt,dungeon,a.radius);a.moving=true;}else a.moving=false;
+      if(d>want){const sp=(U.speed||140),[sx,sy]=steer(a,(goal.x-a.x)/d*sp,(goal.y-a.y)/d*sp,dt,10);moveWithCollision(a,sx,sy,dt,dungeon,a.radius);a.moving=true;}else{steer(a,0,0,dt,14);a.moving=false;}
       if(t&&(a.atkT-=dt)<=0&&d<=want+12){a.atkT=U.every||1;a.atkAnim=.25;
         if(U.ranged){const ang=Math.atan2(t.y-a.y,t.x-a.x),sh=U.shot;shoot({x:a.x,y:a.y-10,vx:Math.cos(ang)*sh.speed,vy:Math.sin(ang)*sh.speed,life:1,kind:sh.kind,school:sh.school,damage:a.P*a.m*a.R,pierce:1,hitR:12,slow:1,color:FX_COLOR[sh.school]});}
         else{const dmg=a.P*a.m*a.R;dealDamage(t,dmg,U.school||'physical',{minion:true});
@@ -1312,8 +1438,10 @@ function update(dt){
     hero.angle=Math.atan2(v.y,v.x);
   }
   hero.moving=l>.02&&Math.hypot(hero.x-oldX,hero.y-oldY)>.08;
+  const hc=Math.cos(hero.angle);
+  stepMotion(hero,dt,hc>.15?1:hc<-.15?-1:(hero._mo?.face||1),{stepLen:30});
   if(hero.moving){
-    const previousStride=hero.walk;hero.walk+=dt*13*(hasted()?1.3:1);
+    const previousStride=hero.walk;hero.walk=hero._mo.stride;
     if(hasted()&&rng()<.5)particles.push({x:hero.x+(rng()-.5)*14,y:hero.y-20-rng()*50,vx:-v.x*40,vy:-v.y*40,life:.3,max:.3,color:'#c6a8ff',size:4});
     // A small timed footstep is a visible animation cue, not a fake input event.
     if(Math.floor(previousStride/Math.PI)!==Math.floor(hero.walk/Math.PI)){
@@ -1923,7 +2051,7 @@ function loop(now){
   if(state==='playing'&&$('inventory').hidden&&$('portal-panel').hidden){
     if(hitStop>0){hitStop-=dt;tickVfx(vfx,dt*.25);}else update(dt);
   }
-  render();requestAnimationFrame(loop);
+  if(!heroSelect?.open)render();requestAnimationFrame(loop);
 }
 function aimAt(clientX,clientY) {
   mouseScreen={x:clientX,y:clientY};
@@ -1998,6 +2126,10 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
     clearEnemies:()=>{enemies.length=0;missiles.length=0;hazards.length=0;return true;},
     spawnAt:(id,dx,dy,opts={})=>{const e=spawn(id,{x:hero.x+dx,y:hero.y+dy});Object.assign(e,opts);return e.id;},
     god:()=>{hero.maxHp=1e6;hero.hp=1e6;return true;},
+    setLevel:(n)=>{profile.level=Math.max(1,Math.min(MAX_LEVEL,n|0));profile.skillPoints=Math.max(0,profile.level-1);hsCache=null;refreshWorldPickers();persist();return profile.level;},
+    giveLoot:(opts={})=>{const it=makeLoot(rng,opts.level||profile.level,'qa-'+(nextId++),{cls:profile.heroClass,...opts});profile.inventory.push(it);persist();return it;},
+    procTest:(school='fire')=>{procCast({school,mult:1},{x:hero.x+80,y:hero.y});return hazards.length;},
+    info:()=>({name:profile.name,cls:profile.heroClass,level:profile.level,difficulty:profile.difficulty,mlvl:monsterLevel(),charId,chars:store.list().length}),
     castPreview:(key)=>{if(!SKILLS[key])throw new Error('invalid skill');hero.mana=1000;cooldowns[key]=0;cast(key);return {count:vfx.length,skill:key};},
     bossTest:()=>{
       if(state!=='playing')throw new Error('start game first');
@@ -2005,8 +2137,30 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
       const e=spawn('boss',{x:hero.x+180,y:hero.y-20});
       e.hp=1;dealDamage(e,10000,'fire');
       return {state,bossDefeated,drops:drops.map(d=>({name:d.item.name,rarity:d.item.rarity,persistent:!!d.persistent})),
-        pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.region]};
+        pending:profile.pendingLoot.length,bossKills:profile.bossKills[profile.difficulty|0][profile.region],pity:{...profile.pity}};
     }
   };
 }
-build();state='intro';requestAnimationFrame(loop);
+// ───── 角色选择（hero-select.js） ─────
+let heroSelect=null;
+function enterCharacter(id,difficulty=0){
+  const raw=store.load(id);if(!raw){announce('角色存档读取失败',true);heroSelect.show('list');return;}
+  charId=id;profile=sanitizeSave(raw);
+  if(!profile.name)profile.name=store.list().find(c=>c.id===id)?.name||'持灯者';
+  if(difficultyUnlocked(profile,difficulty))profile.difficulty=difficulty;
+  allies=[];buffs=[];hsCache=null;wardHp=0;selectedItemId=null;capturingSlot=null;Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
+  document.querySelector('.orb.energy small').textContent=CLASSES[profile.heroClass].resource;
+  $('inv-heading').textContent=profile.name+' 的行囊';
+  refreshWorldPickers();renderSkillBar();
+  begin();
+  announce(profile.name+' · '+CLASSES[profile.heroClass].name+' · '+DIFFICULTIES[profile.difficulty|0].name+'难度 · 怪物等级 '+monsterLevel(),true);
+}
+function openHeroSelect(){
+  if(charId)persist();
+  state='intro';clearInput();$('scrim').hidden=true;$('inventory').hidden=true;$('portal-panel').hidden=true;$('status-panel').hidden=true;
+  heroSelect.show('list');
+}
+heroSelect=createHeroSelect({root:$('hero-select'),store,fresh:freshProfile,onEnter:enterCharacter});
+$('btn-heroes').onclick=()=>{if(state==='playing'&&!confirm('返回角色选择？当前这一趟远征会结束（装备、经验已保存）。'))return;openHeroSelect();};
+refreshWorldPickers();
+build();state='intro';heroSelect.show();requestAnimationFrame(loop);

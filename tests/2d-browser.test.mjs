@@ -25,7 +25,7 @@ try{
         id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId,cid:CID[id]
       });
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
-        version:2,level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
+        version:2,heroClass:'mage',level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
         inventory:[
           item('staff','weapon','余烬裁决长杖',3,[{key:'power',value:28},{key:'fire',value:13},{key:'crit',value:5}],55),
           item('helmet','head','龙焰冠冕',4,[{key:'resistFire',value:12}],0,8,24,'dragonflame'),
@@ -38,6 +38,7 @@ try{
         equipped:{weapon:'staff',head:'helmet',robe:'robe',ring1:'ring',offhand:'focus'}
       }));
     });
+    await page.addInitScript(()=>{window.activeSave=()=>{const r=JSON.parse(localStorage.getItem('ember-chronicles-2d-roster-v1'));return JSON.parse(localStorage.getItem('ember-chronicles-2d-roster-v1:'+r.active));};});
     page.on('pageerror',e=>errs.push(e.message));
     const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
@@ -52,11 +53,12 @@ try{
     assert.equal(spriteState.ready, true, 'pixel-art sprite atlas failed to load');
     assert.equal(await page.locator('#region-select option').count(),9,'all nine regions present');
     assert.equal(await page.locator('[data-skill]').count(),10,'ten ability slots must render');
-    assert.equal(await page.locator('#class-start option').count(),7,'seven classes selectable');
-    await page.selectOption('#class-start','barbarian');
-    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).heroClass),'barbarian','class persists');
-    await page.selectOption('#class-start','mage');
-    await page.click('#modal-primary');
+    // v0.7：旧存档迁移成第一个角色，先进入角色选择界面
+    assert.equal(await page.locator('#hero-select').isVisible(),true,'hero select screen first');
+    assert.equal(await page.locator('.hs-card:not(.hs-new)').count(),1,'legacy save migrated into one character');
+    assert.ok((await page.locator('.hs-card').first().innerText()).includes('持灯者'));
+    assert.equal(await page.locator('.hs-diff').count(),3,'three difficulties');
+    await page.click('.hs-go');
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
     const density=await page.evaluate(()=>window.__ember2dQA.encounterInfo());
@@ -123,19 +125,18 @@ try{
     await page.click('#btn-inventory');
     assert.equal(await page.locator('#inventory').isVisible(),true);
     assert.equal(await page.locator('.equipment-slot').count(),11,'paper doll must show 11 slots');
-    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="gear"]').click();
-    assert.equal(await page.inputValue('#class-inventory'),'mage','class select syncs with start screen');
-    if(viewport.isMobile)await page.locator('.mobile-inv-tabs button[data-view="bag"]').click();
+    assert.ok(await page.locator('#abilitybar .sk-ico').count()>=10,'skill bar uses picture icons');
+    assert.ok(await page.locator('.paragon-node').count()>=10,'paragon board renders');
     assert.equal(await page.locator('.catalog-skill').count(),31,'spell catalogue shows all 31 skills');
     assert.equal(await page.locator('#abilitybar [data-skill]').count(),10,'ten action bar slots');
     assert.equal(await page.locator('.skill-slot').count(),10,'each action bar slot can pick a skill');
     assert.equal(await page.locator('.key-bind').count(),10,'each action bar slot has a rebindable key');
     await page.locator('.key-bind').nth(2).click();
     await page.keyboard.press('g');
-    const binds=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).keybinds);
+    const binds=await page.evaluate(()=>activeSave().keybinds);
     assert.equal(binds[2],'g','slot 3 key rebound to G');
     await page.locator('.key-bind').nth(0).click();await page.keyboard.press('w');
-    assert.equal((await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).keybinds))[0],'1','movement keys cannot be bound');
+    assert.equal((await page.evaluate(()=>activeSave().keybinds))[0],'1','movement keys cannot be bound');
     assert.ok(await page.locator('.item-thumbnail').count()>0,'bag should include actual item icon canvases');
     assert.ok(await page.locator('.equipment-icon').count()>0,'worn gear should show sprites');
     assert.ok((await page.locator('#character-stats').innerText()).includes('暴击'));
@@ -195,7 +196,7 @@ try{
     }
     if(viewport.isMobile){
       // v0.6 起名字由命名规则生成：从存档里读出这枚戒指当前的名字
-      const ringName=await page.evaluate(()=>JSON.parse(localStorage.getItem('ember-chronicles-2d-v1')).inventory.find(i=>i.id==='ring').name);
+      const ringName=await page.evaluate(()=>activeSave().inventory.find(i=>i.id==='ring').name);
       await page.locator('.item-detail').filter({hasText:ringName}).click();
       assert.equal(await page.locator('#ring-choice').isVisible(),true,'mobile must choose which ring to replace');
       await page.selectOption('#ring-target','ring1');
@@ -239,6 +240,18 @@ try{
       const screenshot=await page.screenshot({type:'jpeg',quality:54});
       console.log((viewport.isMobile?'GAME_MOBILE_SCREENSHOT_BASE64:':'GAME_SCREENSHOT_BASE64:')+screenshot.toString('base64'));
     }
+    // v0.7：回到角色选择，新建一个职业角色并进入
+    page.once('dialog',d=>d.accept());
+    await page.click('#btn-heroes');
+    assert.equal(await page.locator('#hero-select').isVisible(),true);
+    await page.click('.hs-new');
+    assert.ok(await page.locator('.hs-plate').count()>=7,'seven classes to choose');
+    await page.locator('.hs-plate',{hasText:'圣骑士'}).first().click();
+    await page.fill('.hs-form input','测试圣骑'+viewport.width);
+    await page.click('.hs-form .hs-go');
+    await page.waitForTimeout(300);
+    const info=await page.evaluate(()=>window.__ember2dQA.info());
+    assert.equal(info.cls,'paladin');assert.equal(info.chars,2);assert.equal(info.level,1);
     assert.deepEqual(errs,[],'page JS exceptions');
     console.log('Smoke passed', viewport.width+'x'+viewport.height);
     await context.close();

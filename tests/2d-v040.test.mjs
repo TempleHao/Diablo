@@ -74,7 +74,7 @@ test('boss exclusives keep their names with a matching legendary icon',()=>{
 test('unique items roll 4+ affixes; element-leaning names favour that element',()=>{
   const r=mulberry32(91);let uniques=0,lean=0,leanHit=0;
   for(let k=0;k<3000;k++){
-    const it=makeLoot(r,40,'x'+k,{boss:true}),e=catalogEntry(it);
+    const it=makeLoot(r,60,'x'+k,{boss:true,force:k%5===0?'unique':null}),e=catalogEntry(it);
     if(it.rarity===4&&!it.setId){uniques++;assert.ok(it.affixes.length>=4);}
     if(it.rarity>=1&&(e.aff==='火'||e.aff==='霜')&&['weapon','offhand','amulet','ring1'].includes(it.slot)){
       lean++;if(it.affixes.some(a=>a.key===(e.aff==='火'?'fire':'cold')))leanHit++;
