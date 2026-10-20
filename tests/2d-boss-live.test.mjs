@@ -2,13 +2,13 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {mulberry32,freshSave,sanitizeSave} from '../dist/2d/core.js';
 import {BOSS_POOLS,rollBossRewards} from '../dist/2d/boss-loot.js';
-test('every regional boss first kill guarantees a collectible exclusive legendary',()=>{
+test('every regional boss first kill gives at least an epic; exclusive legendary is a chance (v0.7.2)',()=>{
  for(let region=0;region<BOSS_POOLS.length;region++){
    let n=0;const loot=rollBossRewards(mulberry32(800+region),12,region,0,()=>String(region)+'-'+(++n));
    assert.equal(loot.firstKill,true);
-   assert.equal(loot.exclusive,true);
-   assert.equal(loot.drops.length,4); // v0.7：3 次首领抽取 + 专属传奇
-   assert.ok(loot.drops.some(x=>x.name===BOSS_POOLS[region].item&&x.rarity===3));
+   assert.ok(loot.drops.length>=2&&loot.drops.length<=4);
+   assert.ok(loot.drops[0].rarity>=2);
+   assert.equal(loot.drops.some(x=>x.name===BOSS_POOLS[region].item),loot.exclusive);
    assert.ok(loot.materials>=16);
  }
 });
@@ -20,7 +20,7 @@ test('repeat boss kills do not guarantee exclusive but always grant an ordinary 
    assert.ok(loot.drops.length>=1);
    if(loot.exclusive)withExclusive++;else without++;
  }
- assert.ok(withExclusive>25&&without>80);
+ assert.ok(withExclusive>=8&&withExclusive<=40&&without>200,'exclusive ~8%: '+withExclusive);
 });
 test('boss first kill flags and unclaimed loot survive save/reload without item duplication',()=>{
  const profile=freshSave();let n=0;
@@ -30,7 +30,7 @@ test('boss first kill flags and unclaimed loot survive save/reload without item 
  const restored=sanitizeSave(JSON.parse(JSON.stringify(profile)));
  assert.equal(restored.bossKills[0][2],1); // v0.7：按难度分开记录
  assert.equal(restored.pendingLoot.length,loot.drops.length);
- assert.ok(restored.pendingLoot.filter(x=>x.item.rarity===3).length>=1);
+ assert.ok(restored.pendingLoot.filter(x=>x.item.rarity>=2).length>=1);
  const claimed=restored.pendingLoot[0].item;
  restored.inventory.push(claimed);
  const loaded=sanitizeSave(JSON.parse(JSON.stringify(restored)));
