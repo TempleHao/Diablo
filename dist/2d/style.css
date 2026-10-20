@@ -736,7 +736,7 @@ body.ghud-on .upgrade-chip{bottom:calc(min(520px,40vw)*436/2139 + 24px)!importan
 .brandmark{display:none}
 .modal .logo-title{margin:0 auto 4px}.modal .logo-title img{width:min(360px,80%);height:auto;display:block;margin:0 auto}
 .modal .crest{display:none}
-.hs-logo{position:absolute;left:50%;top:calc(4px + var(--st,0px));transform:translateX(-50%);width:min(300px,34vw);z-index:3;pointer-events:none;filter:drop-shadow(0 4px 12px #000)}
+.hs-logo{position:absolute;left:50%;top:calc(10px + var(--st,0px));transform:translateX(-50%);width:min(360px,38vw);z-index:3;pointer-events:none;filter:drop-shadow(0 4px 12px #000)}
 .hero-select[data-mode="list"] .hs-logo,.hero-select[data-mode="create"] .hs-logo{display:block}
 .hero-select.is-mobile .hs-logo{width:min(220px,56vw)}
 @media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-logo{height:38px}}
