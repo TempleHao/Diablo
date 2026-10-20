@@ -5,7 +5,9 @@
  *   创建角色：七位英雄并排站在石台上（手机端是一次一位的轮播），点选后右侧显示职业介绍、四项属性、代表技能，输入名字创建。
  * 角色数据通过 storage.js 的仓库读写（现在是本机存档，以后可换成在线账号）。
  */
-import {drawHero,status as heroStatus} from './pixel-mage-demo.js';
+import {SELECT_ART} from './select-art.js';
+// v0.8：选角用高清立绘（7 职业 × 站立 / 戒备 / 攻击 / 施法），不再用游戏内的小像素图放大
+const selImg=new Image();let selReady=false;selImg.onload=()=>{selReady=true;};selImg.src=new URL('./art/select-heroes.webp',import.meta.url).href;
 import {CLASSES,SKILLS} from './systems.js';
 import {DIFFICULTIES,difficultyUnlocked} from './progression.js';
 import {skillIcon} from './ui-icons.js';
@@ -191,26 +193,40 @@ export function createHeroSelect({root,store,fresh,onEnter}){
     }
     ctx.restore();
   }
+  // 立绘：脚底对齐；待机呼吸；选中后循环「戒备 → 攻击 → 施法 → 站立」，姿势之间淡入淡出
+  const POSE_CYCLE=[[0,1.6],[1,.9],[2,1.1],[1,.5],[3,1.4]];
+  function poseAt(t){const total=POSE_CYCLE.reduce((n,p)=>n+p[1],0);let k=t%total;for(const [i,[f,d]] of POSE_CYCLE.entries()){if(k<d)return {f,prev:POSE_CYCLE[(i+POSE_CYCLE.length-1)%POSE_CYCLE.length][0],q:Math.min(1,k/.18)};k-=d;}return {f:0,prev:0,q:1};}
+  function drawArt(cls,fi,x,y,sc,alpha,breath){
+    const r=SELECT_ART[cls]?.[fi];if(!r)return;
+    ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.scale(sc,sc*(1+breath));
+    ctx.imageSmoothingEnabled=sc<1;ctx.imageSmoothingQuality='high';
+    ctx.drawImage(selImg,r[0],r[1],r[2],r[3],-r[4],-r[3],r[2],r[3]);ctx.restore();
+  }
   function frame(now){
     if(!open)return;
     raf=requestAnimationFrame(frame);
     const t=(now-t0)/1000,{w,h,d}=size();
     ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
-    const ready=heroStatus().ready;
     const show=mode==='create'?(mobile()?[pick]:CLASS_ORDER):[selected()?.cls||'mage'];
     const n=show.length,colW=w/n,platesOn=n>1;
-    const scale=Math.min(n===1?1.9:1.65,(h*(n===1?(mobile()?.66:.42):.55))/130,colW/64);
+    // 立绘站立高约 285 像素：多人时按列宽缩放，单人时按舞台高度
+    const scale=n===1?Math.min(1.25,(h*.8)/290):Math.min(1.05,(h-130)/300,colW/150);
     show.forEach((cls,i)=>{
-      const x=colW*(i+.5),y=platesOn?h-112:h*.84,active=n===1||cls===pick,color=CLASS_INFO[cls].color,a=actors[cls];
-      pedestal(x,y+4,Math.min(colW*.36,58*scale/1.35),color,active,t);
-      if(!ready)return;
-      a.x=x;a.y=y;a.angle=(n>1&&i>=n/2)?Math.PI:0;
-      // 选中的英雄每 2.6 秒做一次动作
-      if(active){if(!a.swing||t-a.swing.t0>2.6)a.swing={t0:t+.8,dur:.55};}else a.swing=null;
-      ctx.save();
-      if(!active&&'filter' in ctx)ctx.filter='brightness(.42) saturate(.55)';
-      drawHero(ctx,a,t,null,scale*(active&&n>1?1.08:1));
-      ctx.restore();
+      const x=colW*(i+.5),y=platesOn?h-112:h*.88,active=n===1||cls===pick,color=CLASS_INFO[cls].color;
+      pedestal(x,y+4,Math.min(colW*.4,95*scale),color,active,t);
+      if(!selReady)return;
+      const breath=Math.sin(t*2+i)*.008,a=actors[cls];
+      if(active){
+        if(a.selT==null)a.selT=t;
+        const P=poseAt(t-a.selT),sc=scale*(n>1?1.1:1);
+        if(P.q<1)drawArt(cls,P.prev,x,y,sc,1-P.q,breath);
+        drawArt(cls,P.f,x,y,sc,P.q<1?P.q:1,breath);
+        // 攻击 / 施法时脚下光圈更亮
+        if(P.f>=2){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,y,0,x,y,90*sc);g.addColorStop(0,color+'55');g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.fillRect(x-100*sc,y-60*sc,200*sc,90*sc);ctx.restore();}
+      }else{
+        a.selT=null;
+        ctx.save();if('filter' in ctx)ctx.filter='brightness(.4) saturate(.5)';drawArt(cls,0,x,y,scale,1,breath);ctx.restore();
+      }
     });
   }
   function close(){open=false;root.hidden=true;cancelAnimationFrame(raf);}

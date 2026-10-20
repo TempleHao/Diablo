@@ -235,8 +235,25 @@ function silhouette(key,color){
   g.globalCompositeOperation='source-in';g.fillStyle=color;g.fillRect(0,0,f[2],f[3]);
   tintCache.set(id,c);return c;
 }
-function spriteAt(ctx,key,alpha=1){const f=SPRITES[key];if(!f||!monsReady)return;ctx.globalAlpha=alpha;ctx.drawImage(mons,f[0],f[1],f[2],f[3],-f[4],-f[3],f[2],f[3]);}
-function silAt(ctx,key,color,alpha){const c=silhouette(key,color),f=SPRITES[key];if(!c)return;ctx.globalAlpha=alpha;ctx.drawImage(c,-f[4],-f[3]);}
+function spriteAt(ctx,key,alpha=1,bend=null){const f=SPRITES[key];if(!f||!monsReady)return;ctx.globalAlpha=alpha;if(bend)return bentDraw(ctx,mons,f[0],f[1],f[2],f[3],f[4],bend);ctx.drawImage(mons,f[0],f[1],f[2],f[3],-f[4],-f[3],f[2],f[3]);}
+function silAt(ctx,key,color,alpha,bend=null){const c=silhouette(key,color),f=SPRITES[key];if(!c)return;ctx.globalAlpha=alpha;if(bend)return bentDraw(ctx,c,0,0,f[2],f[3],f[4],bend);ctx.drawImage(c,-f[4],-f[3]);}
+/**
+ * v0.8「分段弯曲」：把一张静态贴图横切成若干条，每条按高度给不同的位移——
+ *   lean：上半身前倾 / 后仰（越往上偏得越多，像脊柱弯曲，而不是整张图旋转）；
+ *   legs：脚下几条左右错开（迈步），髋部以上不动；
+ *   breath：胸口以上纵向伸缩（呼吸 / 蓄力挺身）；
+ *   sway：头部一点滞后摆动。
+ * 单张原画也能做出「身体在动、脚在走」的效果；以后换成逐帧动作表时直接不用这个。
+ */
+function bentDraw(ctx,img,sx,sy,w,h,foot,b){
+  const n=h>180?12:h>120?10:8,lean=b.lean||0,legs=b.legs||0,breath=b.breath||0,sway=b.sway||0;
+  for(let i=0;i<n;i++){
+    const y0=Math.floor(h*i/n),y1=Math.floor(h*(i+1)/n),v=1-((y0+y1)/2)/h; // v：0 脚底 → 1 头顶
+    let dx=lean*h*Math.pow(v,1.5)+(v<.34?legs*(.34-v)/.34:0)+(v>.72?sway*(v-.72)/.28:0);
+    const dy=-breath*h*Math.max(0,v-.42)*1.2;
+    ctx.drawImage(img,sx,sy+y0,w,y1-y0+1,Math.round(-foot+dx),Math.round(-h+y0+dy),w,y1-y0+1);
+  }
+}
 const easeOut=t=>1-(1-t)*(1-t);
 /**
  * 怪物：待机呼吸；行走按 AI 类型（跳步、重踏、疾走、悬浮扑翼）；
@@ -253,44 +270,57 @@ export function enemy(ctx,e,tick,k=1){
   if(M.tier==='elite'||M.tier==='boss'){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,shw*1.5,shw*.5,M.tier==='boss'?'#c0306a':col,.35+.1*Math.sin(tick*4));ctx.globalCompositeOperation='source-over';}
   ctx.fillStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.ellipse(0,3,shw,shw*.28,0,0,Math.PI*2);ctx.fill();
   if(e.spawnT>0){ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,0,shw*1.6,shw*.6,'#b46cff',e.spawnT*1.4);ctx.globalCompositeOperation='source-over';}
-  // 动作参数（v0.7：步伐按走过的距离推进、站立与行走平滑过渡、转身翻面缓动、按速度前倾）
-  let bob=0,tilt=0,sx=1,sy=1,lunge=0,charge=0;
+  // 动作参数（v0.8：分段弯曲——上半身前倾 / 后仰、脚下迈步、胸口呼吸；整体只做很小的位移和压缩）
+  let bob=0,tilt=0,sx=1,sy=1,lunge=0,charge=0,lean=0,legs=0,breath=0,sway=0;
   const A=e.act,mo=e._mo,ww=frozen?0:walkWeight(mo,ai==='tank'?60:80),st=mo?mo.stride:ph*2.4,idle=mo?mo.idle*1.6+ph:ph*1.6;
-  if(fly){const fp=(mo?mo.idle:ph)*2.2;bob=-14-Math.sin(fp)*5;sy=1+Math.sin(fp*3.2)*.06;sx=1-Math.sin(fp*3.2)*.04;tilt=(mo?.lean||0)*1.6;}
+  const heavy=ai==='tank'||M.tier==='boss',small=ai==='swarm';
+  if(fly){const fp=(mo?mo.idle:ph)*2.2;bob=-14-Math.sin(fp)*5;sy=1+Math.sin(fp*3.2)*.06;sx=1-Math.sin(fp*3.2)*.04;lean=(mo?.lean||0)*.8+.05*ww;breath=Math.sin(fp*3.2)*.03;}
   else{
-    // 站立：呼吸（纵向伸缩、横向回缩）
-    const br=Math.sin(idle);sy=1+br*.022*(1-ww);sx=1-br*.012*(1-ww);
-    // 行走：每一步落地下沉、离地时身体略升高；重型怪落地压扁，小怪碎步
+    // 站立：呼吸 + 头部轻微摆动；越重的怪呼吸越慢越沉
+    const br=Math.sin(idle*(heavy?.7:1));breath=br*(heavy?.02:.028)*(1-ww);sway=Math.sin(idle*.53)*2*(1-ww);
+    lean=Math.sin(idle*.5)*.012*(1-ww);
+    // 行走：脚下左右迈步、身体前倾、每步落地下沉；重型怪步子大落地压扁，小怪碎步
     const step=Math.abs(Math.sin(st)),land=1-step;
-    const amp=ai==='tank'?3:ai==='swarm'?2.2:4.2;
-    bob=-step*amp*ww;tilt=(Math.sin(st)*(ai==='tank'?.035:.06)+(mo?.lean||0))*ww;
-    sy*=1-land*(ai==='tank'?.06:.035)*ww;sx*=1+land*(ai==='tank'?.05:.025)*ww;
+    const amp=heavy?3:small?2.2:3.6;
+    bob=-step*amp*ww;legs=Math.sin(st)*(heavy?7:small?4:6)*ww;
+    lean+=(.07+(mo?.lean||0)*.6)*ww;sway+=Math.sin(st+.8)*2.5*ww;
+    sy*=1-land*(heavy?.05:.03)*ww;sx*=1+land*(heavy?.04:.02)*ww;
   }
   if(A&&!frozen){
-    const w=A.wind||.3,t=A.t||0;
-    // 预备：先慢后快地后仰蓄力（ease-in），出手：快速前冲并带一点过冲，收招：回弹
-    if(t<w){charge=t/w;const c2=charge*charge;tilt-=.18*c2;sy*=1+.06*c2;sx*=1-.035*c2;lunge=-6*c2;}
-    else{const q=Math.min(1,(t-w)/.22),out=q<.35?easeOut(q/.35):1-easeOut((q-.35)/.65)*1.08;lunge=Math.max(-2,out)*17;tilt+=.16*(1-q)*(q<.35?1:.6);sy*=1-.08*(1-q);sx*=1+.07*(1-q);}
-    if(A.type==='charge'&&t>=w){lunge=0;tilt=.2;sx*=1.06;sy*=.95;}
+    const w=A.wind||.3,t=A.t||0,isCast=A.type==='ranged'||A.type==='cast';
+    if(t<w){
+      // 蓄力：先慢后快地后仰（施法则挺身抬手），身体泛起属性色
+      charge=t/w;const c2=charge*charge;
+      if(isCast){breath+=.05*c2;lean-=.06*c2;}else{lean-=.2*c2;breath+=.03*c2;lunge=-5*c2;legs-=4*c2;}
+    }else{
+      // 出手：上半身猛地前扑（带过冲），然后回弹
+      const q=Math.min(1,(t-w)/.24),hit=q<.3?easeOut(q/.3):1-easeOut((q-.3)/.7);
+      if(isCast){lean+=.12*hit;breath-=.03*hit;}
+      else{lean+=.34*hit;lunge=hit*15;legs+=6*hit;sy*=1-.06*hit;sx*=1+.05*hit;}
+    }
+    if(A.type==='charge'&&t>=w){lunge=0;lean=.28;legs=Math.sin(tick*22)*7;sx*=1.04;sy*=.96;}
   }
-  // 受击：朝后仰并闪白，不再随机抖动
+  // 受击：上半身被打得后仰、闪白
   const dir=mo?mo.face:(e.face||1),artFace=M.face||0;
-  if(e.flash>0){const h=Math.min(1,e.flash*9);tilt-=.1*h;lunge-=4*h;sx*=1+.05*h;sy*=1-.05*h;}
+  if(e.flash>0){const h=Math.min(1,e.flash*9);lean-=.22*h;lunge-=3*h;sway-=4*h;}
   // 出生：从地面长出
   if(e.spawnT>0){const g=1-Math.min(1,e.spawnT/.5);sy*=.35+.65*easeOut(g);}
+  // 原画朝左的怪，弯曲方向要跟着翻（ctx 已镜像，所以 lean 始终是「朝面向方向」）
+  // 贴图空间里的「前方」：原画朝向（正面原画则用当前面向）；ctx 镜像后屏幕上始终朝面向方向弯
+  const flipArt=artFace&&artFace!==dir?-1:1,fwd=artFace||dir,bend={lean:lean*fwd,legs,breath,sway:sway*fwd};
   ctx.translate(lunge*dir,bob);
   ctx.rotate(tilt*dir);
   const flip=mo?Math.abs(turnScale(mo)):1;
-  ctx.scale(sx*sc*flip*(artFace&&artFace!==dir?-1:1),sy*sc);
-  // 本体
-  spriteAt(ctx,key,e.spawnT>0?1-e.spawnT:1);
+  ctx.scale(sx*sc*flip*flipArt,sy*sc);
+  // 本体（分段弯曲）
+  spriteAt(ctx,key,e.spawnT>0?1-e.spawnT:1,bend);
   ctx.globalCompositeOperation='lighter';
-  if(charge>0&&A?.type!=='ranged')silAt(ctx,key,col,.35*charge+.12*Math.sin(tick*30)*charge);
-  if(e.flash>0)silAt(ctx,key,'#ffffff',Math.min(.85,e.flash*8));
-  if(frozen)silAt(ctx,key,'#5ab8ff',.45);
-  else if(e.slow>0)silAt(ctx,key,'#5ab8ff',.14);
-  if(e.poisonUntil>tick)silAt(ctx,key,'#5aff4a',.14+.06*Math.sin(tick*8));
-  if(e.ampUntil>tick||e.curseUntil>tick)silAt(ctx,key,'#c04060',.12);
+  if(charge>0&&A?.type!=='ranged')silAt(ctx,key,col,.35*charge+.12*Math.sin(tick*30)*charge,bend);
+  if(e.flash>0)silAt(ctx,key,'#ffffff',Math.min(.85,e.flash*8),bend);
+  if(frozen)silAt(ctx,key,'#5ab8ff',.45,bend);
+  else if(e.slow>0)silAt(ctx,key,'#5ab8ff',.14,bend);
+  if(e.poisonUntil>tick)silAt(ctx,key,'#5aff4a',.14+.06*Math.sin(tick*8),bend);
+  if(e.ampUntil>tick||e.curseUntil>tick)silAt(ctx,key,'#c04060',.12,bend);
   ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
   ctx.restore();
   // 法师/远程蓄力：手上聚光
@@ -320,8 +350,10 @@ export function enemyDeath(ctx,e,t,k=1){
   const sc=TIER[M.tier].scale*k*(M.tier==='boss'?1:.9),q=Math.min(1,t/.45),dir=e.face||1,artFace=M.face||0;
   ctx.save();ctx.translate(e.x,e.y);ctx.rotate(-dir*Math.PI/2*easeOut(q)*(M.ai==='fly'||M.fly?.3:.85));
   ctx.scale(sc*(artFace&&artFace!==dir?-1:1),sc*(1-q*.25));
-  spriteAt(ctx,M.sprite,1-q*.35);
-  ctx.globalCompositeOperation='lighter';silAt(ctx,M.sprite,'#ff8a4a',(1-q)*.5);
+  // 先被打得上身后折，再整个倒下
+  const fwd=artFace||dir,bend={lean:-.3*Math.min(1,t/.12)*(1-q*.6)*fwd,legs:3*q,breath:-.04*q,sway:0};
+  spriteAt(ctx,M.sprite,1-q*.35,bend);
+  ctx.globalCompositeOperation='lighter';silAt(ctx,M.sprite,'#ff8a4a',(1-q)*.5,bend);
   ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
 }
 /** 尸体：倒卧的暗色剪影，逐渐淡出（死灵法师可以利用）。 */
@@ -337,7 +369,8 @@ export function corpse(ctx,c,k=1){
 const ALLY_ART={skeleton:'summon0',skelarcher:'summon1',skelmage:'summon2',claygolem:'summon3',bloodgolem:'summon3',firegolem:'summon3',
   revive:'summon4',wolf:'summon5',direwolf:'summon6',raven:'summon7',spirit_oak:'summon8',grizzly:'summon9'};
 const ALLY_TINT={claygolem:'#b08a5c',bloodgolem:'#ff3a3a',firegolem:'#ff8a2a',revive:'#7dff9a'};
-const ALLY_SCALE={skeleton:.55,skelarcher:.55,skelmage:.55,claygolem:.75,bloodgolem:.75,firegolem:.75,revive:.6,wolf:.52,direwolf:.62,raven:.42,spirit_oak:.62,grizzly:.8,valkyrie:.6};
+// v0.8：召唤物与人物一样高（约 124 像素），魔像、树人、灰熊比人物略大（图集高 140）
+const ALLY_SCALE={skeleton:.9,skelarcher:.9,skelmage:.92,claygolem:1.08,bloodgolem:1.08,firegolem:1.08,revive:.95,wolf:.8,direwolf:.92,raven:.62,spirit_oak:1.08,grizzly:1.1,valkyrie:.6};
 /** 召唤物：从地面浮现、行走起伏、攻击前冲、乌鸦扑翼、怨灵漂浮、到期淡出。 */
 export function ally(ctx,a,U,tick,k=1){
   const key=ALLY_ART[a.unit]||(a.unit==='spirit'&&a.skill==='橡木智者'?'summon8':null);
@@ -354,8 +387,12 @@ export function ally(ctx,a,U,tick,k=1){
     const step=Math.abs(Math.sin(stp)),land=1-step,big=a.unit==='grizzly'||a.unit==='claygolem'||a.unit==='bloodgolem'||a.unit==='firegolem';
     bob=-step*(big?3:4)*ww;tilt=(Math.sin(stp)*(big?.035:.06)+(mo?.lean||0))*ww;sy*=1-land*.04*ww;sx*=1+land*.03*ww;
   }
+  // v0.8：地面单位也用分段弯曲（迈步、前倾、攻击前扑）
+  const ground=!fly,bend={lean:0,legs:0,breath:0,sway:0};
+  if(ground){const br=Math.sin(ph*.7);bend.breath=br*.025*(1-ww);bend.legs=Math.sin(stp)*5*ww;bend.lean=.07*ww;bend.sway=Math.sin(stp+.8)*2*ww;tilt*=.3;}
   if(a.atkAnim>0){const q=1-a.atkAnim/.25,wind=q<.3?q/.3:0,hit=q>=.3?Math.sin((q-.3)/.7*Math.PI):0;
-    lunge=-4*wind*wind+hit*14;tilt+=-.1*wind*wind+.14*hit;sy*=1+.04*wind-.05*hit;}
+    lunge=-4*wind*wind+hit*14;if(ground){bend.lean+=-.16*wind*wind+.3*hit;bend.legs+=5*hit;}else tilt+=-.1*wind*wind+.14*hit;sy*=1+.04*wind-.05*hit;}
+  bend.lean*=artFace;bend.sway*=artFace;
   ctx.save();ctx.translate(Math.round(a.x),Math.round(a.y));
   ctx.globalCompositeOperation='lighter';drawEllipseGlow(ctx,0,2,26,10,U.color||U.tint||'#7dff9a',.3*fade);ctx.globalCompositeOperation='source-over';
   if(!fly){ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,3,f[2]*sc*.35,f[2]*sc*.1,0,0,Math.PI*2);ctx.fill();}
@@ -363,11 +400,11 @@ export function ally(ctx,a,U,tick,k=1){
   ctx.scale(sx*sc*(a._mo?Math.abs(turnScale(a._mo)):1)*(artFace!==dir?-1:1),sy*sc);
   // 出场：自下而上浮现
   if(born<1){ctx.save();ctx.beginPath();ctx.rect(-f[4]-4,-f[3]*born,f[2]+8,f[3]*born+4);ctx.clip();}
-  spriteAt(ctx,key,fade*(a.unit==='revive'?.82:1));
+  spriteAt(ctx,key,fade*(a.unit==='revive'?.82:1),ground?bend:null);
   if(born<1)ctx.restore();
   ctx.globalCompositeOperation='lighter';
-  if(ALLY_TINT[a.unit])silAt(ctx,key,ALLY_TINT[a.unit],.28);
-  if(born<1)silAt(ctx,key,'#d8b0ff',(1-born)*.7);
+  if(ALLY_TINT[a.unit])silAt(ctx,key,ALLY_TINT[a.unit],.28,ground?bend:null);
+  if(born<1)silAt(ctx,key,'#d8b0ff',(1-born)*.7,ground?bend:null);
   ctx.restore();ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
   if(a.hp<a.maxHp&&!U.turret){const top=a.y-f[3]*sc+bob-6;ctx.fillStyle='#0d1410';ctx.fillRect(a.x-20,top,40,4);ctx.fillStyle='#6fdc7a';ctx.fillRect(a.x-20,top,40*Math.max(0,a.hp/a.maxHp),4);}
 }

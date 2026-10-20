@@ -16,6 +16,7 @@ import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFacto
 import {LocalStore,STASH_SIZE} from './storage.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
+import {HUD_LAYOUT} from './hud-layout.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
@@ -137,6 +138,7 @@ function renderSkillBar(){
     const cost=document.createElement('small');cost.textContent=meta.mana?meta.mana+' '+CLASSES[profile.heroClass].resource:'无消耗';
     const cooldown=document.createElement('i');button.append(kbd,icon,label,cost,cooldown);bar.append(button);
   });
+  layoutGhud();
   const tip=document.querySelector('.tip');
   if(tip)tip.textContent='WASD 移动 · 鼠标瞄准 · 左键/右键 = 第 1/2 格技能 · 技能键可在行囊（B）里自定义 · B 背包';
 }
@@ -306,13 +308,30 @@ function wavePoint(i,index){
   }
   return randomPoint(250);
 }
-function spawnWave(index){
-  const group=waveMonsters(profile.region,index,rng);
-  for(const [i,id] of group.entries()){
-    if(enemies.length>=MAX_LIVE_ENEMIES)break;
-    spawn(id,wavePoint(i,index));
+// v0.8：怪物成群分散在地图各处待命（D2 式营地），走近才会察觉；第 3 波从远处慢慢围拢。
+function packCenter(minHero,used){
+  for(let n=0;n<300;n++){
+    const x=200+rng()*(WIDTH-400),y=200+rng()*(HEIGHT-400);
+    if(distance({x,y},hero)<minHero||!walkable(x,y,40,dungeon))continue;
+    if(used.some(c=>distance(c,{x,y})<360))continue;
+    return {x,y};
   }
-  if(index>0)announce('第 '+(index+1)+' 波 · '+['黑潮初现','精英增援','守门军团'][index],true);
+  return randomPoint(minHero);
+}
+function spawnWave(index,{hunters=index>=2}={}){
+  const group=waveMonsters(profile.region,index,rng),used=enemies.filter(e=>e.home).map(e=>e.home);
+  let packId=0;
+  for(let i=0;i<group.length;){
+    const size=3+Math.floor(rng()*4),center=hunters?packCenter(700,used):packCenter(560,used);used.push(center);packId++;
+    for(let k=0;k<size&&i<group.length;k++,i++){
+      if(enemies.length>=MAX_LIVE_ENEMIES)break;
+      let p=null;
+      for(let t=0;t<30&&!p;t++){const a=rng()*6.28,r=20+rng()*85,q={x:center.x+Math.cos(a)*r,y:center.y+Math.sin(a)*r};if(walkable(q.x,q.y,24,dungeon)&&!enemies.some(e=>distance(e,q)<40))p=q;}
+      const e=spawn(group[i],p||center);
+      e.home={x:e.x,y:e.y};e.pack=index*100+packId;e.aware=hunters;e.hunter=hunters;e.awareT=0;e.wanderT=rng()*3;
+    }
+  }
+  if(index===2)announce('第 3 波 · 守门军团从远处逼近',true);
 }
 function findBossPoint(){
   // A short, reachable walk down the central aisle instead of spawning inside masonry.
@@ -334,9 +353,9 @@ function build() {
     drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
   $('region-select').value=String(profile.region);$('region-name').textContent=REGION_DATA[profile.region].name;
   Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
-  spawnWave(0);
+  spawnWave(0);spawnWave(1);
   ui.boss.hidden=true;
-  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 '+total+' 名怪物，穿过三波守卫迎战首领';
+  ui.title.textContent='净化 · '+REGION_DATA[profile.region].name;$('map-label').textContent=REGION_DATA[profile.region].label;ui.progress.textContent='击败 '+total+' 名怪物（成群分布在地图各处），引出首领';
   updateHud();
 }
 // v0.7 怪物等级：由难度与区域决定（progression.js），在难度上限内随角色成长；各项属性随等级成长（见 docs/2D-BALANCE.md）
@@ -355,6 +374,11 @@ function spawn(kind,location=null) {
   enemies.push(e);
   if(isBoss){boss=e;ui.boss.hidden=false;ui.boss.querySelector('span').textContent=mon.name;announce('地窟深处，'+mon.name+'已苏醒！',true);}
   return e;
+}
+function wakeEnemy(e){
+  if(e.aware!==false)return;e.aware=true;e.awareT=0;e.wakeIn=null;e.attack=Math.max(e.attack,.6+rng()*.6);
+  floatText(e.x,e.y-(e.tier==='elite'?70:54),'!','#ff7a5a');
+  for(const o of enemies)if(o!==e&&o.aware===false&&o.wakeIn==null&&(o.pack===e.pack||distance(o,e)<240))o.wakeIn=.25+rng()*.9;
 }
 function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); upgradeCheck(); }
 function clearInput(){keys.clear();pointers.clear();heldSlots.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
@@ -768,8 +792,50 @@ $('save-file').onchange=async e=>{
     profile=candidate;persist();build();state='playing';closeInventory();announce('角色存档已导入');
   }catch{alert('存档文件解析失败，原存档未被修改。');}
 };
+// ───── v0.8 电脑版哥特式状态栏（art/hud-frame.webp + hud-layout.js） ─────
+function ghudOn(){return !window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
+function placeIn(el,r){el.style.left=r[0]+'%';el.style.top=r[1]+'%';el.style.width=r[2]+'%';el.style.height=r[3]+'%';}
+function layoutGhud(){
+  const on=ghudOn(),g=$('ghud');g.hidden=!on;document.body.classList.toggle('ghud-on',on);
+  const bar=$('abilitybar'),buffs=$('buffbar');
+  if(on){
+    if(bar.parentElement!==g)g.append(bar);if(buffs.parentElement!==g)g.append(buffs);
+    const L=HUD_LAYOUT;
+    placeIn(g.querySelector('.gh-orb.hp'),L.orbL);placeIn(g.querySelector('.gh-orb.mp'),L.orbR);
+    placeIn(g.querySelector('.gh-bar.hp'),L.hpBar);placeIn(g.querySelector('.gh-bar.mp'),L.mpBar);
+    placeIn(g.querySelector('.gh-txt.hp'),L.hpText);placeIn(g.querySelector('.gh-txt.mp'),L.mpText);
+    placeIn(g.querySelector('.gh-lv'),L.lv);placeIn($('gh-cls'),L.cls);placeIn(buffs,L.buffs);
+    [...bar.children].forEach((b,i)=>{if(L.slots[i])placeIn(b,L.slots[i]);});
+    [...g.querySelectorAll('.gh-util')].forEach((b,i)=>placeIn(b,L.slots[10+i]));
+    const keys=$('gh-keys');keys.replaceChildren();
+    // 第 3–10 格下面有按键牌；第 1、2 格把按键写在格子右下角
+    profile?.keybinds?.forEach((k,i)=>{const el=document.createElement('span');el.textContent=keyLabel(k||'');
+      if(i>=2&&L.keys[i-2])placeIn(el,L.keys[i-2]);else{const r=L.slots[i];placeIn(el,[r[0]+r[2]*.55,r[1]+r[3]*.62,r[2]*.42,r[3]*.36]);el.className='corner';}
+      keys.append(el);});
+  }else{
+    const foot=document.querySelector('footer.hud');if(bar.parentElement!==foot)foot.insertBefore(bar,foot.querySelector('.resource'));
+    if(buffs.parentElement!==document.body)document.body.insertBefore(buffs,g);
+    [...bar.children].forEach(b=>{b.style.left=b.style.top=b.style.width=b.style.height='';});buffs.style.cssText='';
+  }
+}
+window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').addEventListener?.('change',()=>layoutGhud());
+for(const b of document.querySelectorAll('.gh-util'))b.onclick=()=>{const a=b.dataset.act;if(a==='status')toggleStatus();else if(a==='bag')$('btn-inventory').click();else showModal('help');};
+function updateGhud(s){
+  if(!ghudOn())return;
+  const hpR=clamp(hero.hp/hero.maxHp,0,1),mpR=clamp(hero.mana/Math.max(1,hero.maxMana),0,1);
+  $('gh-hp-fill').style.height=(hpR*100)+'%';$('gh-mp-fill').style.height=(mpR*100)+'%';
+  $('gh-hp-bar').style.width=(hpR*100)+'%';$('gh-mp-bar').style.width=(mpR*100)+'%';
+  $('gh-hp-now').textContent=Math.ceil(hero.hp);$('gh-hp-max').textContent=Math.ceil(hero.maxHp);
+  $('gh-mp-now').textContent=Math.ceil(hero.mana);$('gh-mp-max').textContent=Math.ceil(hero.maxMana);
+  $('gh-mp-label').textContent=CLASSES[profile.heroClass].resource;
+  $('gh-lv').textContent='Lv. '+profile.level;$('gh-cls').textContent=CLASSES[profile.heroClass].name;
+  $('gh-xp').style.width=(profile.level>=MAX_LEVEL?100:profile.xp/expRequired(profile.level)*100)+'%';
+  $('gh-gold').textContent=profile.gold;$('gh-ess').textContent=profile.essence;
+  document.querySelector('.gh-orb.hp').classList.toggle('low',hpR<.3);
+}
 function updateHud(){
   if(!hero)return;
+  updateGhud();
   const s=stats(profile), xpNeeded=expRequired(profile.level);
   ui.hp.textContent=Math.ceil(hero.hp);ui.mana.textContent=Math.ceil(hero.mana);
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
@@ -850,6 +916,7 @@ function procCast(pr,at){
 }
 function dealDamage(e,damage,school='physical',opts={}){
   if(!enemies.includes(e))return;
+  if(e.aware===false)wakeEnemy(e);
   const bonus=heroStats();
   const LGD=bonus.legend;
   const bonusDamage=(SCHOOL_STAT[school]?bonus[SCHOOL_STAT[school]]||0:0)+(LGD.elem[school]||0);
@@ -893,7 +960,7 @@ function dealDamage(e,damage,school='physical',opts={}){
   puff(e.x,e.y-14,e.kind==='boss'?'#e89bff':'#e8904b',12,5,200);
   const bossDied=e.kind==='boss';const advanced=gainXp(profile,e.xp||(bossDied?170:22));
   const goldLv=1+(e.level||1)/25;
-  profile.gold+=Math.round((bossDied?150:3+Math.floor(rng()*9))*goldLv);
+  profile.gold+=Math.round((bossDied?150:2+Math.floor(rng()*6))*goldLv);
   const L=heroStats().legend;
   if(L.heal)healHero(hero.maxHp*L.heal/100);
   for(const pr of L.procs)if(pr.on==='kill'&&rng()*100<pr.chance)procCast(pr,e);
@@ -924,7 +991,7 @@ function dealDamage(e,damage,school='physical',opts={}){
   }else{
     kills++;
     const wave=nextWaveForKills(kills);
-    if(wave>=0)spawnWave(wave);
+    if(wave>=2)spawnWave(wave);
     if(shouldSummonBoss(kills,boss))spawn('boss',findBossPoint());
     persist();
   }
@@ -1367,6 +1434,19 @@ function updateEnemies(dt,inSlow){
     if(e.fearUntil>tick){const fx=e.x-hero.x,fy=e.y-hero.y,fd=Math.max(1,Math.hypot(fx,fy));moveWithCollision(e,fx/fd*e.speed*.8,fy/fd*e.speed*.8,dt,dungeon,e.radius);e.moving=true;continue;}
     const slowed=inSlow(e),tf=slowed?.35:1,M=e.mon;
     e.phase+=dt*3*tf;e.attack-=dt*tf;e.modT-=dt*tf;e.slow=Math.max(0,e.slow-dt);
+    // v0.8 待命：没察觉到你之前在营地附近闲逛；走近（远程怪更远）或被打到才会醒，同伴随后陆续醒来
+    if(e.aware===false){
+      if(e.wakeIn!=null){if((e.wakeIn-=dt)<=0)wakeEnemy(e);}
+      else if(distance(e,hero)<(M.ai==='ranged'||M.ai==='caster'?470:e.tier==='elite'?430:390))wakeEnemy(e);
+      else if(allies.some(a=>distance(a,e)<240))wakeEnemy(e);
+      if(e.aware===false){
+        if((e.wanderT-=dt)<=0){e.wanderT=2+rng()*3;const a=rng()*6.28,r=rng()*70;e.wander={x:e.home.x+Math.cos(a)*r,y:e.home.y+Math.sin(a)*r};}
+        const w=e.wander;let mvw=0;
+        if(w){const wx=w.x-e.x,wy=w.y-e.y,wd=Math.hypot(wx,wy);if(wd>8){const [sx,sy]=steer(e,wx/wd*e.speed*.25,wy/wd*e.speed*.25,dt,5);moveWithCollision(e,sx,sy,dt,dungeon,e.radius);e.face=wx>=0?1:-1;mvw=1;}else e.wander=null;}
+        e.moving=mvw>0;continue;
+      }
+    }
+    e.awareT=(e.awareT||0)+dt;
     let foe=hero;
     if(allies.length){let best=Math.hypot(hero.x-e.x,hero.y-e.y)-40;for(const a of allies){if(UNIT[a.unit]?.turret||UNIT[a.unit]?.fly)continue;const da=Math.hypot(a.x-e.x,a.y-e.y);if(da<best&&da<260){best=da;foe=a;}}}
     e.target=foe;
@@ -1401,7 +1481,9 @@ function updateEnemies(dt,inSlow){
     }
     // 移动
     const ranged=M.ai==='ranged'||M.ai==='caster';
-    const speed=e.speed*(e.slow? .38:1)*tf*(e.spawnT>0?0:1);
+    // 察觉后先慢慢逼近（约 3 秒加速到全速）；远处的第 3 波在 450 码外只用一半速度围拢
+    const ramp=e.tier==='boss'?1:Math.min(1,.4+e.awareT*.2)*(e.hunter&&d>450?.55:1);
+    const speed=e.speed*(e.slow? .38:1)*tf*(e.spawnT>0?0:1)*ramp;
     const reach=e.radius+(foe.radius||17)+18;
     let mv=0;
     // v0.7：移动先转向再加速（motion.js steer），起步、拐弯、停下都有过渡
@@ -2201,6 +2283,7 @@ document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
 // Dedicated local QA hook: never active on the public GitHub Pages game.
 if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('qa')){
   window.__ember2dQA={
+    aggroInfo:()=>{const d=enemies.map(e=>Math.round(distance(e,hero)));return {alive:enemies.length,aware:enemies.filter(e=>e.aware!==false).length,near400:d.filter(x=>x<400).length,minDist:Math.min(...d)};},
     encounterInfo:()=>({kills,total,alive:enemies.length,elite:enemies.filter(e=>e.elite).length,waves:WAVE_COUNT,cls:profile.heroClass,effects:vfx.length,allies:allies.length,buffs:buffs.length}),
     setClass:(cls)=>{applyClass(cls,true);return profile.heroClass;},
     clearEnemies:()=>{enemies.length=0;missiles.length=0;hazards.length=0;return true;},

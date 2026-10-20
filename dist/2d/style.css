@@ -563,3 +563,134 @@ body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden]
   #inventory .smart-equip{position:sticky;top:0;z-index:3;margin:0 -12px 8px;border-radius:0;border-left:0;border-right:0}
 }
 @media (max-height:560px) and (pointer:coarse){.upgrade-chip{bottom:calc(112px + var(--sb))}}
+
+/* ═════════ v0.8 电脑版哥特式状态栏 ═════════ */
+.ghud{position:absolute;z-index:3;left:50%;bottom:calc(-2px + var(--sb));transform:translateX(-50%);width:min(1000px,84vw);aspect-ratio:1661/454;pointer-events:none;user-select:none;font-family:"Cinzel","Noto Serif SC","Songti SC",serif}
+.ghud>*{position:absolute}
+.ghud .gh-frame{left:0;top:0;width:100%;height:100%;z-index:2;image-rendering:auto;filter:drop-shadow(0 -6px 18px #000c)}
+body.ghud-on footer.hud,body.ghud-on .tip{display:none}
+/* 血球 / 法力球：液面按比例下降，带高光与流动 */
+.gh-orb{z-index:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 55%,#1a0b0d,#070405 70%)}
+.gh-orb.mp{background:radial-gradient(circle at 50% 55%,#0b0f1d,#040509 70%)}
+.gh-orb i{position:absolute;left:0;right:0;bottom:0;transition:height .18s;background:radial-gradient(circle at 38% 30%,#ff8a7a 0,#e01d1d 22%,#9c0c10 55%,#4a0507 100%);background-size:100% 100%}
+.gh-orb.mp i{background:radial-gradient(circle at 38% 30%,#9fd0ff 0,#2b66f0 24%,#1335a8 56%,#08134a 100%)}
+.gh-orb i::before{content:"";position:absolute;left:-10%;right:-10%;top:-4px;height:8px;border-radius:50%;background:rgba(255,190,170,.45);animation:ghWave 2.4s ease-in-out infinite}
+.gh-orb.mp i::before{background:rgba(170,210,255,.45)}
+.gh-orb b{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 34% 26%,rgba(255,255,255,.55) 0,rgba(255,255,255,.12) 9%,transparent 22%),radial-gradient(circle at 50% 120%,rgba(0,0,0,.6),transparent 60%)}
+.gh-orb.low i{animation:ghPulse .9s ease-in-out infinite}
+@keyframes ghWave{50%{transform:translateX(6%) scaleY(1.5)}}
+@keyframes ghPulse{50%{filter:brightness(1.5) saturate(1.3)}}
+/* 血条 / 蓝条（在边框槽里） */
+.gh-bar{z-index:1;background:linear-gradient(#0c0909,#1a1212);overflow:hidden}
+.gh-bar.mp{background:linear-gradient(#08090f,#11131c)}
+.gh-bar i{position:absolute;left:0;top:0;bottom:0;transition:width .15s;background:linear-gradient(#ff5a4a 0,#d81818 30%,#a10d0d 70%,#5c0606 100%);box-shadow:inset 0 2px 0 rgba(255,200,180,.35)}
+.gh-bar.mp i{background:linear-gradient(#7ab8ff 0,#2a6af0 30%,#1440b8 70%,#0a1d62 100%);box-shadow:inset 0 2px 0 rgba(190,220,255,.35)}
+/* 文字牌 */
+.gh-txt,.gh-lv,.gh-cls{z-index:3;display:flex;align-items:center;justify-content:center;gap:.35em;color:#efe2c4;font-size:clamp(11px,1.45vw,17px);letter-spacing:1px;text-shadow:0 1px 2px #000}
+.gh-txt span{color:#d9b77a}.gh-txt.mp span{color:#7db7ff}
+.gh-txt em{font-style:normal;color:#ff5d4e;font-weight:700}.gh-txt.mp em{color:#5ea8ff}
+.gh-lv{flex-direction:column;gap:2px;color:#f0cd8e;font-size:clamp(13px,1.7vw,21px);font-weight:600}
+.gh-lv i{display:block;width:70%;height:3px;background:#2a2116;border-radius:2px;overflow:hidden}.gh-lv u{display:block;height:100%;background:linear-gradient(90deg,#9c6a2a,#f0cd8e)}
+.gh-cls{color:#e6d4b0;font-size:clamp(11px,1.3vw,15px);letter-spacing:3px}
+/* 技能格 */
+.ghud .abilitybar{position:absolute;inset:0;z-index:3;display:block;pointer-events:none}
+.ghud .abilitybar button{position:absolute;pointer-events:auto;padding:0;border:0;background:#0b0a0b;border-radius:0;display:block;overflow:hidden;box-shadow:inset 0 0 8px #000}
+.ghud .abilitybar button .ability-icon,.ghud .abilitybar button .ability-icon.sk-ico{position:absolute;inset:0;width:100%;height:100%;font-size:0!important}
+.ghud .abilitybar button b,.ghud .abilitybar button small,.ghud .abilitybar button .slot-key{display:none}
+.ghud .abilitybar button i{z-index:1;background:rgba(0,0,0,.66)}
+.ghud .abilitybar button:hover{filter:brightness(1.25)}
+.ghud .abilitybar button.locked{filter:grayscale(1) brightness(.45)}
+.ghud .abilitybar button:active{transform:scale(.94)}
+.gh-keys{inset:0;z-index:4;pointer-events:none}
+.gh-keys span{position:absolute;display:flex;white-space:nowrap;align-items:center;justify-content:center;color:#f0dfbb;font-size:clamp(9px,1.05vw,13px);font-weight:600;text-shadow:0 1px 2px #000}
+.gh-keys span.corner{justify-content:flex-end;align-items:flex-end;color:#fff;font-size:clamp(8px,.9vw,11px);padding:0 2px 1px 0}
+.gh-util{z-index:3;pointer-events:auto;padding:0;border:0;background:radial-gradient(circle,#2a2218,#0d0b0a 80%);color:#e7c88f;font-size:clamp(14px,1.8vw,22px);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;cursor:pointer}
+.gh-util small{font-size:clamp(8px,.8vw,10px);color:#b8a27c;margin-top:2px;letter-spacing:1px}
+.gh-util:hover{filter:brightness(1.35)}
+.ghud .buffbar{position:absolute;z-index:3;transform:none;bottom:auto;display:flex;align-items:flex-end;justify-content:center;gap:4px;pointer-events:none}
+.gh-gold{z-index:3;left:21%;top:21%;display:flex;gap:14px;font-size:12px;color:#b9a27a;text-shadow:0 1px 2px #000}
+.gh-gold b{color:#f0cd8e;font-weight:600}
+body.ghud-on .upgrade-chip{bottom:calc(min(1000px,84vw)*454/1661 + 10px)}
+body.ghud-on .joystick{display:none}
+
+/* ═════════ v0.8 游戏化皮肤：铁框 + 金线 + 石质噪点，按钮做成铸铁牌子，选择框做成刻槽 ═════════ */
+:root{
+  --noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .42  0 0 0 0 .33  0 0 0 .55 0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.22'/></svg>");
+  --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","Noto Serif CJK SC",Georgia,serif;
+  --iron:linear-gradient(180deg,#221b16 0%,#15110e 55%,#0e0b09 100%);
+  --iron-hi:linear-gradient(180deg,#3a2c20 0%,#21180f 60%,#160f0a 100%);
+  --gold:#b68a4e;--gold-dim:#6e5434;--ink:#ecdcb8;
+}
+/* 面板：外黑边 + 金线内框 + 石质底 + 四角铆钉 */
+.modal,.inventory-panel,.status-panel,.portal-dialog,.top-more,.hs-info{
+  background:radial-gradient(4px 4px at 10px 10px,#d8b070 0,#7a5a30 60%,transparent 70%),radial-gradient(4px 4px at calc(100% - 10px) 10px,#d8b070 0,#7a5a30 60%,transparent 70%),
+    radial-gradient(4px 4px at 10px calc(100% - 10px),#d8b070 0,#7a5a30 60%,transparent 70%),radial-gradient(4px 4px at calc(100% - 10px) calc(100% - 10px),#d8b070 0,#7a5a30 60%,transparent 70%),
+    var(--noise),radial-gradient(ellipse at 50% -20%,#3a2a1c 0,transparent 60%),var(--iron)!important;
+  border:2px solid #0a0807!important;border-radius:3px!important;
+  box-shadow:inset 0 0 0 1px #4a3826,inset 0 0 0 3px #0c0a08,inset 0 0 0 4px var(--gold-dim),inset 0 0 50px #000c,0 18px 60px #000e!important;
+}
+.status-panel{border-top:2px solid #0a0807!important}
+.status-head{background:linear-gradient(90deg,color-mix(in srgb,var(--cls) 26%,#1a140f),#1a140f 75%)!important;border-bottom:1px solid var(--gold-dim)!important;margin:4px 4px 0!important}
+.modal h1,.panel-head h2,.portal-dialog h2,.status-head strong,.hs-info h2,.quest strong,.brand b{font-family:var(--serif)!important}
+.panel-head h2{color:#f0dcb0;text-shadow:0 2px 0 #000,0 0 18px #8a4a1a55}
+.eyebrow{color:#c7975a}
+/* 小卡片：嵌入式凹槽 */
+.item,.slot,.equipment-slot,.compare-gear,.status-sec,.status-tile,.smart-equip,.gamble-box,.salvage-settings,.material-token,.build-guide,.skill-catalog-entry,.catalog-skill,.loadout-row,.paragon-node,.stash-items .item,.item-inspect{
+  background:var(--noise),linear-gradient(180deg,#0f0c0a,#16120e)!important;border:1px solid #3d2f20!important;border-radius:2px!important;
+  box-shadow:inset 0 2px 6px #000c,inset 0 0 0 1px #00000080,0 1px 0 #ffffff08!important}
+.item:hover,.equipment-slot:hover,.catalog-skill:hover{border-color:var(--gold)!important;box-shadow:inset 0 2px 6px #000c,0 0 10px #b68a4e44!important}
+.item.is-selected,.item[aria-pressed="true"],.equipment-slot.is-selected{border-color:#e0b268!important;box-shadow:inset 0 0 14px #b0702a55,0 0 12px #e0b26855!important}
+.panel-subhead{font-family:var(--serif);color:#e2c48e;border-bottom:1px solid #3d2f20;padding-bottom:6px}
+/* 按钮：铸铁牌 + 金边，按下凹陷 */
+.top-actions button,.item-actions button,.save-buttons button,.icon-button,.mobile-inv-tabs button,.portal-actions button:not(.primary),.hs-ghost,.hs-diff,.gamble-row button,.status-head button,.subtle,#mobile-back-to-bag,.build-tabs button,.salvage-settings button,.tempering-action,#salvage-bag,.key-bind,.hs-arrow{
+  font-family:var(--serif)!important;color:var(--ink)!important;letter-spacing:1px;
+  background:var(--noise),var(--iron-hi)!important;border:1px solid #0a0807!important;border-radius:2px!important;
+  box-shadow:inset 0 0 0 1px #6e5434,inset 0 1px 0 1px #c9a06455,0 2px 4px #000a!important;text-shadow:0 1px 1px #000;transition:filter .12s,transform .06s}
+.hs-arrow{background:none!important;box-shadow:none!important;border:0!important}
+.top-actions button:hover,.item-actions button:hover,.save-buttons button:hover,.icon-button:hover,.mobile-inv-tabs button:hover,.portal-actions button:hover,.hs-ghost:hover,.hs-diff:hover,.gamble-row button:hover,.status-head button:hover,.build-tabs button:hover,#salvage-bag:hover,.key-bind:hover{filter:brightness(1.3) saturate(1.1);box-shadow:inset 0 0 0 1px #c9a064,inset 0 1px 0 1px #f0cd8e55,0 0 10px #c9813a55!important}
+.top-actions button:active,.item-actions button:active,.mobile-inv-tabs button:active,.hs-ghost:active,.gamble-row button:active{transform:translateY(1px);box-shadow:inset 0 0 0 1px #6e5434,inset 0 3px 6px #000c!important}
+.mobile-inv-tabs button.is-active,.hs-diff.is-active,.build-tabs button.is-active,.topbar.menu-open #btn-menu{color:#fff2d0!important;box-shadow:inset 0 0 0 1px #e0b268,inset 0 0 12px #b0702a88,0 0 10px #e0a04a55!important}
+/* 主按钮：暗红漆面 + 金边（D2 的「进入游戏」那种） */
+.primary,.hs-go,#btn-smart,#mobile-equip,#inv-quick-equip,#portal-next{
+  font-family:var(--serif)!important;letter-spacing:3px!important;color:#fff0d0!important;text-shadow:0 1px 2px #000,0 0 8px #ff8a4a66;
+  background:var(--noise),linear-gradient(180deg,#8a2a1c 0%,#5a160f 55%,#3a0d09 100%)!important;border:1px solid #0a0807!important;border-radius:2px!important;
+  box-shadow:inset 0 0 0 1px #d8a560,inset 0 0 0 3px #3a0d09,inset 0 0 0 4px #9a6a38,inset 0 8px 14px #ffb07033,0 4px 12px #000c!important}
+.primary:hover,.hs-go:hover,#btn-smart:hover,#mobile-equip:hover{filter:brightness(1.18) saturate(1.15)}
+.primary:disabled,#mobile-equip:disabled,#inv-quick-equip:disabled{filter:grayscale(.7) brightness(.7)}
+/* 选择框与输入框：刻槽 */
+select,.hs-form input,input[type="text"]{
+  font-family:var(--serif);color:var(--ink)!important;background:var(--noise),linear-gradient(180deg,#0b0908,#16110d)!important;border:1px solid #0a0807!important;border-radius:2px!important;
+  box-shadow:inset 0 0 0 1px #5a4430,inset 0 3px 8px #000d!important;appearance:none;-webkit-appearance:none;
+  background-image:var(--noise),linear-gradient(45deg,transparent 50%,#c9a064 50%),linear-gradient(135deg,#c9a064 50%,transparent 50%),linear-gradient(180deg,#0b0908,#16110d)!important;
+  background-position:0 0,calc(100% - 15px) 52%,calc(100% - 10px) 52%,0 0!important;background-size:auto,5px 5px,5px 5px,auto!important;background-repeat:repeat,no-repeat,no-repeat,no-repeat!important;padding-right:24px!important}
+.hs-form input{background-image:var(--noise),linear-gradient(180deg,#0b0908,#16110d)!important;padding-right:12px!important}
+select option{background:#15110e;color:#ecdcb8}
+/* 顶栏：铁质横梁 */
+.topbar{background:linear-gradient(180deg,#0a0807f0,#0a0807b0 70%,transparent)!important;border-bottom:0}
+.topbar::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:1px;background:linear-gradient(90deg,transparent,#6e543488 20%,#b68a4e 50%,#6e543488 80%,transparent);pointer-events:none}
+.brandmark{color:#d9a05a!important;text-shadow:0 0 18px #c76c34,0 0 4px #000!important}
+.top-actions button i{color:#e0b268!important}
+.version{font-family:var(--serif);color:#8a7a62!important}
+/* 任务、小地图、事件文字 */
+.quest{border-left:0!important;padding-left:18px!important;background:linear-gradient(90deg,#0a0807aa,transparent);}
+.quest::before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:3px;background:linear-gradient(#e0b268,#6e5434);box-shadow:0 0 8px #c9813a88}
+.minimap{background:var(--noise),#0a0908d8!important;border:2px solid #0a0807!important;box-shadow:inset 0 0 0 1px #6e5434,0 6px 20px #000c!important;border-radius:2px}
+.minimap small{font-family:var(--serif);color:#c7a46a!important}
+/* 弹窗分隔线 */
+.modal .crest{filter:drop-shadow(0 0 10px #c45d2c)}
+.modal p{color:#b8ab95!important}
+/* 角色选择：卡片与职业牌 */
+.hs-card,.hs-plate{background:var(--noise),var(--iron-hi)!important;border:1px solid #0a0807!important;box-shadow:inset 0 0 0 1px #5a4430,0 3px 8px #000a!important;font-family:var(--serif)}
+.hs-card.is-active,.hs-plate.is-active{box-shadow:inset 0 0 0 1px var(--cc,#e0b268),inset 0 0 18px color-mix(in srgb,var(--cc,#e0b268) 35%,transparent),0 0 16px color-mix(in srgb,var(--cc,#e0b268) 40%,transparent)!important}
+/* 手机 HUD：哥特式球与铁格 */
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .hud{background:linear-gradient(transparent,#07060599 30%,#070605ee 70%)!important}
+  .orb{border:3px solid #0a0807!important;box-shadow:inset 0 0 0 2px #8a6a3c,inset 0 0 0 4px #1a120c,inset 0 6px 14px #000a,0 0 0 2px #3a2c1e,0 4px 10px #000c!important;font-family:var(--serif)}
+  .health{background:radial-gradient(circle at 36% 30%,#ff8a7a 0,#d81818 26%,#8a0b0d 60%,#3a0405 100%)!important}
+  .energy{background:radial-gradient(circle at 36% 30%,#9fd0ff 0,#2b66f0 26%,#123296 60%,#06103a 100%)!important}
+  .portrait{background:var(--iron-hi)!important;border:1px solid #0a0807!important;box-shadow:inset 0 0 0 1px #b68a4e!important;color:#f0cd8e!important;font-family:var(--serif)}
+  .abilitybar button{background:#0b0a0b!important;border:1px solid #0a0807!important;box-shadow:inset 0 0 0 1px #8a6a3c,inset 0 0 0 2px #0a0807,0 2px 4px #000c!important;border-radius:2px!important}
+  .top-actions>button{border-radius:3px!important}
+  .joystick{border:3px solid #0a0807!important;box-shadow:inset 0 0 0 2px #6e5434,inset 0 0 24px #000c!important;background:radial-gradient(circle,#1a140f99,#0a080799)!important}
+  .joystick span{background:radial-gradient(circle at 40% 35%,#f0cd8e,#8a6a3c 70%)!important;border:2px solid #0a0807!important;box-shadow:0 0 0 1px #c9a064,0 3px 6px #000c}
+}

@@ -89,17 +89,51 @@ def sheet(name, cols, rows, height):
         im, foot = c; s = height / im.height
         out.append((im.resize((max(1, round(im.width * s)), height), Image.LANCZOS), round(foot * s)))
     return out
-groups = {'normal': sheet('normals', 6, 5, 104), 'caster': sheet('casters', 5, 5, 104),
-          'elite': sheet('elites', 5, 5, 136), 'boss': sheet('bosses', 5, 4, 200)}
-summons = sheet('summons', 5, 2, 112)
+# v0.8：怪物改用用户动效包里的原画裁切（assets-source/2d/monsters-v08，比旧图集清晰得多）。
+# 同一档位按统一比例缩放（保留体型差：蝙蝠、老鼠比骷髅小），去掉相邻怪物残留的小碎块。
+from scipy import ndimage
+def clean(im):
+    a = np.array(im.convert('RGBA')); m = a[..., 3] > 20
+    lab, n = ndimage.label(ndimage.binary_dilation(m, iterations=3))
+    if n > 1:
+        sizes = ndimage.sum(m, lab, range(1, n + 1)); keep = np.zeros_like(m)
+        big = int(np.argmax(sizes)) + 1; bottom = np.nonzero(lab == big)[0].max()
+        for i, sz in enumerate(sizes):
+            ys = np.nonzero(lab == i + 1)[0]
+            if ys.min() >= bottom - 4 and i + 1 != big: continue  # 主体脚下的碎块（相邻格子残留）
+            if sz >= sizes.max() * .06: keep |= lab == i + 1
+        a[~keep, 3] = 0
+    im = Image.fromarray(a); bb = im.getbbox(); return im.crop(bb)
+def foot_of(im):
+    a = np.array(im)[..., 3] > 20; h = a.shape[0]; hb = max(4, int(h * .08))
+    cols = np.nonzero(a[h - hb:])[1]; return int(np.median(cols)) if len(cols) else im.width // 2
+MV = SRC + 'monsters-v08/'
+man = json.load(open(MV + 'manifest.json'))['monsters']
+CAT = {'普通怪': ('normal', 6, 128), '魔法怪': ('caster', 5, 128), '精英怪': ('elite', 5, 160), 'Boss': ('boss', 5, 240)}
+groups = {g: [None] * 30 for g, _, _ in CAT.values()}
+raw = {}
+for m in man:
+    g, cols, target = CAT[m['category']]
+    raw.setdefault(g, []).append((m['grid'][1] * cols + m['grid'][0], m['id'], clean(Image.open(MV + m['id'] + '.webp'))))
+PID = {}
+for g, lst in raw.items():
+    target = next(t for gg, _, t in CAT.values() if gg == g)
+    med = float(np.median([im.height for _, _, im in lst])); s = target / med
+    for idx, pid, im in lst:
+        im2 = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS)
+        groups[g][idx] = (im2, foot_of(im2)); PID[f'{g}{idx}'] = pid
+for g in groups: groups[g] = [x for x in groups[g] if x]
+summons = sheet('summons', 5, 2, 140)
 items = [(f'{g}{i}', im) for g, lst in groups.items() for i, (im, f) in enumerate(lst)] + [(f'summon{i}', im) for i, (im, f) in enumerate(summons)]
 atlas, pos = pack(items, 2048)
-atlas.save(OUT + 'art/monsters.webp', quality=92, method=6)
+atlas.save(OUT + 'art/monsters.webp', quality=85, method=6)
 sprites = {k: list(pos[k]) + [f] for g, lst in groups.items() for i, (im, f) in enumerate(lst) for k in [f'{g}{i}']}
 sprites.update({f'summon{i}': list(pos[f'summon{i}']) + [f] for i, (im, f) in enumerate(summons)})
 js = ('/* 自动生成：scripts/2d-art/build_art.py。英雄分层（身体 + 武器）与怪物/召唤物图集坐标。 */\n'
       'export const HERO_RIG=' + json.dumps(rig, separators=(',', ':')) + ';\n'
       '// [x,y,w,h,footX] in art/monsters.webp\n'
-      'export const SPRITES=' + json.dumps(sprites, separators=(',', ':')) + ';\n')
+      'export const SPRITES=' + json.dumps(sprites, separators=(',', ':')) + ';\n'
+      '// 贴图键 → 动效包怪物编号（N001…B020），以后换成逐帧动作表时按这个编号对应\n'
+      'export const MONSTER_PID=' + json.dumps(PID, separators=(',', ':')) + ';\n')
 open(OUT + 'sprite-data.js', 'w').write(js)
 print('heroes', Image.open(OUT + 'art/heroes.webp').size, 'monsters', atlas.size, os.path.getsize(OUT + 'art/monsters.webp'))

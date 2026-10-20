@@ -64,8 +64,10 @@ try{
     await page.waitForTimeout(300);
     assert.equal(await page.locator('#scrim').isVisible(),false);
     const density=await page.evaluate(()=>window.__ember2dQA.encounterInfo());
-    assert.equal(density.total,36,'threefold population in actual game');
-    assert.equal(density.alive,12,'twelve spawn in first encounter');
+    assert.equal(density.total,54,'v0.8: 54 monsters per run');
+    assert.equal(density.alive,36,'two waves already camped around the map');
+    const ag=await page.evaluate(()=>window.__ember2dQA.aggroInfo());
+    assert.equal(ag.aware,0,'nobody rushes the hero at start');assert.ok(ag.minDist>=400,'packs start away from the hero');
     assert.equal(density.cls,'mage');
     assert.equal(density.waves,3);
     const sprite=await page.evaluate(async()=>{

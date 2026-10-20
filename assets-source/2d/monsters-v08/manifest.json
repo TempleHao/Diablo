@@ -1,0 +1,4810 @@
+{
+  "project": "TempleHao/Diablo/2d",
+  "title": "怪物动作素材过渡版",
+  "monsterCount": 100,
+  "sourceType": "已生成的静态怪物图鉴",
+  "method": "原始怪物裁切+逐帧整体位移、旋转、粒子与淡出（过渡动效，非逐帧手绘骨骼动作）",
+  "coordinate": "精灵图每行对应一种动作：idle,walk,attack,skill,hit,death；每行4列；透明PNG；从左上角0开始，帧坐标(col*frameWidth,row*frameHeight)",
+  "monsters": [
+    {
+      "id": "N001",
+      "name": "骸骨剑士",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        0,
+        0
+      ],
+      "file": "spritesheets/N001.png",
+      "original": "originals/N001.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N002",
+      "name": "嗜血尸鬼",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        1,
+        0
+      ],
+      "file": "spritesheets/N002.png",
+      "original": "originals/N002.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N003",
+      "name": "紫袍亡术师",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        2,
+        0
+      ],
+      "file": "spritesheets/N003.png",
+      "original": "originals/N003.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N004",
+      "name": "爬行食尸鬼",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        3,
+        0
+      ],
+      "file": "spritesheets/N004.png",
+      "original": "originals/N004.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N005",
+      "name": "洞窟血翼蝠",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        4,
+        0
+      ],
+      "file": "spritesheets/N005.png",
+      "original": "originals/N005.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N006",
+      "name": "黑脊毒蛛",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        5,
+        0
+      ],
+      "file": "spritesheets/N006.png",
+      "original": "originals/N006.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N007",
+      "name": "腐化地狱犬",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        0,
+        1
+      ],
+      "file": "spritesheets/N007.png",
+      "original": "originals/N007.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N008",
+      "name": "赤影刀徒",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        1,
+        1
+      ],
+      "file": "spritesheets/N008.png",
+      "original": "originals/N008.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N009",
+      "name": "腐尸屠夫",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        2,
+        1
+      ],
+      "file": "spritesheets/N009.png",
+      "original": "originals/N009.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N010",
+      "name": "烈焰小恶魔",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        3,
+        1
+      ],
+      "file": "spritesheets/N010.png",
+      "original": "originals/N010.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N011",
+      "name": "亡魂黏液",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        4,
+        1
+      ],
+      "file": "spritesheets/N011.png",
+      "original": "originals/N011.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N012",
+      "name": "骷髅弓手",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        5,
+        1
+      ],
+      "file": "spritesheets/N012.png",
+      "original": "originals/N012.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N013",
+      "name": "羊角掠夺者",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        0,
+        2
+      ],
+      "file": "spritesheets/N013.png",
+      "original": "originals/N013.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N014",
+      "name": "甲壳蛛魔",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        1,
+        2
+      ],
+      "file": "spritesheets/N014.png",
+      "original": "originals/N014.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N015",
+      "name": "提灯咒术师",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        2,
+        2
+      ],
+      "file": "spritesheets/N015.png",
+      "original": "originals/N015.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N016",
+      "name": "尖啸幽魂",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        3,
+        2
+      ],
+      "file": "spritesheets/N016.png",
+      "original": "originals/N016.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N017",
+      "name": "角盔守卫",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        4,
+        2
+      ],
+      "file": "spritesheets/N017.png",
+      "original": "originals/N017.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N018",
+      "name": "双刃夜行者",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        5,
+        2
+      ],
+      "file": "spritesheets/N018.png",
+      "original": "originals/N018.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N019",
+      "name": "遗迹骸骨卫士",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        0,
+        3
+      ],
+      "file": "spritesheets/N019.png",
+      "original": "originals/N019.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N020",
+      "name": "深渊噬岩虫",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        1,
+        3
+      ],
+      "file": "spritesheets/N020.png",
+      "original": "originals/N020.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N021",
+      "name": "腐根树魔",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        2,
+        3
+      ],
+      "file": "spritesheets/N021.png",
+      "original": "originals/N021.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N022",
+      "name": "血爪活尸",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        3,
+        3
+      ],
+      "file": "spritesheets/N022.png",
+      "original": "originals/N022.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N023",
+      "name": "失落骑士",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        4,
+        3
+      ],
+      "file": "spritesheets/N023.png",
+      "original": "originals/N023.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N024",
+      "name": "窥视魔眼",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        5,
+        3
+      ],
+      "file": "spritesheets/N024.png",
+      "original": "originals/N024.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N025",
+      "name": "巨拳行刑者",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        0,
+        4
+      ],
+      "file": "spritesheets/N025.png",
+      "original": "originals/N025.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N026",
+      "name": "碧火冤灵",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        1,
+        4
+      ],
+      "file": "spritesheets/N026.png",
+      "original": "originals/N026.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N027",
+      "name": "疫病狼兽",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        2,
+        4
+      ],
+      "file": "spritesheets/N027.png",
+      "original": "originals/N027.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N028",
+      "name": "蘑菇孢魔",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        3,
+        4
+      ],
+      "file": "spritesheets/N028.png",
+      "original": "originals/N028.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N029",
+      "name": "羊首萨满",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        4,
+        4
+      ],
+      "file": "spritesheets/N029.png",
+      "original": "originals/N029.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "N030",
+      "name": "朽木邪灵",
+      "category": "普通怪",
+      "source": "暗黑风格怪物像素图鉴.png",
+      "grid": [
+        5,
+        4
+      ],
+      "file": "spritesheets/N030.png",
+      "original": "originals/N030.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E001",
+      "name": "血誓统领",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        0,
+        0
+      ],
+      "file": "spritesheets/E001.png",
+      "original": "originals/E001.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E002",
+      "name": "霜铁武王",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        1,
+        0
+      ],
+      "file": "spritesheets/E002.png",
+      "original": "originals/E002.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E003",
+      "name": "疫瘴肥魔",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        2,
+        0
+      ],
+      "file": "spritesheets/E003.png",
+      "original": "originals/E003.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E004",
+      "name": "焚翼恶魔",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        3,
+        0
+      ],
+      "file": "spritesheets/E004.png",
+      "original": "originals/E004.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E005",
+      "name": "荒骨祭司",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        4,
+        0
+      ],
+      "file": "spritesheets/E005.png",
+      "original": "originals/E005.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E006",
+      "name": "虚空亡巫",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        0,
+        1
+      ],
+      "file": "spritesheets/E006.png",
+      "original": "originals/E006.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E007",
+      "name": "铁脊屠夫",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        1,
+        1
+      ],
+      "file": "spritesheets/E007.png",
+      "original": "originals/E007.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E008",
+      "name": "血刃虫后",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        2,
+        1
+      ],
+      "file": "spritesheets/E008.png",
+      "original": "originals/E008.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E009",
+      "name": "提灯主祭",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        3,
+        1
+      ],
+      "file": "spritesheets/E009.png",
+      "original": "originals/E009.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E010",
+      "name": "凛冬死神",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        4,
+        1
+      ],
+      "file": "spritesheets/E010.png",
+      "original": "originals/E010.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E011",
+      "name": "牛头战将",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        0,
+        2
+      ],
+      "file": "spritesheets/E011.png",
+      "original": "originals/E011.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E012",
+      "name": "腐森王灵",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        1,
+        2
+      ],
+      "file": "spritesheets/E012.png",
+      "original": "originals/E012.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E013",
+      "name": "猩红枪骑",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        2,
+        2
+      ],
+      "file": "spritesheets/E013.png",
+      "original": "originals/E013.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E014",
+      "name": "血肉聚合体",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        3,
+        2
+      ],
+      "file": "spritesheets/E014.png",
+      "original": "originals/E014.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E015",
+      "name": "金辉审判者",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        4,
+        2
+      ],
+      "file": "spritesheets/E015.png",
+      "original": "originals/E015.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E016",
+      "name": "血翼魅魔",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        0,
+        3
+      ],
+      "file": "spritesheets/E016.png",
+      "original": "originals/E016.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E017",
+      "name": "寒焰骑士",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        1,
+        3
+      ],
+      "file": "spritesheets/E017.png",
+      "original": "originals/E017.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E018",
+      "name": "狂爪巨熊",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        2,
+        3
+      ],
+      "file": "spritesheets/E018.png",
+      "original": "originals/E018.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E019",
+      "name": "疫影咒师",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        3,
+        3
+      ],
+      "file": "spritesheets/E019.png",
+      "original": "originals/E019.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E020",
+      "name": "锁链暴君",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        4,
+        3
+      ],
+      "file": "spritesheets/E020.png",
+      "original": "originals/E020.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E021",
+      "name": "深渊蛇巫",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        0,
+        4
+      ],
+      "file": "spritesheets/E021.png",
+      "original": "originals/E021.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E022",
+      "name": "熔岩蛮神",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        1,
+        4
+      ],
+      "file": "spritesheets/E022.png",
+      "original": "originals/E022.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E023",
+      "name": "百骸教宗",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        2,
+        4
+      ],
+      "file": "spritesheets/E023.png",
+      "original": "originals/E023.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E024",
+      "name": "墓林巨像",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        3,
+        4
+      ],
+      "file": "spritesheets/E024.png",
+      "original": "originals/E024.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "E025",
+      "name": "堕翼圣使",
+      "category": "精英怪",
+      "source": "暗黑奇幻怪物像素图鉴.png",
+      "grid": [
+        4,
+        4
+      ],
+      "file": "spritesheets/E025.png",
+      "original": "originals/E025.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C001",
+      "name": "血焰邪法师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        0,
+        0
+      ],
+      "file": "spritesheets/C001.png",
+      "original": "originals/C001.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C002",
+      "name": "霜魂女妖",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        1,
+        0
+      ],
+      "file": "spritesheets/C002.png",
+      "original": "originals/C002.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C003",
+      "name": "绿焰鸦巫",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        2,
+        0
+      ],
+      "file": "spritesheets/C003.png",
+      "original": "originals/C003.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C004",
+      "name": "紫火亡灵术士",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        3,
+        0
+      ],
+      "file": "spritesheets/C004.png",
+      "original": "originals/C004.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C005",
+      "name": "圣光堕祭司",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        4,
+        0
+      ],
+      "file": "spritesheets/C005.png",
+      "original": "originals/C005.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C006",
+      "name": "寒晶魔导师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        0,
+        1
+      ],
+      "file": "spritesheets/C006.png",
+      "original": "originals/C006.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C007",
+      "name": "地狱翼巫",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        1,
+        1
+      ],
+      "file": "spritesheets/C007.png",
+      "original": "originals/C007.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C008",
+      "name": "林火祭灵",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        2,
+        1
+      ],
+      "file": "spritesheets/C008.png",
+      "original": "originals/C008.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C009",
+      "name": "双影奥术师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        3,
+        1
+      ],
+      "file": "spritesheets/C009.png",
+      "original": "originals/C009.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C010",
+      "name": "赤焰巫师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        4,
+        1
+      ],
+      "file": "spritesheets/C010.png",
+      "original": "originals/C010.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C011",
+      "name": "苍焰尸皇",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        0,
+        2
+      ],
+      "file": "spritesheets/C011.png",
+      "original": "originals/C011.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C012",
+      "name": "血符咒师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        1,
+        2
+      ],
+      "file": "spritesheets/C012.png",
+      "original": "originals/C012.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C013",
+      "name": "元素晶体",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        2,
+        2
+      ],
+      "file": "spritesheets/C013.png",
+      "original": "originals/C013.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C014",
+      "name": "祭血修女",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        3,
+        2
+      ],
+      "file": "spritesheets/C014.png",
+      "original": "originals/C014.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C015",
+      "name": "雷霆暗巫",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        4,
+        2
+      ],
+      "file": "spritesheets/C015.png",
+      "original": "originals/C015.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C016",
+      "name": "月林召术师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        0,
+        3
+      ],
+      "file": "spritesheets/C016.png",
+      "original": "originals/C016.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C017",
+      "name": "紫魂怨巫",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        1,
+        3
+      ],
+      "file": "spritesheets/C017.png",
+      "original": "originals/C017.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C018",
+      "name": "冰火幽灵王",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        2,
+        3
+      ],
+      "file": "spritesheets/C018.png",
+      "original": "originals/C018.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C019",
+      "name": "烛火修女",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        3,
+        3
+      ],
+      "file": "spritesheets/C019.png",
+      "original": "originals/C019.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C020",
+      "name": "群眼秘术师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        4,
+        3
+      ],
+      "file": "spritesheets/C020.png",
+      "original": "originals/C020.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C021",
+      "name": "腐魂药师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        0,
+        4
+      ],
+      "file": "spritesheets/C021.png",
+      "original": "originals/C021.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C022",
+      "name": "幽晶执杖者",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        1,
+        4
+      ],
+      "file": "spritesheets/C022.png",
+      "original": "originals/C022.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C023",
+      "name": "红雾女妖",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        2,
+        4
+      ],
+      "file": "spritesheets/C023.png",
+      "original": "originals/C023.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C024",
+      "name": "古鹿蓝火祭司",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        3,
+        4
+      ],
+      "file": "spritesheets/C024.png",
+      "original": "originals/C024.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "C025",
+      "name": "星盘预言师",
+      "category": "魔法怪",
+      "source": "暗黑奇幻像素法师图鉴.png",
+      "grid": [
+        4,
+        4
+      ],
+      "file": "spritesheets/C025.png",
+      "original": "originals/C025.png",
+      "frameWidth": 256,
+      "frameHeight": 256,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B001",
+      "name": "熔狱魔王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        0,
+        0
+      ],
+      "file": "spritesheets/B001.png",
+      "original": "originals/B001.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B002",
+      "name": "冰封君王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        1,
+        0
+      ],
+      "file": "spritesheets/B002.png",
+      "original": "originals/B002.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B003",
+      "name": "赤目蛛后",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        2,
+        0
+      ],
+      "file": "spritesheets/B003.png",
+      "original": "originals/B003.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B004",
+      "name": "疫病帝王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        3,
+        0
+      ],
+      "file": "spritesheets/B004.png",
+      "original": "originals/B004.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B005",
+      "name": "血冠骸王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        4,
+        0
+      ],
+      "file": "spritesheets/B005.png",
+      "original": "originals/B005.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B006",
+      "name": "角狱战皇",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        0,
+        1
+      ],
+      "file": "spritesheets/B006.png",
+      "original": "originals/B006.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B007",
+      "name": "腐林古神",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        1,
+        1
+      ],
+      "file": "spritesheets/B007.png",
+      "original": "originals/B007.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B008",
+      "name": "堕落炽天使",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        2,
+        1
+      ],
+      "file": "spritesheets/B008.png",
+      "original": "originals/B008.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B009",
+      "name": "圣殿巨像",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        3,
+        1
+      ],
+      "file": "spritesheets/B009.png",
+      "original": "originals/B009.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B010",
+      "name": "炎咒魔尊",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        4,
+        1
+      ],
+      "file": "spritesheets/B010.png",
+      "original": "originals/B010.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B011",
+      "name": "万齿地虫",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        0,
+        2
+      ],
+      "file": "spritesheets/B011.png",
+      "original": "originals/B011.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B012",
+      "name": "地狱巨龙",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        1,
+        2
+      ],
+      "file": "spritesheets/B012.png",
+      "original": "originals/B012.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B013",
+      "name": "万骸巫皇",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        2,
+        2
+      ],
+      "file": "spritesheets/B013.png",
+      "original": "originals/B013.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B014",
+      "name": "血幕女王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        3,
+        2
+      ],
+      "file": "spritesheets/B014.png",
+      "original": "originals/B014.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B015",
+      "name": "锁链巨人",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        4,
+        2
+      ],
+      "file": "spritesheets/B015.png",
+      "original": "originals/B015.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B016",
+      "name": "霜影收割者",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        0,
+        3
+      ],
+      "file": "spritesheets/B016.png",
+      "original": "originals/B016.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B017",
+      "name": "朽木古王",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        1,
+        3
+      ],
+      "file": "spritesheets/B017.png",
+      "original": "originals/B017.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B018",
+      "name": "缝合之母",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        2,
+        3
+      ],
+      "file": "spritesheets/B018.png",
+      "original": "originals/B018.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B019",
+      "name": "三首噬狱犬",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        3,
+        3
+      ],
+      "file": "spritesheets/B019.png",
+      "original": "originals/B019.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    },
+    {
+      "id": "B020",
+      "name": "虚空独眼神",
+      "category": "Boss",
+      "source": "暗黑奇幻像素_boss_图鉴.png",
+      "grid": [
+        4,
+        3
+      ],
+      "file": "spritesheets/B020.png",
+      "original": "originals/B020.png",
+      "frameWidth": 320,
+      "frameHeight": 320,
+      "columns": 4,
+      "rows": 6,
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 4,
+          "frameDurationMs": 170
+        },
+        "walk": {
+          "row": 1,
+          "frames": 4,
+          "frameDurationMs": 125
+        },
+        "attack": {
+          "row": 2,
+          "frames": 4,
+          "frameDurationMs": 115
+        },
+        "skill": {
+          "row": 3,
+          "frames": 4,
+          "frameDurationMs": 165
+        },
+        "hit": {
+          "row": 4,
+          "frames": 4,
+          "frameDurationMs": 120
+        },
+        "death": {
+          "row": 5,
+          "frames": 4,
+          "frameDurationMs": 190
+        }
+      }
+    }
+  ]
+}

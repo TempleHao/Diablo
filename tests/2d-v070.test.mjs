@@ -42,8 +42,8 @@ test('drops per kill: normal monsters rarely drop, elites often, bosses always t
   for(let k=0;k<5000;k++){n+=rollDrops(r,{source:'normal',level:30,newId:id}).length;e+=rollDrops(r,{source:'elite',level:30,newId:id}).length;}
   for(let k=0;k<200;k++)b+=rollDrops(r,{source:'boss',level:30,newId:id}).length;
   // v0.7.2：普通 15%，精英 0.5 + 0.2，首领 2 件必掉 + 1 件 50%
-  assert.ok(n/5000>.12&&n/5000<.18,'normal ~15%: '+n/5000);
-  assert.ok(e/5000>.6&&e/5000<.8,'elite ~0.7 items: '+e/5000);
+  assert.ok(n/5000>.08&&n/5000<.12,'normal ~10% (v0.8): '+n/5000);
+  assert.ok(e/5000>.4&&e/5000<.56,'elite ~0.48 items: '+e/5000);
   assert.ok(b>=400&&b<=600&&b/200>2.3&&b/200<2.7,'boss ~2.5 items: '+b/200);
 });
 test('item level gates bases and legendaries; requirement level follows quality level',()=>{

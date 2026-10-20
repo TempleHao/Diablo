@@ -1,3 +1,4 @@
+import {WAVE_SIZE,ELITE_SLOTS} from './encounters.js';
 /* 余烬纪事 2D · 怪物图鉴（v0.6）：普通 30、远程 25、精英 25、首领 20，共 100 种。
  * sprite：art/monsters.webp 中的贴图键；face：原画朝向（1 右、-1 左、0 正面不翻转）。
  * hp/dmg/spd：相对基准的倍率（基准随怪物等级成长，见 game.js monsterStats）。
@@ -114,10 +115,10 @@ export const MONSTERS={
 };
 // 四档基础属性（再乘每种怪物自己的倍率）
 export const TIER=Object.freeze({
-  normal:{hp:60,dmg:9,speed:125,radius:17,attack:1.1,xp:22,scale:.62},
-  caster:{hp:52,dmg:11,speed:110,radius:16,attack:2.2,xp:26,scale:.64},
-  elite:{hp:380,dmg:17,speed:118,radius:24,attack:1.25,xp:80,scale:.78},
-  boss:{hp:2300,dmg:24,speed:100,radius:42,attack:2.1,xp:260,scale:.92}
+  normal:{hp:60,dmg:9,speed:125,radius:20,attack:1.1,xp:16,scale:.94},
+  caster:{hp:52,dmg:11,speed:110,radius:19,attack:2.2,xp:18,scale:.94},
+  elite:{hp:380,dmg:17,speed:118,radius:30,attack:1.25,xp:58,scale:1.0},
+  boss:{hp:2300,dmg:24,speed:100,radius:50,attack:2.1,xp:260,scale:.96}
 });
 // 九个区域的怪物池：普通、远程、精英、首领（首领按击杀次数轮换）
 export const REGION_MONSTERS=Object.freeze([
@@ -138,8 +139,8 @@ export const bossFor=(region,kills)=>{const list=REGION_MONSTERS[region]?.boss||
 export function waveMonsters(region,index,rng){
   const pool=REGION_MONSTERS[region]||REGION_MONSTERS[0],out=[];
   const pick=list=>list[Math.floor(rng()*list.length)];
-  for(let i=0;i<12;i++){
-    if(index>0&&(i===3||i===9))out.push(pick(pool.elite));
+  for(let i=0;i<WAVE_SIZE;i++){
+    if(ELITE_SLOTS[index]?.includes(i))out.push(pick(pool.elite));
     else if(i%4===2)out.push(pick(pool.caster));
     else out.push(pick(pool.normal));
   }

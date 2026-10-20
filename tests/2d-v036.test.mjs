@@ -5,26 +5,25 @@ import {HERO_ART,animationPose} from '../dist/2d/pixel-mage-demo.js';
 import {freshSave,sanitizeSave} from '../dist/2d/core.js';
 import {REGION_DATA} from '../dist/2d/systems.js';
 import {emitVfx,tickVfx} from '../dist/2d/spell-vfx.js';
-test('all 9 regions now use 3x the previous 12-monster total with 3 distinct encounters',()=>{
- assert.equal(ENCOUNTER_COUNT,36);assert.equal(WAVE_COUNT,3);assert.equal(WAVE_SIZE,12);
- assert.ok(MAX_LIVE_ENEMIES>=WAVE_SIZE);
+test('v0.8: 54 monsters per run in 3 waves of 18, elites 1/2/3 per wave',()=>{
+ assert.equal(ENCOUNTER_COUNT,54);assert.equal(WAVE_COUNT,3);assert.equal(WAVE_SIZE,18);
+ assert.ok(MAX_LIVE_ENEMIES>=WAVE_SIZE*3);
  for(const region of REGION_DATA){
   const waves=Array.from({length:WAVE_COUNT},(_,i)=>encounterWave(region.types,i));
-  assert.equal(waves.flat().length,36);
-  assert.ok(waves[1].filter(x=>x.elite).length>=2);
-  assert.ok(waves[2].filter(x=>x.elite).length>=2);
+  assert.equal(waves.flat().length,54);
+  assert.deepEqual(waves.map(w=>w.filter(x=>x.elite).length),[1,2,3]);
   assert.ok(waves.flat().every(x=>region.types.includes(x.kind)));
  }
 });
-test('reinforcements trigger only at 12 and 24 kills, boss only at 36',()=>{
+test('third wave arrives at 36 kills (waves 1–2 are placed at start), boss at 54',()=>{
  assert.equal(nextWaveForKills(0),-1);
- assert.equal(nextWaveForKills(12),1);
- assert.equal(nextWaveForKills(24),2);
- assert.equal(nextWaveForKills(36),-1);
- for(const i of [1,4,8,11,13,23,25,35])assert.equal(nextWaveForKills(i),-1);
- assert.equal(shouldSummonBoss(35,null),false);
- assert.equal(shouldSummonBoss(36,null),true);
- assert.equal(shouldSummonBoss(36,{}),false);
+ assert.equal(nextWaveForKills(18),1);
+ assert.equal(nextWaveForKills(36),2);
+ assert.equal(nextWaveForKills(54),-1);
+ for(const i of [1,4,17,19,35,37,53])assert.equal(nextWaveForKills(i),-1);
+ assert.equal(shouldSummonBoss(53,null),false);
+ assert.equal(shouldSummonBoss(54,null),true);
+ assert.equal(shouldSummonBoss(54,{}),false);
 });
 test('seven class choices persist and reject invalid values',()=>{
  assert.deepEqual(Object.keys(HERO_ART).sort(),['amazon','assassin','barbarian','druid','mage','necro','paladin']);

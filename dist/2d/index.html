@@ -11,7 +11,7 @@
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.7.3</span>
+    <span class="version">灰烬边境 · 第一幕 / v0.8.0</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -34,6 +34,20 @@
   <div class="resource"><small>金币</small><strong id="gold">0</strong><small>精华</small><strong id="essence">0</strong></div>
 </footer>
 <div class="buffbar" id="buffbar" aria-label="当前增益"></div>
+<div id="ghud" class="ghud" hidden aria-label="状态栏">
+  <div class="gh-orb hp"><i id="gh-hp-fill"></i><b></b></div><div class="gh-orb mp"><i id="gh-mp-fill"></i><b></b></div>
+  <div class="gh-bar hp"><i id="gh-hp-bar"></i></div><div class="gh-bar mp"><i id="gh-mp-bar"></i></div>
+  <img class="gh-frame" src="./art/hud-frame.webp" alt="" draggable="false">
+  <div class="gh-txt hp"><span>生命</span> <em id="gh-hp-now">0</em> / <strong id="gh-hp-max">0</strong></div>
+  <div class="gh-txt mp"><span id="gh-mp-label">法力</span> <em id="gh-mp-now">0</em> / <strong id="gh-mp-max">0</strong></div>
+  <div class="gh-lv"><span id="gh-lv">Lv. 1</span><i><u id="gh-xp"></u></i></div>
+  <div class="gh-cls" id="gh-cls">法师</div>
+  <div class="gh-keys" id="gh-keys"></div>
+  <button type="button" class="gh-util" data-act="status" title="角色状态（C）">◈<small>状态</small></button>
+  <button type="button" class="gh-util" data-act="bag" title="行囊（B）">✥<small>行囊</small></button>
+  <button type="button" class="gh-util" data-act="help" title="操作说明">☰<small>操作</small></button>
+  <div class="gh-gold"><span>金币 <b id="gh-gold">0</b></span><span>精华 <b id="gh-ess">0</b></span></div>
+</div>
 <aside id="status-panel" class="status-panel" hidden aria-label="角色状态"></aside>
 <div class="joystick" id="joystick" aria-label="触摸摇杆"><span id="stick"></span></div>
 <div class="tip">WASD 移动 · 左键/1 火弹 · 2 霜环 · 3 冰箭 · 4 冰甲 · Q 陨火 · 空格 闪现 · E 药剂 · B 背包</div>

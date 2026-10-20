@@ -19,8 +19,8 @@ test('100 monsters in four tiers, all with sprites; every region pool is valid',
   const bosses=new Set();
   for(const r of REGION_MONSTERS){for(const k of ['normal','caster','elite','boss'])for(const id of r[k])assert.equal(MONSTERS[id]?.tier,k,id);r.boss.forEach(b=>bosses.add(b));}
   assert.equal(bosses.size,20,'all 20 bosses appear somewhere');
-  for(let region=0;region<9;region++)for(let w=0;w<3;w++){const g=waveMonsters(region,w,mulberry32(region*7+w));assert.equal(g.length,12);
-    assert.equal(g.filter(id=>MONSTERS[id].tier==='elite').length,w>0?2:0);}
+  for(let region=0;region<9;region++)for(let w=0;w<3;w++){const g=waveMonsters(region,w,mulberry32(region*7+w));assert.equal(g.length,18);
+    assert.equal(g.filter(id=>MONSTERS[id].tier==='elite').length,w+1);}
   for(const m of Object.values(MONSTERS)){if(m.tier==='boss')assert.ok(m.moves.length>=3);if(m.tier==='elite')assert.ok(m.mods.length>=1);
     if(m.ai==='caster'||m.ai==='ranged')assert.ok(m.school&&m.shot,m.name);}
 });

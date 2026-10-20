@@ -24,7 +24,7 @@ function trips({level,difficulty=0,mf=0,runs=3000}){
   let leg=0,set=0,uni=0,ex=0,pity={legendary:0,unique:0};
   for(let r=0;r<runs;r++){
     const d=[];
-    for(let k=0;k<30;k++)d.push(...rollDrops(rng,{source:'normal',level,mf,difficulty,newId:id}));
+    for(let k=0;k<48;k++)d.push(...rollDrops(rng,{source:'normal',level,mf,difficulty,newId:id}));
     for(let k=0;k<6;k++)d.push(...rollDrops(rng,{source:'elite',level,mf,difficulty,newId:id}));
     const b=rollBossRewards(rng,level+2,r%9,3,id,{mf,difficulty,pity});pity=b.pity;if(b.exclusive)ex++;
     for(const it of [...d,...b.drops.filter(x=>x.name!==BOSS_POOLS[r%9].item)]){if(it.setId)set++;else if(it.rarity===4)uni++;else if(it.rarity===3)leg++;}

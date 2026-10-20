@@ -5,8 +5,8 @@ import {makeLoot,catalogEntry} from '../dist/2d/systems.js';
 import {monsterHpMult,monsterDmgMult,armorDR,expRequired,DIFFICULTIES} from '../dist/2d/progression.js';
 import {TIER} from '../dist/2d/monsters.js';
 
-test('XP pacing: 1→60 takes about 50 trips (2.3× the old curve)',()=>{
-  const xpRun=L=>{const D=DIFFICULTIES[L<40?0:L<70?1:2];return (30*(TIER.normal.xp*.8+TIER.caster.xp*.2)+6*TIER.elite.xp+TIER.boss.xp)*(1+(L-1)*.04)*D.xp;};
+test('XP pacing: 1→60 takes about 50 trips (54 monsters per trip since v0.8)',()=>{
+  const xpRun=L=>{const D=DIFFICULTIES[L<40?0:L<70?1:2];return (48*(TIER.normal.xp*.8+TIER.caster.xp*.2)+6*TIER.elite.xp+TIER.boss.xp)*(1+(L-1)*.04)*D.xp;};
   let a=0,b=0;for(let L=1;L<100;L++){const r=expRequired(L)/xpRun(L);if(L<60)a+=r;else b+=r;}
   assert.ok(a>42&&a<58,'1→60 trips: '+a);assert.ok(b>150&&b<260,'60→100 trips: '+b);
   assert.ok(expRequired(60)>expRequired(59),'curve stays monotonic at 60');

@@ -253,7 +253,8 @@ const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'
 // 用「看得见的厄运保护」+「金币赌博」+「白蓝黄靠物品等级持续变强」来缓解长期刷不到的挫败感。
 export const DROP_RULES=Object.freeze({
   // 每只怪的「抽取」：每次抽取掉装备的概率（其余为空 / 只有金币）
-  picks:{normal:[.15],elite:[.5,.2],boss:[1,1,.5]},
+  // v0.8：每趟怪物从 36 只增加到 54 只，单只掉率按比例下调，每趟总掉落不变
+  picks:{normal:[.11],elite:[.36,.15],boss:[1,1,.5]},
   // 每件装备的品质基础几率（从高到低依次判定）
   base:{unique:.0009,set:.0014,legendary:.0036,epic:.032,magic:.24},
   // 寻宝几率递减（与 D2 相同的常数）：有效 = MF × K ÷ (MF + K)；魔法品质吃满额
