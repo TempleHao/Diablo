@@ -16,7 +16,7 @@ import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFacto
 import {LocalStore,STASH_SIZE} from './storage.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
-import {HUD_LAYOUT} from './hud-layout.js';
+import {HUD_STRIP} from './hud-strip-layout.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
@@ -387,7 +387,7 @@ function showModal(kind) {
   clearInput();state=kind==='victory'?'victory':kind==='death'?'death':'paused';
   const title=$('modal').querySelector('h1'), lead=$('modal').querySelector('.lead'), paragraphs=$('modal').querySelectorAll('p');
   const main=$('modal-primary'), secondary=$('modal-secondary');
-  $('scrim').hidden=false; secondary.hidden=true;
+  $('scrim').hidden=false; secondary.hidden=true;title.classList.remove('logo-title');
   if(kind==='victory') {
     title.innerHTML='炉心<span>重燃</span>';lead.textContent='灰烬地窟重归寂静。';
     paragraphs[1].textContent='你已战胜空潮领主，金币、装备与经验会随下一次远征保留。新的轮回将带来更强大的敌人。';
@@ -778,7 +778,7 @@ function renderInventory(){
 }
 $('export-save').onclick=()=>{
   const blob=new Blob([JSON.stringify(profile,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ember-chronicles-2d-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='guixu-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
 };
 $('import-save').onclick=()=>$('save-file').click();
 $('save-file').onchange=async e=>{
@@ -792,30 +792,26 @@ $('save-file').onchange=async e=>{
     profile=candidate;persist();build();state='playing';closeInventory();announce('角色存档已导入');
   }catch{alert('存档文件解析失败，原存档未被修改。');}
 };
-// ───── v0.8 电脑版哥特式状态栏（art/hud-frame.webp + hud-layout.js） ─────
+// ───── v0.9 电脑版状态栏（左下 art/hud-strip.webp + hud-strip-layout.js，右下技能面板） ─────
 function ghudOn(){return !window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
 function placeIn(el,r){el.style.left=r[0]+'%';el.style.top=r[1]+'%';el.style.width=r[2]+'%';el.style.height=r[3]+'%';}
+// v0.9：生命 / 资源条在左下（art/hud-strip.webp），技能栏单独放在右下，互不挤压
 function layoutGhud(){
   const on=ghudOn(),g=$('ghud');g.hidden=!on;document.body.classList.toggle('ghud-on',on);
-  const bar=$('abilitybar'),buffs=$('buffbar');
+  const bar=$('abilitybar'),buffs=$('buffbar'),slots=$('gh-slots');
   if(on){
-    if(bar.parentElement!==g)g.append(bar);if(buffs.parentElement!==g)g.append(buffs);
-    const L=HUD_LAYOUT;
-    placeIn(g.querySelector('.gh-orb.hp'),L.orbL);placeIn(g.querySelector('.gh-orb.mp'),L.orbR);
-    placeIn(g.querySelector('.gh-bar.hp'),L.hpBar);placeIn(g.querySelector('.gh-bar.mp'),L.mpBar);
-    placeIn(g.querySelector('.gh-txt.hp'),L.hpText);placeIn(g.querySelector('.gh-txt.mp'),L.mpText);
-    placeIn(g.querySelector('.gh-lv'),L.lv);placeIn($('gh-cls'),L.cls);placeIn(buffs,L.buffs);
-    [...bar.children].forEach((b,i)=>{if(L.slots[i])placeIn(b,L.slots[i]);});
-    [...g.querySelectorAll('.gh-util')].forEach((b,i)=>placeIn(b,L.slots[10+i]));
-    const keys=$('gh-keys');keys.replaceChildren();
-    // 第 3–10 格下面有按键牌；第 1、2 格把按键写在格子右下角
-    profile?.keybinds?.forEach((k,i)=>{const el=document.createElement('span');el.textContent=keyLabel(k||'');
-      if(i>=2&&L.keys[i-2])placeIn(el,L.keys[i-2]);else{const r=L.slots[i];placeIn(el,[r[0]+r[2]*.55,r[1]+r[3]*.62,r[2]*.42,r[3]*.36]);el.className='corner';}
-      keys.append(el);});
+    if(bar.parentElement!==slots)slots.append(bar);if(buffs.parentElement!==g.querySelector('.gh-right'))g.querySelector('.gh-right').prepend(buffs);
+    const L=HUD_STRIP,left=g.querySelector('.gh-left');
+    placeIn(left.querySelector('.gh-orb.hp'),L.orbL);placeIn(left.querySelector('.gh-orb.mp'),L.orbR);
+    placeIn(left.querySelector('.gh-bar.hp'),L.hpBar);placeIn(left.querySelector('.gh-bar.mp'),L.mpBar);
+    placeIn(left.querySelector('.gh-txt.hp'),L.hpText);placeIn(left.querySelector('.gh-txt.mp'),L.mpText);placeIn(left.querySelector('.gh-lv'),L.lv);
+    [...bar.children].forEach((b,i)=>{b.style.left=b.style.top=b.style.width=b.style.height='';
+      let k=b.querySelector('.gh-key');if(!k){k=document.createElement('span');k.className='gh-key';b.append(k);}
+      k.textContent=keyLabel(profile?.keybinds?.[i]||'')+(i===0?'·L':i===1?'·R':'');});
   }else{
     const foot=document.querySelector('footer.hud');if(bar.parentElement!==foot)foot.insertBefore(bar,foot.querySelector('.resource'));
     if(buffs.parentElement!==document.body)document.body.insertBefore(buffs,g);
-    [...bar.children].forEach(b=>{b.style.left=b.style.top=b.style.width=b.style.height='';});buffs.style.cssText='';
+    bar.querySelectorAll('.gh-key').forEach(k=>k.remove());buffs.style.cssText='';
   }
 }
 window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').addEventListener?.('change',()=>layoutGhud());
@@ -828,9 +824,8 @@ function updateGhud(s){
   $('gh-hp-now').textContent=Math.ceil(hero.hp);$('gh-hp-max').textContent=Math.ceil(hero.maxHp);
   $('gh-mp-now').textContent=Math.ceil(hero.mana);$('gh-mp-max').textContent=Math.ceil(hero.maxMana);
   $('gh-mp-label').textContent=CLASSES[profile.heroClass].resource;
-  $('gh-lv').textContent='Lv. '+profile.level;$('gh-cls').textContent=CLASSES[profile.heroClass].name;
+  $('gh-lv').textContent=profile.level;$('gh-cls').textContent=(profile.name||'')+' · '+CLASSES[profile.heroClass].name;
   $('gh-xp').style.width=(profile.level>=MAX_LEVEL?100:profile.xp/expRequired(profile.level)*100)+'%';
-  $('gh-gold').textContent=profile.gold;$('gh-ess').textContent=profile.essence;
   document.querySelector('.gh-orb.hp').classList.toggle('low',hpR<.3);
 }
 function updateHud(){

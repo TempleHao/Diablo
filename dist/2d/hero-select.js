@@ -1,4 +1,4 @@
-/* 余烬纪事 2D · 角色选择（v0.7，参照《暗黑破坏神 2》）
+/* 归墟 · 角色选择（v0.7，参照《暗黑破坏神 2》）
  *
  * 两个画面：
  *   角色列表：左侧是已有角色卡，中间是选中角色站在石台上的展示，右侧是信息、难度选择与「进入游戏」。
@@ -53,7 +53,8 @@ export function createHeroSelect({root,store,fresh,onEnter}){
   const listBox=el('section','hs-list');
   const bottom=el('div','hs-bottom');
   const account=el('div','hs-account');
-  root.append(bg,title,stage,listBox,side,bottom,account);
+  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-guixu.webp',import.meta.url).href;logo.alt='归墟 GUIXU';
+  root.append(bg,title,logo,stage,listBox,side,bottom,account);
   const ctx=canvas.getContext('2d');
 
   function chars(){return store.list();}

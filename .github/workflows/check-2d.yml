@@ -45,7 +45,7 @@ jobs:
           node --check dist/2d/progression.js
           node --check dist/2d/skill-icons.js
           node --check dist/2d/storage.js
-          node --check dist/2d/hud-layout.js
+          node --check dist/2d/hud-strip-layout.js
           node --check dist/2d/select-art.js
           node --check dist/2d/ui-icons.js
           node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-demo-mage-motion.test.mjs tests/2d-v036.test.mjs tests/2d-v040.test.mjs tests/2d-v041.test.mjs tests/2d-v050.test.mjs tests/2d-v051.test.mjs tests/2d-v060.test.mjs tests/2d-v070.test.mjs tests/2d-v072.test.mjs tests/2d-v073.test.mjs

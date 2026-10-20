@@ -705,3 +705,39 @@ select option{background:#15110e;color:#ecdcb8}
 .gh-util{font-size:clamp(11px,1.3vw,17px)}.gh-util small{display:none}
 body.ghud-on .upgrade-chip{bottom:calc(min(680px,56vw)*454/1661*.75 + 10px)!important}
 .gh-cls{letter-spacing:0;font-size:clamp(9px,.85vw,12px);white-space:nowrap}
+
+/* ═════════ v0.9 状态栏拆分：左下生命 / 资源条，右下技能栏 ═════════ */
+.ghud{left:0!important;right:0!important;width:auto!important;transform:none!important;aspect-ratio:auto!important;bottom:var(--sb)!important;height:0;overflow:visible}
+.ghud>*{position:absolute}
+.gh-left{left:calc(10px + var(--sl));bottom:4px;width:min(520px,40vw);aspect-ratio:2139/436;pointer-events:none}
+.gh-left>*{position:absolute}
+.gh-left .gh-frame{left:0;top:0;width:100%;height:100%;z-index:2;-webkit-mask-image:none;mask-image:none;filter:drop-shadow(0 4px 10px #000c)}
+.gh-left .gh-txt{z-index:3;font-size:clamp(10px,.95vw,13px);gap:.25em}
+.gh-left .gh-lv{z-index:3;flex-direction:column;gap:0;line-height:1}
+.gh-left .gh-lv small{font-size:clamp(7px,.6vw,9px);color:#b8a27c;letter-spacing:1px}
+.gh-left .gh-lv span{font-size:clamp(12px,1.25vw,18px);color:#f0b45e}
+.gh-left .gh-lv i{width:56%;height:2px;margin-top:2px}
+.gh-right{right:calc(12px + var(--sr));bottom:8px;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.gh-right .gh-cls{position:static;display:flex;align-items:baseline;gap:8px;padding:0 4px;font-size:12px;letter-spacing:1px;color:#e6d4b0;height:auto;width:auto}
+.gh-right .gh-cls small{color:#9c8a6c;font-size:10px}
+.gh-slots{position:relative;padding:7px;border:2px solid #0a0807;border-radius:3px;pointer-events:auto;
+  background:var(--noise),linear-gradient(180deg,#221b16,#0e0b09);box-shadow:inset 0 0 0 1px #8a6a3c,inset 0 0 0 3px #0c0a08,inset 0 0 0 4px #4a3826,0 6px 18px #000c}
+.gh-slots::before,.gh-slots::after{content:"";position:absolute;top:-7px;width:14px;height:14px;background:radial-gradient(circle at 40% 35%,#f0cd8e,#7a5a30 65%);border:1px solid #0a0807;transform:rotate(45deg)}
+.gh-slots::before{left:-7px}.gh-slots::after{right:-7px}
+.ghud .gh-slots .abilitybar{position:static;inset:auto;display:grid;grid-template-columns:repeat(5,48px);gap:5px}
+.ghud .gh-slots .abilitybar button{position:relative;width:48px;height:48px;border:1px solid #0a0807;box-shadow:inset 0 0 0 1px #8a6a3c,0 1px 3px #000}
+.ghud .gh-slots .abilitybar button .gh-key{position:absolute;right:1px;bottom:0;z-index:2;font-size:10px;font-weight:700;color:#fff;text-shadow:0 0 3px #000,0 1px 1px #000;font-family:var(--serif)}
+.gh-utils{display:flex;gap:5px;pointer-events:auto}
+.gh-utils .gh-util{position:static;width:34px;height:30px;border:1px solid #0a0807;border-radius:2px;box-shadow:inset 0 0 0 1px #6e5434;font-size:15px}
+.ghud .buffbar{position:static!important;width:auto!important;height:auto!important;display:flex;gap:4px;justify-content:flex-end}
+body.ghud-on .upgrade-chip{bottom:calc(min(520px,40vw)*436/2139 + 24px)!important}
+/* 新名字：归墟 logo */
+.brand{gap:0}.brand-logo{height:52px;width:auto;display:block;filter:drop-shadow(0 2px 6px #000)}
+.brandmark{display:none}
+.modal .logo-title{margin:0 auto 4px}.modal .logo-title img{width:min(360px,80%);height:auto;display:block;margin:0 auto}
+.modal .crest{display:none}
+.hs-logo{position:absolute;left:50%;top:calc(4px + var(--st,0px));transform:translateX(-50%);width:min(300px,34vw);z-index:3;pointer-events:none;filter:drop-shadow(0 4px 12px #000)}
+.hero-select[data-mode="list"] .hs-logo,.hero-select[data-mode="create"] .hs-logo{display:block}
+.hero-select.is-mobile .hs-logo{width:min(220px,56vw)}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-logo{height:38px}}
+.gh-right{padding-left:42px}.gh-utils{position:absolute!important;left:0;bottom:0;flex-direction:column}

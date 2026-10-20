@@ -2,16 +2,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10131a"><meta name="description" content="余烬纪事 2D：原创俯视角地牢动作 RPG。单机免费，刷怪、装备与成长。">
-<title>余烬纪事 2D | 灰烬边境</title>
+<meta name="theme-color" content="#10131a"><meta name="description" content="归墟 GUIXU：原创俯视角暗黑地牢动作 RPG。单机免费，刷怪、装备与成长。">
+<title>归墟 GUIXU</title><link rel="icon" href="./art/logo-guixu-icon.webp">
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
+<canvas id="game" aria-label="归墟游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
-  <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
+  <a class="brand" href="../" title="返回原版 3D 游戏"><img class="brand-logo" src="./art/logo-guixu-text.webp" alt="归墟 GUIXU" draggable="false"></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.8.2</span>
+    <span class="version">灰烬边境 · 第一幕 / v0.9.0</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -35,18 +35,23 @@
 </footer>
 <div class="buffbar" id="buffbar" aria-label="当前增益"></div>
 <div id="ghud" class="ghud" hidden aria-label="状态栏">
-  <div class="gh-orb hp"><i id="gh-hp-fill"></i><b></b></div><div class="gh-orb mp"><i id="gh-mp-fill"></i><b></b></div>
-  <div class="gh-bar hp"><i id="gh-hp-bar"></i></div><div class="gh-bar mp"><i id="gh-mp-bar"></i></div>
-  <img class="gh-frame" src="./art/hud-frame.webp" alt="" draggable="false">
-  <div class="gh-txt hp"><span>生命</span> <em id="gh-hp-now">0</em> / <strong id="gh-hp-max">0</strong></div>
-  <div class="gh-txt mp"><span id="gh-mp-label">法力</span> <em id="gh-mp-now">0</em> / <strong id="gh-mp-max">0</strong></div>
-  <div class="gh-lv"><span id="gh-lv">Lv. 1</span><i><u id="gh-xp"></u></i></div>
-  <div class="gh-cls" id="gh-cls">法师</div>
-  <div class="gh-keys" id="gh-keys"></div>
-  <button type="button" class="gh-util" data-act="status" title="角色状态（C）">◈<small>状态</small></button>
-  <button type="button" class="gh-util" data-act="bag" title="行囊（B）">✥<small>行囊</small></button>
-  <button type="button" class="gh-util" data-act="help" title="操作说明">☰<small>操作</small></button>
-  <div class="gh-gold"><span>金币 <b id="gh-gold">0</b></span><span>精华 <b id="gh-ess">0</b></span></div>
+  <div class="gh-left">
+    <div class="gh-orb hp"><i id="gh-hp-fill"></i><b></b></div><div class="gh-orb mp"><i id="gh-mp-fill"></i><b></b></div>
+    <div class="gh-bar hp"><i id="gh-hp-bar"></i></div><div class="gh-bar mp"><i id="gh-mp-bar"></i></div>
+    <img class="gh-frame" src="./art/hud-strip.webp" alt="" draggable="false">
+    <div class="gh-txt hp"><em id="gh-hp-now">0</em> / <strong id="gh-hp-max">0</strong></div>
+    <div class="gh-txt mp"><em id="gh-mp-now">0</em> / <strong id="gh-mp-max">0</strong></div>
+    <div class="gh-lv"><small>LV</small><span id="gh-lv">1</span><i><u id="gh-xp"></u></i></div>
+  </div>
+  <div class="gh-right">
+    <div class="gh-cls"><b id="gh-cls">法师</b><small id="gh-mp-label">法力</small></div>
+    <div class="gh-slots" id="gh-slots"></div>
+    <div class="gh-utils">
+      <button type="button" class="gh-util" data-act="status" title="角色状态（C）">◈</button>
+      <button type="button" class="gh-util" data-act="bag" title="行囊（B）">✥</button>
+      <button type="button" class="gh-util" data-act="help" title="操作说明">☰</button>
+    </div>
+  </div>
 </div>
 <aside id="status-panel" class="status-panel" hidden aria-label="角色状态"></aside>
 <div class="joystick" id="joystick" aria-label="触摸摇杆"><span id="stick"></span></div>
@@ -55,7 +60,7 @@
 <div id="scrim" class="scrim" hidden>
   <section class="modal" id="modal" aria-live="polite">
     <div class="crest">✦</div><span class="eyebrow">原创俯视角暗黑 ARPG</span>
-    <h1>余烬<span>纪事</span></h1>
+    <h1 class="logo-title"><img src="./art/logo-guixu.webp" alt="归墟 GUIXU" draggable="false"></h1>
     <p class="lead">断昼之后，最后的火种在黑暗里微微颤动。</p>
     <p>选择你的职业：亚马逊、刺客、野蛮人、德鲁伊、死灵法师、圣骑士或法师。深入地窟，击败徘徊的空潮仆从，夺回失落的炉心。装备与成长将随每一次远征保留。</p>
     <div class="features"><span>✧ 九张地图 × 三个难度</span><span>✧ 1551 件图鉴装备</span><span>✧ 七大职业 · 181 项技能</span><span>✧ 等级上限 100</span></div>

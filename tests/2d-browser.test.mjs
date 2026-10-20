@@ -44,7 +44,7 @@ try{
     const openMore=async()=>{if(await page.locator('#btn-menu').isVisible()&&!(await page.locator('#top-more').isVisible()))await page.click('#btn-menu');};
     const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
-    assert.match(await page.title(),/余烬纪事 2D/);
+    assert.match(await page.title(),/归墟/);
     await page.waitForTimeout(300);
     // Real sprite art must load and decode, not just a successful HTML response.
     const spriteState = await page.evaluate(async () => {
