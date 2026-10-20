@@ -1,5 +1,5 @@
 import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient, sanitizeParagon, paragonPoints, PARAGON, itemPowers } from './systems.js';
-import {DIFFICULTIES,clampDifficulty,difficultyUnlocked,expRequired as expCurve} from './progression.js';
+import {DIFFICULTIES,clampDifficulty,difficultyUnlocked,expRequired as expCurve,armorDR,monsterLevel as areaMonsterLevel} from './progression.js';
 import {buildById} from './builds.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
 // 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
@@ -220,6 +220,60 @@ export function autoEquip(p,buildId){
   return changed;
 }
 export function stats(p){return calculateStats(p);}
+// ───────── v0.7.3 战力与智能换装 ─────────
+const SCHOOLS=['fire','cold','lightning','physical','poison','holy','shadow'];
+/** 战力：输出 × 生存的几何平均，按当前流派（元素偏好）计算；与游戏内伤害、减伤公式一致。
+ *  输出 = 攻击力 × 伤害加成 × 擅长武器 × 暴击期望 × 攻速 × 技能等级 × 元素加成 × 传奇特效；
+ *  生存 = 生命 ÷ (1 − 护甲减伤[按当前怪物等级]) × 全抗。 */
+export function combatRating(p,buildId=null){
+  const s=calculateStats(p),cls=p.heroClass||'mage',build=buildById(cls,buildId||p.builds?.[cls]);
+  const w=build?.weights||{};
+  let ew=0,ev=0;for(const k of SCHOOLS){const wt=w[k]||0;ew+=wt;ev+=wt*(s[k]||0);}
+  const elem=ew?ev/ew:SCHOOLS.reduce((a,k)=>a+(s[k]||0),0)/SCHOOLS.length;
+  let powers=0;const byId=new Map(p.inventory.map(i=>[i.id,i]));
+  for(const id of Object.values(p.equipped||{})){const it=byId.get(id);if(it&&(it.req||1)<=p.level)powers+=itemPowers(it).length;}
+  // 武器偏好：擅长武器 ×1.15（与实际伤害一致）；非本职业擅长的武器再打 85 折，避免野蛮人背弓之类的搭配
+  const off=s.power*(1+(s.dmgPct||0)/100)*(s.proficient?1.15:s.weapon?.85:1)*(1+s.crit/100*s.critDmg/100)*(1+s.haste/100)
+    *(1+.12*(s.classSkill||0))*(1+elem/100)*(1+.04*powers)*(1+(s.cdr||0)/200);
+  const mlvl=areaMonsterLevel(p);
+  const res=(s.resistFire+s.resistCold+s.resistDark)/3;
+  const def=s.hp/(1-armorDR(s.armor,mlvl))*(1+Math.max(-50,res)/200)*(1+(s.regen||0)/100);
+  return Math.round(Math.sqrt(Math.max(1,off)*Math.max(1,def))*2);
+}
+/** 智能换装：先按流派权重排出初始搭配，再逐个部位试穿背包里每一件（武器 + 副手按组合），
+ *  只要战力上升就换上，反复到不再提升为止。会考虑套装件数、传奇特效、双手武器占副手、等级不够不能穿。
+ *  返回 {before, after, changed:[部位]}；dry=true 时只计算不应用。 */
+export function smartEquip(p,buildId=null,{dry=false}={}){
+  const original={...p.equipped},before=combatRating(p,buildId);
+  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level);
+  const fits=(it,slot)=>slot.startsWith('ring')?it.slot.startsWith('ring'):getSlotForItem(it,slot)===slot;
+  autoEquip(p,buildId||p.builds?.[p.heroClass]);
+  let best=combatRating(p,buildId);
+  if(best<before){p.equipped={...original};best=before;}
+  // 战力更高就换；空着的部位只要不降战力也穿上（比如只加移速 / 寻宝的腰带、靴子）
+  const tryEq=(next,fillEmpty=false)=>{const prev=p.equipped;p.equipped=next;const r=combatRating(p,buildId);if(r>best+.5||(fillEmpty&&r>=best)){best=Math.max(best,r);return true;}p.equipped=prev;return false;};
+  const weapons=usable.filter(i=>fits(i,'weapon')),offs=usable.filter(i=>fits(i,'offhand'));
+  for(let pass=0;pass<4;pass++){
+    let improved=false;
+    for(const slot of ['head','shoulders','robe','gloves','belt','boots','amulet','ring1','ring2']){
+      for(const it of usable){
+        if(!fits(it,slot)||p.equipped[slot]===it.id)continue;
+        const next={...p.equipped};for(const k of SLOT_IDS)if(next[k]===it.id)next[k]=null;next[slot]=it.id;
+        if(tryEq(next,!p.equipped[slot]))improved=true;
+      }
+    }
+    for(const w of [null,...weapons])for(const o of [null,...offs]){
+      if(!offhandAllowed(w,o))continue;
+      if(p.equipped.weapon===(w?.id||null)&&p.equipped.offhand===(o?.id||null))continue;
+      if(tryEq({...p.equipped,weapon:w?.id||null,offhand:o?.id||null}))improved=true;
+    }
+    if(!improved)break;
+  }
+  const changed=SLOT_IDS.filter(k=>original[k]!==p.equipped[k]);
+  const after=best;
+  if(dry)p.equipped=original;
+  return {before,after,changed};
+}
 export const expRequired=expCurve;
 export function gainXp(p,amount){
   p.xp+=Math.max(0,Math.floor(amount));let advanced=0;

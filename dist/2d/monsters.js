@@ -116,8 +116,8 @@ export const MONSTERS={
 export const TIER=Object.freeze({
   normal:{hp:60,dmg:9,speed:125,radius:17,attack:1.1,xp:22,scale:.62},
   caster:{hp:52,dmg:11,speed:110,radius:16,attack:2.2,xp:26,scale:.64},
-  elite:{hp:260,dmg:15,speed:118,radius:24,attack:1.25,xp:80,scale:.78},
-  boss:{hp:1400,dmg:20,speed:100,radius:42,attack:2.1,xp:260,scale:.92}
+  elite:{hp:380,dmg:17,speed:118,radius:24,attack:1.25,xp:80,scale:.78},
+  boss:{hp:2300,dmg:24,speed:100,radius:42,attack:2.1,xp:260,scale:.92}
 });
 // 九个区域的怪物池：普通、远程、精英、首领（首领按击杀次数轮换）
 export const REGION_MONSTERS=Object.freeze([

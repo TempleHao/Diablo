@@ -46,8 +46,8 @@ test('equipping and salvaging gear respects equipped state',()=>{
 });
 test('XP gain levels repeatedly and stops at 100 (v0.7)',()=>{
   const p=freshSave();
-  assert.equal(expRequired(1),60);
-  assert.equal(gainXp(p,60),1);assert.equal(p.level,2);
+  assert.equal(expRequired(1),138); // v0.7.3：前期经验 ×2.3
+  assert.equal(gainXp(p,138),1);assert.equal(p.level,2);
   gainXp(p,1e9);assert.equal(p.level,100);assert.equal(p.xp,0);
 });
 test('old or absent data does not crash current 2D save',()=>{

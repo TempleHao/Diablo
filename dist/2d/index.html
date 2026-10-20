@@ -11,7 +11,7 @@
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.7.2</span>
+    <span class="version">灰烬边境 · 第一幕 / v0.7.3</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -53,6 +53,11 @@
 <div id="inventory" class="panel-wrap" hidden>
   <section class="inventory-panel" role="dialog" aria-modal="true" aria-labelledby="inv-heading">
     <div class="panel-head"><div><span class="eyebrow">持灯者 / 装备与成长</span><h2 id="inv-heading">旅人的行囊</h2></div><button type="button" id="inv-close" class="icon-button">✕</button></div>
+    <div class="smart-equip" id="smart-equip">
+      <div class="cr-box"><small>战力</small><strong id="cr-now">0</strong></div>
+      <button type="button" id="btn-smart" class="primary">⚡ 一键换装</button>
+      <small id="smart-msg" class="smart-msg">按「战力」自动挑出背包里最强的搭配（会考虑套装、传奇特效、双手武器和当前流派）。</small>
+    </div>
     <nav class="mobile-inv-tabs" id="mobile-inv-tabs" aria-label="移动端行囊页面">
       <button type="button" data-view="bag" class="is-active" aria-pressed="true">背包</button>
       <button type="button" data-view="compare" aria-pressed="false">装备对比</button>
@@ -136,6 +141,7 @@
     <small class="fineprint">背包物品可装备、对比、分解。支持旧 v0.1 / v0.2 存档迁移；数据保存在当前浏览器，推荐定期导出备份。</small>
   </section>
 </div>
+<button id="upgrade-chip" class="upgrade-chip" type="button" hidden>⚡ 有更好的装备 · <b id="upgrade-gain">战力 +0</b> · 点我换上</button>
 <button id="portal-open" class="portal-open" type="button" hidden>✦ 传送阵已开启 · 选择下一地图 <kbd>T</kbd></button>
 <div id="portal-panel" class="panel-wrap portal-wrap" hidden>
   <section class="portal-dialog" role="dialog" aria-modal="true" aria-labelledby="portal-heading">

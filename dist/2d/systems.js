@@ -242,7 +242,7 @@ export function getSlotForItem(item,target){
 // 词缀成长：固定数值类（生命、法力、护甲、强度、回复、吸血）随物品等级线性成长；
 // 百分比类（暴击、增伤、抗性、攻速、移速、寻宝）成长平缓，避免高等级时百分比堆爆；品质再给小幅加成。
 const PCT_AFFIX=new Set(['crit','critDmg','haste','fire','cold','lightning','physical','poison','holy','shadow','resistFire','resistCold','resistDark','move','mf','allRes','cdr']);
-export const RARITY_AFFIX_MULT=Object.freeze([1,1,1.08,1.16,1.25]);
+export const RARITY_AFFIX_MULT=Object.freeze([1,1,1.08,1.22,1.32]);
 export const affixScale=(key,ilvl)=>AFFIXES[key].max===1?1:PCT_AFFIX.has(key)?1+Math.min(MAX_LEVEL,Math.max(1,ilvl))/60*.7:1+(Math.min(MAX_LEVEL,Math.max(1,ilvl))-1)*.055;
 export const affixMax=(key,ilvl,rarity)=>Math.round(AFFIXES[key].max*affixScale(key,ilvl)*RARITY_AFFIX_MULT[rarity|0])+(key.startsWith('sk_')&&ilvl>=70?1:0);
 const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
@@ -305,7 +305,8 @@ function pickNamed(rng,kind,slot,ilvl,cls){
   let pool=slot?(src[slotGroup(slot)]||[]):Object.values(src).flat();
   pool=pool.filter(c=>c.q<=ilvl);
   if(cls&&kind==='legend'&&rng()<DROP_RULES.ownClass){const mine=pool.filter(c=>ownsEntry(c,cls));if(mine.length)pool=mine;}
-  return pool.length?pool[Math.floor(rng()*pool.length)]:null;
+  // v0.7.3：越接近物品等级的传奇 / 暗金越常见（地狱多出高品级的，低品级的仍偶尔出现）
+  return pool.length?weightedPick(rng,pool,c=>.12+2*(c.q/Math.max(ilvl,1))**3):null;
 }
 /** 掉落装备。opts：source normal/elite/boss，cls 当前职业，mf 寻宝几率，difficulty 难度，min 保底品质，force 强制品质。
  *  兼容旧调用：{boss:true} 等同 source:'boss'。 */
@@ -336,8 +337,10 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   }
   const slot=entry.s;
   const owner=entry.owner||CLASS_BY_CATALOG[entry.cls];
-  const count=setId?2+Math.floor(rng()*2):rarity===4?4+Math.floor(rng()*2):rarity===3?2+Math.floor(rng()*2)
-    :rarity===2?(n>=60?4:3)+Math.floor(rng()*2):rarity===1?1+Math.floor(rng()*2):0;
+  // v0.7.3：传奇 / 暗金的词缀数不少于史诗，再加上传奇特效，保证「橙金」确实比「黄」好
+  const hi=n>=60?1:0;
+  const count=setId?3+Math.floor(rng()*2):rarity===4?4+hi+Math.floor(rng()*2):rarity===3?3+hi+Math.floor(rng()*2)
+    :rarity===2?3+hi+Math.floor(rng()*2):rarity===1?1+Math.floor(rng()*2):0;
   // 职业技能词条只出现在该职业偏好的装备上；元素等级词条只出现在法师装备上；高级词缀有物品等级与品质门槛
   const choices=Object.keys(AFFIXES).filter(k=>{const A=AFFIXES[k];return A.slots.includes(slot)&&(!A.cls||A.cls===owner)&&(!k.startsWith('skill')||k==='skillAll'||owner==='mage')
     &&(!A.minIlvl||n>=A.minIlvl)&&(!A.minRarity||rarity>=A.minRarity);});
@@ -362,8 +365,9 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   const armorSlot=['head','shoulders','robe','gloves','belt','boots','offhand'].includes(slot)&&!quiver&&!['法球','图腾','毒瓶','法典','符文书卷'].includes(entry.sub)||['骑士盾','鸢盾','战盾','塔盾','铁盾','钉刺盾','骨盾','轻盾','圆盾'].includes(entry.sub);
   const weaponSlot=slot==='weapon',twoHand=entry.h===2;
   // 基底强度：品级为主、物品等级为辅
-  const qb=Math.max(1,Math.round((entry.q||n)*.75+n*.25));
-  const rmul=rarity===4&&!setId?1.4:1+rarity*.27;
+  // 传奇 / 暗金 / 套装的基础强度不低于物品等级的 85%：高难度掉的橙金一定够用
+  const qb=Math.max(1,Math.round((entry.q||n)*.75+n*.25),rarity>=3?Math.round(n*.85):0);
+  const rmul=[1,1.2,1.4,1.65,1.85][rarity]*(setId?.95:1);
   return normalizeItem({
     id,slot,rarity,ilvl:n,name:entry.n,cid:entry.id,setId,
     req:requiredLevel(entry,rarity,n,affixes,setId),

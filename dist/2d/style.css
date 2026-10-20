@@ -546,3 +546,20 @@ body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden]
 .gamble-row select{flex:1;min-width:0;height:36px;background:#13161c;border:1px solid #5d4b35;color:#e6d6b8;padding:0 6px}
 .gamble-row button{height:36px;padding:0 12px;border:1px solid #c99a5b;background:linear-gradient(100deg,#6d4325,#9a6838);color:#fff2da;white-space:nowrap}
 .gamble-msg{display:block;min-height:1.2em;margin-top:6px;font-size:12px}
+/* v0.7.3 战力 / 一键换装 */
+.smart-equip{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin:0 0 12px;padding:10px 12px;border:1px solid #8a6a40;background:linear-gradient(100deg,#241a12,#14171d 60%);border-radius:4px}
+.cr-box{display:flex;flex-direction:column;align-items:flex-start;min-width:84px}
+.cr-box small{font-size:10px;letter-spacing:2px;color:#a8977a}
+.cr-box strong{font-size:24px;line-height:1.1;color:#ffcf7a;font-variant-numeric:tabular-nums;text-shadow:0 0 12px #c0702a66}
+.smart-equip #btn-smart{max-width:none;width:100%;padding:12px;font-size:15px}
+.smart-msg{grid-column:1/-1;color:#a99c86;font-size:11px;line-height:1.5}
+.upgrade-chip{position:absolute;z-index:4;left:50%;transform:translateX(-50%);bottom:calc(150px + var(--sb,0px));padding:9px 16px;border:1px solid #e0a95e;border-radius:20px;background:linear-gradient(100deg,#6d4325f0,#9a6838f0);color:#fff2da;font-size:13px;box-shadow:0 6px 24px #000a,0 0 18px #c0702a55;animation:chipPulse 2s ease-in-out infinite}
+.upgrade-chip b{color:#ffe3a3}
+@keyframes chipPulse{50%{box-shadow:0 6px 24px #000a,0 0 28px #e0a95e99}}
+#btn-inventory{position:relative}
+#btn-inventory.has-upgrade::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ff7a3c;box-shadow:0 0 8px #ff7a3c}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .upgrade-chip{bottom:calc(244px + var(--sb));font-size:12px;padding:8px 12px;white-space:nowrap}
+  #inventory .smart-equip{position:sticky;top:0;z-index:3;margin:0 -12px 8px;border-radius:0;border-left:0;border-right:0}
+}
+@media (max-height:560px) and (pointer:coarse){.upgrade-chip{bottom:calc(112px + var(--sb))}}

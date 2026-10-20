@@ -41,7 +41,7 @@ test('malformed data cannot inject invalid affixes or high inflated stats',()=>{
 test('loot across levels produces slot, affix, and rarity variety',()=>{
   const r=mulberry32(431),rarities=new Set(),slots=new Set(),types=new Set();
   for(let k=0;k<450;k++){
-    const x=makeLoot(r,1+k%35,'loot-'+k,{boss:k%7===0});
+    const x=makeLoot(r,1+k%35,'loot-'+k,{boss:k%7===0,force:k%50===0?'unique':k%23===0?'legendary':null});
     rarities.add(x.rarity);slots.add(x.slot);
     for(const a of x.affixes)types.add(a.key);
     assert.equal(x.ilvl,1+k%35);

@@ -12,13 +12,13 @@ import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDe
 import {drawDungeonDetail} from './dungeon-detail.js';
 import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, DROP_RULES, GAMBLE_SLOTS, gambleCost, gambleItem, starterKit, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints } from './systems.js';
 import {describePower,skillLegend,PROC_FX} from './legendary.js';
-import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor} from './progression.js';
+import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor,monsterHpMult,monsterDmgMult,armorDR} from './progression.js';
 import {LocalStore,STASH_SIZE} from './storage.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
-import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
+import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
 const ui = { hp: $('hp-num'), mana: $('mana-num'), level: $('level'), xp: $('xp-fill'), gold: $('gold'), essence: $('essence'),
@@ -67,7 +67,7 @@ function renderStatus(){
   const dps=Math.round(s.power*s.dmgMult*(1+s.crit/100*s.critDmg/100)*(s.attack.speed||1)*s.aspdMult/.5);
   const sections=[
     ['角色',[['名字',profile.name||'—'],['职业',C.name],['等级',profile.level+' / '+MAX_LEVEL],['经验',profile.level>=MAX_LEVEL?'已满级':profile.xp+' / '+expRequired(profile.level)],['难度',DIFFICULTIES[profile.difficulty|0].name],['怪物等级',monsterLevel()],['已净化',profile.clears],['金币',profile.gold],['技能点',profile.skillPoints],['巅峰点',paragonLeft(profile)+' / '+paragonPoints(profile.level)],['厄运保护','传奇 '+(profile.pity?.legendary|0)+'/'+DROP_RULES.pity.legendary+' · 暗金 '+(profile.pity?.unique|0)+'/'+DROP_RULES.pity.unique+' 趟']]],
-    ['生存',[['生命',Math.ceil(hero?.hp??s.hp)+' / '+s.hp],[C.resource,Math.ceil(hero?.mana??s.mana)+' / '+s.mana],['每秒回复',s.regen.toFixed(1)],['护甲',s.armor],['护甲减伤',pct(Math.min(60,s.armor/(s.armor+200)*100))],['额外减伤',pct(s.mods.dr*100)],['护盾',Math.ceil(wardHp)],['移动速度',pct(s.moveMult*100)]]],
+    ['生存',[['生命',Math.ceil(hero?.hp??s.hp)+' / '+s.hp],[C.resource,Math.ceil(hero?.mana??s.mana)+' / '+s.mana],['每秒回复',s.regen.toFixed(1)],['护甲',s.armor],['护甲减伤',pct(armorDR(s.armor,monsterLevel())*100)],['额外减伤',pct(s.mods.dr*100)],['护盾',Math.ceil(wardHp)],['移动速度',pct(s.moveMult*100)]]],
     ['输出',[[C.power,s.power],['伤害加成',pct((s.dmgMult-1)*100)],['暴击率',pct(s.crit)],['暴击伤害',pct(s.critDmg)],['攻击/施法速度',pct(s.aspdMult*100)],['吸血',(s.lifesteal?s.lifesteal+'/击 ':'')+(s.mods.lifePct?pct(s.mods.lifePct*100):'')||'0'],['估算每秒伤害',dps],['技能等级加成','+'+s.classSkill],['冷却缩减',pct(s.cdr)],['寻宝几率',pct(s.mf)]]],
     ['武器',[['武器',s.weapon||'空手'],['攻击方式',{melee:'近战',bow:'射箭',throw:'投掷',spell:'法术弹'}[s.attack.mode]],['攻速倍率','×'+(s.attack.speed||1)],['擅长武器',s.weapon?(s.proficient?'是 · 伤害 +15%':'否'):'—'],['擅长副手',s.offProficient?'是':'—']]],
     ['元素加成',[['火焰',pct(s.fire)],['冰霜',pct(s.cold)],['雷电',pct(s.lightning)],['毒素',pct(s.poison)],['神圣',pct(s.holy)],['暗影',pct(s.shadow)],['物理',pct(s.physical)]]],
@@ -82,7 +82,7 @@ function renderStatus(){
   // v0.7.1：顶部四块关键数值
   const hpNow=Math.ceil(hero?.hp??s.hp),mpNow=Math.ceil(hero?.mana??s.mana);
   const tiles=document.createElement('div');tiles.className='status-tiles';
-  for(const [k,v,cls,ratio] of [['生命',hpNow+' / '+s.hp,'t-hp',hpNow/s.hp],[C.resource,mpNow+' / '+s.mana,'t-mp',mpNow/s.mana],['每秒伤害',dps,'t-dps',null],['护甲减伤',pct(Math.min(60,s.armor/(s.armor+200)*100)),'t-arm',null]]){
+  for(const [k,v,cls,ratio] of [['生命',hpNow+' / '+s.hp,'t-hp',hpNow/s.hp],[C.resource,mpNow+' / '+s.mana,'t-mp',mpNow/s.mana],['战力',combatRating(profile),'t-dps',null],['每秒伤害(估)',dps,'t-arm',null]]){
     const t=document.createElement('div');t.className='status-tile '+cls;
     const b=document.createElement('b');b.textContent=v;const sm=document.createElement('small');sm.textContent=k;t.append(sm,b);
     if(ratio!=null){const bar=document.createElement('i');bar.style.width=Math.max(0,Math.min(100,ratio*100))+'%';t.append(bar);}
@@ -190,7 +190,7 @@ function renderBuildGuide(){
   const tips=document.createElement('ul');tips.className='build-tips';for(const t of cur.tips){const li=document.createElement('li');li.textContent=t;tips.append(li);}
   const actions=document.createElement('div');actions.className='build-actions';
   const eq=document.createElement('button');eq.type='button';eq.className='primary';eq.textContent='一键穿戴（按「'+cur.name+'」）';
-  eq.onclick=()=>{let n=0;applyEquipmentChange(()=>{n=autoEquip(profile,cur.id);});announce(n?'一键穿戴完成 · 更换 '+n+' 个部位':'当前已是此流派的最佳搭配',true);};
+  eq.onclick=()=>{profile.builds=profile.builds||{};profile.builds[profile.heroClass]=cur.id;runSmartEquip(cur.id);};
   const sk=document.createElement('button');sk.type='button';sk.textContent='套用推荐技能栏';
   sk.onclick=()=>{profile.activeSkills=[...cur.skills];persist();renderSkillBar();renderInventory();announce('技能栏已套用「'+cur.name+'」',true);};
   const spent=skillsOf(cls).reduce((n,k)=>n+(profile.skillRanks[k]||0),0);
@@ -343,8 +343,8 @@ function build() {
 function monsterLevel(boss=false){return areaMonsterLevel(profile,boss);}
 function monsterStats(mon){
   const T=TIER[mon.tier],boss=mon.tier==='boss',L=monsterLevel(boss),D=DIFFICULTIES[profile.difficulty|0];
-  return {level:L,hp:Math.round(T.hp*mon.hp*(1+(L-1)*.16)*D.hp),dmg:T.dmg*mon.dmg*(1+(L-1)*.085)*D.dmg,
-    speed:T.speed*mon.spd,radius:T.radius*(mon.ai==='tank'?1.2:mon.ai==='swarm'?.85:1),xp:Math.round(T.xp*(1+(L-1)*.04)*D.xp*xpFactor(profile.level,L))};
+  return {level:L,hp:Math.round(T.hp*mon.hp*monsterHpMult(L,profile.difficulty|0)),dmg:T.dmg*mon.dmg*monsterDmgMult(L,profile.difficulty|0),
+    speed:T.speed*mon.spd*[1,1.05,1.1][profile.difficulty|0],radius:T.radius*(mon.ai==='tank'?1.2:mon.ai==='swarm'?.85:1),xp:Math.round(T.xp*(1+(L-1)*.04)*D.xp*xpFactor(profile.level,L))};
 }
 function spawn(kind,location=null) {
   const p=location||randomPoint();
@@ -356,7 +356,7 @@ function spawn(kind,location=null) {
   if(isBoss){boss=e;ui.boss.hidden=false;ui.boss.querySelector('span').textContent=mon.name;announce('地窟深处，'+mon.name+'已苏醒！',true);}
   return e;
 }
-function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); }
+function begin() { hideModal(); build(); state='playing'; clearInput(); persist(); announce('第 1 波 · 地窟徘徊者',true); upgradeCheck(); }
 function clearInput(){keys.clear();pointers.clear();heldSlots.clear();joystick.x=joystick.y=0;joystick.id=null;$('stick').style.transform='';}
 function showModal(kind) {
   const previousState=state;
@@ -433,6 +433,30 @@ function applyEquipmentChange(operate){
   }
   persist();renderInventory();updateHud();
 }
+// ───── v0.7.3 战力与一键换装 ─────
+function runSmartEquip(buildId=null){
+  let res=null;applyEquipmentChange(()=>{res=smartEquip(profile,buildId);});
+  const gain=res.after-res.before,pctGain=res.before?Math.round(gain/res.before*100):0;
+  const msg=res.changed.length?'换上 '+res.changed.length+' 个部位 · 战力 '+res.before+' → '+res.after+(pctGain?'（+'+pctGain+'%）':''):'已经是最强搭配 · 战力 '+res.after;
+  announce(msg,true);const m=$('smart-msg');if(m)m.textContent=msg;
+  upgradeCheck(true);return res;
+}
+$('btn-smart').onclick=()=>runSmartEquip();
+$('upgrade-chip').onclick=()=>runSmartEquip();
+// 拾取 / 赌博 / 取回后检查是否有更好的搭配（节流，避免每帧计算）
+let upgradeTimer=0;
+function upgradeCheck(now=false){
+  clearTimeout(upgradeTimer);
+  const run=()=>{
+    if(!profile)return;
+    const r=smartEquip(profile,null,{dry:true}),gain=r.after-r.before;
+    const show=r.changed.length>0&&gain>=Math.max(3,r.before*.02);
+    $('upgrade-chip').hidden=!show||state!=='playing';
+    $('upgrade-gain').textContent='战力 +'+gain;
+    $('btn-inventory').classList.toggle('has-upgrade',show);
+  };
+  if(now)run();else upgradeTimer=setTimeout(run,250);
+}
 // ───── 赌博（金币 → 指定部位随机装备） ─────
 const GAMBLE_NAMES={weapon:'武器',offhand:'副手',head:'头盔',robe:'胸甲',gloves:'手套',boots:'靴子',belt:'腰带',ring1:'戒指',amulet:'项链'};
 function refreshGamble(){
@@ -455,7 +479,7 @@ $('gamble-go').onclick=()=>{
   persist();
   $('gamble-msg').textContent='获得 '+RARITIES[item.rarity]+(item.setId?'（套装）':'')+'：'+item.name;
   $('gamble-msg').style.color=item.setId?SET_COLOR:RARITY_COLORS[item.rarity];
-  selectedItemId=item.id;renderInventory();updateHud();
+  selectedItemId=item.id;renderInventory();updateHud();upgradeCheck();
 };
 function refreshCraftingPanel(){
   refreshGamble();
@@ -546,9 +570,12 @@ function inspectItem(item){
     if(gear)name.className='rarity-'+gear.rarity;
     card.append(caption,pic,name);pair.append(card);
   }
-  const delta=Math.round(itemScore(item)-itemScore(worn||{power:0,hp:0,mana:0,armor:0,affixes:[]}));
+  // v0.7.3：用真实「战力」比较（试穿后整套重算，含套装、传奇特效、双手武器占副手）
+  const crNow=combatRating(profile);let crTry=crNow;
+  if(!tooLow&&!(worn&&worn.id===item.id)){const trial={...profile,equipped:{...profile.equipped}};if(equip(trial,item.id,target))crTry=combatRating(trial);}
+  const delta=crTry-crNow;
   const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
-  compare.textContent='相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 评分变化 '+(delta>0?'+':'')+delta;
+  compare.textContent=tooLow?'需求等级不足，穿上不生效':worn&&worn.id===item.id?'正在穿着 · 战力 '+crNow:'相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 战力 '+(delta>0?'+':'')+delta+'（'+crNow+' → '+crTry+'）';
   panel.append(compare);
   if(worn&&worn.id!==item.id){
     const current=document.createElement('p');current.className='current-gear';
@@ -634,6 +661,7 @@ function renderParagon(){
 }
 function renderInventory(){
   refreshCraftingPanel();
+  $('cr-now').textContent=String(combatRating(profile));
   const statsNow=stats(profile),statFields=[
     ['等级',profile.level],['法术强度',statsNow.power],['生命',statsNow.hp],['法力',statsNow.mana],
     ['护甲',statsNow.armor],['暴击',statsNow.crit+'%'],['施法速度',statsNow.haste+'%'],
@@ -786,7 +814,7 @@ function injury(amount,src=null){
   const defense=heroStats();
   if(src?.weakenUntil>tick)amount*=1-(src.weaken||0);
   if(src&&defense.mods.thorns&&enemies.includes(src))dealDamage(src,amount*defense.mods.thorns,'physical',{noCrit:true});
-  const mitigated=Math.max(1,amount*(1-Math.min(.6,defense.armor/(defense.armor+200)))*(armorUntil>tick?.44:1)*(1-clamp(defense.mods.dr,-.5,.75)));
+  const mitigated=Math.max(1,amount*(1-armorDR(defense.armor,src?.level||monsterLevel()))*(armorUntil>tick?.44:1)*(1-clamp(defense.mods.dr,-.5,.75)));
   const absorbed=Math.min(wardHp,mitigated);wardHp-=absorbed;
   const finalDamage=mitigated-absorbed;
   if(absorbed)floatText(hero.x,hero.y-39,'护盾吸收 '+Math.ceil(absorbed),'#add6ff');
@@ -1391,9 +1419,9 @@ function updateEnemies(dt,inSlow){
     e.moving=mv>.5;
     // 普攻（带预警）
     if(e.attack<=0){
-      const T=TIER[e.tier];
-      if(ranged&&d<560&&foe===hero){e.act={type:'ranged',t:0,wind:e.tier==='caster'?.55:.4};e.attack=T.attack*(.85+rng()*.3);}
-      else if(!ranged&&d<reach+8){e.act={type:'melee',t:0,wind:M.ai==='tank'?.5:M.ai==='swarm'?.22:e.tier==='boss'?.45:.32,target:foe,ang};e.attack=T.attack*(M.ai==='swarm'?.7:M.ai==='tank'?1.35:1);}
+      const T=TIER[e.tier],AS=[1,.92,.84][profile.difficulty|0]; // 难度越高出手越快
+      if(ranged&&d<560&&foe===hero){e.act={type:'ranged',t:0,wind:e.tier==='caster'?.55:.4};e.attack=T.attack*(.85+rng()*.3)*AS;}
+      else if(!ranged&&d<reach+8){e.act={type:'melee',t:0,wind:M.ai==='tank'?.5:M.ai==='swarm'?.22:e.tier==='boss'?.45:.32,target:foe,ang};e.attack=T.attack*(M.ai==='swarm'?.7:M.ai==='tank'?1.35:1)*AS;}
     }
   }
 }
@@ -1556,7 +1584,7 @@ function update(dt){
       if(profile.inventory.length>=MAX_ITEMS){if(d.age<dt*2)announce('背包已满，请在行囊分解装备');continue;}
       profile.inventory.push(d.item);drops.splice(drops.indexOf(d),1);
       if(d.persistent)profile.pendingLoot=profile.pendingLoot.filter(p=>p.item.id!==d.item.id);
-      puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();
+      puff(d.x,d.y,palette.rare[d.item.rarity],16,3,100);announce('拾取 · '+d.item.name,true);persist();upgradeCheck();
     }
   }
   for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=1-dt*2;p.vy*=1-dt*2;p.life-=dt;if(p.life<=0)particles.splice(i,1);}
@@ -2197,7 +2225,7 @@ if(location.hostname==='127.0.0.1' && new URLSearchParams(location.search).has('
 let heroSelect=null;
 function enterCharacter(id,difficulty=0){
   const raw=store.load(id);if(!raw){announce('角色存档读取失败',true);heroSelect.show('list');return;}
-  charId=id;profile=sanitizeSave(raw);
+  charId=id;profile=sanitizeSave(raw);$('upgrade-chip').hidden=true;
   if(!profile.name)profile.name=store.list().find(c=>c.id===id)?.name||'持灯者';
   if(difficultyUnlocked(profile,difficulty))profile.difficulty=difficulty;
   allies=[];buffs=[];hsCache=null;wardHp=0;selectedItemId=null;capturingSlot=null;Object.keys(cooldowns).forEach(k=>cooldowns[k]=0);
