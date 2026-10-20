@@ -51,7 +51,15 @@ jobs:
           node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-demo-mage-motion.test.mjs tests/2d-v036.test.mjs tests/2d-v040.test.mjs tests/2d-v041.test.mjs tests/2d-v050.test.mjs tests/2d-v051.test.mjs tests/2d-v060.test.mjs tests/2d-v070.test.mjs tests/2d-v072.test.mjs tests/2d-v073.test.mjs
       - name: Browser runtime smoke tests
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq fonts-wqy-microhei
+          sudo apt-get update -qq || true
+          sudo apt-get install -y -qq fonts-wqy-microhei || sudo apt-get install -y -qq fonts-noto-cjk || true
           npm install --no-save --package-lock=false playwright-core@1.56.1
-          SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs
+          # ubuntu-latest 迁移到新版本后可能没有系统 Chrome：找不到就装 Playwright 自带的 Chromium
+          if [ -z "$CHROME_BIN" ] && ! command -v google-chrome >/dev/null; then
+            npx --yes playwright@1.56.1 install --with-deps chromium
+            export CHROME_BIN=$(ls -d ~/.cache/ms-playwright/chromium-*/chrome-linux*/chrome | head -1)
+          fi
+          set -o pipefail
+          SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs 2>&1 | tee browser.log | grep -v BASE64 || {
+            # 失败时把最后的错误写成注解，方便在 API 里直接读到
+            echo "::error title=browser smoke::$(grep -v BASE64 browser.log | tail -25 | tr '\n' ' ' | cut -c1-1500)"; exit 1; }
