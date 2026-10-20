@@ -741,3 +741,4 @@ body.ghud-on .upgrade-chip{bottom:calc(min(520px,40vw)*436/2139 + 24px)!importan
 .hero-select.is-mobile .hs-logo{width:min(220px,56vw)}
 @media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-logo{height:38px}}
 .gh-right{padding-left:42px}.gh-utils{position:absolute!important;left:0;bottom:0;flex-direction:column}
+body:has(#scrim:not([hidden])) .portal-open,body:has(#inventory:not([hidden])) .portal-open,body:has(#hero-select:not([hidden])) .portal-open{display:none}
