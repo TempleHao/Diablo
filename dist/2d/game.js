@@ -14,7 +14,7 @@ import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS
 import {describePower,skillLegend,PROC_FX} from './legendary.js';
 import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor} from './progression.js';
 import {LocalStore,STASH_SIZE} from './storage.js';
-import {createHeroSelect} from './hero-select.js';
+import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
@@ -71,22 +71,35 @@ function renderStatus(){
   const title=document.createElement('strong');title.textContent=C.name+' · '+C.title;
   const close=document.createElement('button');close.type='button';close.textContent='✕';close.setAttribute('aria-label','关闭状态面板');close.onclick=()=>toggleStatus(false);
   head.append(title,close);panel.append(head);
+  panel.style.setProperty('--cls',CLASS_INFO[profile.heroClass]?.color||'#d6a660');
+  // v0.7.1：顶部四块关键数值
+  const hpNow=Math.ceil(hero?.hp??s.hp),mpNow=Math.ceil(hero?.mana??s.mana);
+  const tiles=document.createElement('div');tiles.className='status-tiles';
+  for(const [k,v,cls,ratio] of [['生命',hpNow+' / '+s.hp,'t-hp',hpNow/s.hp],[C.resource,mpNow+' / '+s.mana,'t-mp',mpNow/s.mana],['每秒伤害',dps,'t-dps',null],['护甲减伤',pct(Math.min(60,s.armor/(s.armor+200)*100)),'t-arm',null]]){
+    const t=document.createElement('div');t.className='status-tile '+cls;
+    const b=document.createElement('b');b.textContent=v;const sm=document.createElement('small');sm.textContent=k;t.append(sm,b);
+    if(ratio!=null){const bar=document.createElement('i');bar.style.width=Math.max(0,Math.min(100,ratio*100))+'%';t.append(bar);}
+    tiles.append(t);
+  }
+  panel.append(tiles);
+  const body=document.createElement('div');body.className='status-body';panel.append(body);
   for(const [name,rows] of sections){
-    const h=document.createElement('h4');h.textContent=name;panel.append(h);
+    const sec=document.createElement('section');sec.className='status-sec';
+    const h=document.createElement('h4');h.textContent=name;sec.append(h);
     const grid=document.createElement('dl');
     for(const [k,v] of rows){const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;grid.append(dt,dd);}
-    panel.append(grid);
+    sec.append(grid);body.append(sec);
   }
   const active=buffs.filter(b=>b.until>tick);
-  const h=document.createElement('h4');h.textContent='生效中的增益';panel.append(h);
+  const bsec=document.createElement('section');bsec.className='status-sec status-wide';const h=document.createElement('h4');h.textContent='生效中的增益';bsec.append(h);body.append(bsec);
   const list=document.createElement('p');list.className='status-buffs';
   list.textContent=active.length?active.map(b=>(SKILLS[b.id]?.name||b.id.replace(/^hit_/,''))+(b.dur<59?' '+Math.ceil(b.until-tick)+'秒':'')).join(' · '):'无';
-  panel.append(list);
+  bsec.append(list);
   const sets=Object.entries(s.sets||{}).filter(([,n])=>n>0);
-  if(sets.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='套装：'+sets.map(([id,n])=>SETS[id].name+' '+n+'/'+SETS[id].size).join(' · ');panel.append(p);}
+  if(sets.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='套装：'+sets.map(([id,n])=>SETS[id].name+' '+n+'/'+SETS[id].size).join(' · ');bsec.append(p);}
   const powers=[];for(const id of Object.values(profile.equipped)){const it=profile.inventory.find(i=>i.id===id);if(it&&(it.req||1)<=profile.level)for(const pw of itemPowers(it))powers.push(it.name+'：'+describePower(pw));}
-  if(powers.length){const h2=document.createElement('h4');h2.textContent='传奇特效';panel.append(h2);const ul=document.createElement('ul');ul.className='status-powers';for(const t of powers){const li=document.createElement('li');li.textContent=t;ul.append(li);}panel.append(ul);}
-  if(allies.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='随从/陷阱：'+allies.length+' 个';panel.append(p);}
+  if(powers.length){const psec=document.createElement('section');psec.className='status-sec status-wide';const h2=document.createElement('h4');h2.textContent='传奇特效';psec.append(h2);const ul=document.createElement('ul');ul.className='status-powers';for(const t of powers){const li=document.createElement('li');li.textContent=t;ul.append(li);}psec.append(ul);body.append(psec);}
+  if(allies.length){const p=document.createElement('p');p.className='status-buffs';p.textContent='随从/陷阱：'+allies.length+' 个';bsec.append(p);}
 }
 function toggleStatus(force){
   const panel=$('status-panel');panel.hidden=force===undefined?!panel.hidden:!force;
@@ -368,6 +381,13 @@ function onPause(){ if(!$('inventory').hidden)return; if(state==='playing')showM
 $('modal-primary').onclick=begin;
 $('btn-pause').onclick=onPause;
 $('btn-help').onclick=()=>showModal('help');
+// v0.7.1 手机顶栏：难度、区域、操作、暂停收进「更多」下拉，点外面或选完自动收起
+const topbarEl=document.querySelector('.topbar');
+function setTopMenu(open){topbarEl.classList.toggle('menu-open',open);$('btn-menu').setAttribute('aria-expanded',String(open));}
+$('btn-menu').onclick=e=>{e.stopPropagation();setTopMenu(!topbarEl.classList.contains('menu-open'));};
+$('top-more').addEventListener('click',e=>{if(e.target.closest('button'))setTopMenu(false);});
+$('top-more').addEventListener('change',()=>setTopMenu(false));
+document.addEventListener('pointerdown',e=>{if(topbarEl.classList.contains('menu-open')&&!e.target.closest('.topbar'))setTopMenu(false);},true);
 const mobileMode=()=>window.matchMedia('(max-width:700px), (max-height:550px) and (pointer:coarse)').matches;
 function setMobileInventoryView(view){
   if(!['bag','gear','compare'].includes(view))return;

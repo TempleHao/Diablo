@@ -40,6 +40,7 @@ try{
     });
     await page.addInitScript(()=>{window.activeSave=()=>{const r=JSON.parse(localStorage.getItem('ember-chronicles-2d-roster-v1'));return JSON.parse(localStorage.getItem('ember-chronicles-2d-roster-v1:'+r.active));};});
     page.on('pageerror',e=>errs.push(e.message));
+    const openMore=async()=>{if(await page.locator('#btn-menu').isVisible()&&!(await page.locator('#top-more').isVisible()))await page.click('#btn-menu');};
     const response=await page.goto('http://127.0.0.1:8765/2d/?qa=1',{waitUntil:'load'});
     assert.equal(response.status(),200);
     assert.match(await page.title(),/余烬纪事 2D/);
@@ -215,6 +216,7 @@ try{
     assert.equal(await page.locator('#inventory').isVisible(),false);
     await page.keyboard.press('6');
     await page.waitForTimeout(150);
+    await openMore();
     await page.click('#btn-pause');
     assert.equal(await page.locator('#scrim').isVisible(),true);
     await page.click('#modal-primary');
@@ -229,11 +231,13 @@ try{
     await page.click('#portal-next');
     assert.equal(await page.locator('#portal-panel').isVisible(),false);
     assert.equal(await page.locator('#region-name').innerText(),'遗弃监牢');
+    await openMore();
     page.once('dialog',d=>d.accept());
     await page.selectOption('#region-select','2');
     await page.waitForTimeout(230);
     assert.equal(await page.locator('#region-name').innerText(),'余烬祭坛');
     assert.equal(await page.locator('#map-label').innerText(),'血色符文');
+    await openMore();
     await page.selectOption('#region-select','3').catch(()=>{});
     await page.waitForTimeout(200);
     if(process.env.SCREENSHOT_FOR_REVIEW==='1') {

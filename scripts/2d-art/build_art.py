@@ -32,7 +32,18 @@ RIG = {  # source-pixel rects (x0,y0,x1,y1) on the cut sprite, grip pivot, swing
     'necro':     dict(rects=[(168, 0, 257, 240), (186, 240, 218, 412)], pivot=(200, 225), style='staff', face=1),
     'paladin':   dict(rects=[(0, 0, 104, 206)], pivot=(62, 178), style='smash', face=-1),
 }
-cells = grid_cells(SRC + 'sheet-heroes-v2.webp', 7, 1)
+cells0 = grid_cells(SRC + 'sheet-heroes-v2.webp', 7, 1)
+# v0.7.1：放宽裁切窗口，收回越过网格线的部分（野蛮人左臂、德鲁伊和死灵法师的边缘）。
+# RIG 里的坐标按旧裁切写的，这里按新旧原点差平移。
+cells = grid_cells(SRC + 'sheet-heroes-v2.webp', 7, 1, grow=60)
+for i, cls in enumerate(HERO_ORDER):
+    dx = cells0[i][0].info['ox'] - cells[i][0].info['ox']; dy = cells0[i][0].info['oy'] - cells[i][0].info['oy']
+    r = RIG[cls]
+    for key in ('rects', 'rects2'):
+        if key in r: r[key] = [(x0 + dx, y0 + dy, x1 + dx, y1 + dy) for x0, y0, x1, y1 in r[key]]
+    for key in ('pivot', 'pivot2'):
+        if key in r: r[key] = (r[key][0] + dx, r[key][1] + dy)
+    print(cls, 'shift', dx, dy)
 H = max(cells[i][0].height for i in range(6))
 S = 200 / H
 bodies, weapons, rig = [], [], {}

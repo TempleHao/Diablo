@@ -10,7 +10,19 @@
 <canvas id="game" aria-label="余烬纪事 2D 游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
-  <div class="top-actions"><span class="version">灰烬边境 · 第一幕 / 角色选择 · 掉落 · 百级 v0.7.0</span><label class="region-picker">难度 <select id="difficulty-select" aria-label="选择难度"></select></label><label class="region-picker">区域 <select id="region-select" aria-label="选择探索区域"></select></label><button id="btn-heroes" type="button">角色</button><button id="btn-status" type="button">状态 <kbd>C</kbd></button><button id="btn-help" type="button">操作</button><button id="btn-inventory" type="button">行囊 <kbd>B</kbd></button><button id="btn-pause" type="button">暂停</button></div>
+  <div class="top-actions">
+    <span class="version">灰烬边境 · 第一幕 / v0.7.1</span>
+    <div class="top-more" id="top-more">
+      <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
+      <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
+      <button id="btn-help" type="button"><i aria-hidden="true">?</i><span>操作</span></button>
+      <button id="btn-pause" type="button"><i aria-hidden="true">Ⅱ</i><span>暂停</span></button>
+    </div>
+    <button id="btn-heroes" type="button"><i aria-hidden="true">♜</i><span>角色</span></button>
+    <button id="btn-status" type="button"><i aria-hidden="true">◈</i><span>状态</span> <kbd>C</kbd></button>
+    <button id="btn-inventory" type="button"><i aria-hidden="true">✥</i><span>行囊</span> <kbd>B</kbd></button>
+    <button id="btn-menu" type="button" aria-expanded="false" aria-controls="top-more" aria-label="更多：难度、区域、操作、暂停"><i aria-hidden="true">☰</i><span>更多</span></button>
+  </div>
 </header>
 <section class="quest" aria-live="polite"><span class="eyebrow">第一幕 · <span id="region-name">断昼前庭</span></span><strong id="quest-title">净化灰烬边境</strong><p id="quest-progress">深入荒废地窟，驱散徘徊者</p></section>
 <div class="eventlog" id="eventlog" aria-live="polite"></div>

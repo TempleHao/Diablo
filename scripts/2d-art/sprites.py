@@ -29,7 +29,7 @@ def extract(a,fg,lab,b):
     hb=max(4,int((y1-y0)*.06));cols=np.where(m[-hb:])[1]
     foot=int(np.median(cols)) if len(cols) else (x1-x0)//2
     return Image.fromarray(rgba),foot
-def grid_cells(path,cols,rows,thr=14,pad=0):
+def grid_cells(path,cols,rows,thr=14,pad=0,grow=0):
     a,fg=foreground(path,thr)
     H,W=fg.shape;cw,ch=W/cols,H/rows
     out=[]
@@ -51,13 +51,23 @@ def grid_cells(path,cols,rows,thr=14,pad=0):
                 edge=(xs.min()<=1 or xs.max()>=sub.shape[1]-2 or ys.min()<=1 or ys.max()>=sub.shape[0]-2)
                 if edge and s<mx*.3:continue
                 keep|=m&sub
+            if grow:
+                # 角色有部分（比如伸出的胳膊）越过了网格线：在左右各放宽 grow 像素的窗口里，
+                # 把与本格主体相连（膨胀后连通）的部分也收进来，邻格的角色不会被带进来。
+                gx0,gx1=max(0,x0-grow),min(W,x1+grow)
+                wide=fg[y0:y1,gx0:gx1]
+                wl,_=ndimage.label(ndimage.binary_dilation(wide,iterations=4))
+                ids=set(np.unique(wl[:,x0-gx0:x1-gx0][keep]))-{0}
+                keep2=np.isin(wl,list(ids))&wide
+                keep=keep2;x0=gx0
             ys,xs=np.where(keep)
             if not len(ys):out.append(None);continue
             yy0,yy1,xx0,xx1=ys.min(),ys.max()+1,xs.min(),xs.max()+1
             rgba=np.dstack([a[y0+yy0:y0+yy1,x0+xx0:x0+xx1],keep[yy0:yy1,xx0:xx1]*255]).astype(np.uint8)
             hb=max(4,int((yy1-yy0)*.08));cols_=np.where(keep[yy1-hb:yy1,xx0:xx1])[1]
             foot=int(np.median(cols_)) if len(cols_) else (xx1-xx0)//2
-            out.append((Image.fromarray(rgba),foot))
+            im_=Image.fromarray(rgba);im_.info['ox']=x0+xx0;im_.info['oy']=y0+yy0
+            out.append((im_,foot))
     return out
 def preview(items,path,cell=160,cols=10,bg=(60,70,80,255)):
     rows=(len(items)+cols-1)//cols

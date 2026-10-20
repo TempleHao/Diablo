@@ -404,3 +404,137 @@ body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden]
 .paragon-reset{border:1px solid #6d4b38;background:#1b1412;color:#dca98b;padding:7px}
 .region-picker select option:disabled{color:#777}
 .loadout-row{grid-template-columns:64px 74px 28px 1fr}
+
+/* ═════════ v0.7.1 顶栏 / HUD / 状态面板重做 ═════════
+   1) 所有贴边元素都让出刘海、圆角、底部横条（env(safe-area-inset-*)）；
+   2) 手机顶栏只留 角色 / 状态 / 行囊 / 更多，难度、区域、操作、暂停收进「更多」下拉；
+   3) 手机 HUD 统一：技能只显示图标（两行五格），生命/资源球靠左，摇杆在其上方；
+   4) 状态面板：顶部四块关键数值 + 分组卡片，电脑两列、手机全宽。 */
+:root{--st:env(safe-area-inset-top,0px);--sr:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px);--gold:#c99a5b;--gold-hi:#f0cd8e;--line:#6d573c}
+
+/* 顶栏（电脑） */
+.topbar{padding-left:calc(max(20px,3.5vw) + var(--sl));padding-right:calc(max(20px,3.5vw) + var(--sr));padding-top:calc(12px + var(--st));height:calc(70px + var(--st))}
+.top-actions{gap:6px}
+.top-more{display:contents}
+.top-actions button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 13px;border:1px solid #5d4b35;background:linear-gradient(#1d2028f0,#12151be8);border-radius:3px;color:#d8c9ad;font-size:13px;letter-spacing:1px;transition:background .15s,border-color .15s}
+.top-actions button:hover{background:linear-gradient(#3a2e22,#211a14);border-color:var(--gold)}
+.top-actions button i{font-style:normal;color:var(--gold);font-size:13px;line-height:1}
+.top-actions button kbd{border:1px solid #4d4031;border-radius:2px;padding:0 4px;font-size:9px;line-height:14px;color:#9c8d75}
+#btn-menu{display:none}
+.region-picker{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#a69a84}
+.region-picker select{height:36px;border:1px solid #5d4b35;background:#13161c;color:#e6d6b8;border-radius:3px;padding:0 8px;font-size:13px}
+.version{white-space:nowrap}
+
+/* 状态面板（通用） */
+.status-panel{--cls:#d6a660;top:calc(84px + var(--st));left:calc(max(14px,2vw) + var(--sl));width:min(560px,calc(100vw - 28px));padding:0;border:1px solid #6d573c;border-top:2px solid var(--cls);background:linear-gradient(180deg,#141821f5,#0b0e13f5);border-radius:4px;box-shadow:0 18px 50px #000c,inset 0 1px 0 #ffffff0d;font-size:12px;scrollbar-width:thin}
+.status-head{position:sticky;top:0;z-index:1;margin:0;padding:11px 14px;background:linear-gradient(90deg,color-mix(in srgb,var(--cls) 22%,#141821),#141821 70%);border-bottom:1px solid #4a3c2c}
+.status-head strong{font-family:serif;font-size:16px;letter-spacing:2px;color:#f3e0bb}
+.status-head button{width:30px;height:30px;padding:0;border-radius:3px}
+.status-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:10px 12px 4px}
+.status-tile{position:relative;overflow:hidden;padding:7px 9px 9px;border:1px solid #3d3326;background:#0e1218;border-radius:3px}
+.status-tile small{display:block;font-size:10px;letter-spacing:1px;color:#93887a}
+.status-tile b{display:block;margin-top:3px;font-size:15px;font-weight:600;color:#f1dfbd;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-tile i{position:absolute;left:0;bottom:0;height:3px;background:#b23c33}
+.status-tile.t-mp i{background:#3c6fc4}.status-tile.t-dps b{color:#ffc277}.status-tile.t-arm b{color:#c9d3dc}
+.status-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:6px 12px 12px}
+.status-sec{border:1px solid #2f2820;background:#0d1117;border-radius:3px;padding:2px 10px 8px}
+.status-sec.status-wide{grid-column:1/-1}
+.status-panel h4{margin:6px 0 5px;padding:0 0 4px;font-size:11px;letter-spacing:2px;color:color-mix(in srgb,var(--cls) 70%,#e7c38a);border-bottom:1px solid #3a3025}
+.status-panel dl{gap:0 10px}
+.status-panel dt,.status-panel dd{padding:3px 0;border-bottom:1px dashed #ffffff0a}
+.status-panel dd{color:#efe0c3}
+.status-buffs{margin:4px 0;font-size:12px}
+.status-powers{margin:4px 0;padding-left:16px;color:#d8b9ee;line-height:1.6}
+
+/* HUD（电脑）微调：底部让出横条 */
+.hud{padding-bottom:calc(19px + var(--sb));padding-left:calc(28px + var(--sl));padding-right:calc(28px + var(--sr))}
+.abilitybar button{border-radius:3px}
+.abilitybar button .ability-icon.sk-ico{border-radius:2px}
+
+/* ───── 手机 / 小屏（竖屏 ≤ 900 宽，或横屏 ≤ 560 高的触屏） ───── */
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .topbar{height:auto;min-height:0;align-items:center;padding:calc(6px + var(--st)) calc(10px + var(--sr)) 8px calc(10px + var(--sl));gap:8px;background:linear-gradient(#07090cf2,#07090cc0 70%,#07090c00)}
+  .brand{gap:7px;min-width:0}.brandmark{font-size:22px}.brand b{font-size:15px;letter-spacing:2px;white-space:nowrap}.brand small{display:none}
+  .version{display:none}
+  .top-actions{gap:5px;flex-wrap:nowrap}
+  .top-actions>button{flex-direction:column;justify-content:center;gap:2px;width:46px;height:42px;padding:0;font-size:10px;letter-spacing:0}
+  .top-actions>button i{font-size:15px}
+  .top-actions kbd{display:none}
+  #btn-menu{display:inline-flex}
+  .topbar.menu-open #btn-menu{border-color:var(--gold);background:#3a2e22}
+  .top-more{display:none;position:absolute;top:calc(100% - 2px);right:calc(10px + var(--sr));z-index:8;width:min(260px,calc(100vw - 20px));flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-top:2px solid var(--gold);background:#10141af7;border-radius:4px;box-shadow:0 14px 40px #000d}
+  .topbar.menu-open .top-more{display:flex}
+  .top-more .region-picker{display:flex;justify-content:space-between;font-size:12px;color:#bfae92}
+  .top-more .region-picker select{width:170px;max-width:none;height:40px;font-size:14px;padding:0 8px}
+  .top-more button{width:100%;height:42px;justify-content:center;font-size:13px}
+  .region-picker{font-size:12px}
+
+  .quest{top:calc(60px + var(--st));left:calc(12px + var(--sl));padding-left:10px}
+  .quest .eyebrow{font-size:9px}.quest strong{font-size:15px;margin-top:4px}.quest p{font-size:10px;margin-top:3px}
+  .eventlog{top:calc(126px + var(--st));left:calc(12px + var(--sl));max-width:min(62vw,260px);font-size:11px}
+  .minimap{top:calc(60px + var(--st));right:calc(10px + var(--sr))}
+  .bossbar{top:calc(58px + var(--st))}
+
+  .hud{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;min-height:0;padding:16px calc(10px + var(--sr)) calc(8px + var(--sb)) calc(10px + var(--sl));background:linear-gradient(transparent,#07090ce6 45%)}
+  .vitalblock{position:relative;left:auto;bottom:auto;display:flex;align-items:center;gap:0;margin-bottom:4px}
+  .orb{width:50px;height:50px;border-width:3px}.orb span{font-size:15px}.orb small{font-size:8px}
+  .portrait{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:auto;height:auto;padding:1px 6px;z-index:1;background:#141820;border-radius:8px;flex-direction:row;gap:3px}
+  .portrait span{font-size:10px}.portrait strong{font-size:9px}
+  .vitalblock .orb.energy{margin-left:6px}
+  .xpbar{left:6px;width:calc(100% - 12px);bottom:-6px;height:3px}
+  .abilitybar{display:grid;grid-template-columns:repeat(5,46px);gap:4px}
+  .abilitybar button{width:46px;min-width:0;height:46px;padding:0;border-radius:4px}
+  .abilitybar button .ability-icon,.abilitybar button .ability-icon.sk-ico{width:38px;height:38px;font-size:22px!important}
+  .abilitybar b,.abilitybar small,.abilitybar button .slot-key{display:none}
+  .resource,.tip{display:none}
+  .joystick{display:block;left:calc(14px + var(--sl));bottom:calc(124px + var(--sb));width:110px;height:110px}
+  .joystick span{left:33px;top:33px;width:40px;height:40px}
+  .buffbar{left:auto;right:calc(10px + var(--sr));transform:none;bottom:calc(118px + var(--sb))}
+  .buffbar .buff{width:28px;height:32px}
+
+  .status-panel{top:calc(58px + var(--st));left:calc(8px + var(--sl));right:calc(8px + var(--sr));width:auto;max-height:calc(100dvh - 58px - var(--st) - 128px - var(--sb))}
+  .status-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .status-body{grid-template-columns:1fr}
+  #inventory .inventory-panel{padding-top:var(--st);padding-left:calc(12px + var(--sl));padding-right:calc(12px + var(--sr))}
+  .hero-select{padding:var(--st) var(--sr) var(--sb) var(--sl)}
+}
+/* 小于 380 宽：技能格 42px，标题只留图标 */
+@media (max-width:380px){
+  .brand b{display:none}
+  .abilitybar{grid-template-columns:repeat(5,42px);gap:3px}
+  .abilitybar button{width:42px;height:42px}
+  .abilitybar button .ability-icon,.abilitybar button .ability-icon.sk-ico{width:34px;height:34px}
+  .orb{width:46px;height:46px}
+}
+/* 横屏手机：摇杆左下、生命球居中偏左、技能右下；顶部信息更紧凑 */
+@media (max-height:560px) and (pointer:coarse){
+  .topbar{padding-top:calc(4px + var(--st));padding-bottom:4px}
+  .top-actions>button{height:38px}
+  .quest{top:calc(52px + var(--st))}.quest p{display:none}
+  .eventlog{top:calc(98px + var(--st))}
+  .minimap{top:calc(52px + var(--st))}.minimap canvas{width:96px;height:72px}
+  .hud{padding-left:calc(140px + var(--sl));padding-top:8px}
+  .joystick{bottom:calc(10px + var(--sb));left:calc(16px + var(--sl));width:104px;height:104px}
+  .joystick span{left:30px;top:30px}
+  .buffbar{bottom:calc(112px + var(--sb))}
+  .status-panel{top:calc(50px + var(--st));max-height:calc(100dvh - 50px - var(--st) - 110px - var(--sb))}
+  .status-body{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .status-tiles{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+.topbar{z-index:7}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){.portrait{white-space:nowrap}}
+/* v0.7.1 角色选择 · 横屏手机：左侧英雄展示，右侧可滚动的信息与按钮 */
+.hero-select.is-mobile.is-land{display:block;overflow:hidden}
+.hero-select.is-land .hs-bg{inset:0;height:auto;background-size:auto 100vh;background-position:22% top}
+.hero-select.is-land .hs-bg::after{background:linear-gradient(90deg,rgba(7,6,10,.15),rgba(7,6,10,.55) 42%,#07060af2 55%)}
+.hero-select.is-land .hs-stage{position:absolute;margin:0;left:var(--sl);top:var(--st);bottom:calc(46px + var(--sb));width:42%;height:auto;min-height:0}
+.hero-select.is-land .hs-side{position:absolute;margin:0;top:calc(8px + var(--st));right:calc(10px + var(--sr));bottom:calc(8px + var(--sb));left:auto;width:54%;max-height:none;overflow:auto;padding:0 2px 10px}
+.hero-select.is-land .hs-list{position:absolute;left:calc(10px + var(--sl));top:calc(8px + var(--st));width:42%;padding:0;flex-direction:row;overflow-x:auto;z-index:3}
+.hero-select.is-land .hs-card{min-width:140px;padding:6px 9px}
+.hero-select.is-land[data-mode="list"] .hs-stage{top:calc(60px + var(--st))}
+.hero-select.is-land .hs-bottom{position:absolute;left:var(--sl);bottom:var(--sb);width:42%;padding:6px 10px}
+.hero-select.is-land .hs-account{display:none}
+.hero-select.is-land .hs-info{padding:10px 12px}.hero-select.is-land .hs-info h2{font-size:20px}.hero-select.is-land .hs-desc{font-size:12px;line-height:1.6;margin:6px 0}
+.hero-select.is-land .hs-form input{padding:8px 10px}
+.hero-select.is-land .hs-go{padding:11px!important}
+.hs-side>*{flex-shrink:0}

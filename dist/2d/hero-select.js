@@ -30,7 +30,9 @@ export const CLASS_INFO=Object.freeze({
 });
 const ATTR=['力量','敏捷','体力','精力'];
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
-const mobile=()=>window.matchMedia('(max-width:760px)').matches;
+// 手机：竖屏（≤760 宽）或横屏（触屏且 ≤560 高）都用单人轮播布局；横屏另加 is-land 改成左右两栏
+const mobile=()=>window.matchMedia('(max-width:760px), (max-height:560px) and (pointer:coarse)').matches;
+const landscape=()=>mobile()&&window.matchMedia('(orientation:landscape)').matches;
 
 /**
  * root：挂载节点；store：角色仓库；fresh(cls)：新角色存档；onEnter(id,difficulty)：进入游戏。
@@ -57,7 +59,7 @@ export function createHeroSelect({root,store,fresh,onEnter}){
 
   // ───── 渲染 ─────
   function render(){
-    root.dataset.mode=mode;root.classList.toggle('is-mobile',mobile());
+    root.dataset.mode=mode;root.classList.toggle('is-mobile',mobile());root.classList.toggle('is-land',landscape());
     plates.replaceChildren();stage.querySelector('.hs-carousel')?.remove();side.replaceChildren();listBox.replaceChildren();bottom.replaceChildren();account.replaceChildren();
     account.append(el('span','hs-account-dot'),el('span',null,store.kind==='local'?'本机存档 · 数据保存在当前浏览器':'在线账号'),el('small',null,'在线登录版开发中，届时可把本机角色上传到账号'));
     if(mode==='create')renderCreate();else renderList();
