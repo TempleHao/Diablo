@@ -694,3 +694,14 @@ select option{background:#15110e;color:#ecdcb8}
   .joystick{border:3px solid #0a0807!important;box-shadow:inset 0 0 0 2px #6e5434,inset 0 0 24px #000c!important;background:radial-gradient(circle,#1a140f99,#0a080799)!important}
   .joystick span{background:radial-gradient(circle at 40% 35%,#f0cd8e,#8a6a3c 70%)!important;border:2px solid #0a0807!important;box-shadow:0 0 0 1px #c9a064,0 3px 6px #000c}
 }
+/* v0.8.1：状态栏缩小并下沉——宽度 1000 → 760，底部石座沉到屏幕外，顶部雕饰淡出，实际占用高度约为原来的一半 */
+.ghud{width:min(680px,56vw)!important;bottom:calc(-1 * min(680px,56vw) * 454 / 1661 * .115 + var(--sb))!important}
+.ghud .gh-frame{-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.35) 14%,#000 30%);mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.35) 14%,#000 30%);filter:none}
+.gh-gold{display:none}
+.ghud .buffbar{top:4%!important;left:58%!important;width:30%!important;height:auto!important}
+.gh-txt,.gh-cls{font-size:clamp(10px,1vw,13px)}
+.gh-lv{font-size:clamp(11px,1.2vw,16px)}
+.gh-keys span{font-size:clamp(8px,.75vw,10px)}
+.gh-util{font-size:clamp(11px,1.3vw,17px)}.gh-util small{display:none}
+body.ghud-on .upgrade-chip{bottom:calc(min(680px,56vw)*454/1661*.75 + 10px)!important}
+.gh-cls{letter-spacing:0;font-size:clamp(9px,.85vw,12px);white-space:nowrap}
