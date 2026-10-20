@@ -115,10 +115,10 @@ export const MONSTERS={
 };
 // 四档基础属性（再乘每种怪物自己的倍率）
 export const TIER=Object.freeze({
-  normal:{hp:60,dmg:9,speed:125,radius:20,attack:1.1,xp:16,scale:.94},
-  caster:{hp:52,dmg:11,speed:110,radius:19,attack:2.2,xp:18,scale:.94},
-  elite:{hp:380,dmg:17,speed:118,radius:30,attack:1.25,xp:58,scale:1.0},
-  boss:{hp:2300,dmg:24,speed:100,radius:50,attack:2.1,xp:260,scale:.96}
+  normal:{hp:60,dmg:9,speed:125,radius:19,attack:1.1,xp:16,scale:.86},
+  caster:{hp:52,dmg:11,speed:110,radius:18,attack:2.2,xp:18,scale:.86},
+  elite:{hp:380,dmg:17,speed:118,radius:24,attack:1.25,xp:58,scale:.8},
+  boss:{hp:2300,dmg:24,speed:100,radius:40,attack:2.1,xp:260,scale:.68}
 });
 // 九个区域的怪物池：普通、远程、精英、首领（首领按击杀次数轮换）
 export const REGION_MONSTERS=Object.freeze([
