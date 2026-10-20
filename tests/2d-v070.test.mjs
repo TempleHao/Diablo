@@ -6,7 +6,7 @@ import {CLASS_BASES,CLASS_LEGENDS,SET_PIECES} from '../dist/2d/class-catalog.js'
 import {powersOf,describePower,skillLegend,emptyLegend,addPower} from '../dist/2d/legendary.js';
 import {rollBossRewards,BOSS_POOLS} from '../dist/2d/boss-loot.js';
 import {DIFFICULTIES,monsterLevel,difficultyUnlocked,xpFactor} from '../dist/2d/progression.js';
-import {LocalStore,MemoryStorage,ROSTER_KEY,LEGACY_KEY,cleanName,STASH_SIZE} from '../dist/2d/storage.js';
+import {LocalStore,MemoryStorage,ROSTER_KEY,LEGACY_KEY,cleanName,STASH_SIZE,EPOCH_KEY,DATA_EPOCH} from '../dist/2d/storage.js';
 import {SKILL_ICON} from '../dist/2d/skill-icons.js';
 import {readFileSync,existsSync} from 'node:fs';
 
@@ -29,9 +29,9 @@ test('drop rates: rarer qualities are rarer, sources and difficulty raise legend
   const count=(opts,N=60000)=>{const r=mulberry32(5),c=[0,0,0,0,0];let set=0;for(let k=0;k<N;k++){const q=rollQuality(r,opts);c[q.rarity]++;if(q.set)set++;}return {c:c.map(x=>x/N),set:set/N};};
   const n=count({ilvl:50,source:'normal'}),b=count({ilvl:50,source:'boss'}),h=count({ilvl:50,source:'normal',difficulty:2});
   assert.ok(n.c[0]>n.c[1]&&n.c[1]>n.c[2]&&n.c[2]>n.c[3],'white > magic > epic > legendary');
-  assert.ok(n.c[3]>.005&&n.c[3]<.02,'legendary per normal item ~1%: '+n.c[3]);
-  assert.ok(b.c[3]>n.c[3]*2.5,'boss items much more likely legendary');
-  assert.ok(h.c[3]>n.c[3]*1.4,'hell raises legendary chance');
+  assert.ok(n.c[3]>.002&&n.c[3]<.008,'legendary per normal item ~0.4% (v0.7.2): '+n.c[3]);
+  assert.ok(b.c[3]>n.c[3]*2,'boss items more likely legendary');
+  assert.ok(h.c[3]>n.c[3]*2.2,'hell raises legendary chance a lot');
   const m0=count({ilvl:50,mf:0}),m300=count({ilvl:50,mf:300}),m900=count({ilvl:50,mf:900});
   const gain1=m300.c[3]/m0.c[3],gain2=m900.c[3]/m300.c[3];
   assert.ok(gain1>1.5,'MF helps');assert.ok(gain2<gain1,'diminishing returns');
@@ -41,9 +41,10 @@ test('drops per kill: normal monsters rarely drop, elites often, bosses always t
   const r=mulberry32(77);let n=0,e=0,b=0;const id=()=>'d'+Math.random();
   for(let k=0;k<5000;k++){n+=rollDrops(r,{source:'normal',level:30,newId:id}).length;e+=rollDrops(r,{source:'elite',level:30,newId:id}).length;}
   for(let k=0;k<200;k++)b+=rollDrops(r,{source:'boss',level:30,newId:id}).length;
-  assert.ok(n/5000>.09&&n/5000<.16,'normal ~12%: '+n/5000);
-  assert.ok(e/5000>.75&&e/5000<1.05,'elite ~0.9 items: '+e/5000);
-  assert.equal(b,600);
+  // v0.7.2：普通 15%，精英 0.5 + 0.2，首领 2 件必掉 + 1 件 50%
+  assert.ok(n/5000>.12&&n/5000<.18,'normal ~15%: '+n/5000);
+  assert.ok(e/5000>.6&&e/5000<.8,'elite ~0.7 items: '+e/5000);
+  assert.ok(b>=400&&b<=600&&b/200>2.3&&b/200<2.7,'boss ~2.5 items: '+b/200);
 });
 test('item level gates bases and legendaries; requirement level follows quality level',()=>{
   const r=mulberry32(9);
@@ -137,7 +138,7 @@ test('difficulties: area levels, player scaling cap, unlocks, resist penalty, XP
   assert.deepEqual(migrated.bossKills[0].slice(0,3),[1,2,3]);assert.equal(migrated.difficulty,0,'locked difficulty falls back');
 });
 test('roster storage: legacy save migrates once, characters are independent, stash is shared, names validated',()=>{
-  const mem=new MemoryStorage();
+  const mem=new MemoryStorage();mem.setItem(EPOCH_KEY,DATA_EPOCH);
   mem.setItem(LEGACY_KEY,JSON.stringify({version:2,level:33,heroClass:'paladin',inventory:[]}));
   const st=new LocalStore(mem);
   const id=st.migrateLegacy();assert.ok(id);assert.equal(st.migrateLegacy(),null,'only once');

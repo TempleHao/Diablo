@@ -28,7 +28,7 @@ const OLD=CATALOG.map(c=>({...c,a:'NMELU'[c.r]}));
 const LEGENDS=CLASS_LEGENDS.map(c=>({...c,r:3}));
 const ALL=[...OLD,...CLASS_BASES.map(c=>({...c,r:-1})),...LEGENDS].map(Object.freeze);
 export const CATALOG_BY_ID=new Map(ALL.map(c=>[c.id,c]));
-const slotGroup=slot=>slot==='ring2'?'ring1':slot;
+export const slotGroup=slot=>slot==='ring2'?'ring1':slot;
 const bySlot=list=>{const m={};for(const c of list)(m[c.s]||=[]).push(c);for(const k in m)m[k].sort((a,b)=>a.q-b.q);return m;};
 // 掉落池：基底（白/蓝/黄装）、传奇、暗金
 export const POOLS=Object.freeze({
@@ -247,27 +247,42 @@ export const affixScale=(key,ilvl)=>AFFIXES[key].max===1?1:PCT_AFFIX.has(key)?1+
 export const affixMax=(key,ilvl,rarity)=>Math.round(AFFIXES[key].max*affixScale(key,ilvl)*RARITY_AFFIX_MULT[rarity|0])+(key.startsWith('sk_')&&ilvl>=70?1:0);
 const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
 
-// ───────── 掉落规则（D2 式，见 docs/2D-LOOT.md） ─────────
+// ───────── 掉落规则（v0.7.2，向《暗黑破坏神 2》看齐，见 docs/2D-LOOT.md） ─────────
+// 思路：大部分击杀不掉东西；掉下来的大多是白/蓝；黄（史诗）是前中期的主力升级；
+// 橙（传奇）、绿（套装）、金（暗金）是稀有事件，普通难度要刷十几到几十趟，地狱快得多。
+// 用「看得见的厄运保护」+「金币赌博」+「白蓝黄靠物品等级持续变强」来缓解长期刷不到的挫败感。
 export const DROP_RULES=Object.freeze({
-  // 每只怪的「抽取」：数字是每次抽取掉装备的概率（其余为空 / 金币）
-  picks:{normal:[.12],elite:[.62,.28],boss:[1,1,1]},
+  // 每只怪的「抽取」：每次抽取掉装备的概率（其余为空 / 只有金币）
+  picks:{normal:[.15],elite:[.5,.2],boss:[1,1,.5]},
   // 每件装备的品质基础几率（从高到低依次判定）
-  base:{unique:.0015,set:.0025,legendary:.0075,epic:.055,magic:.32},
-  // 寻宝几率的递减：有效 = MF × K ÷ (MF + K)，魔法品质吃满额
+  base:{unique:.0009,set:.0014,legendary:.0036,epic:.032,magic:.24},
+  // 寻宝几率递减（与 D2 相同的常数）：有效 = MF × K ÷ (MF + K)；魔法品质吃满额
   mfK:{epic:600,set:500,legendary:400,unique:250},
-  source:{normal:1,elite:2,boss:3.5},
-  difficulty:[1,1.3,1.6],
+  // 来源倍率：精英、首领更容易出好东西（D2 的冠军 / 头目加成）
+  source:{normal:1,elite:1.6,boss:2.5},
+  // 难度倍率：hi 作用于传奇/套装/暗金，lo 作用于史诗/魔法
+  difficulty:{hi:[1,1.7,2.8],lo:[1,1.15,1.3]},
   slotWeight:{weapon:3,offhand:1.5,head:1,shoulders:.6,robe:1,gloves:1,belt:1,boots:1,amulet:.7,ring1:1.2},
   ownClass:.5,
-  pity:{legendary:8,unique:30}
+  // 厄运保护（按趟计）：连续 N 趟没见到传奇以上 / 暗金，下一个首领必掉
+  pity:{legendary:20,unique:80},
+  // 首领专属传奇：每次击杀的几率（普通 / 噩梦 / 地狱）；首杀不再必掉，改为首杀第一件至少史诗
+  bossExclusive:[.08,.11,.15],
+  // 赌博（D2 式）：花金币买一件指定部位的未鉴定装备，品质几率如下
+  gamble:{unique:.003,set:.005,legendary:.015,epic:.12}
 });
 const effMf=(mf,k)=>k?mf*k/(mf+k):mf;
-/** 品质判定：返回 {rarity, set}。min 为保底品质（首领第一件至少史诗）。 */
+/** 品质判定：返回 {rarity, set}。min 为保底品质。force：unique/set/legendary/epic/magic/normal。 */
 export function rollQuality(rng,{ilvl=1,mf=0,source='normal',difficulty=0,min=0,force=null}={}){
-  const R=DROP_RULES,lv=1+Math.min(MAX_LEVEL,ilvl)/200,src=R.source[source]||1,dif=R.difficulty[difficulty]||1,mfv=Math.max(0,mf);
-  const chance=(key,base)=>base*lv*src*(['legendary','set','unique'].includes(key)?dif:1)*(1+effMf(mfv,R.mfK[key])/100);
+  const R=DROP_RULES,lv=1+Math.min(MAX_LEVEL,ilvl)/250,src=R.source[source]||1,mfv=Math.max(0,mf);
+  const hi=R.difficulty.hi[difficulty]||1,lo=R.difficulty.lo[difficulty]||1;
+  const chance=(key,base)=>base*lv*src*(['legendary','set','unique'].includes(key)?hi:lo)*(1+effMf(mfv,R.mfK[key])/100);
   if(force==='unique')return {rarity:4,set:false};
+  if(force==='set')return {rarity:4,set:true};
   if(force==='legendary')return {rarity:3,set:false};
+  if(force==='epic')return {rarity:2,set:false};
+  if(force==='magic')return {rarity:1,set:false};
+  if(force==='normal')return {rarity:0,set:false};
   if(rng()<chance('unique',R.base.unique))return {rarity:4,set:false};
   if(rng()<chance('set',R.base.set))return {rarity:4,set:true};
   if(rng()<chance('legendary',R.base.legendary))return {rarity:3,set:false};
@@ -294,27 +309,29 @@ function pickNamed(rng,kind,slot,ilvl,cls){
 }
 /** 掉落装备。opts：source normal/elite/boss，cls 当前职业，mf 寻宝几率，difficulty 难度，min 保底品质，force 强制品质。
  *  兼容旧调用：{boss:true} 等同 source:'boss'。 */
-export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null}={}){
+export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null,slot:wantSlot=null,entry:forceEntry=null}={}){
   const n=Math.max(1,Math.min(MAX_LEVEL,Math.floor(level)||1));
   source=source||(boss?'boss':'normal');
   let {rarity,set}=rollQuality(rng,{ilvl:n,mf,source,difficulty,min,force});
-  let entry=null,setId=null;
-  if(set){
-    const sets=Object.keys(SETS).filter(k=>SETS[k].q<=n);
+  let entry=forceEntry,setId=null;
+  if(set&&!entry){
+    const sets=Object.keys(SETS).filter(k=>SETS[k].q<=n&&(!wantSlot||(SETS[k].cids?SETS[k].cids.some(c=>CATALOG_BY_ID.get(c)?.s===slotGroup(wantSlot)):SETS[k].slots.includes(slotGroup(wantSlot)))));
     const mine=sets.filter(k=>SETS[k].cls===cls);
     const usePool=mine.length&&rng()<DROP_RULES.ownClass?mine:sets;
     setId=usePool.length?usePool[Math.floor(rng()*usePool.length)]:null;
     if(setId){
       const S=SETS[setId];
-      if(S.cids)entry=CATALOG_BY_ID.get(S.cids[Math.floor(rng()*S.cids.length)]);
-      else{const slot=S.slots[Math.floor(rng()*S.slots.length)];entry=pickBase(rng,slot,n,cls);}
+      const cids=S.cids&&wantSlot?S.cids.filter(c=>CATALOG_BY_ID.get(c)?.s===slotGroup(wantSlot)):S.cids;
+      if(S.cids)entry=CATALOG_BY_ID.get(cids[Math.floor(rng()*cids.length)]);
+      else{const slot=wantSlot?slotGroup(wantSlot):S.slots[Math.floor(rng()*S.slots.length)];entry=pickBase(rng,slot,n,cls);}
     }else rarity=3;
   }
-  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',null,n,cls);if(!entry)rarity=2;}
+  // 与 D2 相同：没有物品等级够得上的传奇/暗金时，降为史诗
+  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',wantSlot,n,cls);if(!entry)rarity=2;}
   if(!entry){
     // 只在有符合物品等级基底的部位里抽（比如护肩最低品级 5，1-4 级不出护肩）
     const slots=Object.keys(DROP_RULES.slotWeight).filter(s=>(POOLS.base[slotGroup(s)]||[]).some(c=>c.q<=n));
-    const slot=weightedPick(rng,slots,s=>DROP_RULES.slotWeight[s]);
+    const slot=wantSlot&&(POOLS.base[slotGroup(wantSlot)]||[]).length?slotGroup(wantSlot):weightedPick(rng,slots,s=>DROP_RULES.slotWeight[s]);
     entry=pickBase(rng,slot,n,cls);
   }
   const slot=entry.s;
@@ -359,13 +376,48 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   });
 }
 /** 一次击杀掉落的全部装备（不含金币）。pityHit：首领保底触发时强制一件传奇。 */
-export function rollDrops(rng,{source='normal',level=1,mf=0,cls=null,difficulty=0,newId,force=null}){
+export function rollDrops(rng,{source='normal',level=1,mf=0,cls=null,difficulty=0,newId,force=null,firstMin=null}){
   const out=[];
   for(const [i,p] of (DROP_RULES.picks[source]||DROP_RULES.picks.normal).entries()){
     if(rng()>=p)continue;
-    out.push(makeLoot(rng,level,newId(),{source,cls,mf,difficulty,min:source==='boss'&&i===0?2:0,force:i===0?force:null}));
+    // 首领第一件至少魔法（首杀时至少史诗，由 boss-loot 传入 firstMin）
+    const min=i===0?(firstMin??(source==='boss'?1:0)):0;
+    out.push(makeLoot(rng,level,newId(),{source,cls,mf,difficulty,min,force:i===0?force:null}));
   }
   return out;
+}
+// ───────── 赌博（D2 式金币消耗）：选部位，花金币买一件随机品质装备 ─────────
+export const GAMBLE_SLOTS=Object.freeze(['weapon','offhand','head','robe','gloves','boots','belt','ring1','amulet']);
+/** 价格随角色等级上涨；戒指、项链贵一倍（与 D2 一样，首饰最贵）。 */
+export const gambleCost=(level,slot)=>Math.round((150+Math.max(1,Math.min(MAX_LEVEL,level|0))*28)*(slot==='ring1'||slot==='amulet'?2:1));
+export function gambleQuality(rng){
+  const G=DROP_RULES.gamble,r=rng();
+  if(r<G.unique)return 'unique';
+  if(r<G.unique+G.set)return 'set';
+  if(r<G.unique+G.set+G.legendary)return 'legendary';
+  if(r<G.unique+G.set+G.legendary+G.epic)return 'epic';
+  return 'magic';
+}
+/** 赌一件：物品等级 = 角色等级 −5 ~ +4（D2 赌博同样有物品等级浮动）。返回装备或 null。 */
+export function gambleItem(rng,level,slot,id,cls=null){
+  if(!GAMBLE_SLOTS.includes(slot))return null;
+  const ilvl=Math.max(1,Math.min(MAX_LEVEL,(level|0)-5+Math.floor(rng()*10)));
+  return makeLoot(rng,ilvl,id,{cls,slot,force:gambleQuality(rng)});
+}
+/** 新角色起始装备：本职业最低品级的武器（普通品质）+ 一件胸甲，开局不用空手。 */
+export function starterKit(cls,newId){
+  const own=g=>(POOLS.base[g]||[]).filter(c=>ownsEntry(c,cls)).sort((a,b)=>a.q-b.q);
+  const pickFirst=(g,pred=()=>true)=>own(g).find(pred)||(POOLS.base[g]||[]).slice().sort((a,b)=>a.q-b.q)[0];
+  const weapons=CLASSES[cls]?.weapons||[];
+  const w=pickFirst('weapon',c=>weapons.includes(c.sub)&&c.sub!=='箭囊');
+  const r=pickFirst('robe');
+  const one=()=>0;
+  const out=[];
+  for(const [g,e] of [['weapon',w],['robe',r]]){
+    if(!e)continue;
+    out.push(makeLoot(one,Math.max(1,e.q|0),newId(),{cls,slot:g,force:'normal',entry:e}));
+  }
+  return out.filter(Boolean);
 }
 export function emptyEquipment(){return Object.fromEntries(SLOT_IDS.map(s=>[s,null]));}
 /** 装备带来的属性：基础值 + 词缀 + 套装加成；同时汇总传奇特效（legend）。 */

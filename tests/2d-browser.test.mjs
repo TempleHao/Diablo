@@ -24,6 +24,7 @@ try{
       const item=(id,slot,name,rarity,affixes,power=0,hp=0,armor=0,setId=null)=>({
         id,slot,name,rarity,ilvl:18,affixes,power,hp,mana:slot==='offhand'?80:0,armor,value:300,setId,cid:CID[id]
       });
+      if(!localStorage.getItem('ember-chronicles-2d-epoch'))localStorage.setItem('ember-chronicles-2d-epoch','2026-10-20-reset');
       localStorage.setItem('ember-chronicles-2d-v1',JSON.stringify({
         version:2,heroClass:'mage',level:18,gold:1400,essence:50,clears:2,region:0,xp:40,skillRanks:{fire:3,nova:2},materials:{dust:70,crystal:90,core:6},
         inventory:[
@@ -90,8 +91,8 @@ try{
     const firstBoss=await page.evaluate(()=>window.__ember2dQA.bossTest());
     assert.equal(firstBoss.state,'playing','boss defeat must not end the game');
     assert.equal(firstBoss.bossDefeated,true);
-    assert.ok(firstBoss.drops.length>=2,'first boss kill must drop ordinary and exclusive loot');
-    assert.equal(firstBoss.drops.some(d=>d.rarity===3&&d.persistent),true,'guaranteed special legendary');
+    assert.ok(firstBoss.drops.length>=2,'first boss kill drops loot');
+    assert.equal(firstBoss.drops.some(d=>d.rarity>=2&&d.persistent),true,'first kill: at least one epic (v0.7.2)');
     assert.equal(firstBoss.bossKills,1);
     assert.equal(await page.locator('#portal-open').isVisible(),true,'boss portal must appear');
     assert.equal(firstBoss.pending,firstBoss.drops.length);

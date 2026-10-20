@@ -10,7 +10,7 @@ import {heroRig} from './pixel-mage-demo.js';
 import {SKILL_BAL} from './balance.js';
 import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDecals,shakeOffset} from './fx.js';
 import {drawDungeonDetail} from './dungeon-detail.js';
-import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, DROP_RULES, GAMBLE_SLOTS, gambleCost, gambleItem, starterKit, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints } from './systems.js';
 import {describePower,skillLegend,PROC_FX} from './legendary.js';
 import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor} from './progression.js';
 import {LocalStore,STASH_SIZE} from './storage.js';
@@ -40,7 +40,12 @@ store.migrateLegacy();
 let charId=store.active();
 profile=charId?sanitizeSave(store.load(charId)):freshSave();
 /** 新角色的初始存档：职业固定，技能栏用该职业默认配置。 */
-function freshProfile(cls){const p=freshSave();p.heroClass=cls;p.activeSkills=sanitizeActive(cls,null);return p;}
+function freshProfile(cls){
+  const p=freshSave();p.heroClass=cls;p.activeSkills=sanitizeActive(cls,null);
+  // v0.7.2：新角色带一把本职业的普通武器和一件胸甲
+  let k=0;for(const it of starterKit(cls,()=>'start-'+cls+'-'+(k++))){p.inventory.push(it);p.equipped[it.slot]=it.id;}
+  return p;
+}
 // 仅本地 QA 用：原地切换职业（正式界面里职业随角色固定）。
 function applyClass(cls,quiet=false){
   if(!switchClass(profile,cls))return;
@@ -53,13 +58,15 @@ function applyClass(cls,quiet=false){
 }
 document.querySelector('.orb.energy small').textContent=CLASSES[profile.heroClass].resource;
 
+// 本趟是否已在地上掉过传奇以上 / 暗金（用于厄运保护按「趟」计）
+let tripLoot={legend:false,unique:false};
 // ───── 角色状态面板（C 键）与增益栏 ─────
 function renderStatus(){
   const panel=$('status-panel');if(!panel||panel.hidden)return;
   const s=heroStats(),C=CLASSES[profile.heroClass],pct=v=>Math.round(v)+'%';
   const dps=Math.round(s.power*s.dmgMult*(1+s.crit/100*s.critDmg/100)*(s.attack.speed||1)*s.aspdMult/.5);
   const sections=[
-    ['角色',[['名字',profile.name||'—'],['职业',C.name],['等级',profile.level+' / '+MAX_LEVEL],['经验',profile.level>=MAX_LEVEL?'已满级':profile.xp+' / '+expRequired(profile.level)],['难度',DIFFICULTIES[profile.difficulty|0].name],['怪物等级',monsterLevel()],['已净化',profile.clears],['金币',profile.gold],['技能点',profile.skillPoints],['巅峰点',paragonLeft(profile)+' / '+paragonPoints(profile.level)]]],
+    ['角色',[['名字',profile.name||'—'],['职业',C.name],['等级',profile.level+' / '+MAX_LEVEL],['经验',profile.level>=MAX_LEVEL?'已满级':profile.xp+' / '+expRequired(profile.level)],['难度',DIFFICULTIES[profile.difficulty|0].name],['怪物等级',monsterLevel()],['已净化',profile.clears],['金币',profile.gold],['技能点',profile.skillPoints],['巅峰点',paragonLeft(profile)+' / '+paragonPoints(profile.level)],['厄运保护','传奇 '+(profile.pity?.legendary|0)+'/'+DROP_RULES.pity.legendary+' · 暗金 '+(profile.pity?.unique|0)+'/'+DROP_RULES.pity.unique+' 趟']]],
     ['生存',[['生命',Math.ceil(hero?.hp??s.hp)+' / '+s.hp],[C.resource,Math.ceil(hero?.mana??s.mana)+' / '+s.mana],['每秒回复',s.regen.toFixed(1)],['护甲',s.armor],['护甲减伤',pct(Math.min(60,s.armor/(s.armor+200)*100))],['额外减伤',pct(s.mods.dr*100)],['护盾',Math.ceil(wardHp)],['移动速度',pct(s.moveMult*100)]]],
     ['输出',[[C.power,s.power],['伤害加成',pct((s.dmgMult-1)*100)],['暴击率',pct(s.crit)],['暴击伤害',pct(s.critDmg)],['攻击/施法速度',pct(s.aspdMult*100)],['吸血',(s.lifesteal?s.lifesteal+'/击 ':'')+(s.mods.lifePct?pct(s.mods.lifePct*100):'')||'0'],['估算每秒伤害',dps],['技能等级加成','+'+s.classSkill],['冷却缩减',pct(s.cdr)],['寻宝几率',pct(s.mf)]]],
     ['武器',[['武器',s.weapon||'空手'],['攻击方式',{melee:'近战',bow:'射箭',throw:'投掷',spell:'法术弹'}[s.attack.mode]],['攻速倍率','×'+(s.attack.speed||1)],['擅长武器',s.weapon?(s.proficient?'是 · 伤害 +15%':'否'):'—'],['擅长副手',s.offProficient?'是':'—']]],
@@ -321,7 +328,7 @@ function build() {
   rng=mulberry32(seed); dungeon=makeDungeon(seed,profile.region);
   const s=stats(profile);
   hero={x:START.x,y:START.y, radius:17,hp:s.hp,mana:s.mana,maxHp:s.hp,maxMana:s.mana,angle:-Math.PI/2,invuln:0,cast:0,walk:0,moving:false};
-  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];vfx=[];dying=[];decals=[];summons=[];allies=[];buffs=[];corpses=[];pending=[];hasteUntil=0;bladesUntil=0;thunderUntil=0;heldSlots.clear();hitStop=0;shake.amount=0;kills=0;boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
+  enemies=[];missiles=[];drops=[];particles=[];texts=[];hazards=[];vfx=[];dying=[];decals=[];summons=[];allies=[];buffs=[];corpses=[];pending=[];hasteUntil=0;bladesUntil=0;thunderUntil=0;heldSlots.clear();hitStop=0;shake.amount=0;kills=0;tripLoot={legend:false,unique:false};boss=null;nextId=1;tick=0;manualAim=null;armorUntil=0;wardHp=0;combo=0;bossDefeated=false;portal=null;
   $('portal-panel').hidden=true;$('portal-open').hidden=true;
   for(const [i,pending] of profile.pendingLoot.entries())if(pending.region===profile.region)
     drops.push({x:START.x+40+(i%4)*38,y:START.y-50-Math.floor(i/4)*43,item:pending.item,age:0,persistent:true});
@@ -426,7 +433,32 @@ function applyEquipmentChange(operate){
   }
   persist();renderInventory();updateHud();
 }
+// ───── 赌博（金币 → 指定部位随机装备） ─────
+const GAMBLE_NAMES={weapon:'武器',offhand:'副手',head:'头盔',robe:'胸甲',gloves:'手套',boots:'靴子',belt:'腰带',ring1:'戒指',amulet:'项链'};
+function refreshGamble(){
+  const sel=$('gamble-slot');if(!sel)return;
+  const cur=sel.value||'weapon';
+  sel.replaceChildren(...GAMBLE_SLOTS.map(slot=>{const o=document.createElement('option');o.value=slot;o.textContent=GAMBLE_NAMES[slot]+' · '+gambleCost(profile.level,slot)+' 金币';return o;}));
+  sel.value=cur;
+  const cost=gambleCost(profile.level,sel.value);
+  $('gamble-go').disabled=profile.gold<cost||profile.inventory.length>=MAX_ITEMS;
+  $('gamble-go').textContent='赌一件（'+cost+' 金币）';
+}
+$('gamble-slot').onchange=refreshGamble;
+$('gamble-go').onclick=()=>{
+  const slot=$('gamble-slot').value,cost=gambleCost(profile.level,slot);
+  if(profile.gold<cost||profile.inventory.length>=MAX_ITEMS)return;
+  const item=gambleItem(rng,profile.level,slot,'gamble-'+Date.now()+'-'+(nextId++),profile.heroClass);
+  if(!item)return;
+  profile.gold-=cost;profile.inventory.push(item);
+  if(item.rarity>=3&&profile.pity){profile.pity.legendary=0;if(item.rarity===4&&!item.setId)profile.pity.unique=0;}
+  persist();
+  $('gamble-msg').textContent='获得 '+RARITIES[item.rarity]+(item.setId?'（套装）':'')+'：'+item.name;
+  $('gamble-msg').style.color=item.setId?SET_COLOR:RARITY_COLORS[item.rarity];
+  selectedItemId=item.id;renderInventory();updateHud();
+};
 function refreshCraftingPanel(){
+  refreshGamble();
   const sel=$('auto-salvage');
   sel.value=String(profile.autoSalvage);
   const wallet=$('material-wallet');wallet.replaceChildren();
@@ -839,11 +871,11 @@ function dealDamage(e,damage,school='physical',opts={}){
   for(const pr of L.procs)if(pr.on==='kill'&&rng()*100<pr.chance)procCast(pr,e);
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;hsCache=null;
     announce('等级提升 · '+profile.level+'级！'+(profile.level>60?' · 获得巅峰点':''),true);refreshWorldPickers();}
-  if(!bossDied)for(const item of rollDrops(rng,{source:e.elite?'elite':'normal',level:e.level||monsterLevel(),mf:heroStats().mf,cls:profile.heroClass,difficulty:profile.difficulty|0,newId:()=>'ember2d-'+Date.now()+'-'+nextId++}))dropItem(e.x+(rng()-.5)*30,e.y+(rng()-.5)*20,item);
+  if(!bossDied)for(const item of rollDrops(rng,{source:e.elite?'elite':'normal',level:e.level||monsterLevel(),mf:heroStats().mf,cls:profile.heroClass,difficulty:profile.difficulty|0,newId:()=>'ember2d-'+Date.now()+'-'+nextId++})){if(item.rarity>=3)tripLoot.legend=true;if(item.rarity===4&&!item.setId)tripLoot.unique=true;dropItem(e.x+(rng()-.5)*30,e.y+(rng()-.5)*20,item);}
   if(bossDied){
     const region=profile.region,dif=profile.difficulty|0,previousKills=profile.bossKills[dif][region]||0;
     const reward=rollBossRewards(rng,e.level||monsterLevel(true),region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++),{cls:profile.heroClass,mf:heroStats().mf,difficulty:dif,pity:profile.pity});
-    profile.bossKills[dif][region]=previousKills+1;profile.pity=reward.pity;
+    profile.bossKills[dif][region]=previousKills+1;profile.pity=reward.pity;if(tripLoot.legend)profile.pity.legendary=0;if(tripLoot.unique)profile.pity.unique=0;
     if(region===8&&previousKills===0&&dif<2)announce(DIFFICULTIES[dif+1].name+'难度已解锁！',true);
     refreshWorldPickers();
     profile.essence+=reward.materials;profile.clears++;

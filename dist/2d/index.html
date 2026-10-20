@@ -11,7 +11,7 @@
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><span class="brandmark">✦</span><span><b>余烬纪事</b><small>EMBER CHRONICLES <em>· 2D</em></small></span></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.7.1</span>
+    <span class="version">灰烬边境 · 第一幕 / v0.7.2</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -89,6 +89,11 @@
           <small>已装备、收藏、传奇及套装永久受保护；关闭时全部保留。</small>
         </div>
         <div class="material-wallet" id="material-wallet" aria-live="polite"></div>
+        <div class="gamble-box" id="gamble-box">
+          <div class="gamble-head"><strong>赌博</strong><small>花金币买一件指定部位的随机装备（同《暗黑破坏神 2》）。暗金 0.3%、套装 0.5%、传奇 1.5%、史诗 12%，其余为魔法。</small></div>
+          <div class="gamble-row"><select id="gamble-slot" aria-label="赌博部位"></select><button id="gamble-go" type="button">赌一件</button></div>
+          <small id="gamble-msg" class="gamble-msg"></small>
+        </div>
         <div class="bag-controls">
           <label>类别
             <select id="inv-filter" aria-label="背包装备类别">

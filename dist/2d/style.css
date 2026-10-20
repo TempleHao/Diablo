@@ -538,3 +538,11 @@ body:has(.status-panel:not([hidden])) .quest,body:has(.status-panel:not([hidden]
 .hero-select.is-land .hs-form input{padding:8px 10px}
 .hero-select.is-land .hs-go{padding:11px!important}
 .hs-side>*{flex-shrink:0}
+/* v0.7.2 赌博 */
+.gamble-box{margin:10px 0 12px;padding:10px 12px;border:1px solid #6a5235;background:linear-gradient(160deg,#1d1712,#101216);border-radius:3px}
+.gamble-head strong{display:block;color:#f0cd8e;font-size:13px;letter-spacing:2px}
+.gamble-head small{display:block;color:#9b8e7a;font-size:10px;line-height:1.6;margin:3px 0 8px}
+.gamble-row{display:flex;gap:6px}
+.gamble-row select{flex:1;min-width:0;height:36px;background:#13161c;border:1px solid #5d4b35;color:#e6d6b8;padding:0 6px}
+.gamble-row button{height:36px;padding:0 12px;border:1px solid #c99a5b;background:linear-gradient(100deg,#6d4325,#9a6838);color:#fff2da;white-space:nowrap}
+.gamble-msg{display:block;min-height:1.2em;margin-top:6px;font-size:12px}

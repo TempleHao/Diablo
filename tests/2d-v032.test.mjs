@@ -11,9 +11,11 @@ test('nine areas have unique labels and boss-specific first-kill rewards',()=>{
  assert.equal(new Set(REGION_DATA.map(r=>r.id)).size,9);
  assert.equal(new Set(BOSS_POOLS.map(r=>r.item)).size,9);
  for(let region=0;region<9;region++){
+  // v0.7.2：首杀不再必掉专属传奇，改为第一件至少史诗；专属传奇按几率掉
   const rewards=rollBossRewards(mulberry32(100+region),18,region,0,(()=>{let i=0;return()=>String(++i)})());
-  assert.equal(rewards.exclusive,true);
-  assert.equal(rewards.drops.filter(item=>item.name===BOSS_POOLS[region].item).length,1);
+  assert.equal(rewards.firstKill,true);assert.ok(rewards.drops[0].rarity>=2);
+  let seed=0,ex=null;while(!ex){const r=rollBossRewards(mulberry32(seed++),18,region,3,(()=>{let i=0;return()=>String(++i)})());if(r.exclusive)ex=r;}
+  assert.equal(ex.drops.filter(item=>item.name===BOSS_POOLS[region].item).length,1);
   assert.equal(makeDungeon(101,region).region,region);
  }
 });

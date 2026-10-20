@@ -37,7 +37,7 @@ test('auto-equip fills slots, respects weapon/offhand rules, never wears legacy 
 });
 test('build weights steer choices: fire build prefers fire gear',()=>{
   const p=freshSave();p.level=30;const r=mulberry32(4);
-  for(let i=0;i<120;i++)p.inventory.push(makeLoot(r,30,'m'+i,{cls:'mage'}));
+  for(let i=0;i<120;i++)p.inventory.push(makeLoot(r,30,'m'+i,{cls:'mage',min:1}));
   const fire=BUILDS.mage[0],frost=BUILDS.mage[1];
   const sum=(key)=>Object.values(p.equipped).filter(Boolean).map(id=>p.inventory.find(i=>i.id===id)).reduce((n,it)=>n+(it.affixes.find(a=>a.key===key)?.value||0),0);
   autoEquip(p,fire.id);const f1=sum('fire'),c1=sum('cold');

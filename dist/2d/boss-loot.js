@@ -3,7 +3,7 @@
  * Pure, deterministic and independently testable; no asset dependencies.
  * Dedicated drops do not require paid assets or cloud services.
  */
-import { rollDrops, normalizeItem, BOSS_ITEM_ICONS, DROP_RULES, MAX_LEVEL } from './systems.js';
+import { rollDrops, normalizeItem, BOSS_ITEM_ICONS, DROP_RULES, MAX_LEVEL, POOLS } from './systems.js';
 
 export const BOSS_POOLS=Object.freeze([
   {id:'ashen-priest',name:'灰烬司祭',item:'炉誓秘杖',slot:'weapon',
@@ -25,16 +25,20 @@ export const BOSS_POOLS=Object.freeze([
   {id:'obsidian-lord',name:'黑曜暴君',item:'黑曜焚世长杖',slot:'weapon',
     stats:{power:48},affixes:[{key:'fire',value:16},{key:'skillFire',value:1},{key:'critDmg',value:15}]}
 ]);
-/** 首领奖励：3 次抽取（第一件至少史诗）+ 专属传奇（首杀必掉，之后 26%）。
- *  保底（v0.7）：连续 pity.legendary 次首领没出传奇/暗金，这次第一件必为传奇；暗金同理（pity.unique 次）。 */
+/** 首领奖励（v0.7.2）：2 次必掉 + 1 次 50%；第一件至少魔法，首杀时至少史诗。
+ *  专属传奇：每次击杀按难度 8% / 11% / 15%（不再首杀必掉）。
+ *  厄运保护：pity 为「连续多少趟没见到传奇以上 / 暗金」（整趟里任何地方掉到都算，由 game.js 清零），
+ *  到达 DROP_RULES.pity 时这次首领第一件必为传奇 / 暗金。 */
 export function rollBossRewards(rng,level,region,previousKills,newId,{cls=null,mf=0,difficulty=0,pity=null}={}){
   if(!Number.isInteger(region)||region<0||region>=BOSS_POOLS.length)throw new RangeError('invalid boss region');
   if(typeof rng!=='function'||typeof newId!=='function')throw new TypeError('missing loot RNG or ID factory');
   const pool=BOSS_POOLS[region],firstKill=previousKills===0;
   const P=DROP_RULES.pity,dry=pity||{legendary:0,unique:0};
-  const force=dry.unique>=P.unique-1?'unique':dry.legendary>=P.legendary-1?'legendary':null;
-  const drops=rollDrops(rng,{source:'boss',level,mf,cls,difficulty,newId,force});
-  const exclusive=firstKill||rng()<.26;
+  // 暗金保底只在「这个等级已经可能出暗金」时计数和触发（D2 同理：物品等级不够就没有暗金）
+  const uniqueOk=Object.values(POOLS.unique).flat().some(c=>c.q<=level);
+  const force=uniqueOk&&dry.unique>=P.unique-1?'unique':dry.legendary>=P.legendary-1?'legendary':null;
+  const drops=rollDrops(rng,{source:'boss',level,mf,cls,difficulty,newId,force,firstMin:firstKill?2:1});
+  const exclusive=rng()<(DROP_RULES.bossExclusive[difficulty]??DROP_RULES.bossExclusive[0]);
   if(exclusive){
     const scale=1+Math.floor(Math.max(1,level)/8)*.14;
     const stats=Object.fromEntries(Object.entries(pool.stats).map(([key,val])=>[key,Math.round(val*scale)]));
@@ -48,7 +52,7 @@ export function rollBossRewards(rng,level,region,previousKills,newId,{cls=null,m
     drops.push(item);
   }
   const gotLegend=drops.some(d=>d.rarity===3&&d.name!==pool.item),gotUnique=drops.some(d=>d.rarity===4&&!d.setId);
-  const nextPity={legendary:gotLegend||gotUnique?0:dry.legendary+1,unique:gotUnique?0:dry.unique+1};
+  const nextPity={legendary:gotLegend||gotUnique?0:dry.legendary+1,unique:gotUnique||!uniqueOk?0:dry.unique+1};
   return {id:pool.id,boss:pool.name,firstKill,exclusive,forced:force,pity:nextPity,
     materials:firstKill?16:4+rng()*7|0,drops};
 }

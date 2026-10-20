@@ -16,6 +16,11 @@ export const ROSTER_KEY='ember-chronicles-2d-roster-v1';
 export const LEGACY_KEY='ember-chronicles-2d-v1';
 export const MAX_CHARACTERS=12;
 export const STASH_SIZE=40;
+/** 数据纪元：改这个值 = 所有玩家的 2D 存档（角色、共享仓库、旧版单存档）在下次打开时清零一次。
+ *  v0.7.2（2026-10-20）：按测试需要全部清零，从头开始。只清 2D（ember-chronicles-2d*），3D 版存档不动。 */
+export const DATA_EPOCH='2026-10-20-reset';
+export const EPOCH_KEY='ember-chronicles-2d-epoch';
+const PREFIX='ember-chronicles-2d';
 const now=()=>Date.now();
 const newId=()=>'c'+now().toString(36)+Math.floor(Math.random()*1e6).toString(36);
 /** 角色名：1-12 个字符，去掉首尾空白与控制字符。 */
@@ -24,7 +29,17 @@ export function cleanName(name){
   return s;
 }
 export class LocalStore{
-  constructor(storage=globalThis.localStorage){this.s=storage;this.kind='local';}
+  constructor(storage=globalThis.localStorage){this.s=storage;this.kind='local';this.wiped=this._checkEpoch();}
+  /** 纪元不一致时清空本机全部 2D 数据，返回是否清空过。 */
+  _checkEpoch(){
+    try{
+      if(!this.s||this.s.getItem(EPOCH_KEY)===DATA_EPOCH)return false;
+      const keys=[];for(let i=0;i<this.s.length;i++){const k=this.s.key(i);if(k&&k.startsWith(PREFIX))keys.push(k);}
+      for(const k of keys)this.s.removeItem(k);
+      this.s.setItem(EPOCH_KEY,DATA_EPOCH);
+      return keys.length>0;
+    }catch{return false;}
+  }
   _get(key){try{const v=this.s?.getItem(key);return v?JSON.parse(v):null;}catch{return null;}}
   _set(key,val){try{this.s?.setItem(key,JSON.stringify(val));return true;}catch{return false;}}
   _del(key){try{this.s?.removeItem(key);}catch{}}
@@ -82,4 +97,6 @@ export class MemoryStorage{
   getItem(k){return this.m.has(k)?this.m.get(k):null;}
   setItem(k,v){this.m.set(k,String(v));}
   removeItem(k){this.m.delete(k);}
+  get length(){return this.m.size;}
+  key(i){return [...this.m.keys()][i]??null;}
 }

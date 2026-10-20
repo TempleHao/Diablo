@@ -64,7 +64,8 @@ test('legacy saves: items get catalog names and icons, legs/relic stay in bag un
 });
 test('boss exclusives keep their names with a matching legendary icon',()=>{
   for(let region=0;region<9;region++){
-    const drop=rollBossRewards(mulberry32(region+3),20,region,0,(()=>{let i=0;return()=>'b'+(++i)})()).drops.at(-1);
+    let seed=region*1000,res;do{res=rollBossRewards(mulberry32(seed++),20,region,0,(()=>{let i=0;return()=>'b'+(++i)})());}while(!res.exclusive);
+    const drop=res.drops.at(-1);
     assert.equal(drop.name,BOSS_POOLS[region].item);
     const entry=catalogEntry(drop);
     assert.ok(entry&&entry.r===3);

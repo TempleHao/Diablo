@@ -62,6 +62,7 @@ export function createHeroSelect({root,store,fresh,onEnter}){
     root.dataset.mode=mode;root.classList.toggle('is-mobile',mobile());root.classList.toggle('is-land',landscape());
     plates.replaceChildren();stage.querySelector('.hs-carousel')?.remove();side.replaceChildren();listBox.replaceChildren();bottom.replaceChildren();account.replaceChildren();
     account.append(el('span','hs-account-dot'),el('span',null,store.kind==='local'?'本机存档 · 数据保存在当前浏览器':'在线账号'),el('small',null,'在线登录版开发中，届时可把本机角色上传到账号'));
+    if(store.wiped)account.append(el('small','hs-wiped','· 测试数据已清零，从头开始'));
     if(mode==='create')renderCreate();else renderList();
   }
   function plate(cls,onClick,active){
