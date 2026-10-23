@@ -797,3 +797,46 @@ body:has(#scrim:not([hidden])) .portal-open,body:has(#inventory:not([hidden])) .
   .eventlog{top:calc(132px + var(--st,0px))!important}
 }
 @media (max-height:560px) and (pointer:coarse){.brand-logo{height:46px!important}.quest{top:calc(56px + var(--st,0px))!important}.eventlog{top:calc(100px + var(--st,0px))!important}}
+
+/* ═════════ v0.9.4 技能名 + 手机端也用哥特式状态栏 ═════════ */
+/* 技能格：图标在上，名字在下（与「锁」字同级的小字），不再只有图标 */
+.ghud .gh-slots .abilitybar{grid-template-columns:repeat(5,52px)!important;gap:4px 5px!important}
+.ghud .gh-slots .abilitybar button{width:52px!important;height:62px!important;display:block!important;background:#0b0a0b!important}
+.ghud .gh-slots .abilitybar button .ability-icon,.ghud .gh-slots .abilitybar button .ability-icon.sk-ico{position:absolute!important;left:3px!important;top:3px!important;width:46px!important;height:46px!important;right:auto!important;bottom:auto!important}
+.ghud .gh-slots .abilitybar button .gh-key{bottom:15px!important;right:4px!important}
+.ghud .gh-name{position:absolute;left:0;right:0;bottom:1px;z-index:2;font-size:10px;line-height:12px;text-align:center;color:#e6d4b0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 1px;text-shadow:0 1px 1px #000}
+.ghud .gh-slots .abilitybar button.locked .gh-name{color:#8a7a66}
+.ghud .abilitybar .locked:after{z-index:3;font-size:9px}
+.ghud .gh-slots .abilitybar button i{bottom:13px!important;top:auto}
+/* 手机：footer 旧版 HUD 不再显示；血条图放左下，技能面板放右下，摇杆在血条上方 */
+body.ghud-mobile footer.hud{display:none!important}
+body.ghud-mobile .joystick{display:block!important}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  /* 竖屏：血条横跨底部，技能面板在它上方靠右，摇杆在左 */
+  .gh-left{left:calc(6px + var(--sl))!important;right:calc(6px + var(--sr));width:auto!important;bottom:2px!important}
+  .gh-right{right:calc(6px + var(--sr))!important;bottom:calc((100vw - 12px) * 436 / 2139 + 6px)!important;padding-left:0!important;gap:3px!important}
+  .gh-right .gh-cls{display:none!important}
+  .gh-utils{display:none!important}
+  .gh-slots{padding:4px!important}
+  .gh-slots::before,.gh-slots::after{display:none}
+  .ghud .gh-slots .abilitybar{grid-template-columns:repeat(5,48px)!important;gap:3px!important}
+  .ghud .gh-slots .abilitybar button{width:48px!important;height:58px!important}
+  .ghud .gh-slots .abilitybar button .ability-icon,.ghud .gh-slots .abilitybar button .ability-icon.sk-ico{width:42px!important;height:42px!important}
+  .ghud .gh-slots .abilitybar button .gh-key{display:none}
+  .ghud .gh-name{font-size:9px}
+  .gh-left .gh-txt{font-size:9px}
+  .gh-left .gh-lv span{font-size:12px}.gh-left .gh-lv small{display:none}
+  .joystick{bottom:calc((100vw - 12px) * 436 / 2139 + 14px)!important;left:calc(12px + var(--sl))!important}
+  .ghud .buffbar{justify-content:flex-end}
+  body.ghud-on .upgrade-chip{bottom:calc((100vw - 12px) * 436 / 2139 + 140px)!important}
+}
+/* 横屏手机：血条在左下（宽 46%），技能面板在右下，摇杆在血条上方 */
+@media (max-height:560px) and (pointer:coarse){
+  .gh-left{right:auto!important;width:46vw!important}
+  .gh-right{bottom:4px!important}
+  .ghud .gh-slots .abilitybar button{height:54px!important;width:46px!important}
+  .ghud .gh-slots .abilitybar{grid-template-columns:repeat(5,46px)!important}
+  .joystick{bottom:calc(46vw * 436 / 2139 + 10px)!important;width:96px!important;height:96px!important}
+  .joystick span{left:26px!important;top:26px!important}
+  body.ghud-on .upgrade-chip{bottom:calc(46vw * 436 / 2139 + 12px)!important;left:auto!important;right:calc(48vw)!important;transform:none!important}
+}

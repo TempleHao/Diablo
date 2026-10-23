@@ -793,11 +793,13 @@ $('save-file').onchange=async e=>{
   }catch{alert('存档文件解析失败，原存档未被修改。');}
 };
 // ───── v0.9 电脑版状态栏（左下 art/hud-strip.webp + hud-strip-layout.js，右下技能面板） ─────
-function ghudOn(){return !window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
+// v0.9.4：手机也用同一套状态栏（左下血条图、右下技能面板），只是尺寸和排布不同
+function ghudOn(){return true;}
+function hudMobile(){return window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
 function placeIn(el,r){el.style.left=r[0]+'%';el.style.top=r[1]+'%';el.style.width=r[2]+'%';el.style.height=r[3]+'%';}
 // v0.9：生命 / 资源条在左下（art/hud-strip.webp），技能栏单独放在右下，互不挤压
 function layoutGhud(){
-  const on=ghudOn(),g=$('ghud');g.hidden=!on;document.body.classList.toggle('ghud-on',on);
+  const on=ghudOn(),g=$('ghud');g.hidden=!on;document.body.classList.toggle('ghud-on',on);document.body.classList.toggle('ghud-mobile',hudMobile());
   const bar=$('abilitybar'),buffs=$('buffbar'),slots=$('gh-slots');
   if(on){
     if(bar.parentElement!==slots)slots.append(bar);if(buffs.parentElement!==g.querySelector('.gh-right'))g.querySelector('.gh-right').prepend(buffs);
@@ -807,7 +809,10 @@ function layoutGhud(){
     placeIn(left.querySelector('.gh-txt.hp'),L.hpText);placeIn(left.querySelector('.gh-txt.mp'),L.mpText);placeIn(left.querySelector('.gh-lv'),L.lv);
     [...bar.children].forEach((b,i)=>{b.style.left=b.style.top=b.style.width=b.style.height='';
       let k=b.querySelector('.gh-key');if(!k){k=document.createElement('span');k.className='gh-key';b.append(k);}
-      k.textContent=keyLabel(profile?.keybinds?.[i]||'')+(i===0?'·L':i===1?'·R':'');});
+      k.textContent=keyLabel(profile?.keybinds?.[i]||'')+(i===0?'·L':i===1?'·R':'');
+      // 技能名写在格子下方（和「锁」字同样大小）
+      let nm=b.querySelector('.gh-name');if(!nm){nm=document.createElement('span');nm.className='gh-name';b.append(nm);}
+      nm.textContent=SKILLS[b.dataset.skill]?.name||'';});
   }else{
     const foot=document.querySelector('footer.hud');if(bar.parentElement!==foot)foot.insertBefore(bar,foot.querySelector('.resource'));
     if(buffs.parentElement!==document.body)document.body.insertBefore(buffs,g);
