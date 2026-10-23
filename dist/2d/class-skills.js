@@ -1,4 +1,4 @@
-/* 余烬纪事 2D · 六个职业的技能数据（每职业 3 系 × 8 = 24 项）。
+/* 归墟 2D · 六个职业的技能数据（每职业 3 系 × 8 = 24 项）。
  * a = 技能原型（由 game.js 的通用技能引擎执行），m = 伤害倍率（× 攻击力/法术强度 × 等级加成）。
  * 原型：basic 普攻（随武器变化）/ melee 近战 / whirl 旋风 / leap 跳斩 / charge 冲锋 / proj 弹道 / nova 新星 /
  *       area 区域 / chain 连锁 / summon 召唤随从 / turret 陷阱与图腾 / buff 增益 / aura 光环 / curse 诅咒 /

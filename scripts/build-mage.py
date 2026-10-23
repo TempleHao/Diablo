@@ -1,4 +1,4 @@
-"""Build the original Ember Mage with a deformable armature and three glTF clips.
+"""Build the original VORAGH with a deformable armature and three glTF clips.
 Run: blender -b --python scripts/build-mage.py -- /absolute/project/path
 """
 import bpy, math, sys, random

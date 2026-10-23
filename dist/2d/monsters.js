@@ -1,5 +1,5 @@
 import {WAVE_SIZE,ELITE_SLOTS} from './encounters.js';
-/* 余烬纪事 2D · 怪物图鉴（v0.6）：普通 30、远程 25、精英 25、首领 20，共 100 种。
+/* 归墟 2D · 怪物图鉴（v0.6）：普通 30、远程 25、精英 25、首领 20，共 100 种。
  * sprite：art/monsters.webp 中的贴图键；face：原画朝向（1 右、-1 左、0 正面不翻转）。
  * hp/dmg/spd：相对基准的倍率（基准随怪物等级成长，见 game.js monsterStats）。
  * ai：melee 近战 / ranged 远程 / fly 飞行近战 / caster 法师 / tank 慢速重击 / swarm 快速成群。

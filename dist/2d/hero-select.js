@@ -53,7 +53,7 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
   const listBox=el('section','hs-list');
   const bottom=el('div','hs-bottom');
   const account=el('div','hs-account');
-  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-guixu.webp?v=092',import.meta.url).href;logo.alt='归墟 GUIXU';
+  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-voragh.webp?v=110',import.meta.url).href;logo.alt='归墟 VORAGH';
   root.append(bg,title,logo,stage,listBox,side,bottom,account);
   const ctx=canvas.getContext('2d');
 

@@ -1,5 +1,5 @@
 /**
- * Ember Chronicles 2D - a compact, original dark-fantasy mage renderer.
+ * VORAGH 2D - a compact, original dark-fantasy mage renderer.
  * Foot-anchored silhouette designed for 0.55-0.67x display scale.
  * Source vectors are deliberately high resolution for small screens.
  * Interim game artwork; not the final realistic A-direction animated sprite.

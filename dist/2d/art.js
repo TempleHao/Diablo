@@ -7,7 +7,7 @@ import {SPRITES} from './sprite-data.js';
 import {TIER,ELITE_MOD_NAMES,SCHOOL_COLOR} from './monsters.js';
 import {drawGlow,drawEllipseGlow} from './fx.js';
 /**
- * 余烬纪事 · 2D 美术层
+ * 归墟 · 2D 美术层
  * Sprite art: 0x72 DungeonTileset II v1.7 (CC0 1.0).
  * Original: https://0x72.itch.io/dungeontileset-ii
  * Sheet is checked into art/ (no hotlink, CDN, or runtime network dependency).

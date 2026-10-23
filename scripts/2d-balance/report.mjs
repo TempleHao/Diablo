@@ -4,7 +4,7 @@ import {report} from '../../dist/2d/balance.js';
 import {CLASSES} from '../../dist/2d/classes.js';
 import {TIER,MONSTERS} from '../../dist/2d/monsters.js';
 import {affixMax,AFFIXES} from '../../dist/2d/systems.js';
-const rows=report(),L=['# 余烬纪事 2D · 数值平衡说明（v0.7.3）','',
+const rows=report(),L=['# 归墟 2D · 数值平衡说明（v0.7.3）','',
 '本文件由 `scripts/2d-balance/report.mjs` 根据游戏里实际使用的模型（`dist/2d/balance.js`）生成，改数值后重新运行即可更新。','',
 '## 1. 技能伤害预算','','所有伤害以角色的攻击力/法术强度 **P** 为单位（技能等级 0，不含装备加成）。','',
 '| 类型 | 规则 |','|---|---|',

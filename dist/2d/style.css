@@ -917,3 +917,16 @@ body.ghud-mobile .joystick{display:block!important}
 .gm-actions button:hover{filter:brightness(1.3)}
 .gm-msg{display:block;margin:8px 12px 0;color:#9fd0ff}
 #btn-gm i{color:#9fd0ff!important}
+/* v1.1 手机圆形技能按钮：图标本身带方形画框，放大 124% 后按圆裁切，只留中间画面，外圈由按钮的金属环来做 */
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .ghud .gh-slots .abilitybar button{overflow:visible!important;background:radial-gradient(circle,#1a1410,#050404 70%)!important}
+  .ghud .gh-slots .abilitybar button .ability-icon,.ghud .gh-slots .abilitybar button .ability-icon.sk-ico{
+    left:-12%!important;top:-12%!important;width:124%!important;height:124%!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+    clip-path:circle(40.4% at 50% 50%);-webkit-clip-path:circle(40.4% at 50% 50%)}
+  .ghud .gh-slots .abilitybar button::before{content:"";position:absolute;inset:0;z-index:2;border-radius:50%;pointer-events:none;
+    box-shadow:inset 0 0 0 2px #0a0807,inset 0 0 0 3px #b48a50,inset 0 0 10px #000c,inset 0 6px 10px rgba(255,230,180,.12)}
+  .ghud .gh-slots .abilitybar button i{z-index:1;border-radius:50%;overflow:hidden}
+  .ghud .gh-slots .abilitybar .locked:after{border-radius:8px;top:-4px!important;right:-4px!important}
+}
+/* 横版新标志更宽：中等宽度电脑缩小标志、隐藏版本字样，保证顶栏按钮不出屏 */
+@media (min-width:901px) and (max-width:1280px){.brand-logo{height:64px!important}.version{display:none!important}.top-actions{gap:4px}.top-actions button{padding:0 9px}}

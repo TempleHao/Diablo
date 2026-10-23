@@ -33,7 +33,7 @@ with sync_playwright() as playwright:
              display_header_footer=True,
              header_template='<span></span>',
              footer_template='<div style="font:9px sans-serif;width:100%;text-align:center;color:#777">'
-                             'Ember Mage | Design 1.0 &nbsp; · &nbsp; '
+                             'VORAGH | Design 1.0 &nbsp; · &nbsp; '
                              '<span class="pageNumber"></span> / <span class="totalPages"></span></div>',
              outline=True, tagged=True)
     browser.close()

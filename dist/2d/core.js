@@ -2,7 +2,7 @@ import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, emptyEquipment, normalizeItem, m
 import {DIFFICULTIES,clampDifficulty,difficultyUnlocked,expRequired as expCurve,armorDR,monsterLevel as areaMonsterLevel} from './progression.js';
 import {buildById} from './builds.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
-// 余烬纪事 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
+// 归墟 · 2D 规则内核。无 DOM 依赖，方便 Node 回归。
 export const TILE = 72;
 export const COLS = 40;
 export const ROWS = 30;

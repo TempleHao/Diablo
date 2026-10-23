@@ -792,7 +792,7 @@ function renderInventory(){
 }
 $('export-save').onclick=()=>{
   const blob=new Blob([JSON.stringify(profile,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='guixu-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='voragh-save.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
 };
 $('import-save').onclick=()=>$('save-file').click();
 $('save-file').onchange=async e=>{

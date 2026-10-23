@@ -1,4 +1,4 @@
-/* 余烬纪事 2D · 职业与武器（纯数据，无 DOM 依赖）。 */
+/* 归墟 2D · 职业与武器（纯数据，无 DOM 依赖）。 */
 
 // 七个职业。catalog 对应装备图鉴里的“偏好职业”；weapons 为擅长的武器/副手类型（装备时有加成）。
 export const CLASSES=Object.freeze({

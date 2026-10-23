@@ -1,5 +1,5 @@
 /**
- * 余烬纪事 2D · 渲染辅助：光晕贴图缓存、光照遮罩、地面印记、震屏。
+ * 归墟 2D · 渲染辅助：光晕贴图缓存、光照遮罩、地面印记、震屏。
  * 目标是"好看但不卡"：不用 shadowBlur / ctx.filter，所有发光都是预渲染贴图 + drawImage。
  */
 const hasDom=typeof document!=='undefined';

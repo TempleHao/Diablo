@@ -109,7 +109,7 @@ manifest = {
 
 toc = "\n".join(f"- [{titles[p.name]}](#chapter-{p.name[:2]})" for p in CHAPTERS)
 combined = [
-    "# 《余烬纪事》完整故事与游戏策划纲领\n",
+    "# 《归墟》完整故事与游戏策划纲领\n",
     "**策划基线1.0 · 2026-10-11 · 游戏当前版本0.2.0**\n",
     f"源章节去重：{totals['hanCharacters']:,}个汉字，{totals['totalCharacters']:,}个总字符。"
     "这是设计基线与待验证提案，不是已实现功能清单。\n",
@@ -211,14 +211,14 @@ document.querySelector('#print').addEventListener('click', () => window.print())
 OUTPUT.mkdir(parents=True, exist_ok=True)
 page = f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="余烬纪事完整故事与游戏策划纲领：五幕叙事、法师构筑、装备、怪物、关卡、终局及制作验证。">
-<title>余烬纪事 · 完整游戏策划 1.0</title><style>{css}</style></head>
-<body><div class="layout"><aside><div class="brand">余烬纪事</div><div class="edition">完整游戏策划 · 基线 1.0</div>
+<meta name="description" content="归墟完整故事与游戏策划纲领：五幕叙事、法师构筑、装备、怪物、关卡、终局及制作验证。">
+<title>归墟 · 完整游戏策划 1.0</title><style>{css}</style></head>
+<body><div class="layout"><aside><div class="brand">归墟</div><div class="edition">完整游戏策划 · 基线 1.0</div>
 <nav aria-label="章节目录">{nav}</nav><div class="downloads"><a href="GAME-BIBLE-1.0.pdf" download>↓ 下载 PDF</a>
 <a href="https://github.com/TempleHao/Diablo/tree/main/docs/bible">查看分章源文件</a></div></aside>
 <main><div class="toolbar"><label for="query">检索</label><input id="query" placeholder="技能、词条、人物或规则" type="search">
 <button id="next">下一处</button><span id="search-status" role="status"></span><button id="print">打印</button></div>
-<header class="cover"><div class="eyebrow">EMBER MAGE / GAME DESIGN BIBLE</div><h1>《余烬纪事》<br>完整故事与游戏策划纲领</h1>
+<header class="cover"><div class="eyebrow">VORAGH / GAME DESIGN BIBLE</div><h1>《归墟》<br>完整故事与游戏策划纲领</h1>
 <p class="lead">原创 3D 网页刷宝 ARPG。以法师为首发职业，以手机与键鼠的简单操作承载技能、装备、关卡和终局的长期选择。</p>
 <div class="stats"><div class="stat"><strong>{totals['hanCharacters'] / 10000:.1f} 万</strong><span>汉字 · 源章节去重</span></div>
 <div class="stat"><strong>5 幕</strong><span>完整故事框架</span></div><div class="stat"><strong>9 章</strong><span>系统规则与制作依据</span></div></div>
