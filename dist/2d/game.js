@@ -17,6 +17,7 @@ import {LocalStore,STASH_SIZE} from './storage.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
 import {HUD_STRIP} from './hud-strip-layout.js';
+import {HUD_ORB} from './hud-orb-layout.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
@@ -798,6 +799,15 @@ function ghudOn(){return true;}
 function hudMobile(){return window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
 function placeIn(el,r){el.style.left=r[0]+'%';el.style.top=r[1]+'%';el.style.width=r[2]+'%';el.style.height=r[3]+'%';}
 // v0.9：生命 / 资源条在左下（art/hud-strip.webp），技能栏单独放在右下，互不挤压
+// 手机技能：第 1 格是右下角的大按钮，其余 9 格沿两道弧排在它左上方（参照《暗黑破坏神：不朽》）
+function arcSlots(n){
+  const land=window.matchMedia('(max-height:560px)').matches,big=land?60:66,sm=land?44:48;
+  const cx=big/2,cy=big/2,out=[{r:0,b:0}];
+  const ring=(radius,count,a0,a1)=>{for(let k=0;k<count;k++){const t=count===1?0:k/(count-1),a=(a0+(a1-a0)*t)*Math.PI/180;
+    out.push({r:Math.round(cx-Math.cos(a)*radius-sm/2),b:Math.round(cy+Math.sin(a)*radius-sm/2)});}};
+  ring(land?92:104,4,180,90);ring(land?146:164,5,180,90);
+  return out.slice(0,n);
+}
 function layoutGhud(){
   const on=ghudOn(),g=$('ghud');g.hidden=!on;document.body.classList.toggle('ghud-on',on);document.body.classList.toggle('ghud-mobile',hudMobile());
   const bar=$('abilitybar'),buffs=$('buffbar'),slots=$('gh-slots');
@@ -807,7 +817,11 @@ function layoutGhud(){
     placeIn(left.querySelector('.gh-orb.hp'),L.orbL);placeIn(left.querySelector('.gh-orb.mp'),L.orbR);
     placeIn(left.querySelector('.gh-bar.hp'),L.hpBar);placeIn(left.querySelector('.gh-bar.mp'),L.mpBar);
     placeIn(left.querySelector('.gh-txt.hp'),L.hpText);placeIn(left.querySelector('.gh-txt.mp'),L.mpText);placeIn(left.querySelector('.gh-lv'),L.lv);
-    [...bar.children].forEach((b,i)=>{b.style.left=b.style.top=b.style.width=b.style.height='';
+    placeIn(g.querySelector('.om-liq'),HUD_ORB.orb);
+    const arc=hudMobile()?arcSlots(bar.children.length):null;
+    [...bar.children].forEach((b,i)=>{b.style.left=b.style.top=b.style.width=b.style.height='';b.style.right=b.style.bottom='';
+      b.classList.toggle('arc-main',!!arc&&i===0);
+      if(arc){b.style.right=arc[i].r+'px';b.style.bottom=arc[i].b+'px';}
       let k=b.querySelector('.gh-key');if(!k){k=document.createElement('span');k.className='gh-key';b.append(k);}
       k.textContent=keyLabel(profile?.keybinds?.[i]||'')+(i===0?'·L':i===1?'·R':'');
       // 技能名写在格子下方（和「锁」字同样大小）
@@ -832,6 +846,11 @@ function updateGhud(s){
   $('gh-lv').textContent=profile.level;$('gh-cls').textContent=(profile.name||'')+' · '+CLASSES[profile.heroClass].name;
   $('gh-xp').style.width=(profile.level>=MAX_LEVEL?100:profile.xp/expRequired(profile.level)*100)+'%';
   document.querySelector('.gh-orb.hp').classList.toggle('low',hpR<.3);
+  // 手机一体血球：左半生命、右半资源
+  $('om-hp').style.height=(hpR*100)+'%';$('om-mp').style.height=(mpR*100)+'%';
+  $('om-hp-n').textContent=Math.ceil(hero.hp);$('om-mp-n').textContent=Math.ceil(hero.mana);
+  $('om-lv').textContent=profile.level;$('om-xp').style.width=$('gh-xp').style.width;
+  $('gh-orbm').classList.toggle('low',hpR<.3);
 }
 function updateHud(){
   if(!hero)return;

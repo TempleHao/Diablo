@@ -840,3 +840,45 @@ body.ghud-mobile .joystick{display:block!important}
   .joystick span{left:26px!important;top:26px!important}
   body.ghud-on .upgrade-chip{bottom:calc(46vw * 436 / 2139 + 12px)!important;left:auto!important;right:calc(48vw)!important;transform:none!important}
 }
+
+/* ═════════ v0.9.5 手机：一体血球 + 弧形技能 ═════════ */
+.gh-orbm{display:none}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .gh-left{display:none!important}
+  .gh-orbm{display:block;position:absolute;left:calc(4px + var(--sl));bottom:calc(150px + var(--sb));width:150px;aspect-ratio:540/371;pointer-events:none}
+  .gh-orbm>*{position:absolute}
+  .om-frame{left:0;top:0;width:100%;height:100%;z-index:2;filter:drop-shadow(0 3px 6px #000c)}
+  .om-liq{z-index:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 55%,#160b10,#050306 72%)}
+  .om-half{position:absolute;top:0;bottom:0;width:50%;overflow:hidden}.om-half.hp{left:0}.om-half.mp{right:0}
+  .om-half i{position:absolute;left:0;right:0;bottom:0;transition:height .18s}
+  .om-half.hp i{left:0;width:200%;background:radial-gradient(circle at 38% 32%,#ff8a7a 0,#e01d1d 24%,#9c0c10 56%,#4a0507 100%)}
+  .om-half.mp i{left:-100%;width:200%;background:radial-gradient(circle at 62% 32%,#9fd0ff 0,#2b66f0 24%,#1335a8 56%,#08134a 100%)}
+  .om-liq>b{position:absolute;inset:0;border-radius:50%;z-index:1;background:linear-gradient(90deg,transparent 49.3%,#0008 49.6%,#d8b06a 50%,#0008 50.4%,transparent 50.7%),radial-gradient(circle at 34% 26%,rgba(255,255,255,.5) 0,rgba(255,255,255,.1) 10%,transparent 24%),radial-gradient(circle at 50% 120%,rgba(0,0,0,.6),transparent 60%)}
+  .om-num{position:absolute;z-index:2;top:50%;transform:translateY(-50%);font-style:normal;font-size:11px;font-weight:700;color:#fff;text-shadow:0 0 3px #000,0 1px 1px #000;font-family:var(--serif)}
+  .om-num.hp{right:54%}.om-num.mp{left:54%}
+  .gh-orbm.low .om-half.hp i{animation:ghPulse .9s ease-in-out infinite}
+  .om-lv{left:0;right:0;bottom:-2px;z-index:3;text-align:center;font-size:10px;color:#c9a46a;font-family:var(--serif);text-shadow:0 1px 2px #000}
+  .om-lv b{color:#f0cd8e;font-size:12px}
+  .om-xp{left:30%;right:30%;bottom:-6px;height:2px;background:#2a2116;z-index:3}.om-xp u{display:block;height:100%;background:#f0cd8e}
+  /* 技能：右下角弧形 */
+  .gh-right{right:calc(12px + var(--sr))!important;bottom:calc(14px + var(--sb))!important;width:250px;height:250px;padding:0!important;display:block!important}
+  .gh-right .buffbar{position:absolute!important;right:0;bottom:250px}
+  .gh-slots{position:absolute!important;inset:0;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+  .ghud .gh-slots .abilitybar{display:block!important;position:absolute;inset:0}
+  .ghud .gh-slots .abilitybar button{position:absolute!important;width:48px!important;height:48px!important;border-radius:50%!important;overflow:visible!important;
+    box-shadow:0 0 0 2px #0a0807,0 0 0 3px #8a6a3c,0 3px 8px #000c!important;background:#0b0a0b!important}
+  .ghud .gh-slots .abilitybar button .ability-icon,.ghud .gh-slots .abilitybar button .ability-icon.sk-ico{left:0!important;top:0!important;width:100%!important;height:100%!important;border-radius:50%;border:0}
+  .ghud .gh-slots .abilitybar button i{border-radius:50%;bottom:0!important}
+  .ghud .gh-slots .abilitybar button.arc-main{width:66px!important;height:66px!important;box-shadow:0 0 0 2px #0a0807,0 0 0 4px #c9a064,0 0 14px #c9813a66,0 3px 8px #000c!important}
+  .ghud .gh-name{bottom:-12px;font-size:9px;line-height:11px;overflow:visible}
+  .joystick{bottom:calc(14px + var(--sb))!important;left:calc(14px + var(--sl))!important}
+  body.ghud-on .upgrade-chip{bottom:calc(260px + var(--sb))!important;left:auto!important;right:12px!important;transform:none!important}
+}
+@media (max-height:560px) and (pointer:coarse){
+  .gh-orbm{left:50%;transform:translateX(-50%);bottom:calc(2px + var(--sb));width:150px}
+  .gh-right{width:210px;height:210px}
+  .ghud .gh-slots .abilitybar button{width:44px!important;height:44px!important}
+  .ghud .gh-slots .abilitybar button.arc-main{width:60px!important;height:60px!important}
+  .gh-right .buffbar{bottom:218px}
+  .joystick{bottom:calc(14px + var(--sb))!important}
+}

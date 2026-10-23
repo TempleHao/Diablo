@@ -4,14 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131a"><meta name="description" content="归墟 GUIXU：原创俯视角暗黑地牢动作 RPG。单机免费，刷怪、装备与成长。">
 <title>归墟 GUIXU</title><link rel="icon" href="./art/logo-guixu-icon.webp">
-<link rel="stylesheet" href="./style.css?v=094">
+<link rel="stylesheet" href="./style.css?v=095">
 </head>
 <body>
 <canvas id="game" aria-label="归墟游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><img class="brand-logo" src="./art/logo-guixu-sm.webp?v=093" alt="归墟 GUIXU" draggable="false"></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.9.4</span>
+    <span class="version">灰烬边境 · 第一幕 / v0.9.5</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -42,6 +42,12 @@
     <div class="gh-txt hp"><em id="gh-hp-now">0</em> / <strong id="gh-hp-max">0</strong></div>
     <div class="gh-txt mp"><em id="gh-mp-now">0</em> / <strong id="gh-mp-max">0</strong></div>
     <div class="gh-lv"><small>LV</small><span id="gh-lv">1</span><i><u id="gh-xp"></u></i></div>
+  </div>
+  <div class="gh-orbm" id="gh-orbm">
+    <div class="om-liq"><span class="om-half hp"><i id="om-hp"></i></span><span class="om-half mp"><i id="om-mp"></i></span><b></b>
+      <em class="om-num hp" id="om-hp-n">0</em><em class="om-num mp" id="om-mp-n">0</em></div>
+    <img class="om-frame" src="./art/hud-orb.webp?v=095" alt="" draggable="false">
+    <span class="om-lv">Lv <b id="om-lv">1</b></span><i class="om-xp"><u id="om-xp"></u></i>
   </div>
   <div class="gh-right">
     <div class="gh-cls"><b id="gh-cls">法师</b><small id="gh-mp-label">法力</small></div>
