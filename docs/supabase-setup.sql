@@ -62,6 +62,12 @@ create trigger on_auth_user_created after insert on auth.users for each row exec
 -- 以后想把别的账号设成测试员（或取消）：
 -- update public.players set is_tester = true where username = '账号名';
 
+-- 新项目可能不会自动开放新表：手动授权
+grant usage on schema public to anon, authenticated;
+grant select on public.players to authenticated;
+grant select, insert, update, delete on public.characters to authenticated;
+grant select, insert, update, delete on public.stashes to authenticated;
+
 -- 补建：在建表之前就已注册的账号补一行玩家资料（guixu_test 标为测试员）。重复运行没有影响。
 insert into public.players (id, username, is_tester)
 select id, lower(coalesce(raw_user_meta_data->>'username', split_part(email, '@', 1))),
