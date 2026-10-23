@@ -1,7 +1,7 @@
 /* 技能图标（v0.7 新图标图集 art/skills.webp）：返回一个按背景图定位的 <span>。
  * 用百分比定位，图标大小可以由 CSS 决定；传 size 时直接设置宽高（像素）。 */
 import {SKILL_ICON,SKILL_ICON_COLS} from './skill-icons.js';
-const URL_SKILLS=new URL('./art/skills.webp',import.meta.url).href;
+const URL_SKILLS=new URL('./art/skills.webp?v=112',import.meta.url).href;
 const ROWS=Math.ceil(Object.keys(SKILL_ICON).length/SKILL_ICON_COLS);
 export function skillIcon(id,size=0,extraClass=''){
   const el=document.createElement('span');el.className=('sk-ico '+extraClass).trim();

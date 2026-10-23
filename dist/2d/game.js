@@ -19,7 +19,7 @@ import {TEST_ACCOUNT} from './online-config.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
 import {HUD_STRIP} from './hud-strip-layout.js';
-import {HUD_ORB} from './hud-orb-layout.js';
+import {HUD_BAR_M} from './hud-bar-layout.js';
 import {stepMotion,steer} from './motion.js';
 import {loreFor} from './naming.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
@@ -810,15 +810,16 @@ $('save-file').onchange=async e=>{
 // v0.9.4：手机也用同一套状态栏（左下血条图、右下技能面板），只是尺寸和排布不同
 function ghudOn(){return true;}
 function hudMobile(){return window.matchMedia('(max-width:900px), (max-height:560px) and (pointer:coarse)').matches;}
+function placeBox(el,r){el.style.left=r.l+'%';el.style.top=r.t+'%';el.style.width=r.w+'%';el.style.height=r.h+'%';}
 function placeIn(el,r){el.style.left=r[0]+'%';el.style.top=r[1]+'%';el.style.width=r[2]+'%';el.style.height=r[3]+'%';}
 // v0.9：生命 / 资源条在左下（art/hud-strip.webp），技能栏单独放在右下，互不挤压
 // 手机技能：第 1 格是右下角的大按钮，其余 9 格沿两道弧排在它左上方（参照《暗黑破坏神：不朽》）
 function arcSlots(n){
-  const land=window.matchMedia('(max-height:560px)').matches,big=land?60:66,sm=land?44:48;
+  const land=window.matchMedia('(max-height:560px)').matches,big=land?54:58,sm=land?42:44;
   const cx=big/2,cy=big/2,out=[{r:0,b:0}];
   const ring=(radius,count,a0,a1)=>{for(let k=0;k<count;k++){const t=count===1?0:k/(count-1),a=(a0+(a1-a0)*t)*Math.PI/180;
     out.push({r:Math.round(cx-Math.cos(a)*radius-sm/2),b:Math.round(cy+Math.sin(a)*radius-sm/2)});}};
-  ring(land?92:104,4,180,90);ring(land?146:164,5,180,90);
+  ring(land?86:100,4,180,90);ring(land?142:162,5,180,90);
   return out.slice(0,n);
 }
 function layoutGhud(){
@@ -830,7 +831,13 @@ function layoutGhud(){
     placeIn(left.querySelector('.gh-orb.hp'),L.orbL);placeIn(left.querySelector('.gh-orb.mp'),L.orbR);
     placeIn(left.querySelector('.gh-bar.hp'),L.hpBar);placeIn(left.querySelector('.gh-bar.mp'),L.mpBar);
     placeIn(left.querySelector('.gh-txt.hp'),L.hpText);placeIn(left.querySelector('.gh-txt.mp'),L.mpText);placeIn(left.querySelector('.gh-lv'),L.lv);
-    placeIn(g.querySelector('.om-liq'),HUD_ORB.orb);
+    // 手机状态条：两条填充和 Lv 徽章按框架图里的位置摆放，条的外形用多边形裁切
+    const M=HUD_BAR_M,mb=g.querySelector('.mb-bar');
+    placeBox(mb.querySelector('.mb-fill.hp'),M.hp);placeBox(mb.querySelector('.mb-fill.mp'),M.mp);
+    placeBox(mb.querySelector('.mb-num.hp'),M.hp);placeBox(mb.querySelector('.mb-num.mp'),M.mp);placeBox(mb.querySelector('.mb-lv'),M.lv);
+    mb.style.setProperty('--hp-poly','polygon('+M.hpPoly.map(p=>p[0]+'% '+p[1]+'%').join(',')+')');
+    mb.style.setProperty('--mp-poly','polygon('+M.mpPoly.map(p=>p[0]+'% '+p[1]+'%').join(',')+')');
+    mb.style.aspectRatio=String(M.aspect);
     const arc=hudMobile()?arcSlots(bar.children.length):null;
     [...bar.children].forEach((b,i)=>{b.style.left=b.style.top=b.style.width=b.style.height='';b.style.right=b.style.bottom='';
       b.classList.toggle('arc-main',!!arc&&i===0);
@@ -859,9 +866,9 @@ function updateGhud(s){
   $('gh-lv').textContent=profile.level;$('gh-cls').textContent=(profile.name||'')+' · '+CLASSES[profile.heroClass].name;
   $('gh-xp').style.width=(profile.level>=MAX_LEVEL?100:profile.xp/expRequired(profile.level)*100)+'%';
   document.querySelector('.gh-orb.hp').classList.toggle('low',hpR<.3);
-  // 手机一体血球：左半生命、右半资源
-  $('om-hp').style.height=(hpR*100)+'%';$('om-mp').style.height=(mpR*100)+'%';
-  $('om-hp-n').textContent=Math.ceil(hero.hp);$('om-mp-n').textContent=Math.ceil(hero.mana);
+  // 手机状态条：生命从左往右、法力从右往左（各自靠着自己的球）
+  $('om-hp').style.setProperty('--r',(hpR*100)+'%');$('om-mp').style.setProperty('--r',(mpR*100)+'%');
+  $('om-hp-n').textContent=Math.ceil(hero.hp)+' / '+Math.ceil(hero.maxHp);$('om-mp-n').textContent=Math.ceil(hero.mana)+' / '+Math.ceil(hero.maxMana);
   $('om-lv').textContent=profile.level;$('om-xp').style.width=$('gh-xp').style.width;
   $('gh-orbm').classList.toggle('low',hpR<.3);
 }
@@ -873,6 +880,7 @@ function updateHud(){
   ui.level.textContent='LV '+String(profile.level).padStart(2,'0');ui.gold.textContent=profile.gold;ui.essence.textContent=profile.essence;
   ui.xp.style.width=(profile.level>=MAX_LEVEL?100:profile.xp/xpNeeded*100)+'%';
   ui.progress.textContent=boss?'击败 '+(boss.mon?.name||BOSS_POOLS[profile.region].name)+'，收集专属战利品':bossDefeated?'首领已击败 · 继续拾取装备 / B 查看背包 / 暂停手动重刷':'徘徊者 '+Math.min(kills,total)+' / '+total+' · 靠近掉落自动拾取';
+  $('om-kill').textContent=boss?'首领 · '+(boss.mon?.name||BOSS_POOLS[profile.region].name):bossDefeated?'首领已击败 · 传送阵已开启':'击杀 '+Math.min(kills,total)+' / '+total;
   if(boss){ui.bossHp.style.width=(clamp(boss.hp/boss.maxHp,0,1)*100)+'%';}
   for(const [key,rule] of Object.entries(skillData)){
     const el=document.querySelector('[data-skill="'+key+'"]');

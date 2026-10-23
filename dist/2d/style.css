@@ -766,7 +766,7 @@ body:has(#scrim:not([hidden])) .portal-open,body:has(#inventory:not([hidden])) .
 .hero-select.is-mobile:not(.is-land) .hs-logo{position:relative;left:auto;top:auto;transform:none;display:block;flex:none;margin:calc(10px + var(--st,0px)) auto 0;height:clamp(72px,14vh,120px);width:auto;max-width:70vw;object-fit:contain}
 .hero-select.is-mobile:not(.is-land) .hs-stage{margin-top:0;height:clamp(200px,34vh,320px)}
 /* 手机横屏 */
-.hero-select.is-land .hs-logo{position:absolute;left:var(--sl,0px);width:42%;top:calc(6px + var(--st,0px));height:clamp(48px,18vh,80px);transform:none;object-fit:contain}
+.hero-select.is-land .hs-logo{position:absolute;left:calc(6px + var(--sl,0px));width:calc(46% - var(--sl,0px) - var(--sr,0px) - 26px);top:calc(6px + var(--st,0px));height:clamp(48px,18vh,80px);transform:none;object-fit:contain}
 .hero-select.is-land[data-mode="create"] .hs-stage{top:calc(clamp(48px,18vh,80px) + 6px + var(--st,0px))}
 .hero-select.is-land[data-mode="list"] .hs-logo{display:none}
 .hero-select{--logoH:clamp(80px,18vh,190px)}
@@ -924,17 +924,16 @@ body.ghud-mobile .joystick{display:block!important}
 .login-guest{display:block;margin:0 auto;min-height:40px;padding:8px 14px;background:none;border:0;font-family:var(--serif);font-size:13px;letter-spacing:1px;color:#b89a6c;text-decoration:underline;text-decoration-color:#6e5434;text-underline-offset:5px}
 .login-guest:hover{color:var(--ink)}
 .login-foot{position:relative;margin:10px 0 0;font-size:11px;letter-spacing:2px;color:#6f6880}
-/* 竖屏手机：标志放大到屏宽之外（两侧星云渐隐出屏），占满表单以上的全部空间 */
+/* 竖屏手机：标志用去掉两侧外缘的窄版，完整放在屏幕里（左右各留 8px 以上），不出屏 */
 .login-hero{flex:1 0 auto;min-height:160px}
-.login-logo-wrap{width:calc(100% + 32px + var(--sl,0px) + var(--sr,0px));overflow:hidden;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
-.login-logo{width:clamp(min(96vw,720px),calc((100dvh - 430px) * 3.1),min(150vw,720px))}
+.login-logo-wrap{width:100%}
+.login-logo-wrap picture{display:contents}
+.login-logo{width:min(100%,640px,calc((100dvh - 400px) * 2.5));min-width:min(100%,280px)}
 .login-form{margin-top:8px}
 /* 电脑：标志 + 表单作为一组垂直居中 */
 @media (min-width:900px) and (min-height:561px){
   .login-hero{flex:none;min-height:0;margin-top:auto}
-  .login-logo-wrap{width:100%;overflow:visible;-webkit-mask-image:none;mask-image:none}
-  .login-logo{width:clamp(min(520px,60vw),calc((100dvh - 450px) * 3.1),min(900px,66vw))}
+  .login-logo{min-width:0;width:clamp(min(520px,60vw),calc((100dvh - 450px) * 3.1),min(900px,66vw))}
   .login-tag{font-size:15px;letter-spacing:8px}
   .login-form{margin-top:18px}
   .login-foot{margin-bottom:auto;padding-top:14px}
@@ -943,8 +942,8 @@ body.ghud-mobile .joystick{display:block!important}
 @media (max-height:560px) and (orientation:landscape){
   .login-box{flex-direction:row;align-items:center;gap:12px}
   .login-hero{flex:1 1 0;min-width:0;min-height:0;align-self:stretch}
-  .login-logo-wrap{width:calc(100% + 20px);-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%)}
-  .login-logo{width:min(125%,760px)}
+  .login-logo-wrap{width:100%}
+  .login-logo{width:min(100%,760px);min-width:0}
   .login-tag{font-size:12px;letter-spacing:5px}
   .login-form{flex:none;width:min(360px,46vw);margin:auto 0;padding:12px 16px 6px;gap:6px}
   #login-online{gap:6px}
@@ -982,3 +981,56 @@ body.ghud-mobile .joystick{display:block!important}
 }
 /* 横版新标志更宽：中等宽度电脑缩小标志、隐藏版本字样，保证顶栏按钮不出屏 */
 @media (min-width:901px) and (max-width:1280px){.brand-logo{height:64px!important}.version{display:none!important}.top-actions{gap:4px}.top-actions button{padding:0 9px}}
+/* ═════════ v1.1.2 手机：左上角小状态条（用户效果图）；去掉「第一幕」标题，只在条下留一行小字的击杀数 ═════════ */
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  body.ghud-on .quest{display:none!important}
+  .gh-orbm{position:fixed!important;left:calc(8px + var(--sl))!important;top:calc(58px + var(--st))!important;bottom:auto!important;transform:none!important;width:min(68vw,280px)!important;aspect-ratio:auto!important}
+  .gh-orbm>.mb-bar,.gh-orbm>.mb-kill{position:relative!important}
+  .mb-bar{display:block;width:100%;filter:drop-shadow(0 2px 4px #000c)}
+  .mb-bar>*{position:absolute}
+  .mb-frame{left:0;top:0;width:100%;height:100%;z-index:1}
+  .mb-fill{z-index:2;transition:background-size .2s}
+  .mb-fill.hp{clip-path:var(--hp-poly);background:linear-gradient(180deg,#ff8a78 0,#e8343e 22%,#a8121c 62%,#5e060c 100%) left center/var(--r,100%) 100% no-repeat}
+  .mb-fill.mp{clip-path:var(--mp-poly);background:linear-gradient(180deg,#9cccff 0,#3474f2 24%,#1438b0 62%,#081650 100%) right center/var(--r,100%) 100% no-repeat}
+  .gh-orbm.low .mb-fill.hp{animation:ghPulse .9s ease-in-out infinite}
+  .mb-num{z-index:3;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:9px;line-height:1;font-weight:700;color:#fff6e8;letter-spacing:.3px;
+    font-family:var(--serif);text-shadow:0 0 2px #000,0 1px 1px #000;white-space:nowrap}
+  .mb-lv{z-index:3;display:flex;align-items:center;justify-content:center;gap:0;font-family:var(--serif);line-height:1;text-shadow:0 1px 2px #000}
+  .mb-lv small{display:none}
+  .mb-lv b{font-size:11px;color:#f0cd8e}
+  .mb-bar .om-xp{z-index:3;left:18%;right:18%;bottom:13%;top:auto;height:2px;background:#1d160f}
+  .mb-bar .om-xp u{display:block;height:100%;background:linear-gradient(90deg,#8a6a3c,#f0cd8e)}
+  .mb-kill{display:block;margin:-2px 0 0 18%;font-size:10px;line-height:13px;letter-spacing:1px;color:#cdb68a;font-family:var(--serif);text-shadow:0 1px 2px #000,0 0 4px #000}
+  .mb-kill:empty{display:none}
+  body.ghud-on .eventlog{top:calc(132px + var(--st))!important;left:calc(10px + var(--sl))!important}
+  body.ghud-on .bossbar{top:calc(126px + var(--st))!important}
+  /* 技能：按钮略小，图标不再放大（方框已在图集里裁掉，放大只会更糊），技能名一直能看清 */
+  .gh-right{width:240px!important;height:240px!important}
+  .gh-right .buffbar{bottom:244px!important}
+  .ghud .gh-slots .abilitybar button{width:44px!important;height:44px!important}
+  .ghud .gh-slots .abilitybar button.arc-main{width:58px!important;height:58px!important}
+  .ghud .gh-slots .abilitybar button .ability-icon,.ghud .gh-slots .abilitybar button .ability-icon.sk-ico{
+    left:0!important;top:0!important;width:100%!important;height:100%!important;clip-path:circle(47% at 50% 50%);-webkit-clip-path:circle(47% at 50% 50%)}
+  .ghud .gh-slots .abilitybar button.locked{filter:none!important}
+  .ghud .gh-slots .abilitybar button.locked .ability-icon{filter:grayscale(1) brightness(.5)}
+  .ghud .gh-name{bottom:-13px!important;font-size:9px!important;line-height:11px!important;color:#e9d7b2!important;overflow:visible!important;
+    text-shadow:0 0 3px #000,0 1px 1px #000,0 0 6px #000!important;letter-spacing:.2px;z-index:4}
+  .ghud .gh-slots .abilitybar button.locked .gh-name{color:#c2ad88!important}
+  body.ghud-on .upgrade-chip{bottom:calc(244px + var(--sb))!important}
+}
+@media (max-height:560px) and (pointer:coarse){
+  .gh-orbm{top:calc(54px + var(--st))!important;width:min(42vw,270px)!important}
+  body.ghud-on .eventlog{top:calc(122px + var(--st))!important}
+  body.ghud-on .bossbar{top:calc(56px + var(--st))!important}
+  .gh-right{width:196px!important;height:196px!important}
+  .gh-right .buffbar{bottom:200px!important}
+  .ghud .gh-slots .abilitybar button{width:42px!important;height:42px!important}
+  .ghud .gh-slots .abilitybar button.arc-main{width:54px!important;height:54px!important}
+  .minimap canvas{width:92px!important;height:69px!important}
+  .minimap small{display:none!important}
+  .gh-right{width:200px!important;height:200px!important}
+}
+/* v1.1.2 手机选角：七个职业按钮按屏宽均分，全部放得下，不再有半个按钮露在屏幕边上 */
+.hero-select.is-mobile .hs-thumbs{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px!important;overflow:visible!important}
+.hero-select.is-mobile .hs-thumbs .hs-plate{min-width:0!important;max-width:none!important;padding:5px 0!important}
+.hero-select.is-mobile .hs-thumbs .hs-plate b{font-size:clamp(9px,2.7vw,11px)!important;letter-spacing:0!important}

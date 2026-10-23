@@ -45,3 +45,10 @@ ic = full.crop((int(w * .32), int(h * .02), int(w * .68), int(h * .02) + int(w *
 bg = Image.new('RGBA', (128, 128), (10, 8, 22, 255)); bg.alpha_composite(ic)
 m = Image.new('L', (128, 128), 0); ImageDraw.Draw(m).ellipse((0, 0, 127, 127), fill=255); bg.putalpha(m); bg.save('dist/2d/art/logo-voragh-icon.webp')
 print('big', big.size, 'small', sm.size)
+# 手机竖屏用的窄版：去掉两侧最外的星云（约各 10%），两侧重新渐隐，整张图完整放进屏幕，不靠出屏来显大
+fw, fh = big.size
+nar = np.array(big.crop((int(fw * .1), 0, int(fw * .9), fh))).astype(np.float32)
+nw = nar.shape[1]; t = np.clip(np.minimum(np.arange(nw), np.arange(nw)[::-1]) / (nw * .08), 0, 1); t = t * t * (3 - 2 * t)
+nar[..., 3] *= t[None, :]
+Image.fromarray(nar.astype(np.uint8)).save('dist/2d/art/logo-voragh-narrow.webp', quality=93, method=6)
+print('narrow', nw, fh)
