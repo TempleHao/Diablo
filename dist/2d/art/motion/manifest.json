@@ -1,0 +1,5252 @@
+{
+  "units": [
+    {
+      "id": "amazon",
+      "label": "亚马逊",
+      "kind": "hero",
+      "file": "hero/amazon.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "assassin",
+      "label": "刺客",
+      "kind": "hero",
+      "file": "hero/assassin.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "barbarian",
+      "label": "野蛮人",
+      "kind": "hero",
+      "file": "hero/barbarian.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "druid",
+      "label": "德鲁伊",
+      "kind": "hero",
+      "file": "hero/druid.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "necro",
+      "label": "死灵法师",
+      "kind": "hero",
+      "file": "hero/necro.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "paladin",
+      "label": "圣骑士",
+      "kind": "hero",
+      "file": "hero/paladin.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "mage",
+      "label": "白袍男法师",
+      "kind": "hero",
+      "file": "hero/mage.webp",
+      "width": 192,
+      "height": 192,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "existing-static-rig",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N001",
+      "label": "N001",
+      "kind": "monster",
+      "file": "monster/N001.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N002",
+      "label": "N002",
+      "kind": "monster",
+      "file": "monster/N002.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N003",
+      "label": "N003",
+      "kind": "monster",
+      "file": "monster/N003.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N004",
+      "label": "N004",
+      "kind": "monster",
+      "file": "monster/N004.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N005",
+      "label": "N005",
+      "kind": "monster",
+      "file": "monster/N005.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N006",
+      "label": "N006",
+      "kind": "monster",
+      "file": "monster/N006.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N007",
+      "label": "N007",
+      "kind": "monster",
+      "file": "monster/N007.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N008",
+      "label": "N008",
+      "kind": "monster",
+      "file": "monster/N008.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N009",
+      "label": "N009",
+      "kind": "monster",
+      "file": "monster/N009.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N010",
+      "label": "N010",
+      "kind": "monster",
+      "file": "monster/N010.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N011",
+      "label": "N011",
+      "kind": "monster",
+      "file": "monster/N011.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N012",
+      "label": "N012",
+      "kind": "monster",
+      "file": "monster/N012.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N013",
+      "label": "N013",
+      "kind": "monster",
+      "file": "monster/N013.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N014",
+      "label": "N014",
+      "kind": "monster",
+      "file": "monster/N014.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N015",
+      "label": "N015",
+      "kind": "monster",
+      "file": "monster/N015.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N016",
+      "label": "N016",
+      "kind": "monster",
+      "file": "monster/N016.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N017",
+      "label": "N017",
+      "kind": "monster",
+      "file": "monster/N017.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N018",
+      "label": "N018",
+      "kind": "monster",
+      "file": "monster/N018.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N019",
+      "label": "N019",
+      "kind": "monster",
+      "file": "monster/N019.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N020",
+      "label": "N020",
+      "kind": "monster",
+      "file": "monster/N020.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N021",
+      "label": "N021",
+      "kind": "monster",
+      "file": "monster/N021.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N022",
+      "label": "N022",
+      "kind": "monster",
+      "file": "monster/N022.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N023",
+      "label": "N023",
+      "kind": "monster",
+      "file": "monster/N023.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N024",
+      "label": "N024",
+      "kind": "monster",
+      "file": "monster/N024.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N025",
+      "label": "N025",
+      "kind": "monster",
+      "file": "monster/N025.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N026",
+      "label": "N026",
+      "kind": "monster",
+      "file": "monster/N026.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N027",
+      "label": "N027",
+      "kind": "monster",
+      "file": "monster/N027.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N028",
+      "label": "N028",
+      "kind": "monster",
+      "file": "monster/N028.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N029",
+      "label": "N029",
+      "kind": "monster",
+      "file": "monster/N029.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "N030",
+      "label": "N030",
+      "kind": "monster",
+      "file": "monster/N030.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E001",
+      "label": "E001",
+      "kind": "monster",
+      "file": "monster/E001.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E002",
+      "label": "E002",
+      "kind": "monster",
+      "file": "monster/E002.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E003",
+      "label": "E003",
+      "kind": "monster",
+      "file": "monster/E003.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E004",
+      "label": "E004",
+      "kind": "monster",
+      "file": "monster/E004.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E005",
+      "label": "E005",
+      "kind": "monster",
+      "file": "monster/E005.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E006",
+      "label": "E006",
+      "kind": "monster",
+      "file": "monster/E006.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E007",
+      "label": "E007",
+      "kind": "monster",
+      "file": "monster/E007.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E008",
+      "label": "E008",
+      "kind": "monster",
+      "file": "monster/E008.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E009",
+      "label": "E009",
+      "kind": "monster",
+      "file": "monster/E009.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E010",
+      "label": "E010",
+      "kind": "monster",
+      "file": "monster/E010.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E011",
+      "label": "E011",
+      "kind": "monster",
+      "file": "monster/E011.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E012",
+      "label": "E012",
+      "kind": "monster",
+      "file": "monster/E012.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E013",
+      "label": "E013",
+      "kind": "monster",
+      "file": "monster/E013.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E014",
+      "label": "E014",
+      "kind": "monster",
+      "file": "monster/E014.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E015",
+      "label": "E015",
+      "kind": "monster",
+      "file": "monster/E015.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E016",
+      "label": "E016",
+      "kind": "monster",
+      "file": "monster/E016.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E017",
+      "label": "E017",
+      "kind": "monster",
+      "file": "monster/E017.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E018",
+      "label": "E018",
+      "kind": "monster",
+      "file": "monster/E018.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E019",
+      "label": "E019",
+      "kind": "monster",
+      "file": "monster/E019.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E020",
+      "label": "E020",
+      "kind": "monster",
+      "file": "monster/E020.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E021",
+      "label": "E021",
+      "kind": "monster",
+      "file": "monster/E021.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E022",
+      "label": "E022",
+      "kind": "monster",
+      "file": "monster/E022.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E023",
+      "label": "E023",
+      "kind": "monster",
+      "file": "monster/E023.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E024",
+      "label": "E024",
+      "kind": "monster",
+      "file": "monster/E024.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "E025",
+      "label": "E025",
+      "kind": "monster",
+      "file": "monster/E025.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C001",
+      "label": "C001",
+      "kind": "monster",
+      "file": "monster/C001.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C002",
+      "label": "C002",
+      "kind": "monster",
+      "file": "monster/C002.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C003",
+      "label": "C003",
+      "kind": "monster",
+      "file": "monster/C003.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C004",
+      "label": "C004",
+      "kind": "monster",
+      "file": "monster/C004.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C005",
+      "label": "C005",
+      "kind": "monster",
+      "file": "monster/C005.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C006",
+      "label": "C006",
+      "kind": "monster",
+      "file": "monster/C006.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C007",
+      "label": "C007",
+      "kind": "monster",
+      "file": "monster/C007.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C008",
+      "label": "C008",
+      "kind": "monster",
+      "file": "monster/C008.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C009",
+      "label": "C009",
+      "kind": "monster",
+      "file": "monster/C009.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C010",
+      "label": "C010",
+      "kind": "monster",
+      "file": "monster/C010.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C011",
+      "label": "C011",
+      "kind": "monster",
+      "file": "monster/C011.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C012",
+      "label": "C012",
+      "kind": "monster",
+      "file": "monster/C012.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C013",
+      "label": "C013",
+      "kind": "monster",
+      "file": "monster/C013.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C014",
+      "label": "C014",
+      "kind": "monster",
+      "file": "monster/C014.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C015",
+      "label": "C015",
+      "kind": "monster",
+      "file": "monster/C015.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C016",
+      "label": "C016",
+      "kind": "monster",
+      "file": "monster/C016.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C017",
+      "label": "C017",
+      "kind": "monster",
+      "file": "monster/C017.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C018",
+      "label": "C018",
+      "kind": "monster",
+      "file": "monster/C018.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C019",
+      "label": "C019",
+      "kind": "monster",
+      "file": "monster/C019.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C020",
+      "label": "C020",
+      "kind": "monster",
+      "file": "monster/C020.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C021",
+      "label": "C021",
+      "kind": "monster",
+      "file": "monster/C021.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C022",
+      "label": "C022",
+      "kind": "monster",
+      "file": "monster/C022.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C023",
+      "label": "C023",
+      "kind": "monster",
+      "file": "monster/C023.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C024",
+      "label": "C024",
+      "kind": "monster",
+      "file": "monster/C024.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "C025",
+      "label": "C025",
+      "kind": "monster",
+      "file": "monster/C025.webp",
+      "width": 128,
+      "height": 128,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B001",
+      "label": "B001",
+      "kind": "monster",
+      "file": "monster/B001.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B002",
+      "label": "B002",
+      "kind": "monster",
+      "file": "monster/B002.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B003",
+      "label": "B003",
+      "kind": "monster",
+      "file": "monster/B003.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B004",
+      "label": "B004",
+      "kind": "monster",
+      "file": "monster/B004.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B005",
+      "label": "B005",
+      "kind": "monster",
+      "file": "monster/B005.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B006",
+      "label": "B006",
+      "kind": "monster",
+      "file": "monster/B006.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B007",
+      "label": "B007",
+      "kind": "monster",
+      "file": "monster/B007.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B008",
+      "label": "B008",
+      "kind": "monster",
+      "file": "monster/B008.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B009",
+      "label": "B009",
+      "kind": "monster",
+      "file": "monster/B009.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B010",
+      "label": "B010",
+      "kind": "monster",
+      "file": "monster/B010.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B011",
+      "label": "B011",
+      "kind": "monster",
+      "file": "monster/B011.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B012",
+      "label": "B012",
+      "kind": "monster",
+      "file": "monster/B012.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B013",
+      "label": "B013",
+      "kind": "monster",
+      "file": "monster/B013.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B014",
+      "label": "B014",
+      "kind": "monster",
+      "file": "monster/B014.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B015",
+      "label": "B015",
+      "kind": "monster",
+      "file": "monster/B015.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B016",
+      "label": "B016",
+      "kind": "monster",
+      "file": "monster/B016.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B017",
+      "label": "B017",
+      "kind": "monster",
+      "file": "monster/B017.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B018",
+      "label": "B018",
+      "kind": "monster",
+      "file": "monster/B018.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B019",
+      "label": "B019",
+      "kind": "monster",
+      "file": "monster/B019.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "B020",
+      "label": "B020",
+      "kind": "monster",
+      "file": "monster/B020.webp",
+      "width": 224,
+      "height": 224,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon0",
+      "label": "召唤物 1",
+      "kind": "summon",
+      "file": "summon/summon0.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon1",
+      "label": "召唤物 2",
+      "kind": "summon",
+      "file": "summon/summon1.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon2",
+      "label": "召唤物 3",
+      "kind": "summon",
+      "file": "summon/summon2.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon3",
+      "label": "召唤物 4",
+      "kind": "summon",
+      "file": "summon/summon3.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon4",
+      "label": "召唤物 5",
+      "kind": "summon",
+      "file": "summon/summon4.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon5",
+      "label": "召唤物 6",
+      "kind": "summon",
+      "file": "summon/summon5.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon6",
+      "label": "召唤物 7",
+      "kind": "summon",
+      "file": "summon/summon6.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon7",
+      "label": "召唤物 8",
+      "kind": "summon",
+      "file": "summon/summon7.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon8",
+      "label": "召唤物 9",
+      "kind": "summon",
+      "file": "summon/summon8.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "summon9",
+      "label": "召唤物 10",
+      "kind": "summon",
+      "file": "summon/summon9.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "static-with-procedural-tween",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "guard",
+      "label": "城镇守卫",
+      "kind": "follower",
+      "file": "follower/guard.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "TEMPORARY-PROXY-NOT-NEW-ART",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "mercenary",
+      "label": "佣兵枪兵",
+      "kind": "follower",
+      "file": "follower/mercenary.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "TEMPORARY-PROXY-NOT-NEW-ART",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "priest",
+      "label": "神职侍从",
+      "kind": "follower",
+      "file": "follower/priest.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "TEMPORARY-PROXY-NOT-NEW-ART",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "scout",
+      "label": "斥候",
+      "kind": "follower",
+      "file": "follower/scout.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "TEMPORARY-PROXY-NOT-NEW-ART",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    },
+    {
+      "id": "shield_retainer",
+      "label": "盾卫",
+      "kind": "follower",
+      "file": "follower/shield_retainer.webp",
+      "width": 160,
+      "height": 160,
+      "cols": 8,
+      "rows": 6,
+      "sourceGrade": "TEMPORARY-PROXY-NOT-NEW-ART",
+      "actions": {
+        "idle": {
+          "row": 0,
+          "frames": 8,
+          "fps": 8
+        },
+        "walk": {
+          "row": 1,
+          "frames": 8,
+          "fps": 12
+        },
+        "attack": {
+          "row": 2,
+          "frames": 8,
+          "fps": 12
+        },
+        "skill": {
+          "row": 3,
+          "frames": 8,
+          "fps": 10
+        },
+        "hit": {
+          "row": 4,
+          "frames": 8,
+          "fps": 12
+        },
+        "death": {
+          "row": 5,
+          "frames": 8,
+          "fps": 9
+        }
+      }
+    }
+  ],
+  "total": 122,
+  "note": "PROCEDURAL PLACEHOLDER; not articulated 8-frame animation"
+}
