@@ -31,7 +31,7 @@ export function audit(state) {
   const fail=(where,message)=>failures.push({where,message});
   if(!state||typeof state!=='object'||Array.isArray(state))return [{where:'$',message:'state must be an object'}];
   if(state.schemaVersion!==1)fail('schemaVersion','unexpected schema version');
-  if(state.project!=='TempleHao/Diablo'||state.track!=='VORAGH 2D A-direction final')fail('project','wrong repository or project track');
+  if(state.project!=='TempleHao/Diablo'||state.track!=='Ember Chronicles 2D A-direction final')fail('project','wrong repository or project track');
   if(!['development','blocked','candidate-review','complete'].includes(state.state))fail('state','unrecognized overall state');
   if(!PHASES.includes(state.currentPhase))fail('currentPhase','unknown current phase');
   const phases=state.phases??{},gates=state.gates??{};
