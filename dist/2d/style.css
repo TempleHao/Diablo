@@ -781,3 +781,19 @@ body:has(#scrim:not([hidden])) .portal-open,body:has(#inventory:not([hidden])) .
   filter:drop-shadow(0 1px 0 #000) drop-shadow(0 0 6px #5b3fa055)}
 .brand-title small{margin-top:3px;font-family:var(--serif);font-size:9px;letter-spacing:7px;color:#a88d62;padding-left:2px}
 @media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-mark{width:30px;height:30px}.brand-title b{font-size:21px;letter-spacing:3px}.brand-title small{display:none}}
+/* v0.9.3 顶栏标志：用完整标志（不裁成圆、不改成文字），按比例缩小放在左上角；
+   标志比顶栏略高、向下探出一点，用柔和的暗色光晕托底，和画面融在一起而不是一块贴图 */
+.brand-mark,.brand-title{display:none!important}
+.brand{position:relative;align-self:flex-start;margin-top:-6px}
+.brand::before{content:"";position:absolute;inset:-14px -26px -18px -20px;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 45% 50%,rgba(6,5,9,.85) 0,rgba(6,5,9,.55) 45%,transparent 72%)}
+.brand-logo{display:block!important;height:82px!important;width:auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,.9)) drop-shadow(0 0 14px rgba(90,60,170,.35))!important;transition:filter .2s}
+.brand:hover .brand-logo{filter:drop-shadow(0 3px 6px rgba(0,0,0,.9)) drop-shadow(0 0 18px rgba(130,90,230,.55))!important}
+.quest{top:calc(104px + var(--st,0px))!important}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){
+  .brand{margin-top:-4px}.brand::before{inset:-10px -16px -12px -12px}
+  .brand-logo{height:56px!important}
+  .quest{top:calc(70px + var(--st,0px))!important}
+  .eventlog{top:calc(132px + var(--st,0px))!important}
+}
+@media (max-height:560px) and (pointer:coarse){.brand-logo{height:46px!important}.quest{top:calc(56px + var(--st,0px))!important}.eventlog{top:calc(100px + var(--st,0px))!important}}
