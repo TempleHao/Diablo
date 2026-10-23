@@ -14,6 +14,8 @@ import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS
 import {describePower,skillLegend,PROC_FX} from './legendary.js';
 import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor,monsterHpMult,monsterDmgMult,armorDR} from './progression.js';
 import {LocalStore,STASH_SIZE} from './storage.js';
+import {onlineEnabled,Session,CloudStore,USERNAME_RE} from './online.js';
+import {TEST_ACCOUNT} from './online-config.js';
 import {createHeroSelect,CLASS_INFO} from './hero-select.js';
 import {skillIcon} from './ui-icons.js';
 import {HUD_STRIP} from './hud-strip-layout.js';
@@ -37,7 +39,18 @@ const cooldowns=Object.fromEntries(Object.keys(SKILLS).map(k=>[k,0]));
 let armorUntil=0, wardHp=0, combo=0, bossDefeated=false, portal=null, selectedItemId=null, selectedRingSlot=null;
 const palette = { stone:'#262d34', stoneEdge:'#11171e', gold:'#e5b777', ice:'#91dcfa', fire:'#ff9a57', rare:RARITY_COLORS };
 // v0.7：多角色（storage.js）。每个角色职业固定；旧版单存档首次打开时迁移成第一个角色。
-const store=new LocalStore();
+// v1.0：仓库可以在「本机游客」与「在线账号（云存档）」之间切换；游戏和角色选择只认这个中转对象
+class StoreHub{
+  constructor(cur){this.cur=cur;}
+  use(next){this.cur=next;}
+  get kind(){return this.cur.kind;} get wiped(){return this.cur.wiped;}
+  migrateLegacy(){return this.cur.migrateLegacy();} list(){return this.cur.list();} active(){return this.cur.active();}
+  setActive(id){return this.cur.setActive(id);} load(id){return this.cur.load(id);} save(id,p){return this.cur.save(id,p);}
+  create(n,c,p){return this.cur.create(n,c,p);} remove(id){return this.cur.remove(id);} stash(){return this.cur.stash();} saveStash(i){return this.cur.saveStash(i);}
+}
+const localStore=new LocalStore();
+const store=new StoreHub(localStore);
+const session=new Session();
 store.migrateLegacy();
 let charId=store.active();
 profile=charId?sanitizeSave(store.load(charId)):freshSave();
@@ -895,7 +908,7 @@ function heroStats(){
 }
 function floatText(x,y,value,color='#f1ca90',big=false){texts.push({x,y,text:String(value),color,life:.85,big,vx:(Math.random()-.5)*30});if(texts.length>50)texts.shift();}
 function injury(amount,src=null){
-  if(hero.invuln>0||state!=='playing'||hero.leap)return;
+  if(hero.invuln>0||state!=='playing'||hero.leap||(gmGod&&store.kind==='cloud'&&session.isTester))return;
   const defense=heroStats();
   if(src?.weakenUntil>tick)amount*=1-(src.weaken||0);
   if(src&&defense.mods.thorns&&enemies.includes(src))dealDamage(src,amount*defense.mods.thorns,'physical',{noCrit:true});
@@ -2342,7 +2355,74 @@ function openHeroSelect(){
   state='intro';clearInput();$('scrim').hidden=true;$('inventory').hidden=true;$('portal-panel').hidden=true;$('status-panel').hidden=true;
   heroSelect.show('list');
 }
-heroSelect=createHeroSelect({root:$('hero-select'),store,fresh:freshProfile,onEnter:enterCharacter});
-$('btn-heroes').onclick=()=>{if(state==='playing'&&!confirm('返回角色选择？当前这一趟远征会结束（装备、经验已保存）。'))return;openHeroSelect();};
+heroSelect=createHeroSelect({root:$('hero-select'),store,fresh:freshProfile,onEnter:enterCharacter,account:accountInfo});
+// ───── 登录（v1.0） ─────
+function accountInfo(){
+  if(store.kind==='cloud'){
+    const st={synced:'已同步',pending:'待上传…',error:'上传失败，稍后自动重试'}[store.cur.status]||'';
+    return {label:'账号 '+session.username+(session.isTester?' · 测试员':''),note:'云存档 · '+st,action:'退出登录',onAction:()=>{store.cur.flush();session.signOut();store.use(localStore);charId=null;showLogin();}};
+  }
+  return {label:'游客 · 本机存档',note:onlineEnabled()?'数据只保存在当前浏览器':'在线登录尚未开通，数据保存在当前浏览器',action:onlineEnabled()?'登录 / 注册':null,onAction:()=>showLogin()};
+}
+async function useAccount(){
+  const cs=new CloudStore(session);cs.onStatus=()=>{if(heroSelect.open)heroSelect.refresh?.();};
+  await cs.pull();store.use(cs);charId=null;updateGmButton();
+}
+function showLogin(){
+  heroSelect.close();updateGmButton();
+  const box=$('login');box.hidden=false;
+  const user=$('login-user'),pass=$('login-pass'),msg=$('login-msg');msg.textContent='';
+  user.value=session.username||'';pass.value='';
+  $('login-online').hidden=!onlineEnabled();$('login-offline-note').hidden=onlineEnabled();
+  const busy=on=>{for(const b of box.querySelectorAll('button'))b.disabled=on;};
+  const go=async(kind)=>{
+    msg.textContent='';const u=user.value.trim(),pw=pass.value;
+    if(!USERNAME_RE.test(u)){msg.textContent='账号名 3–16 位，只能用字母、数字、下划线';return;}
+    if(pw.length<6){msg.textContent='密码至少 6 位';return;}
+    busy(true);msg.textContent=kind==='up'?'正在注册…':'正在登录…';
+    try{if(kind==='up')await session.signUp(u,pw);else await session.signIn(u,pw);await useAccount();box.hidden=true;heroSelect.show();}
+    catch(e){msg.textContent=e.message||String(e);}
+    finally{busy(false);}
+  };
+  $('login-in').onclick=()=>go('in');$('login-up').onclick=()=>go('up');
+  $('login-form').onsubmit=e=>{e.preventDefault();go('in');};
+  $('login-guest').onclick=()=>{box.hidden=true;store.use(localStore);charId=null;updateGmButton();heroSelect.show();};
+}
+// ───── 测试员 GM 面板（只对数据库里标记为测试员的账号显示） ─────
+function updateGmButton(){$('btn-gm').hidden=!(store.kind==='cloud'&&session.isTester);}
+function gmGear(){
+  // 每个部位给一件 100 级的传奇 / 暗金 / 套装，再按战力一键换装
+  const slots=['weapon','offhand','head','shoulders','robe','gloves','belt','boots','amulet','ring1','ring1'];let n=0;
+  for(const slot of slots)for(const force of ['unique','legendary','set']){if(profile.inventory.length>=MAX_ITEMS)break;
+    profile.inventory.push(makeLoot(rng,MAX_LEVEL,'gm-'+Date.now()+'-'+(n++),{cls:profile.heroClass,slot,force}));}
+  applyEquipmentChange(()=>smartEquip(profile));return n;
+}
+const GM_ACTIONS=[
+  ['等级 +10',()=>{gainXp(profile,0);profile.level=Math.min(MAX_LEVEL,profile.level+10);profile.xp=0;profile.skillPoints+=10;}],
+  ['直接满级 100',()=>{const add=MAX_LEVEL-profile.level;profile.level=MAX_LEVEL;profile.xp=0;profile.skillPoints+=Math.max(0,add);}],
+  ['技能点 +20',()=>{profile.skillPoints+=20;}],
+  ['金币 +100 万',()=>{profile.gold+=1000000;}],
+  ['精华与材料 +999',()=>{profile.essence+=999;for(const k of Object.keys(profile.materials))profile.materials[k]+=999;}],
+  ['一键神装（100 级传奇 / 暗金 / 套装）',()=>{const n=gmGear();announce('已放入 '+n+' 件 100 级装备并按战力换装',true);}],
+  ['解锁噩梦和地狱',()=>{profile.bossKills[0][8]=Math.max(1,profile.bossKills[0][8]|0);profile.bossKills[1][8]=Math.max(1,profile.bossKills[1][8]|0);refreshWorldPickers();}],
+  ['无敌开关',()=>{gmGod=!gmGod;announce('无敌 '+(gmGod?'开启':'关闭'),true);}],
+  ['清空背包（保留已穿）',()=>{const worn=new Set(Object.values(profile.equipped));profile.inventory=profile.inventory.filter(i=>worn.has(i.id));}],
+];
+let gmGod=false;
+function renderGm(){
+  const box=$('gm-actions');box.replaceChildren();
+  for(const [label,fn] of GM_ACTIONS){const b=document.createElement('button');b.type='button';b.textContent=label;
+    b.onclick=()=>{if(store.kind!=='cloud'||!session.isTester)return;fn();hsCache=null;const s=stats(profile);if(hero){hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;}
+      refreshWorldPickers();renderSkillBar();persist();updateHud();if(!$('inventory').hidden)renderInventory();$('gm-msg').textContent='已执行：'+label;};
+    box.append(b);}
+}
+$('btn-gm').onclick=()=>{if(store.kind!=='cloud'||!session.isTester)return;const p=$('gm-panel');p.hidden=!p.hidden;if(!p.hidden)renderGm();};
+$('gm-close').onclick=()=>{$('gm-panel').hidden=true;};
+$('btn-heroes').onclick=()=>{if(state==='playing'&&!confirm('返回角色选择？当前这一趟远征会结束（装备、经验已保存）。'))return;$('gm-panel').hidden=true;openHeroSelect();};
 refreshWorldPickers();
-build();state='intro';heroSelect.show();requestAnimationFrame(loop);
+build();state='intro';requestAnimationFrame(loop);
+// 启动：有登录会话就直接进账号；开通了在线服务但没登录就显示登录页；否则以游客进入
+(async()=>{
+  if(onlineEnabled()&&session.user){try{if(await session.restore()){await useAccount();heroSelect.show();return;}}catch{}}
+  if(onlineEnabled()&&!new URLSearchParams(location.search).has('qa'))showLogin();else heroSelect.show();
+})();

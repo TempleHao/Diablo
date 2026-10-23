@@ -47,6 +47,8 @@ jobs:
           node --check dist/2d/storage.js
           node --check dist/2d/hud-strip-layout.js
           node --check dist/2d/hud-orb-layout.js
+          node --check dist/2d/online.js
+          node --check dist/2d/online-config.js
           node --check dist/2d/select-art.js
           node --check dist/2d/ui-icons.js
           node --test tests/2d-core.test.mjs tests/2d-systems.test.mjs tests/2d-boss-live.test.mjs tests/2d-v032.test.mjs tests/2d-v033.test.mjs tests/2d-demo-mage-motion.test.mjs tests/2d-v036.test.mjs tests/2d-v040.test.mjs tests/2d-v041.test.mjs tests/2d-v050.test.mjs tests/2d-v051.test.mjs tests/2d-v060.test.mjs tests/2d-v070.test.mjs tests/2d-v072.test.mjs tests/2d-v073.test.mjs
@@ -64,4 +66,5 @@ jobs:
           SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs 2>&1 | tee browser.log | grep -v BASE64 || {
             # 失败时把最后的错误写成注解，方便在 API 里直接读到
             echo "::error title=browser smoke::$(grep -v BASE64 browser.log | tail -25 | tr '\n' ' ' | cut -c1-1500)"; exit 1; }
+          node tests/2d-online.test.mjs 2>&1 | tee online.log || { echo "::error title=online flow::$(tail -25 online.log | tr '\n' ' ' | cut -c1-1500)"; exit 1; }
           node tests/2d-ui-layout.test.mjs 2>&1 | tee ui.log || { echo "::error title=ui layout::$(tail -25 ui.log | tr '\n' ' ' | cut -c1-1500)"; exit 1; }

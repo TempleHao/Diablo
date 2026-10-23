@@ -4,20 +4,21 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131a"><meta name="description" content="归墟 GUIXU：原创俯视角暗黑地牢动作 RPG。单机免费，刷怪、装备与成长。">
 <title>归墟 GUIXU</title><link rel="icon" href="./art/logo-guixu-icon.webp">
-<link rel="stylesheet" href="./style.css?v=095">
+<link rel="stylesheet" href="./style.css?v=100">
 </head>
 <body>
 <canvas id="game" aria-label="归墟游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><img class="brand-logo" src="./art/logo-guixu-sm.webp?v=093" alt="归墟 GUIXU" draggable="false"></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v0.9.5</span>
+    <span class="version">灰烬边境 · 第一幕 / v1.0.0</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
       <button id="btn-help" type="button"><i aria-hidden="true">?</i><span>操作</span></button>
       <button id="btn-pause" type="button"><i aria-hidden="true">Ⅱ</i><span>暂停</span></button>
     </div>
+    <button id="btn-gm" type="button" hidden title="测试员工具"><i aria-hidden="true">⚙</i><span>GM</span></button>
     <button id="btn-heroes" type="button"><i aria-hidden="true">♜</i><span>角色</span></button>
     <button id="btn-status" type="button"><i aria-hidden="true">◈</i><span>状态</span> <kbd>C</kbd></button>
     <button id="btn-inventory" type="button"><i aria-hidden="true">✥</i><span>行囊</span> <kbd>B</kbd></button>
@@ -63,6 +64,29 @@
 <div class="joystick" id="joystick" aria-label="触摸摇杆"><span id="stick"></span></div>
 <div class="tip">WASD 移动 · 左键/1 火弹 · 2 霜环 · 3 冰箭 · 4 冰甲 · Q 陨火 · 空格 闪现 · E 药剂 · B 背包</div>
 <div id="hero-select" hidden></div>
+<div id="login" class="login" hidden>
+  <div class="login-bg"></div>
+  <section class="login-box" aria-labelledby="login-title">
+    <img class="login-logo" src="./art/logo-guixu.webp?v=100" alt="归墟 GUIXU" draggable="false">
+    <h2 id="login-title" class="sr-only">登录</h2>
+    <form id="login-form" class="login-form" autocomplete="on">
+      <div id="login-online">
+        <label><span>账号</span><input id="login-user" name="username" autocomplete="username" maxlength="16" placeholder="字母、数字、下划线，3–16 位"></label>
+        <label><span>密码</span><input id="login-pass" name="password" type="password" autocomplete="current-password" maxlength="64" placeholder="至少 6 位"></label>
+        <div class="login-actions"><button id="login-in" class="primary" type="submit">登 录</button><button id="login-up" type="button">注册新账号</button></div>
+      </div>
+      <p id="login-offline-note" class="login-note" hidden>在线登录尚未开通。</p>
+      <small id="login-msg" class="login-msg" aria-live="polite"></small>
+      <button id="login-guest" type="button" class="subtle">以游客进入（只保存在本机）</button>
+    </form>
+  </section>
+</div>
+<aside id="gm-panel" class="gm-panel" hidden aria-label="测试员工具">
+  <div class="gm-head"><strong>⚙ 测试员工具</strong><button id="gm-close" type="button" aria-label="关闭">✕</button></div>
+  <p class="gm-tip">只有测试账号能看到。改动作用于当前角色，并自动保存到云端。</p>
+  <div id="gm-actions" class="gm-actions"></div>
+  <small id="gm-msg" class="gm-msg"></small>
+</aside>
 <div id="scrim" class="scrim" hidden>
   <section class="modal" id="modal" aria-live="polite">
     <div class="crest">✦</div><span class="eyebrow">原创俯视角暗黑 ARPG</span>

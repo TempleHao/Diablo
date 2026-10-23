@@ -39,7 +39,7 @@ const landscape=()=>mobile()&&window.matchMedia('(orientation:landscape)').match
 /**
  * root：挂载节点；store：角色仓库；fresh(cls)：新角色存档；onEnter(id,difficulty)：进入游戏。
  */
-export function createHeroSelect({root,store,fresh,onEnter}){
+export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=null}){
   let mode='list',pick='barbarian',selId=null,diff=0,raf=0,t0=performance.now(),open=false;
   const actors=Object.fromEntries(CLASS_ORDER.map(c=>[c,{x:0,y:0,cls:c,angle:0,moving:false,walk:0,cast:0,invuln:0,swing:null}]));
   root.className='hero-select';root.hidden=true;
@@ -64,7 +64,9 @@ export function createHeroSelect({root,store,fresh,onEnter}){
   function render(){
     root.dataset.mode=mode;root.classList.toggle('is-mobile',mobile());root.classList.toggle('is-land',landscape());
     plates.replaceChildren();stage.querySelector('.hs-carousel')?.remove();side.replaceChildren();listBox.replaceChildren();bottom.replaceChildren();account.replaceChildren();
-    account.append(el('span','hs-account-dot'),el('span',null,store.kind==='local'?'本机存档 · 数据保存在当前浏览器':'在线账号'),el('small',null,'在线登录版开发中，届时可把本机角色上传到账号'));
+    const A=accountInfo?.()||{label:'本机存档',note:''};
+    account.append(el('span','hs-account-dot'+(store.kind==='cloud'?' is-cloud':'')),el('span',null,A.label),el('small',null,A.note||''));
+    if(A.action){const b=el('button','hs-ghost hs-acct-btn',A.action);b.type='button';b.onclick=A.onAction;account.append(b);}
     if(store.wiped)account.append(el('small','hs-wiped','· 测试数据已清零，从头开始'));
     if(mode==='create')renderCreate();else renderList();
   }
@@ -233,5 +235,5 @@ export function createHeroSelect({root,store,fresh,onEnter}){
   function close(){open=false;root.hidden=true;cancelAnimationFrame(raf);}
   function show(m){mode=m||(chars().length?'list':'create');open=true;root.hidden=false;render();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);}
   window.addEventListener('resize',()=>{if(open)render();});
-  return {show,close,get open(){return open;}};
+  return {show,close,refresh:()=>{if(open)render();},get open(){return open;}};
 }
