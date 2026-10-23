@@ -7,7 +7,7 @@
  */
 import {SELECT_HD} from './select-art.js';
 // v1.2：每个职业一张独立高清立绘（art/select/<职业>.webp，原始分辨率），动作用连续的网格形变 + 法阵 / 粒子 / 刀光特效来做
-const HD={};for(const c of Object.keys(SELECT_HD)){const im=new Image();im.src=new URL('./art/select/'+c+'.webp?v=120',import.meta.url).href;HD[c]=im;}
+const HD={};for(const c of Object.keys(SELECT_HD)){const im=new Image();im.src=new URL('./art/select/'+c+'.webp?v=121',import.meta.url).href;HD[c]=im;}
 const hdReady=c=>HD[c]?.complete&&HD[c].naturalWidth>0;
 // 未选中的人用压暗的版本：加载后只算一次（每帧用 ctx.filter 压暗太慢）
 const DIM={};
@@ -216,7 +216,7 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
     const charge=fade(1.5,3.1,s)*(1-fade(4.22,5.05,s)),release=fade(3.48,3.83,s)*(1-fade(4.16,4.65,s));
     return {enter,charge:k>=6&&s>5.2?0:charge,release:k>=6&&s>5.2?0:release};
   }
-  // 整张立绘按 3 像素横条绘制，每条按身高位置做呼吸 / 衣摆 / 蓄力位移，脚底固定不动（一张完整的图，不做帧间淡入淡出）
+  // 整张立绘按屏幕上约 3 像素高的横条绘制，每条按身高位置做呼吸 / 衣摆 / 蓄力位移，脚底固定不动（一张完整的图，不做帧间淡入淡出）
   function drawHD(cls,x,y,h,t,charge,release,alpha,full){
     const im=full?HD[cls]:dimmed(cls),[iw,ih,fx]=SELECT_HD[cls],sc=h/ih,w=iw*sc;
     const breath=Math.sin(t*2.45),lean=release*.027-charge*.013+Math.sin(t*.95)*.005;
@@ -225,7 +225,7 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
     const x0=-w*fx;
     if(!full){ctx.drawImage(im,x0,-h,w,h);ctx.restore();return;}   // 未选中的人只做整体呼吸，省性能
-    const strip=3;
+    const strip=Math.max(3,Math.round(3*(devicePixelRatio>1?1.5:1)/sc));   // 屏幕上每条约 3 像素（高清图缩小显示时不必逐 3 像素画）
     for(let sy=0;sy<ih;sy+=strip){const span=Math.min(strip,ih-sy),f=sy/ih,upper=(1-f)*(1-f);
       const wind=(Math.sin(t*1.57+f*4.1)*1.7+Math.sin(t*2.67+f*6.2)*.85)*sc;
       const sway=(breath*1.5*upper+Math.sin(t*.83)*2.1*upper)*sc,skill=(charge*5*upper+release*6*(1-f))*sc;
@@ -267,13 +267,13 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
     ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
     const show=mode==='create'?(mobile()?[pick]:CLASS_ORDER):[selected()?.cls||'mage'];
     const n=show.length,colW=w/n,platesOn=n>1;
-    // 立绘高度：多人时按列宽和舞台高度取小，单人时按舞台高度；各职业按原图身高比例（法杖、长枪更高）
-    const baseH=n===1?h*.8:Math.min(h-130,colW*2.05);
+    // 立绘高度：多人时按列宽和舞台高度取小（新立绘较宽，约 0.65:1），单人时按舞台高度
+    const baseH=n===1?h*.8:Math.min(h-130,colW*1.85);
     show.forEach((cls,i)=>{
       const x=colW*(i+.5),y=platesOn?h-112:h*.9,active=n===1||cls===pick,color=CLASS_INFO[cls].color;
       pedestal(x,y+4,Math.min(colW*.4,baseH*.17),color,active,t);
       if(!hdReady(cls))return;
-      const hh=baseH*(SELECT_HD[cls][1]/600),a=actors[cls];
+      const hh=baseH,a=actors[cls];
       if(active){
         if(a.selT==null)a.selT=t;
         const T=timeline(t-a.selT),H2=hh*(n>1?1.08:1)*(.9+.1*T.enter);
