@@ -5,9 +5,20 @@
  *   创建角色：七位英雄并排站在石台上（手机端是一次一位的轮播），点选后右侧显示职业介绍、四项属性、代表技能，输入名字创建。
  * 角色数据通过 storage.js 的仓库读写（现在是本机存档，以后可换成在线账号）。
  */
-import {SELECT_ART} from './select-art.js';
-// v0.8：选角用高清立绘（7 职业 × 站立 / 戒备 / 攻击 / 施法），不再用游戏内的小像素图放大
-const selImg=new Image();let selReady=false;selImg.onload=()=>{selReady=true;};selImg.src=new URL('./art/select-heroes.webp',import.meta.url).href;
+import {SELECT_HD} from './select-art.js';
+// v1.2：每个职业一张独立高清立绘（art/select/<职业>.webp，原始分辨率），动作用连续的网格形变 + 法阵 / 粒子 / 刀光特效来做
+const HD={};for(const c of Object.keys(SELECT_HD)){const im=new Image();im.src=new URL('./art/select/'+c+'.webp?v=120',import.meta.url).href;HD[c]=im;}
+const hdReady=c=>HD[c]?.complete&&HD[c].naturalWidth>0;
+// 未选中的人用压暗的版本：加载后只算一次（每帧用 ctx.filter 压暗太慢）
+const DIM={};
+function dimmed(c){
+  if(DIM[c])return DIM[c];const im=HD[c],cv=document.createElement('canvas');cv.width=im.naturalWidth;cv.height=im.naturalHeight;
+  const x=cv.getContext('2d');x.drawImage(im,0,0);const d=x.getImageData(0,0,cv.width,cv.height),a=d.data;
+  for(let i=0;i<a.length;i+=4){const l=(a[i]*.3+a[i+1]*.59+a[i+2]*.11);for(let k=0;k<3;k++)a[i+k]=(a[i+k]*.55+l*.45)*.42;}
+  x.putImageData(d,0,0);return DIM[c]=cv;
+}
+// 近战职业放刀光，施法职业放法阵前的光球
+const MELEE=new Set(['barbarian','amazon','assassin']);
 import {CLASSES,SKILLS} from './systems.js';
 import {DIFFICULTIES,difficultyUnlocked} from './progression.js';
 import {skillIcon} from './ui-icons.js';
@@ -27,8 +38,8 @@ export const CLASS_INFO=Object.freeze({
     desc:'骷髅、骨与诅咒的主宰。驱使亡者大军，以骨矛贯穿敌阵，用尸体爆炸清扫战场。'},
   druid:{en:'DRUID',color:'#66ff70',attr:[4,2,5,4],sig:['dru_tornado','dru_werewolf','dru_grizzly','dru_volcano'],
     desc:'荒野的守护者。呼唤火焰与风暴，化身狼人和熊人，召唤灰熊与狼群为伴。'},
-  mage:{en:'SORCERESS',color:'#6fb6ff',attr:[2,3,2,7],sig:['fireball','frozenorb','chain','blackhole'],
-    desc:'掌控元素之力，远离战场的毁灭者。火、冰、雷与奥术四系法术，闪现穿越墙壁。'}
+  mage:{en:'MAGE',color:'#6fb6ff',attr:[2,3,2,7],sig:['fireball','frozenorb','chain','blackhole'],
+    desc:'白袍的年轻法师，掌控元素之力的毁灭者。火、冰、雷与奥术四系法术，闪现穿越墙壁。'}
 });
 const ATTR=['力量','敏捷','体力','精力'];
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
@@ -53,7 +64,7 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
   const listBox=el('section','hs-list');
   const bottom=el('div','hs-bottom');
   const account=el('div','hs-account');
-  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-voragh.webp?v=112',import.meta.url).href;logo.alt='归墟 VORAGH';
+  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-voragh.webp?v=120',import.meta.url).href;logo.alt='归墟 VORAGH';
   root.append(bg,title,logo,stage,listBox,side,bottom,account);
   const ctx=canvas.getContext('2d');
 
@@ -196,14 +207,58 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
     }
     ctx.restore();
   }
-  // 立绘：脚底对齐；待机呼吸；选中后循环「戒备 → 攻击 → 施法 → 站立」，姿势之间淡入淡出
-  const POSE_CYCLE=[[0,1.6],[1,.9],[2,1.1],[1,.5],[3,1.4]];
-  function poseAt(t){const total=POSE_CYCLE.reduce((n,p)=>n+p[1],0);let k=t%total;for(const [i,[f,d]] of POSE_CYCLE.entries()){if(k<d)return {f,prev:POSE_CYCLE[(i+POSE_CYCLE.length-1)%POSE_CYCLE.length][0],q:Math.min(1,k/.18)};k-=d;}return {f:0,prev:0,q:1};}
-  function drawArt(cls,fi,x,y,sc,alpha,breath){
-    const r=SELECT_ART[cls]?.[fi];if(!r)return;
-    ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.scale(sc,sc*(1+breath));
-    ctx.imageSmoothingEnabled=sc<1;ctx.imageSmoothingQuality='high';
-    ctx.drawImage(selImg,r[0],r[1],r[2],r[3],-r[4],-r[3],r[2],r[3]);ctx.restore();
+  // ───── 立绘动效（参照用户提供的 60 帧选角原型）─────
+  // 时间线（选中后）：0–1.05s 出场（放大淡入）→ 1.5–3.1s 蓄力（身体微抬、法阵展开）→ 3.5–4.2s 释放（前倾、刀光 / 光爆）→ 之后待机，每 9 秒重演一次技能。
+  const TAU=Math.PI*2,clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);},fade=(a,b,x)=>smooth((x-a)/(b-a));
+  function timeline(t){
+    const enter=fade(0,1.05,t),k=t<6?t:6+((t-6)%9);           // 第一次完整演示，之后每 9 秒重演
+    const s=k<6?k:k-6+1.2;                                     // 重演时跳过出场
+    const charge=fade(1.5,3.1,s)*(1-fade(4.22,5.05,s)),release=fade(3.48,3.83,s)*(1-fade(4.16,4.65,s));
+    return {enter,charge:k>=6&&s>5.2?0:charge,release:k>=6&&s>5.2?0:release};
+  }
+  // 整张立绘按 3 像素横条绘制，每条按身高位置做呼吸 / 衣摆 / 蓄力位移，脚底固定不动（一张完整的图，不做帧间淡入淡出）
+  function drawHD(cls,x,y,h,t,charge,release,alpha,full){
+    const im=full?HD[cls]:dimmed(cls),[iw,ih,fx]=SELECT_HD[cls],sc=h/ih,w=iw*sc;
+    const breath=Math.sin(t*2.45),lean=release*.027-charge*.013+Math.sin(t*.95)*.005;
+    const rise=charge*14*sc-release*4*sc,zoom=1+.010*breath+.028*release;
+    ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y-rise);ctx.rotate(lean);ctx.scale(zoom,zoom);
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+    const x0=-w*fx;
+    if(!full){ctx.drawImage(im,x0,-h,w,h);ctx.restore();return;}   // 未选中的人只做整体呼吸，省性能
+    const strip=3;
+    for(let sy=0;sy<ih;sy+=strip){const span=Math.min(strip,ih-sy),f=sy/ih,upper=(1-f)*(1-f);
+      const wind=(Math.sin(t*1.57+f*4.1)*1.7+Math.sin(t*2.67+f*6.2)*.85)*sc;
+      const sway=(breath*1.5*upper+Math.sin(t*.83)*2.1*upper)*sc,skill=(charge*5*upper+release*6*(1-f))*sc;
+      ctx.drawImage(im,0,sy,iw,span,x0+wind*(f>.48?(.5+f):.32)+sway+skill,-h+f*h,w,span*sc+.56);}
+    ctx.restore();
+  }
+  function rune(cx,cy,rad,t,col,alpha){
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(t*.28);ctx.globalAlpha=alpha;ctx.lineWidth=1.6;ctx.strokeStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;
+    ctx.beginPath();ctx.arc(0,0,rad,0,TAU);ctx.stroke();ctx.beginPath();ctx.arc(0,0,rad*.72,0,TAU);ctx.stroke();
+    for(let i=0;i<12;i++){const a=i*TAU/12,c=Math.cos(a),s=Math.sin(a);ctx.beginPath();ctx.moveTo(c*rad*.83,s*rad*.83);ctx.lineTo(c*rad*1.12,s*rad*1.12);ctx.stroke();}
+    ctx.rotate(-t*.49);ctx.beginPath();for(let i=0;i<=3;i++){const a=i*TAU/3;ctx[i?'lineTo':'moveTo'](Math.cos(a)*rad*.7,Math.sin(a)*rad*.7);}ctx.stroke();
+    ctx.restore();
+  }
+  function effects(cls,x,y,h,t,charge,release,front){
+    const col=CLASS_INFO[cls].color;
+    if(!front){
+      if(charge>.01)rune(x+h*.13,y-h*.55,(40+90*charge+26*release)*h/560,t,col,clamp(charge*1.05,0,1)*.9);
+      if(charge>.01){ctx.save();ctx.globalAlpha=.45*charge;ctx.strokeStyle=col;ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(x,y,h*.2*(1+charge),h*.035,0,0,TAU);ctx.stroke();ctx.restore();}
+      return;
+    }
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    if(MELEE.has(cls)){
+      if(release>.02){ctx.translate(x,y-h*.55);ctx.rotate(-.45+release*1.22);ctx.strokeStyle=col;ctx.lineCap='round';
+        for(let i=0;i<4;i++){ctx.globalAlpha=(.75-i*.14)*release;ctx.lineWidth=(7-i*1.4)*h/560;ctx.beginPath();ctx.arc(0,0,h*(.34+i*.035),-1.15,.35);ctx.stroke();}}
+    }else if(charge>.02){
+      const r=h*(.18+charge*.26),cx=x+h*.13,cy=y-h*(.55+.06*charge),g=ctx.createRadialGradient(cx,cy,1,cx,cy,r);
+      g.addColorStop(0,col+'aa');g.addColorStop(.35,col+'33');g.addColorStop(1,col+'00');ctx.globalAlpha=charge*(.7+.3*release);ctx.fillStyle=g;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+    }
+    // 上升的光点：蓄力时变多变亮
+    const n=26;ctx.fillStyle=col;
+    for(let i=0;i<n;i++){const e=(i*.618)%1,p=((t*(.12+e*.1)+e*3.1)%1),px=x+Math.sin(i*14.72+t*(.3+e*.2))*h*.22,py=y-p*h*.95;
+      ctx.globalAlpha=(1-p)*(.25+.65*charge+.3*release)*(i%3?1:.6);const sz=(1.2+e*2.2)*h/560;ctx.fillRect(px,py,sz,sz);}
+    ctx.restore();
   }
   function frame(now){
     if(!open)return;
@@ -212,23 +267,23 @@ export function createHeroSelect({root,store,fresh,onEnter,account:accountInfo=n
     ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);
     const show=mode==='create'?(mobile()?[pick]:CLASS_ORDER):[selected()?.cls||'mage'];
     const n=show.length,colW=w/n,platesOn=n>1;
-    // 立绘站立高约 285 像素：多人时按列宽缩放，单人时按舞台高度
-    const scale=n===1?Math.min(1.6,(h*.82)/290):Math.min(1.35,(h-125)/295,colW/150);
+    // 立绘高度：多人时按列宽和舞台高度取小，单人时按舞台高度；各职业按原图身高比例（法杖、长枪更高）
+    const baseH=n===1?h*.8:Math.min(h-130,colW*2.05);
     show.forEach((cls,i)=>{
-      const x=colW*(i+.5),y=platesOn?h-112:h*.88,active=n===1||cls===pick,color=CLASS_INFO[cls].color;
-      pedestal(x,y+4,Math.min(colW*.4,95*scale),color,active,t);
-      if(!selReady)return;
-      const breath=Math.sin(t*2+i)*.008,a=actors[cls];
+      const x=colW*(i+.5),y=platesOn?h-112:h*.9,active=n===1||cls===pick,color=CLASS_INFO[cls].color;
+      pedestal(x,y+4,Math.min(colW*.4,baseH*.17),color,active,t);
+      if(!hdReady(cls))return;
+      const hh=baseH*(SELECT_HD[cls][1]/600),a=actors[cls];
       if(active){
         if(a.selT==null)a.selT=t;
-        const P=poseAt(t-a.selT),sc=scale*(n>1?1.1:1);
-        if(P.q<1)drawArt(cls,P.prev,x,y,sc,1-P.q,breath);
-        drawArt(cls,P.f,x,y,sc,P.q<1?P.q:1,breath);
-        // 攻击 / 施法时脚下光圈更亮
-        if(P.f>=2){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,y,0,x,y,90*sc);g.addColorStop(0,color+'55');g.addColorStop(1,color+'00');ctx.fillStyle=g;ctx.fillRect(x-100*sc,y-60*sc,200*sc,90*sc);ctx.restore();}
+        const T=timeline(t-a.selT),H2=hh*(n>1?1.08:1)*(.9+.1*T.enter);
+        effects(cls,x,y,H2,t,T.charge*.55,0,false);
+        ctx.save();ctx.globalAlpha=.55*T.enter;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(x,y+3,H2*.16,H2*.02,0,0,TAU);ctx.fill();ctx.restore();
+        drawHD(cls,x,y,H2,t,T.charge,T.release,T.enter,true);
+        effects(cls,x,y,H2,t,T.charge,T.release,true);
       }else{
         a.selT=null;
-        ctx.save();if('filter' in ctx)ctx.filter='brightness(.4) saturate(.5)';drawArt(cls,0,x,y,scale,1,breath);ctx.restore();
+        drawHD(cls,x,y,hh,t+i,0,0,1,false);
       }
     });
   }
