@@ -47,6 +47,7 @@ function translate(m){
   if(/rate limit|too many/i.test(m))return '操作太频繁，请稍后再试';
   if(/Email not confirmed/i.test(m))return '账号未确认（请在 Supabase 后台关闭「Confirm email」）';
   if(/JWT expired/i.test(m))return '登录已过期，请重新登录';
+  if(/Could not find the table|schema cache|relation .* does not exist/i.test(m))return '服务器还没建好存档表：请在 Supabase 的 SQL Editor 里运行建表脚本（docs/supabase-setup.sql）';
   return m;
 }
 
