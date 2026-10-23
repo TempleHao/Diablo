@@ -1,0 +1,52 @@
+name: Guixu Motion Atlas Prototype
+on:
+  push:
+    branches:
+      - art/guixu-animation-review-20261023
+    paths:
+      - scripts/2d-motion/**
+      - dist/2d/motion-manifest.json
+      - .github/workflows/guixu-motion-prototype.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install Pillow==11.3.0
+      - name: Build placeholder motion assets
+        run: python scripts/2d-motion/build_motion.py
+      - name: Check 122 atlases
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          root=Path('dist/2d/art/motion')
+          m=json.loads((root/'manifest.json').read_text())
+          assert len(m['units'])==122
+          for u in m['units']:
+              f=root/u['file']
+              assert f.exists(),f
+              with Image.open(f) as im:
+                  assert im.size==(u['cols']*u['width'],6*u['height']),str(f)
+          print('Validated:',len(m['units']))
+          PY
+      - name: Commit generated assets to review branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/2d/art/motion
+          if ! git diff --cached --quiet; then
+            git commit -m "art: build 122 provisional pixel motion atlases"
+            git push
+          fi
