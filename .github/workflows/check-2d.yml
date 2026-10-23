@@ -63,3 +63,4 @@ jobs:
           SCREENSHOT_FOR_REVIEW=1 node tests/2d-browser.test.mjs 2>&1 | tee browser.log | grep -v BASE64 || {
             # 失败时把最后的错误写成注解，方便在 API 里直接读到
             echo "::error title=browser smoke::$(grep -v BASE64 browser.log | tail -25 | tr '\n' ' ' | cut -c1-1500)"; exit 1; }
+          node tests/2d-ui-layout.test.mjs 2>&1 | tee ui.log || { echo "::error title=ui layout::$(tail -25 ui.log | tr '\n' ' ' | cut -c1-1500)"; exit 1; }

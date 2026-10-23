@@ -53,7 +53,7 @@ export function createHeroSelect({root,store,fresh,onEnter}){
   const listBox=el('section','hs-list');
   const bottom=el('div','hs-bottom');
   const account=el('div','hs-account');
-  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-guixu.webp',import.meta.url).href;logo.alt='归墟 GUIXU';
+  const logo=el('img','hs-logo');logo.src=new URL('./art/logo-guixu.webp?v=092',import.meta.url).href;logo.alt='归墟 GUIXU';
   root.append(bg,title,logo,stage,listBox,side,bottom,account);
   const ctx=canvas.getContext('2d');
 
@@ -211,7 +211,7 @@ export function createHeroSelect({root,store,fresh,onEnter}){
     const show=mode==='create'?(mobile()?[pick]:CLASS_ORDER):[selected()?.cls||'mage'];
     const n=show.length,colW=w/n,platesOn=n>1;
     // 立绘站立高约 285 像素：多人时按列宽缩放，单人时按舞台高度
-    const scale=n===1?Math.min(1.25,(h*.8)/290):Math.min(1.05,(h-130)/300,colW/150);
+    const scale=n===1?Math.min(1.6,(h*.82)/290):Math.min(1.35,(h-125)/295,colW/150);
     show.forEach((cls,i)=>{
       const x=colW*(i+.5),y=platesOn?h-112:h*.88,active=n===1||cls===pick,color=CLASS_INFO[cls].color;
       pedestal(x,y+4,Math.min(colW*.4,95*scale),color,active,t);

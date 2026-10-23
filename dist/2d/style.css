@@ -742,3 +742,42 @@ body.ghud-on .upgrade-chip{bottom:calc(min(520px,40vw)*436/2139 + 24px)!importan
 @media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-logo{height:38px}}
 .gh-right{padding-left:42px}.gh-utils{position:absolute!important;left:0;bottom:0;flex-direction:column}
 body:has(#scrim:not([hidden])) .portal-open,body:has(#inventory:not([hidden])) .portal-open,body:has(#hero-select:not([hidden])) .portal-open{display:none}
+
+/* ═════════ v0.9.2 角色选择：统一的版面规则 ═════════
+   电脑（宽 ≥ 900 且高 ≥ 560）：右侧固定信息栏（宽 clamp(320px,27vw,430px)），左侧为舞台列；
+     标志放在舞台列顶部居中，高度 clamp(70px,15vh,150px)，舞台从标志下方开始，任何宽度都不与信息栏、角色列表重叠；
+     账号提示放在信息栏顶部；背景按宽度铺满。
+   手机竖屏：标志 → 舞台 → 职业按钮 / 名字 / 按钮 → 介绍，自上而下排列。
+   手机横屏：左列（标志 + 舞台）、右列（可滚动的信息），列表模式时把标志让给角色列表。 */
+.hero-select{--pad:clamp(12px,1.8vw,28px);--side:clamp(320px,27vw,430px);--logoH:clamp(70px,15vh,150px);--listW:clamp(220px,18vw,280px);--stL:var(--pad);--stR:calc(var(--side) + var(--pad) * 2)}
+.hero-select[data-mode="list"]{--stL:calc(var(--listW) + var(--pad) * 2)}
+.hs-bg{background-size:max(100vw,calc(74vh * 3.115)) auto!important}
+.hero-select:not(.is-mobile) .hs-logo{left:var(--stL);width:calc(100% - var(--stL) - var(--stR));height:var(--logoH);top:var(--pad);transform:none;object-fit:contain}
+.hero-select:not(.is-mobile) .hs-stage{left:var(--stL);right:var(--stR);top:calc(var(--pad) + var(--logoH));bottom:56px}
+.hero-select:not(.is-mobile) .hs-account{right:var(--pad);top:var(--pad);width:var(--side);max-width:none;justify-content:flex-start;flex-wrap:wrap;line-height:1.4}
+.hero-select:not(.is-mobile) .hs-side{right:var(--pad);width:var(--side);top:calc(var(--pad) + 52px);bottom:var(--pad);max-height:none;padding:6px 4px 12px}
+.hero-select:not(.is-mobile) .hs-list{left:var(--pad);width:var(--listW);top:var(--pad);bottom:64px}
+.hero-select:not(.is-mobile) .hs-bottom{left:0;right:auto;padding:0 var(--pad) 14px}
+.hero-select:not(.is-mobile) .hs-plates{bottom:0}
+.hero-select:not(.is-mobile) .hs-plate{max-width:150px}
+@media (min-width:1600px){.hero-select:not(.is-mobile) .hs-info{padding:20px 22px}.hero-select:not(.is-mobile) .hs-desc{font-size:14px}.hero-select:not(.is-mobile) .hs-plate b{font-size:16px}}
+/* 手机竖屏 */
+.hero-select.is-mobile:not(.is-land) .hs-bg{height:52vh;background-size:auto 46vh!important;background-position:center top}
+.hero-select.is-mobile:not(.is-land) .hs-logo{position:relative;left:auto;top:auto;transform:none;display:block;flex:none;margin:calc(10px + var(--st,0px)) auto 0;height:clamp(72px,14vh,120px);width:auto;max-width:70vw;object-fit:contain}
+.hero-select.is-mobile:not(.is-land) .hs-stage{margin-top:0;height:clamp(200px,34vh,320px)}
+/* 手机横屏 */
+.hero-select.is-land .hs-logo{position:absolute;left:var(--sl,0px);width:42%;top:calc(6px + var(--st,0px));height:clamp(48px,18vh,80px);transform:none;object-fit:contain}
+.hero-select.is-land[data-mode="create"] .hs-stage{top:calc(clamp(48px,18vh,80px) + 6px + var(--st,0px))}
+.hero-select.is-land[data-mode="list"] .hs-logo{display:none}
+.hero-select{--logoH:clamp(80px,18vh,190px)}
+.hero-select.is-mobile .hs-side>.hs-go{order:-1}
+.hs-bg{background-image:url("./art/select-bg.webp?v=092")!important}
+/* 顶栏标题：完整标志细节太多，缩到 40 像素会糊成一块，所以顶栏用同色系的金属字 + 小徽记，大标志只放在选角和开场弹窗 */
+.brand{align-items:center;gap:10px!important}
+.brand-mark{width:40px;height:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px #6e5434,0 0 0 3px #0a0807,0 0 12px #6a4cc055;filter:saturate(.9)}
+.brand-title{display:flex;flex-direction:column;line-height:1}
+.brand-title b{font-family:"STXingkai","Xingkai SC","KaiTi","STKaiti",var(--serif);font-size:30px;font-weight:700;letter-spacing:6px;
+  background:linear-gradient(180deg,#f3e2bd 0%,#c9a46a 38%,#7b6243 62%,#d8bd8a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 1px 0 #000) drop-shadow(0 0 6px #5b3fa055)}
+.brand-title small{margin-top:3px;font-family:var(--serif);font-size:9px;letter-spacing:7px;color:#a88d62;padding-left:2px}
+@media (max-width:900px), (max-height:560px) and (pointer:coarse){.brand-mark{width:30px;height:30px}.brand-title b{font-size:21px;letter-spacing:3px}.brand-title small{display:none}}
