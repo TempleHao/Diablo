@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>归墟 · 动作验收</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#e7d4b5;background:radial-gradient(ellipse at center,#252329,#08090c);font:14px system-ui,"Noto Sans SC",sans-serif}
+main{max-width:1080px;margin:auto;padding:18px}h1{font:32px Georgia,serif;letter-spacing:3px;margin:0 0 12px}
+.note{background:#241c18;padding:12px;border:1px solid #6b4a34;line-height:1.6;margin:12px 0}
+.layout{display:grid;grid-template-columns:250px 1fr;gap:16px}
+fieldset{border:1px solid #735b3b;background:#0e1219;padding:16px;min-width:0}
+label{display:block;margin:7px 0 12px}select,button,input{width:100%;background:#241c19;color:#f1d5ad;border:1px solid #8e7654;padding:10px;margin-top:6px;cursor:pointer}
+canvas{width:100%;background:linear-gradient(#14151d,#252025);image-rendering:pixelated;border:1px solid #78603d}
+.small{color:#ac9980;margin-top:8px;font-size:12px;line-height:1.6}#title{font-size:20px;margin:7px 0}pre{white-space:pre-wrap;max-height:130px;overflow:auto}
+@media(max-width:700px){.layout{grid-template-columns:1fr}h1{font-size:25px}}
+</style></head><body><main>
+<h1>归墟 · MOTION REVIEW</h1>
+<div class="note">122单位 / 七职业 + 100怪物 + 10召唤物 + 5随从。此页展示可运行的过渡动作精灵表；目前是静态角色经整体变形和位移生成的8帧动作，并非已完成的精细肢体动画。</div>
+<div class="layout"><fieldset>
+<label>单位类型<select id="cat"><option value="hero">七职业</option><option value="monster">怪物100</option><option value="summon">召唤物10</option><option value="follower">侍卫/随从5</option></select></label>
+<label>选择单位<select id="unit"></select></label>
+<label>选择动作<select id="action"><option value="idle">待机</option><option value="walk">行走</option><option value="attack">攻击</option><option value="skill">技能/施法</option><option value="hit">受击</option><option value="death">死亡</option></select></label>
+<label>播放速度<input id="speed" type="range" min=".25" max="2" step=".25" value="1"></label>
+<button id="previous">上一单位</button><button id="next">下一单位</button>
+<button id="toggle">暂停 / 播放</button>
+<div class="small" id="info">正在加载资源</div>
+</fieldset><section><div id="title"></div><canvas id="view" width="680" height="550"></canvas><p class="small">渲染时间轴采用 requestAnimationFrame；实际图像以图集内8帧轮播。若需要真正平滑肢体动作，应进一步绘制或绑定关节与武器层。</p><pre id="diagnostic"></pre></section></div></main>
+<script type="module">
+const root='./art/motion/';
+const $=id=>document.getElementById(id);const c=$('view'),ctx=c.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+let units=[],list=[],idx=0,img=null,unit=null,paused=false,speed=1,elapsed=0,last=0;
+const dur={idle:1.2,walk:.76,attack:.8,skill:1.15,hit:.48,death:1.3};
+const ease=t=>t*t*(3-2*t);const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function choose(){
+  list=units.filter(u=>u.kind===$('cat').value);idx=(idx+list.length)%list.length;
+  unit=list[idx];$('unit').replaceChildren(...list.map((u,i)=>new Option(u.label+' · '+u.id,String(i))));
+  $('unit').value=String(idx);elapsed=0;img=new Image();img.src=root+unit.file;
+  $('title').textContent=unit.label+'  —  '+unit.id;
+  $('diagnostic').textContent=JSON.stringify({id:unit.id,sourceGrade:unit.sourceGrade,actions:unit.actions},null,2);
+}
+$('cat').onchange=()=>{idx=0;choose()};$('unit').onchange=e=>{idx=+e.target.value;choose()};
+$('action').onchange=()=>{elapsed=0};$('speed').oninput=e=>speed=+e.target.value;
+$('previous').onclick=()=>{idx--;choose()};$('next').onclick=()=>{idx++;choose()};
+$('toggle').onclick=()=>paused=!paused;
+function render(now){
+  requestAnimationFrame(render);
+  if(!paused) elapsed+=Math.min(.05,(now-last)/1000||0)*speed;
+  last=now;ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='#38312a';ctx.fillRect(0,469,680,81);
+  if(!unit||!img||!img.complete||!img.naturalWidth)return;
+  const action=$('action').value,act=unit.actions[action],p=(elapsed/dur[action])%1;
+  const i=Math.min(7,Math.floor(p*8));const size=unit.width;
+  ctx.fillStyle='#09070b77';ctx.beginPath();ctx.ellipse(340,470,105,18,0,0,Math.PI*2);ctx.fill();
+  const bob=action==='idle'?-3*Math.sin(p*2*Math.PI):action==='walk'?-6*Math.abs(Math.sin(p*2*Math.PI)):0;
+  const lunge=action==='attack'?-22*ease(clamp(p/.25,0,1))+70*ease(clamp((p-.25)/.23,0,1))-48*ease(clamp((p-.50)/.5,0,1)):0;
+  const rotate=action==='hit'?-0.07*Math.sin(p*Math.PI):action==='death'?-0.85*ease(p):0;
+  const target=unit.kind==='monster'&&unit.id.startsWith('B')?410:365;
+  ctx.save();ctx.translate(340+lunge,459+bob);ctx.rotate(rotate);
+  if(action==='death')ctx.globalAlpha=1-.65*ease(p);
+  ctx.drawImage(img,size*i,size*act.row,size,size,-target/2,-target,target,target);
+  ctx.restore();
+  $('info').textContent='单位 '+(idx+1)+'/'+list.length+' · '+action+' · 第'+(i+1)+'/8帧 · '+act.fps+'FPS源帧 · 60Hz渲染';
+}
+fetch(root+'manifest.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()}).then(m=>{units=m.units;choose();requestAnimationFrame(render)}).catch(e=>$('info').textContent='资源未加载：'+e);
+</script></body></html>
