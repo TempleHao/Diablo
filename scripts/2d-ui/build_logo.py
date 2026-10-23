@@ -1,6 +1,7 @@
 """归墟 VORAGH 标志（v1.1）：assets-source/2d/ui/logo-voragh.png（黑底横版，蓝紫星空风）→ 透明底。
 - 黑底 → 透明：亮度 + 饱和度给出软透明度，星云边缘自然渐隐；
 - 字体、金属框和亮部保持实心（闭运算 + 小孔填充），不会被抠空发灰；
+- 原图上下边被星云顶满，四边做渐隐，避免抠出来带一条硬边；
 - 四周纯黑留白裁掉；大图给选角 / 登录 / 开场，另导出顶栏小图（字和 VORAGH 为主，裁掉两侧星云）与圆形图标。
 用法：python3 scripts/2d-ui/build_logo.py
 """
@@ -17,6 +18,13 @@ solid = cv2.morphologyEx(core.astype(np.uint8), cv2.MORPH_CLOSE, cv2.getStructur
 lab, n = ndimage.label(~solid); sizes = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
 solid |= np.isin(lab, [i + 1 for i, s in enumerate(sizes) if s < 700])
 al = np.maximum(soft, cv2.GaussianBlur(solid.astype(np.float32), (0, 0), .8))
+# 原图上下两边的星云和尖刺顶到了画布边，直接抠出来会在上下各留一条硬直线，看起来像被挡住、被裁了一刀。
+# 所以四边各做一段柔和渐隐（字和 VORAGH 在中间，不受影响）。
+def ramp(n, a, b):
+    t = np.clip((np.arange(n, dtype=np.float32) - a) / max(b - a, 1), 0, 1); return t * t * (3 - 2 * t)
+fy = ramp(H, 0, H * .16) * ramp(H, 0, H * .17)[::-1]
+fx = ramp(W, 0, W * .07) * ramp(W, 0, W * .07)[::-1]
+al = al * fy[:, None] * fx[None, :]
 rgb = np.clip(a / np.maximum(al[..., None], .3), 0, 255)
 full = Image.fromarray(np.dstack([rgb.astype(np.uint8), (al * 255).astype(np.uint8)]))
 bb = Image.fromarray(((al > .06) * 255).astype(np.uint8)).getbbox(); full = full.crop(bb)

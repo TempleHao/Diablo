@@ -34,6 +34,18 @@ try{
     for(const [id,l,r,t,b] of btns)if(l<0||r>w+1||t<0||b>h)problems.push(tag+': top button off screen '+id);
     if(!mobile){const L=await rect(page,'.gh-left'),R=await rect(page,'.gh-right');if(hit(L,R))problems.push(tag+': vitals and skill panel overlap');}
     const sw=await page.evaluate(()=>document.documentElement.scrollWidth);if(sw>w+1)problems.push(tag+': horizontal scroll '+sw);
+    // 登录页：标志完整在屏内、够大、不和表单相交；登录和游客按钮不用滚动就能看到
+    const lp=await ctx.newPage();await lp.route(/supabase\.co/,r=>r.abort());
+    await lp.goto('http://127.0.0.1:8766/2d/');await lp.waitForTimeout(700);
+    if(!(await lp.locator('#login').isVisible()))problems.push(tag+': login page not shown');
+    else{
+      const wrap=await rect(lp,'.login-logo-wrap'),img=await rect(lp,'.login-logo'),form=await rect(lp,'.login-form');
+      if(hit(wrap,form))problems.push(tag+': login logo overlaps form');
+      if(!img||img.t<-1||img.b>h+1)problems.push(tag+': login logo cut off vertically');
+      else if(img.b-img.t<h*.2)problems.push(tag+': login logo too small ('+Math.round(img.b-img.t)+'px)');
+      for(const s of ['#login-in','#login-guest']){const r=await rect(lp,s);if(!r||r.b>h+1||r.t<0||r.l<0||r.r>w+1)problems.push(tag+': '+s+' not visible without scrolling');}
+      const lsw=await lp.evaluate(()=>{const L=document.getElementById('login');return L.scrollWidth-L.clientWidth;});if(lsw>1)problems.push(tag+': login horizontal scroll');
+    }
     await ctx.close();
   }
   assert.deepEqual(problems,[],problems.join('\n'));
