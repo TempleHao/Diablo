@@ -33,3 +33,8 @@ test('drops lean hard to the current class; gambling only sells usable gear',()=
   assert.ok(wOk<w,'a few other-class weapons still drop for alts');
   for(let k=0;k<300;k++){const it=gambleItem(r,50,'weapon','g'+k,'assassin');if(!it.setId)assert.ok(canUseItem(it,'assassin'));}
 });
+test('one-click equip can pick a non-bow two-hander (no offhand is a legal pair)',()=>{
+  const p=freshSave();p.heroClass='barbarian';p.level=100;
+  const axe=mk('axe2',3,'weapon',c=>c.sub==='双手斧');p.inventory.push(axe);
+  smartEquip(p);assert.equal(p.equipped.weapon,'axe2');
+});

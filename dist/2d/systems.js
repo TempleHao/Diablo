@@ -62,8 +62,8 @@ export const isBow=item=>BOWS.has(catalogEntry(item)?.sub);
 export const isQuiver=item=>catalogEntry(item)?.sub==='箭囊';
 /** 副手能否与当前武器同时装备。 */
 export function offhandAllowed(weapon,offhand){
-  if(!weapon||weapon.hands!==2)return true;
-  return isBow(weapon)&&(!offhand||isQuiver(offhand));
+  if(!weapon||weapon.hands!==2||!offhand)return true;   // v1.3.1 修正：双手武器不带副手本来就合法（之前判成不合法，一键换装永远不会选双手武器）
+  return isBow(weapon)&&isQuiver(offhand);
 }
 const hashId=str=>{let h=2166136261;for(const ch of String(str)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 // 首领专属装备：名称固定，图标取同类型传奇图标。
