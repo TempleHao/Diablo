@@ -80,15 +80,15 @@ export const AFFIXES={
   mana:{name:'最大法力',min:6,max:24,slots:['head','robe','offhand','belt','amulet','ring1','ring2']},
   armor:{name:'护甲',min:3,max:18,slots:['head','shoulders','robe','gloves','belt','boots','offhand']},
   crit:{name:'暴击率 %',min:1,max:5,slots:['weapon','gloves','amulet','ring1','ring2']},
-  critDmg:{name:'暴击伤害 %',min:5,max:17,slots:['weapon','gloves','amulet','ring1','ring2']},
+  critDmg:{name:'暴击伤害 %',min:5,max:17,slots:['weapon','offhand','head','gloves','amulet','ring1','ring2']},
   haste:{name:'攻击/施法速度 %',min:2,max:9,slots:['weapon','gloves','offhand','amulet','ring1','ring2']},
-  fire:{name:'火焰增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
-  cold:{name:'冰霜增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
-  lightning:{name:'雷电增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
-  physical:{name:'物理增伤 %',min:3,max:13,slots:['weapon','gloves','amulet','ring1','ring2']},
-  poison:{name:'毒素增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
-  holy:{name:'神圣增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
-  shadow:{name:'暗影增伤 %',min:3,max:13,slots:['weapon','offhand','amulet','ring1','ring2']},
+  fire:{name:'火焰增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  cold:{name:'冰霜增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  lightning:{name:'雷电增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  physical:{name:'物理增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  poison:{name:'毒素增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  holy:{name:'神圣增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
+  shadow:{name:'暗影增伤 %',min:3,max:13,slots:['weapon','offhand','gloves','amulet','ring1','ring2']},
   move:{name:'移动速度 %',min:2,max:8,slots:['boots']},
   sk_amazon:{name:'亚马逊技能等级',min:1,max:1,cls:'amazon',slots:['weapon','offhand','amulet','head']},
   sk_assassin:{name:'刺客技能等级',min:1,max:1,cls:'assassin',slots:['weapon','offhand','amulet','head']},
@@ -263,7 +263,7 @@ const PCT_AFFIX=new Set(['crit','critDmg','haste','fire','cold','lightning','phy
 export const RARITY_AFFIX_MULT=Object.freeze([1,1,1.08,1.22,1.32]);
 export const affixScale=(key,ilvl)=>AFFIXES[key].max===1?1:PCT_AFFIX.has(key)?1+Math.min(MAX_LEVEL,Math.max(1,ilvl))/60*.7:1+(Math.min(MAX_LEVEL,Math.max(1,ilvl))-1)*.055;
 export const affixMax=(key,ilvl,rarity)=>Math.round(AFFIXES[key].max*affixScale(key,ilvl)*RARITY_AFFIX_MULT[rarity|0])+(key.startsWith('sk_')&&ilvl>=70?1:0);
-const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
+const ELEMENT={火:'fire',炎:'fire',霜:'cold',冰:'cold',雷:'lightning',毒:'poison',光:'holy',暗影:'shadow',暗:'shadow',血:'lifesteal',岩:'armor',风:'haste'};
 
 // ───────── 掉落规则（v0.7.2，向《暗黑破坏神 2》看齐，见 docs/2D-LOOT.md） ─────────
 // 思路：大部分击杀不掉东西；掉下来的大多是白/蓝；黄（史诗）是前中期的主力升级；
@@ -487,6 +487,8 @@ export function sanitizeParagon(raw,level){
   return out;
 }
 export const DIFFICULTY_RES_PENALTY=Object.freeze([0,-20,-40]);
+/** 职业强度系数：只在中后期生效（30 级以下 ×1，100 级满额），前期手感不变；满配时用它把七职业战力上限拉齐。 */
+export const classScale=(C,level)=>1+((C.dmgScale||1)-1)*Math.max(0,Math.min(1,((level|0)-30)/70));
 export function calculateStats(profile){
   const {extra,sets,legend}=equipmentBonus(profile);
   const value=(k,d=0)=>(extra[k]||0)+d;
@@ -496,7 +498,8 @@ export function calculateStats(profile){
   const off=profile.inventory.find(i=>i.id===profile.equipped?.offhand),osub=catalogEntry(off)?.sub||null;
   const pen=DIFFICULTY_RES_PENALTY[profile.difficulty|0]||0,allRes=value('allRes')+pg('res');
   const res=k=>Math.min(75,value(k)+allRes+pen);
-  return {cls,power:17+profile.level*3+value('power'),hp:Math.round((C.hp+(profile.level-1)*C.hpLv+value('hp'))*(1+pg('hp')/100)),
+  // v1.4 职业强度系数（C.dmgScale）：满配时七个职业的战力上限拉到相差 10% 以内，见 docs/2D-BALANCE.md
+  return {cls,power:Math.round((17+profile.level*3+value('power'))*classScale(C,profile.level)),hp:Math.round((C.hp+(profile.level-1)*C.hpLv+value('hp'))*(1+pg('hp')/100)),
     mana:C.mana+value('mana'),armor:Math.round((C.armor+value('armor'))*(1+pg('armor')/100)),
     crit:Math.min(70,5+C.crit+value('crit')+pg('crit')+legend.crit),critDmg:50+value('critDmg')+pg('critDmg'),
     weapon:wsub,attack:attackMode(cls,wsub),proficient:proficient(cls,wsub),offProficient:proficient(cls,osub),

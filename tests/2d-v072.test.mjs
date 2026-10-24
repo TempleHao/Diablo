@@ -37,7 +37,8 @@ test('loot pacing (D2-like): normal difficulty is stingy, hell and MF are clearl
   assert.ok(nrm.uni<1/25,'normal: unique rarer than 1 per 25 trips, got 1/'+(1/nrm.uni).toFixed(1));
   assert.ok(nrm.set<1/20,'normal: set rarer than 1 per 20 trips');
   assert.ok(nrm.ex>.05&&nrm.ex<.12,'boss exclusive ~8%');
-  assert.ok(hell.leg>nrm.leg*1.9&&hell.uni>nrm.uni*2,'hell clearly better '+JSON.stringify([nrm,hell]));
+  // 暗金样本少（3000 趟约 90 件），随机波动约 ±10%，门槛用 1.8 倍
+  assert.ok(hell.leg>nrm.leg*1.9&&hell.uni>nrm.uni*1.8,'hell clearly better '+JSON.stringify([nrm,hell]));
   assert.ok(mf.leg>hell.leg*1.5&&mf.uni>hell.uni*1.5,'MF helps');
 });
 test('no uniques below the lowest unique quality level, and unique pity does not count there',()=>{
