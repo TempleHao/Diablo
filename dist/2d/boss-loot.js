@@ -37,7 +37,7 @@ export function rollBossRewards(rng,level,region,previousKills,newId,{cls=null,m
   // 暗金保底只在「这个等级已经可能出暗金」时计数和触发（D2 同理：物品等级不够就没有暗金）
   const uniqueOk=Object.values(POOLS.unique).flat().some(c=>c.q<=level);
   const force=uniqueOk&&dry.unique>=P.unique-1?'unique':dry.legendary>=P.legendary-1?'legendary':null;
-  const drops=rollDrops(rng,{source:'boss',level,mf,cls,difficulty,newId,force,firstMin:firstKill?2:1});
+  const drops=rollDrops(rng,{source:'boss',level,mf,cls,difficulty,newId,force,firstMin:firstKill?2:1,region});
   const exclusive=rng()<(DROP_RULES.bossExclusive[difficulty]??DROP_RULES.bossExclusive[0]);
   if(exclusive){
     const scale=1+Math.floor(Math.max(1,level)/8)*.14;

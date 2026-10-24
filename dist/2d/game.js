@@ -21,7 +21,7 @@ import {skillIcon} from './ui-icons.js';
 import {HUD_STRIP} from './hud-strip-layout.js';
 import {HUD_BAR_M} from './hud-bar-layout.js';
 import {stepMotion,steer} from './motion.js';
-import {loreFor} from './naming.js';
+import {loreFor,originLabel} from './naming.js';
 import { TILE, WIDTH, HEIGHT, START, SAVE_KEY, clamp, distance, mulberry32, makeDungeon, walkable, moveWithCollision, freshSave, sanitizeSave, rebindKey, switchClass, respec, autoEquip, smartEquip, combatRating, blinkLanding, stats, expRequired, gainXp, createItem, equip, salvage, upgradeSkill, rankCap, paragonLeft, addParagon, resetParagon, sanitizeActive } from './core.js';
 const $ = id => document.getElementById(id);
 const canvas = $('game'), ctx = canvas.getContext('2d'), minimap = $('minimap').getContext('2d');
@@ -510,7 +510,7 @@ $('gamble-slot').onchange=refreshGamble;
 $('gamble-go').onclick=()=>{
   const slot=$('gamble-slot').value,cost=gambleCost(profile.level,slot);
   if(profile.gold<cost||profile.inventory.length>=MAX_ITEMS)return;
-  const item=gambleItem(rng,profile.level,slot,'gamble-'+Date.now()+'-'+(nextId++),profile.heroClass);
+  const item=gambleItem(rng,profile.level,slot,'gamble-'+Date.now()+'-'+(nextId++),profile.heroClass,profile.region|0);
   if(!item)return;
   profile.gold-=cost;profile.inventory.push(item);
   if(item.rarity>=3&&profile.pity){profile.pity.legendary=0;if(item.rarity===4&&!item.setId)profile.pity.unique=0;}
@@ -565,7 +565,7 @@ function inspectItem(item){
   const panel=$('item-inspect');panel.replaceChildren();
   if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('compare-pair').replaceChildren();$('ring-choice').hidden=true;$('mobile-item-name').textContent='点选背包中的装备';$('mobile-equip').disabled=true;$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity+(item.setId?' rarity-set':'');title.textContent=item.name;
-  const meta=document.createElement('small');meta.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · 物品等级 '+item.ilvl+' · '+slotLabel(item);
+  const meta=document.createElement('small');meta.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · 物品等级 '+item.ilvl+' · '+slotLabel(item)+(item.origin?' · '+originLabel(item.origin):'');
   const tooLow=(item.req||1)>profile.level,wrongCls=!canUseItem(item,profile.heroClass);
   const reqLine=document.createElement('small');reqLine.className='item-req'+(tooLow?' is-blocked':'');reqLine.textContent='需求等级 '+(item.req||1)+(tooLow?'（当前 '+profile.level+' 级，不能穿戴）':'');
   const clsLine=document.createElement('small');clsLine.className='item-req item-cls'+(wrongCls?' is-blocked':'');
@@ -587,7 +587,7 @@ function inspectItem(item){
     panel.append(fx);
   }
   if(info?.cls){const fit=document.createElement('small');fit.className='item-class';fit.textContent='风格：'+info.cls+(info.h===2?' · 双手'+(isBow(item)?'（可配箭袋）':''):'');panel.append(fit);}
-  if(info?.lore&&item.rarity===4){const lore=document.createElement('p');lore.className='item-lore';lore.textContent=loreFor(info,item.name);panel.append(lore);}
+  if(item.rarity>=3&&!item.setId&&loreFor(info)){const lore=document.createElement('p');lore.className='item-lore';lore.textContent=loreFor(info);panel.append(lore);}
   if(item.legacy){const old=document.createElement('p');old.className='score-down';old.textContent='旧版装备槽已取消：不能穿戴，可以分解换材料。';panel.append(old);}
   if(item.setId){
     const set=SETS[item.setId],count=Object.values(profile.equipped).map(id=>profile.inventory.find(i=>i.id===id)).filter(i=>i?.setId===item.setId).length;
@@ -1012,7 +1012,7 @@ function dealDamage(e,damage,school='physical',opts={}){
   for(const pr of L.procs)if(pr.on==='kill'&&rng()*100<pr.chance)procCast(pr,e);
   if(advanced){const s=stats(profile);hero.maxHp=s.hp;hero.maxMana=s.mana;hero.hp=s.hp;hero.mana=s.mana;hsCache=null;
     announce('等级提升 · '+profile.level+'级！'+(profile.level>60?' · 获得巅峰点':''),true);refreshWorldPickers();}
-  if(!bossDied)for(const item of rollDrops(rng,{source:e.elite?'elite':'normal',level:e.level||monsterLevel(),mf:heroStats().mf,cls:profile.heroClass,difficulty:profile.difficulty|0,newId:()=>'ember2d-'+Date.now()+'-'+nextId++})){if(item.rarity>=3)tripLoot.legend=true;if(item.rarity===4&&!item.setId)tripLoot.unique=true;dropItem(e.x+(rng()-.5)*30,e.y+(rng()-.5)*20,item);}
+  if(!bossDied)for(const item of rollDrops(rng,{source:e.elite?'elite':'normal',level:e.level||monsterLevel(),mf:heroStats().mf,cls:profile.heroClass,difficulty:profile.difficulty|0,region:profile.region|0,newId:()=>'ember2d-'+Date.now()+'-'+nextId++})){if(item.rarity>=3)tripLoot.legend=true;if(item.rarity===4&&!item.setId)tripLoot.unique=true;dropItem(e.x+(rng()-.5)*30,e.y+(rng()-.5)*20,item);}
   if(bossDied){
     const region=profile.region,dif=profile.difficulty|0,previousKills=profile.bossKills[dif][region]||0;
     const reward=rollBossRewards(rng,e.level||monsterLevel(true),region,previousKills,()=> 'boss-'+Date.now()+'-'+(nextId++),{cls:profile.heroClass,mf:heroStats().mf,difficulty:dif,pity:profile.pity});

@@ -5,7 +5,9 @@ import {CATALOG} from './equipment-catalog.js';
 import {CLASS_BASES,CLASS_LEGENDS,SET_PIECES,CLASS_SET_NAMES} from './class-catalog.js';
 import {CLASSES,CLASS_IDS,CLASS_BY_CATALOG,proficient,attackMode,WEAPON_TYPES} from './classes.js';
 import {CLASS_SKILLS} from './class-skills.js';
-import {nameItem,BASES as NAME_BASES,baseIndex} from './naming.js';
+import {nameItem,setName,setPieceWord,baseName,originOf} from './naming.js';
+import {NAMING} from './naming-data.js';
+import {CLASS_BASES_V2} from './class-catalog-v2.js';
 import {powersOf,emptyLegend,addPower} from './legendary.js';
 export {CLASSES,CLASS_IDS,proficient,attackMode};
 // v0.4：装备槽与「黑铁遗珍」装备库对齐（11 槽）。双手武器占用副手；弓弩例外，可以配箭袋。
@@ -26,7 +28,8 @@ export const SET_COLOR='#5fd36b';
 // 旧图鉴：品质决定图集（N/M/E/L/U）。v0.7 职业图鉴自带图集 a（C-职业 基底，K-职业 传奇）。
 const OLD=CATALOG.map(c=>({...c,a:'NMELU'[c.r]}));
 const LEGENDS=CLASS_LEGENDS.map(c=>({...c,r:3}));
-const ALL=[...OLD,...CLASS_BASES.map(c=>({...c,r:-1})),...LEGENDS].map(Object.freeze);
+// v1.6：第二批职业装备图（C2-职业）。没有手写名，显示名由 naming.js 生成
+const ALL=[...OLD,...CLASS_BASES.map(c=>({...c,r:-1})),...CLASS_BASES_V2.map(c=>({...c,r:-1,n:baseName(c,'e')})),...LEGENDS].map(Object.freeze);
 export const CATALOG_BY_ID=new Map(ALL.map(c=>[c.id,c]));
 export const slotGroup=slot=>slot==='ring2'?'ring1':slot;
 const bySlot=list=>{const m={};for(const c of list)(m[c.s]||=[]).push(c);for(const k in m)m[k].sort((a,b)=>a.q-b.q);return m;};
@@ -52,7 +55,7 @@ export function itemClasses(item){
   if(set?.cls)return [set.cls];
   if(item.rarity>=3&&!item.setId){const o=e.owner||CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
   // v1.5：用户给的七张职业装备图（art/equipment/C-<职业>）上的每一件，都只属于那个职业——防具、首饰也一样
-  if(typeof e.a==='string'&&e.a.startsWith('C-')){const o=CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
+  if(typeof e.a==='string'&&/^C2?-/.test(e.a)){const o=CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
   if((e.s==='weapon'||e.s==='offhand')&&TYPE_USERS.has(e.sub))return [...TYPE_USERS.get(e.sub)];
   return null;
 }
@@ -115,17 +118,16 @@ export const AFFIXES={
 // 套装：旧版两套（按部位）+ v0.7 七职业套装（按图鉴编号，4 件）
 const piecesOf=cls=>SET_PIECES.filter(p=>p.set===cls).map(p=>p.base);
 export const SETS={
-  dragonflame:{name:'龙焰法衣',q:8,slots:['head','robe','gloves'],size:3,
+  dragonflame:{name:'祝融',q:8,slots:['head','robe','gloves'],size:3,
     bonus:{2:{fire:15},3:{}},text:{2:'火焰增伤 +15%',3:'每第三次火系命中附加爆炎'}},
-  warden:{name:'监牢审判',q:14,slots:['weapon','offhand','belt'],size:3,
+  warden:{name:'皋陶',q:14,slots:['weapon','offhand','belt'],size:3,
     bonus:{2:{armor:25},3:{hp:70,crit:5}},text:{2:'护甲 +25',3:'生命 +70 与暴击率 +5%'}}
 };
 for(const cls of CLASS_IDS){
-  SETS['set_'+cls]={name:CLASS_SET_NAMES[cls],q:36,cls,cids:piecesOf(cls),size:4,
+  SETS['set_'+cls]={name:setName(cls)||CLASS_SET_NAMES[cls],q:36,cls,cids:piecesOf(cls),size:4,
     bonus:{2:{['sk_'+cls]:1,hp:60},3:{allRes:12,mf:30},4:{powers:[{k:'dmg',pct:30},{k:'cdrAll',pct:15},{k:'allSkill',n:1}]}},
     text:{2:'+1 '+CLASSES[cls].name+'技能等级，生命 +60',3:'全部抗性 +12%，寻宝几率 +30%',4:'伤害 +30%，全部技能冷却 -15%，+1 全部技能等级'}};
 }
-const SET_PIECE_WORD={weapon:'武装',offhand:'圣物',head:'冠冕',robe:'战衣',gloves:'之握',boots:'足迹',belt:'束带',amulet:'护符',ring1:'指环',shoulders:'肩铠'};
 export const setFits=(setId,entry,slot)=>{const s=SETS[setId];if(!s||!entry)return false;return s.cids?s.cids.includes(entry.id):s.slots.includes(slot);};
 // v0.4.1：31 个技能，分火、冰、雷、奥术四系。按键不再绑死在技能上，由技能栏的格子决定。
 export const SKILL_SCHOOLS=Object.freeze({fire:'火焰',cold:'冰霜',lightning:'雷电',arcane:'奥术'});
@@ -231,7 +233,7 @@ export function normalizeItem(item) {
     else if(boss&&boss.s===slotGroup(item.slot))entry=boss;
     else{
       // 旧存档补图鉴：只从通用的黑铁遗珍里挑，免得旧装备被分到别的职业名下穿不上
-      const all=catalogPool(rarity,item.slot),plain=all.filter(c=>!String(c.a||'').startsWith('C-')),named=plain.filter(c=>c.sub&&item.name.includes(c.sub)),pool=named.length?named:plain.length?plain:all;   // 名字里有武器类型（如「焦木法杖」）就挑同类型
+      const all=catalogPool(rarity,item.slot),plain=all.filter(c=>!/^C2?-/.test(String(c.a||''))),named=plain.filter(c=>c.sub&&item.name.includes(c.sub)),pool=named.length?named:plain.length?plain:all;   // 名字里有武器类型（如「焦木法杖」）就挑同类型
       entry=pool[hashId(item.id)%pool.length];
       name=entry.n;
     }
@@ -240,10 +242,10 @@ export function normalizeItem(item) {
   const ilvl=safeNum(item.ilvl||1,MAX_LEVEL)||1;
   // 命名（naming.js）：首领专属保留原名；套装 =「套装名·部位」；职业传奇用图鉴专名；其余按品质规则生成
   if(entry&&!BOSS_ITEM_ICONS[name]){
-    if(setId)name=SETS[setId].name+'·'+(SETS[setId].cids?SET_PIECE_WORD[slotGroup(item.slot)]:NAME_BASES[baseIndex(entry.id)]?.n||entry.n);
+    if(setId)name=SETS[setId].name+'·'+setPieceWord(item.slot);
     else{
       const maxes=Object.fromEntries(Object.keys(AFFIXES).map(k=>[k,affixMax(k,ilvl,rarity)]));
-      name=nameItem({id:item.id,cid:entry.id,ilvl,affixes},rarity,maxes,entry);
+      name=nameItem({id:item.id,cid:entry.id,ilvl,affixes,origin:item.origin},rarity,maxes,entry);
     }
   }
   const req=Number.isFinite(item.req)?Math.max(1,Math.min(MAX_LEVEL,Math.floor(item.req))):1;
@@ -251,7 +253,7 @@ export function normalizeItem(item) {
     id:item.id,slot:item.slot,name,rarity,ilvl,req,
     power:safeNum(item.power),hp:safeNum(item.hp),mana:safeNum(item.mana),
     armor:safeNum(item.armor),value:safeNum(item.value,99999),affixes,setId,
-    cid:entry?.id||null,hands:entry?.h===2?2:1,legacy,
+    cid:entry?.id||null,hands:entry?.h===2?2:1,legacy,origin:entry?originOf(item,entry):null,
     favorite:item.favorite===true,tempered:item.tempered===true
   };
 }
@@ -326,17 +328,21 @@ export function pickBase(rng,slot,ilvl,cls=null,strict=false){
   if(cls&&(strict||rng()<DROP_RULES.ownClass)){const mine=pool.filter(c=>ownsEntry(c,cls)||c.cls==='全职业');if(mine.length)pool=mine;}
   return weightedPick(rng,pool,c=>.06+3*(c.q/Math.max(ilvl,1))**3);
 }
-function pickNamed(rng,kind,slot,ilvl,cls,strict=false){
+function pickNamed(rng,kind,slot,ilvl,cls,strict=false,origin=null){
   const src=POOLS[kind];
   let pool=slot?(src[slotGroup(slot)]||[]):Object.values(src).flat();
   pool=pool.filter(c=>c.q<=ilvl);
   if(cls&&(strict||rng()<DROP_RULES.ownNamed)){const mine=pool.filter(c=>(ownsEntry(c,cls)||c.cls==='全职业')&&typeOk(c,cls));if(mine.length)pool=mine;}
+  if(origin){const same=pool.filter(c=>NAMING.NAMED[c.id]?.[1]===origin);if(same.length)pool=same;}
   // v0.7.3：越接近物品等级的传奇 / 暗金越常见（地狱多出高品级的，低品级的仍偶尔出现）
   return pool.length?weightedPick(rng,pool,c=>.12+2*(c.q/Math.max(ilvl,1))**3):null;
 }
 /** 掉落装备。opts：source normal/elite/boss，cls 当前职业，mf 寻宝几率，difficulty 难度，min 保底品质，force 强制品质。
  *  兼容旧调用：{boss:true} 等同 source:'boss'。 */
-export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null,slot:wantSlot=null,entry:forceEntry=null,strict=false}={}){
+/** v1.6 出身：前几张图多掉东土遗物，后几张多掉西境遗物（第 1 图 80% 东土 → 第 9 图 80% 西境），九张图平均各半。 */
+export const eastChance=region=>Number.isInteger(region)&&region>=0?.8-.6*Math.min(8,region)/8:.5;
+export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null,slot:wantSlot=null,entry:forceEntry=null,strict=false,region=null}={}){
+  const origin=rng()<eastChance(region)?'e':'w';
   const n=Math.max(1,Math.min(MAX_LEVEL,Math.floor(level)||1));
   source=source||(boss?'boss':'normal');
   let {rarity,set}=rollQuality(rng,{ilvl:n,mf,source,difficulty,min,force});
@@ -354,7 +360,7 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
     }else rarity=3;
   }
   // 与 D2 相同：没有物品等级够得上的传奇/暗金时，降为史诗
-  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',wantSlot,n,cls,strict);if(!entry)rarity=2;}
+  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',wantSlot,n,cls,strict,origin);if(!entry)rarity=2;}
   if(!entry){
     // 只在有符合物品等级基底的部位里抽（比如护肩最低品级 5，1-4 级不出护肩）
     const slots=Object.keys(DROP_RULES.slotWeight).filter(s=>(POOLS.base[slotGroup(s)]||[]).some(c=>c.q<=n));
@@ -395,7 +401,7 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   const qb=Math.max(1,Math.round((entry.q||n)*.75+n*.25),rarity>=3?Math.round(n*.85):0);
   const rmul=[1,1.2,1.4,1.65,1.85][rarity]*(setId?.95:1);
   return normalizeItem({
-    id,slot,rarity,ilvl:n,name:entry.n,cid:entry.id,setId,
+    id,slot,rarity,ilvl:n,name:entry.n,cid:entry.id,setId,origin,
     req:requiredLevel(entry,rarity,n,affixes,setId),
     // 武器强度按攻速归一：慢武器单次更痛、快武器出手更多（÷√攻速），双手 ×1.4
     power:weaponSlot?Math.round((6+qb*2.5)*rmul*(twoHand?1.4:1)/Math.sqrt(WEAPON_TYPES[entry.sub]?.speed||1)):quiver?Math.round((3+qb*.9)*(1+rarity*.2)):0,
@@ -406,13 +412,13 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   });
 }
 /** 一次击杀掉落的全部装备（不含金币）。pityHit：首领保底触发时强制一件传奇。 */
-export function rollDrops(rng,{source='normal',level=1,mf=0,cls=null,difficulty=0,newId,force=null,firstMin=null}){
+export function rollDrops(rng,{source='normal',level=1,mf=0,cls=null,difficulty=0,newId,force=null,firstMin=null,region=null}){
   const out=[];
   for(const [i,p] of (DROP_RULES.picks[source]||DROP_RULES.picks.normal).entries()){
     if(rng()>=p)continue;
     // 首领第一件至少魔法（首杀时至少史诗，由 boss-loot 传入 firstMin）
     const min=i===0?(firstMin??(source==='boss'?1:0)):0;
-    out.push(makeLoot(rng,level,newId(),{source,cls,mf,difficulty,min,force:i===0?force:null}));
+    out.push(makeLoot(rng,level,newId(),{source,cls,mf,difficulty,min,force:i===0?force:null,region}));
   }
   return out;
 }
@@ -429,10 +435,10 @@ export function gambleQuality(rng){
   return 'magic';
 }
 /** 赌一件：物品等级 = 角色等级 −5 ~ +4（D2 赌博同样有物品等级浮动）。返回装备或 null。 */
-export function gambleItem(rng,level,slot,id,cls=null){
+export function gambleItem(rng,level,slot,id,cls=null,region=null){
   if(!GAMBLE_SLOTS.includes(slot))return null;
   const ilvl=Math.max(1,Math.min(MAX_LEVEL,(level|0)-5+Math.floor(rng()*10)));
-  return makeLoot(rng,ilvl,id,{cls,slot,force:gambleQuality(rng),strict:!!cls});   // 赌博买的一定是自己能用的
+  return makeLoot(rng,ilvl,id,{cls,slot,force:gambleQuality(rng),strict:!!cls,region});   // 赌博买的一定是自己能用的
 }
 /** 新角色起始装备：本职业最低品级的武器（普通品质）+ 一件胸甲，开局不用空手。 */
 export function starterKit(cls,newId){

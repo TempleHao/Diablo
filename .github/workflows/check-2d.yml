@@ -48,6 +48,8 @@ jobs:
           node --check dist/2d/hud-strip-layout.js
           node --check dist/2d/hud-orb-layout.js
           node --check dist/2d/hud-bar-layout.js
+          node --check dist/2d/naming-data.js
+          node --check dist/2d/class-catalog-v2.js
           node --check dist/2d/online.js
           node --check dist/2d/online-config.js
           node --check dist/2d/select-art.js

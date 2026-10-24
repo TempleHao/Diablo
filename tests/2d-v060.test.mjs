@@ -4,7 +4,8 @@ import {existsSync} from 'node:fs';
 import {MONSTERS,TIER,REGION_MONSTERS,waveMonsters} from '../dist/2d/monsters.js';
 import {SPRITES,HERO_RIG} from '../dist/2d/sprite-data.js';
 import {report,SKILL_BAL,budget} from '../dist/2d/balance.js';
-import {LEGENDARY,UNIQUE,BASES,nameItem} from '../dist/2d/naming.js';
+import {nameItem,nameProblems,originOf} from '../dist/2d/naming.js';
+import {NAMING} from '../dist/2d/naming-data.js';
 import {makeLoot,catalogEntry,catalogPool,normalizeItem,AFFIXES,affixMax,SKILLS} from '../dist/2d/systems.js';
 import {mulberry32,blinkLanding,walkable} from '../dist/2d/core.js';
 import {swingPose} from '../dist/2d/pixel-mage-demo.js';
@@ -43,29 +44,34 @@ test('blink teleports through walls and never lands inside one',()=>{
   const p=blinkLanding({x:150,y:200},{x:220,y:200},17,d);assert.ok(walkable(p.x,p.y,17,d));
   const q=blinkLanding({x:330,y:180},{x:430,y:180},17,d);assert.ok(walkable(q.x,q.y,17,d)&&q.x<400);
 });
-test('item names: rules per rarity, deterministic, hand-written legendary/unique names are unique',()=>{
-  assert.equal(new Set(LEGENDARY.slice(1)).size,100);assert.equal(new Set(UNIQUE.slice(1)).size,100);
-  assert.equal(new Set([...LEGENDARY.slice(1),...UNIQUE.slice(1)]).size,200);
+test('item names (v1.6): east/west lexicons never mix, named items fixed and unique, deterministic',()=>{
+  const named=Object.values(NAMING.NAMED).map(x=>x[0]);
+  assert.equal(new Set(named).size,named.length,'legendary/unique names are unique');
+  const allE=new Set([...NAMING.EPIC_E]),allW=new Set([...NAMING.EPIC_W]);
   const r=mulberry32(21);
-  for(let k=0;k<600;k++){
-    const it=makeLoot(r,1+k%60,'n'+k,{boss:k%4===0}),e=catalogEntry(it),b=BASES[Number(e.id.slice(-3))];
-    if(it.setId)continue;
-    // v0.7 职业图鉴：基底名自带品阶词；职业传奇用图鉴专名
-    if(/^C[BL]-/.test(e.id)){
-      if(it.rarity===0)assert.equal(it.name,e.n);
-      if(it.rarity===1)assert.ok(it.name.includes(e.n),it.name);
-      if(it.rarity===3)assert.equal(it.name,e.n);
-      assert.equal(normalizeItem(JSON.parse(JSON.stringify(it))).name,it.name,'stable across save/load');
-      continue;
-    }
-    if(it.rarity===0)assert.ok(it.name.endsWith(b.n)||it.name.endsWith(b.n.slice(1)),it.name);
-    if(it.rarity===1)assert.ok(it.name.includes(b.n)||it.name.includes(b.n.slice(1)),it.name);
-    if(it.rarity===3)assert.equal(it.name,LEGENDARY[Number(e.id.slice(-3))]);
-    if(it.rarity===4)assert.equal(it.name,UNIQUE[Number(e.id.slice(-3))]);
+  for(let k=0;k<800;k++){
+    const it=makeLoot(r,1+k%99,'n'+k,{boss:k%4===0,region:k%9}),e=catalogEntry(it);
+    assert.ok(it.origin==='e'||it.origin==='w');
+    if(it.rarity>=3&&!it.setId)assert.equal(it.name,NAMING.NAMED[e.id][0]);
+    if(it.rarity===2&&!it.setId){const head=[...allE,...allW].find(w=>it.name.startsWith(w));assert.ok(head,it.name);
+      assert.ok((it.origin==='e'?allE:allW).has(head),'epic imagery follows origin '+it.name);}
+    assert.deepEqual(nameProblems(it.name),[],it.name);
+    assert.ok([...it.name.replace('·','')].length<=8,it.name);
     assert.equal(normalizeItem(JSON.parse(JSON.stringify(it))).name,it.name,'stable across save/load');
   }
-  const pool=catalogPool(1,'weapon').filter(c=>c.id.startsWith('EQ-')),x={id:'z',cid:pool[0].id,ilvl:30,affixes:[{key:'fire',value:affixMax('fire',30,1)},{key:'haste',value:3}]};
-  const nm=nameItem(x,1,{fire:affixMax('fire',30,1)});assert.ok(nm.startsWith('炽焰')&&nm.endsWith('·疾风'),nm);
+  const pool=catalogPool(1,'weapon').filter(c=>c.sub==='长剑'),x={id:'z',cid:pool[0].id,ilvl:30,origin:'e',affixes:[{key:'fire',value:affixMax('fire',30,1)},{key:'hp',value:3}]};
+  assert.equal(nameItem(x,1,{fire:affixMax('fire',30,1)},pool[0]).replace(/长剑|汉剑/,'X'),'燎X·熊');
+  assert.equal(nameItem({...x,origin:'w'},1,{fire:affixMax('fire',30,1)},pool[0]).replace(/阔剑|长剑/,'X'),'熔铸X·狼');
+});
+test('named items: every class gets half east, half west; early maps drop east, late maps west',()=>{
+  const per={};for(const [id,[n,o]] of Object.entries(NAMING.NAMED)){const e=catalogEntry({cid:id});const c=e.owner||({'亚马逊':'amazon','刺客':'assassin','野蛮人':'barbarian','德鲁伊':'druid','死灵法师':'necro','圣骑士':'paladin','法师':'mage'})[e.cls]||'all';(per[c]||={e:0,w:0})[o]++;}
+  for(const [c,v] of Object.entries(per))assert.ok(Math.abs(v.e-v.w)<=1,c+' '+JSON.stringify(v));
+  const r=mulberry32(5),share=reg=>{let e=0;for(let k=0;k<2000;k++)if(makeLoot(r,40,'o'+reg+k,{region:reg}).origin==='e')e++;return e/2000;};
+  assert.ok(share(0)>.72&&share(8)<.28&&Math.abs(share(4)-.5)<.06);
+});
+test('name quality: no banned words, at most one dark image, every named item has a source note',()=>{
+  for(const [n,,note] of Object.values(NAMING.NAMED)){assert.deepEqual(nameProblems(n),[],n);assert.ok(note&&note.length>=4,n);}
+  for(const list of [NAMING.EPIC_E,NAMING.EPIC_W])for(const w of list)assert.deepEqual(nameProblems(w),[],w);
 });
 test('balance: every damage skill lands on its budget; basic attacks equal; spam DPS across classes within a band',()=>{
   const rows=report();

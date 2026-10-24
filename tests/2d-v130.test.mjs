@@ -5,7 +5,7 @@ import {makeLoot,gambleItem,itemClasses,canUseItem,normalizeItem,catalogPool,SET
 import {freshSave,sanitizeSave,equip,smartEquip,mulberry32} from '../dist/2d/core.js';
 const mk=(id,rarity,slot,f,extra={})=>normalizeItem({id,slot,name:'x',rarity,ilvl:40,power:10,hp:0,mana:0,armor:5,affixes:[],cid:catalogPool(rarity,slot).find(f).id,...extra});
 test('weapons are limited to classes that use the type; plain armor is shared',()=>{
-  const axe=mk('axe',1,'weapon',c=>c.sub==='双手斧'),staff=mk('st',1,'weapon',c=>c.sub==='法杖'),helm=mk('h',2,'head',c=>!String(c.a||'').startsWith('C-'));
+  const axe=mk('axe',1,'weapon',c=>c.sub==='双手斧'),staff=mk('st',1,'weapon',c=>c.sub==='法杖'),helm=mk('h',2,'head',c=>!/^C2?-/.test(String(c.a||'')));
   assert.ok(canUseItem(axe,'barbarian'));assert.ok(!canUseItem(axe,'mage'));
   assert.ok(canUseItem(staff,'mage'));assert.ok(!canUseItem(staff,'barbarian'));
   assert.equal(itemClasses(helm),null);for(const c of ['mage','barbarian','assassin'])assert.ok(canUseItem(helm,c));
