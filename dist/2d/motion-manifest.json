@@ -1,0 +1,1730 @@
+{
+  "title": "Guixu motion baseline — review only",
+  "version": "2026-10-23-motion-review-v1",
+  "counts": {
+    "heroes": 7,
+    "monsters": 100,
+    "summons": 10,
+    "followers": 5,
+    "total": 122
+  },
+  "actions": {
+    "idle": {
+      "fps": 8
+    },
+    "walk": {
+      "fps": 12
+    },
+    "attack": {
+      "fps": 12
+    },
+    "skill": {
+      "fps": 10
+    },
+    "hit": {
+      "fps": 12
+    },
+    "death": {
+      "fps": 9
+    }
+  },
+  "status": "reference motion controller, not final authored animation frames",
+  "entries": [
+    {
+      "id": "amazon",
+      "label": "亚马逊",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        0,
+        0,
+        112,
+        200
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "assassin",
+      "label": "刺客",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        580,
+        202,
+        119,
+        169
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "barbarian",
+      "label": "野蛮人",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        268,
+        202,
+        154,
+        174
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "druid",
+      "label": "德鲁伊",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        696,
+        0,
+        160,
+        189
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "necro",
+      "label": "死灵法师",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        420,
+        0,
+        136,
+        194
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "paladin",
+      "label": "圣骑士",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        0,
+        202,
+        132,
+        179
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "mage",
+      "label": "白袍男法师",
+      "kind": "hero",
+      "source": "art/heroes.webp",
+      "rect": [
+        114,
+        0,
+        190,
+        200
+      ],
+      "animationGrade": "existing-static-rig"
+    },
+    {
+      "id": "N001",
+      "label": "N001",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1658,
+        116,
+        124
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N002",
+      "label": "N002",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        743,
+        1391,
+        140,
+        131
+      ],
+      "foot": 88,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N003",
+      "label": "N003",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        806,
+        1099,
+        127,
+        145
+      ],
+      "foot": 73,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N004",
+      "label": "N004",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        118,
+        1658,
+        127,
+        123
+      ],
+      "foot": 35,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N005",
+      "label": "N005",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1784,
+        165,
+        112
+      ],
+      "foot": 61,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N006",
+      "label": "N006",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        320,
+        1784,
+        150,
+        109
+      ],
+      "foot": 50,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N007",
+      "label": "N007",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        472,
+        1784,
+        158,
+        108
+      ],
+      "foot": 99,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N008",
+      "label": "N008",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1368,
+        1391,
+        126,
+        130
+      ],
+      "foot": 65,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N009",
+      "label": "N009",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1834,
+        1528,
+        137,
+        126
+      ],
+      "foot": 84,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N010",
+      "label": "N010",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        891,
+        1658,
+        137,
+        119
+      ],
+      "foot": 83,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N011",
+      "label": "N011",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1802,
+        1658,
+        165,
+        113
+      ],
+      "foot": 79,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N012",
+      "label": "N012",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1300,
+        1249,
+        137,
+        136
+      ],
+      "foot": 71,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N013",
+      "label": "N013",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1600,
+        1249,
+        148,
+        135
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N014",
+      "label": "N014",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        891,
+        1528,
+        155,
+        127
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N015",
+      "label": "N015",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1750,
+        1249,
+        135,
+        135
+      ],
+      "foot": 67,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N016",
+      "label": "N016",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        645,
+        935,
+        135,
+        158
+      ],
+      "foot": 107,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N017",
+      "label": "N017",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1649,
+        1391,
+        165,
+        129
+      ],
+      "foot": 88,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N018",
+      "label": "N018",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        607,
+        1391,
+        134,
+        132
+      ],
+      "foot": 99,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N019",
+      "label": "N019",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1528,
+        124,
+        128
+      ],
+      "foot": 55,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N020",
+      "label": "N020",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1048,
+        1528,
+        156,
+        127
+      ],
+      "foot": 69,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N021",
+      "label": "N021",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        126,
+        1528,
+        155,
+        128
+      ],
+      "foot": 84,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N022",
+      "label": "N022",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        167,
+        1784,
+        151,
+        110
+      ],
+      "foot": 49,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N023",
+      "label": "N023",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1206,
+        1528,
+        165,
+        127
+      ],
+      "foot": 90,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N024",
+      "label": "N024",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1373,
+        1528,
+        137,
+        127
+      ],
+      "foot": 69,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N025",
+      "label": "N025",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        450,
+        1391,
+        155,
+        133
+      ],
+      "foot": 39,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N026",
+      "label": "N026",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1496,
+        1391,
+        151,
+        130
+      ],
+      "foot": 61,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N027",
+      "label": "N027",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1639,
+        1658,
+        161,
+        114
+      ],
+      "foot": 47,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N028",
+      "label": "N028",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1887,
+        1249,
+        151,
+        135
+      ],
+      "foot": 41,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N029",
+      "label": "N029",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1391,
+        148,
+        135
+      ],
+      "foot": 60,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "N030",
+      "label": "N030",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        150,
+        1391,
+        153,
+        135
+      ],
+      "foot": 94,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E001",
+      "label": "E001",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        627,
+        745,
+        213,
+        178
+      ],
+      "foot": 125,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E002",
+      "label": "E002",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        782,
+        935,
+        213,
+        157
+      ],
+      "foot": 127,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E003",
+      "label": "E003",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1444,
+        1099,
+        194,
+        142
+      ],
+      "foot": 103,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E004",
+      "label": "E004",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        935,
+        213,
+        162
+      ],
+      "foot": 78,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E005",
+      "label": "E005",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        842,
+        745,
+        213,
+        177
+      ],
+      "foot": 95,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E006",
+      "label": "E006",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1668,
+        506,
+        210,
+        189
+      ],
+      "foot": 86,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E007",
+      "label": "E007",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        161,
+        1099,
+        213,
+        148
+      ],
+      "foot": 120,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E008",
+      "label": "E008",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1212,
+        935,
+        204,
+        151
+      ],
+      "foot": 87,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E009",
+      "label": "E009",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        745,
+        195,
+        188
+      ],
+      "foot": 84,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E010",
+      "label": "E010",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        412,
+        745,
+        213,
+        182
+      ],
+      "foot": 119,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E011",
+      "label": "E011",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1702,
+        745,
+        212,
+        163
+      ],
+      "foot": 49,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E012",
+      "label": "E012",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1272,
+        745,
+        213,
+        170
+      ],
+      "foot": 126,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E013",
+      "label": "E013",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1418,
+        935,
+        198,
+        151
+      ],
+      "foot": 93,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E014",
+      "label": "E014",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        215,
+        935,
+        213,
+        160
+      ],
+      "foot": 117,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E015",
+      "label": "E015",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        197,
+        745,
+        213,
+        184
+      ],
+      "foot": 119,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E016",
+      "label": "E016",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        430,
+        935,
+        213,
+        160
+      ],
+      "foot": 83,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E017",
+      "label": "E017",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        935,
+        1099,
+        197,
+        145
+      ],
+      "foot": 94,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E018",
+      "label": "E018",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1776,
+        1099,
+        213,
+        140
+      ],
+      "foot": 118,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E019",
+      "label": "E019",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1057,
+        745,
+        213,
+        173
+      ],
+      "foot": 86,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E020",
+      "label": "E020",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        376,
+        1099,
+        213,
+        148
+      ],
+      "foot": 129,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E021",
+      "label": "E021",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1618,
+        935,
+        195,
+        151
+      ],
+      "foot": 101,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E022",
+      "label": "E022",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        591,
+        1099,
+        213,
+        148
+      ],
+      "foot": 106,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E023",
+      "label": "E023",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1487,
+        745,
+        213,
+        167
+      ],
+      "foot": 82,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E024",
+      "label": "E024",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1815,
+        935,
+        213,
+        149
+      ],
+      "foot": 130,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "E025",
+      "label": "E025",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        997,
+        935,
+        213,
+        153
+      ],
+      "foot": 79,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C001",
+      "label": "C001",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1640,
+        1099,
+        134,
+        141
+      ],
+      "foot": 57,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C002",
+      "label": "C002",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        305,
+        1391,
+        143,
+        135
+      ],
+      "foot": 67,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C003",
+      "label": "C003",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1156,
+        1249,
+        142,
+        138
+      ],
+      "foot": 60,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C004",
+      "label": "C004",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1439,
+        1249,
+        159,
+        136
+      ],
+      "foot": 62,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C005",
+      "label": "C005",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1134,
+        1099,
+        149,
+        144
+      ],
+      "foot": 49,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C006",
+      "label": "C006",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        283,
+        1528,
+        145,
+        128
+      ],
+      "foot": 62,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C007",
+      "label": "C007",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1352,
+        1658,
+        159,
+        116
+      ],
+      "foot": 64,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C008",
+      "label": "C008",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1512,
+        1528,
+        159,
+        127
+      ],
+      "foot": 77,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C009",
+      "label": "C009",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1030,
+        1658,
+        159,
+        119
+      ],
+      "foot": 73,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C010",
+      "label": "C010",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1285,
+        1099,
+        157,
+        144
+      ],
+      "foot": 67,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C011",
+      "label": "C011",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        885,
+        1391,
+        159,
+        131
+      ],
+      "foot": 65,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C012",
+      "label": "C012",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1046,
+        1391,
+        159,
+        131
+      ],
+      "foot": 76,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C013",
+      "label": "C013",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1099,
+        159,
+        148
+      ],
+      "foot": 134,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C014",
+      "label": "C014",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1207,
+        1391,
+        159,
+        131
+      ],
+      "foot": 66,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C015",
+      "label": "C015",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1673,
+        1528,
+        159,
+        127
+      ],
+      "foot": 68,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C016",
+      "label": "C016",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        430,
+        1528,
+        146,
+        128
+      ],
+      "foot": 58,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C017",
+      "label": "C017",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        408,
+        1658,
+        159,
+        122
+      ],
+      "foot": 69,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C018",
+      "label": "C018",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        578,
+        1528,
+        150,
+        128
+      ],
+      "foot": 79,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C019",
+      "label": "C019",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        569,
+        1658,
+        159,
+        122
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C020",
+      "label": "C020",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        730,
+        1658,
+        159,
+        120
+      ],
+      "foot": 86,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C021",
+      "label": "C021",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        730,
+        1528,
+        159,
+        128
+      ],
+      "foot": 71,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C022",
+      "label": "C022",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1513,
+        1658,
+        124,
+        115
+      ],
+      "foot": 55,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C023",
+      "label": "C023",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1191,
+        1658,
+        159,
+        118
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C024",
+      "label": "C024",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        247,
+        1658,
+        159,
+        123
+      ],
+      "foot": 74,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "C025",
+      "label": "C025",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1816,
+        1391,
+        159,
+        129
+      ],
+      "foot": 58,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B001",
+      "label": "B001",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        260,
+        277,
+        244
+      ],
+      "foot": 141,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B002",
+      "label": "B002",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        279,
+        260,
+        258,
+        244
+      ],
+      "foot": 136,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B003",
+      "label": "B003",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        549,
+        506,
+        286,
+        233
+      ],
+      "foot": 141,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B004",
+      "label": "B004",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        0,
+        286,
+        258
+      ],
+      "foot": 162,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B005",
+      "label": "B005",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1366,
+        0,
+        256,
+        252
+      ],
+      "foot": 119,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B006",
+      "label": "B006",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        829,
+        0,
+        268,
+        254
+      ],
+      "foot": 70,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B007",
+      "label": "B007",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1099,
+        0,
+        265,
+        254
+      ],
+      "foot": 107,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B008",
+      "label": "B008",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        539,
+        0,
+        288,
+        255
+      ],
+      "foot": 138,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B009",
+      "label": "B009",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1624,
+        0,
+        283,
+        252
+      ],
+      "foot": 145,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B010",
+      "label": "B010",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        288,
+        0,
+        249,
+        256
+      ],
+      "foot": 124,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B011",
+      "label": "B011",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        274,
+        506,
+        273,
+        235
+      ],
+      "foot": 134,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B012",
+      "label": "B012",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1112,
+        506,
+        272,
+        232
+      ],
+      "foot": 129,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B013",
+      "label": "B013",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1386,
+        506,
+        280,
+        228
+      ],
+      "foot": 143,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B014",
+      "label": "B014",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        837,
+        506,
+        273,
+        233
+      ],
+      "foot": 136,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B015",
+      "label": "B015",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1384,
+        260,
+        274,
+        238
+      ],
+      "foot": 114,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B016",
+      "label": "B016",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        821,
+        260,
+        279,
+        239
+      ],
+      "foot": 117,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B017",
+      "label": "B017",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        506,
+        272,
+        237
+      ],
+      "foot": 131,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B018",
+      "label": "B018",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1660,
+        260,
+        288,
+        238
+      ],
+      "foot": 139,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B019",
+      "label": "B019",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        1102,
+        260,
+        280,
+        239
+      ],
+      "foot": 138,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "B020",
+      "label": "B020",
+      "kind": "monster",
+      "source": "art/monsters.webp",
+      "rect": [
+        539,
+        260,
+        280,
+        241
+      ],
+      "foot": 142,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon0",
+      "label": "召唤物 1",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        0,
+        1249,
+        125,
+        140
+      ],
+      "foot": 83,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon1",
+      "label": "召唤物 2",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        127,
+        1249,
+        111,
+        140
+      ],
+      "foot": 63,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon2",
+      "label": "召唤物 3",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        240,
+        1249,
+        86,
+        140
+      ],
+      "foot": 42,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon3",
+      "label": "召唤物 4",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        328,
+        1249,
+        114,
+        140
+      ],
+      "foot": 59,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon4",
+      "label": "召唤物 5",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        444,
+        1249,
+        114,
+        140
+      ],
+      "foot": 85,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon5",
+      "label": "召唤物 6",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        560,
+        1249,
+        122,
+        140
+      ],
+      "foot": 61,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon6",
+      "label": "召唤物 7",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        684,
+        1249,
+        160,
+        140
+      ],
+      "foot": 102,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon7",
+      "label": "召唤物 8",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        846,
+        1249,
+        100,
+        140
+      ],
+      "foot": 57,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon8",
+      "label": "召唤物 9",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        948,
+        1249,
+        87,
+        140
+      ],
+      "foot": 35,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "summon9",
+      "label": "召唤物 10",
+      "kind": "summon",
+      "source": "art/monsters.webp",
+      "rect": [
+        1037,
+        1249,
+        117,
+        140
+      ],
+      "foot": 58,
+      "animationGrade": "static-with-procedural-tween"
+    },
+    {
+      "id": "guard",
+      "label": "城镇守卫",
+      "kind": "follower",
+      "source": "art/heroes.webp",
+      "rect": [
+        0,
+        202,
+        132,
+        179
+      ],
+      "animationGrade": "TEMPORARY-PROXY-NOT-NEW-ART"
+    },
+    {
+      "id": "mercenary",
+      "label": "佣兵枪兵",
+      "kind": "follower",
+      "source": "art/heroes.webp",
+      "rect": [
+        0,
+        0,
+        112,
+        200
+      ],
+      "animationGrade": "TEMPORARY-PROXY-NOT-NEW-ART"
+    },
+    {
+      "id": "priest",
+      "label": "神职侍从",
+      "kind": "follower",
+      "source": "art/heroes.webp",
+      "rect": [
+        114,
+        0,
+        190,
+        200
+      ],
+      "animationGrade": "TEMPORARY-PROXY-NOT-NEW-ART"
+    },
+    {
+      "id": "scout",
+      "label": "斥候",
+      "kind": "follower",
+      "source": "art/heroes.webp",
+      "rect": [
+        580,
+        202,
+        119,
+        169
+      ],
+      "animationGrade": "TEMPORARY-PROXY-NOT-NEW-ART"
+    },
+    {
+      "id": "shield_retainer",
+      "label": "盾卫",
+      "kind": "follower",
+      "source": "art/heroes.webp",
+      "rect": [
+        0,
+        202,
+        132,
+        179
+      ],
+      "animationGrade": "TEMPORARY-PROXY-NOT-NEW-ART"
+    }
+  ]
+}
