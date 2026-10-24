@@ -59,9 +59,10 @@ test('item names (v1.6): east/west lexicons never mix, named items fixed and uni
     assert.ok([...it.name.replace('·','')].length<=8,it.name);
     assert.equal(normalizeItem(JSON.parse(JSON.stringify(it))).name,it.name,'stable across save/load');
   }
-  const pool=catalogPool(1,'weapon').filter(c=>c.sub==='长剑'),x={id:'z',cid:pool[0].id,ilvl:30,origin:'e',affixes:[{key:'fire',value:affixMax('fire',30,1)},{key:'hp',value:3}]};
-  assert.equal(nameItem(x,1,{fire:affixMax('fire',30,1)},pool[0]).replace(/长剑|汉剑/,'X'),'燎X·熊');
-  assert.equal(nameItem({...x,origin:'w'},1,{fire:affixMax('fire',30,1)},pool[0]).replace(/阔剑|长剑/,'X'),'熔铸X·狼');
+  const fm={fire:affixMax('fire',30,1)},W=catalogPool(1,'weapon').find(c=>c.sub==='长剑'&&c.o!=='e'),E=catalogPool(1,'weapon').find(c=>c.sub==='长剑'&&c.o==='e');
+  const x={id:'z',ilvl:30,affixes:[{key:'fire',value:fm.fire},{key:'hp',value:3}]};
+  assert.equal(nameItem({...x,cid:E.id},1,fm,E).replace(/长剑|汉剑/,'X'),'燎X·熊','east art → east words');
+  assert.equal(nameItem({...x,cid:W.id},1,fm,W).replace(/阔剑|长剑/,'X'),'熔铸X·狼','gothic art → west words');
 });
 test('named items: every class gets half east, half west; early maps drop east, late maps west',()=>{
   const per={};for(const [id,[n,o]] of Object.entries(NAMING.NAMED)){const e=catalogEntry({cid:id});const c=e.owner||({'亚马逊':'amazon','刺客':'assassin','野蛮人':'barbarian','德鲁伊':'druid','死灵法师':'necro','圣骑士':'paladin','法师':'mage'})[e.cls]||'all';(per[c]||={e:0,w:0})[o]++;}

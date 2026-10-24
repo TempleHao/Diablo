@@ -1,7 +1,7 @@
 /* 归墟 2D · 装备命名（v1.6，规则见 docs/2D-NAMING.md，词库见 scripts/2d-naming/lexicon.py）
  *
  * 每件装备都是从四方漂入归墟的遗物：东土（中国古文、古兵器）或西境（欧洲古兵器、法器与西方奇幻，专名意译）。
- * 一个名字只用一套词库，绝不混用。出身 origin：'e' 东土 / 'w' 西境。
+ * 出身看图：中国风的图是东土，哥特暗黑风的图是西境；名字跟着图走，一个名字只用一套词库。
  *   普通  品相 + 基底            百炼横刀 / 淬火阔剑
  *   魔法  前缀 + 基底 · 后缀      霜横刀·蛟 / 凛冬阔剑·猛犸（前缀取第一条词缀，后缀取第二条，数值高用强一档的字）
  *   史诗  意象 + 器称            白虹锋、易水匕 / 鸦宴剑、白鹿弓
@@ -14,10 +14,10 @@ import {NAMING as N} from './naming-data.js';
 const hash=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 const CLS_BY_CN={'亚马逊':'amazon','刺客':'assassin','野蛮人':'barbarian','德鲁伊':'druid','死灵法师':'necro','圣骑士':'paladin','法师':'mage'};
 export const kindOf=entry=>N.KIND_OF[entry?.sub]||N.SLOT_KIND[entry?.s]||'amulet';
-/** 出身：传奇 / 暗金固定；其余按物品自带的 origin，没有时按物品 ID 稳定地取一半。 */
+/** 出身由图决定：中国风的第三批职业图（o:'e'）是东土遗物，其余（哥特暗黑风）都是西境遗物。 */
 export function originOf(item,entry){
   const fixed=N.NAMED[entry?.id];if(fixed)return fixed[1];
-  return item?.origin==='e'||item?.origin==='w'?item.origin:(hash(item?.id)&1?'e':'w');
+  return entry?.o==='e'?'e':'w';
 }
 /** 基底名（东 / 西），职业装备图上的头盔、胸甲按职业换名词。 */
 export function baseName(entry,o,h=0){

@@ -18,7 +18,11 @@ def kind(e):
 def main():
     old = load('dist/2d/equipment-catalog.js', 'CATALOG')
     legs = load('dist/2d/class-catalog.js', 'CLASS_LEGENDS')
-    named = [e for e in old if e['r'] == 4] + legs + [e for e in old if e['r'] == 3]
+    v3 = load('dist/2d/class-catalog-v3.js', 'EAST_NAMED')
+    # 西境：哥特暗黑风的原有传奇暗金；东土：中国风图上一一对应的传奇暗金。暗金先挑名器。
+    west = [e for e in old if e['r'] == 4] + legs + [e for e in old if e['r'] == 3]
+    east = [e for e in v3 if e['r'] == 4] + [e for e in v3 if e['r'] == 3]
+    named = [(e, 'w') for e in west] + [(e, 'e') for e in east]
     used, names, out = set(), set(), {}
     count = {}            # (职业, 东/西) → 件数
     hero_i = {}
@@ -26,25 +30,23 @@ def main():
     for r in RELICS:
         relic_by.setdefault((r[1], r[2]), []).append(r)
     stats = {'relic': 0, 'hero': 0}
-    for e in named:
+    for e, o in named:
         cls = e.get('owner') or CN.get(e.get('cls'), 'all')
         k = kind(e)
-        ce, cw = count.get((cls, 'e'), 0), count.get((cls, 'w'), 0)
-        if ce != cw: o = 'e' if ce < cw else 'w'
-        else: o = 'e' if zlib.crc32(e['id'].encode()) % 2 else 'w'
         rel = [r for r in relic_by.get((o, k), []) if r[0] not in used]
         if rel:
             n, _, _, note = rel[0]; used.add(n); stats['relic'] += 1
         else:
             pool = HEROES.get(cls, HEROES['all'])[0 if o == 'e' else 1]
-            word = HERO_WORD[k][0 if o == 'e' else 1]
-            i = hero_i.get((cls, o), 0)
-            for t in range(len(pool) * 3):
-                hn, hnote = pool[(i + t) % len(pool)]
-                n = hn + '之' + word
-                if n not in names: break
-            else:
-                raise SystemExit('ran out of hero names for ' + cls + o + k)
+            oi = 0 if o == 'e' else 1
+            words = [HERO_WORD[k][oi]] + [w for w in KIND_WORD.get(k, ([], []))[oi] if w != HERO_WORD[k][oi]]
+            i = hero_i.get((cls, o), 0); n = None
+            for word in words:          # 同一个人物的同一种器物用完了，换同类的另一个字（枪 → 矛 → 戟）
+                for t in range(len(pool)):
+                    hn, hnote = pool[(i + t) % len(pool)]
+                    if hn + '之' + word not in names: n = hn + '之' + word; break
+                if n: break
+            if not n: raise SystemExit('ran out of hero names for ' + cls + o + k)
             hero_i[(cls, o)] = i + t + 1
             note = '相传为' + hn + '所用。' + hn + '：' + hnote + '。'
             stats['hero'] += 1
@@ -56,7 +58,7 @@ def main():
         'BASE': BASE, 'CLASS_BASE': {f'{c}|{s}': v for (c, s), v in CLASS_BASE.items()}, 'GRADE': GRADE,
         'PREFIX_E': PREFIX_E, 'PREFIX_W': PREFIX_W, 'SUFFIX_E': SUFFIX_E, 'SUFFIX_W': SUFFIX_W,
         'EPIC_E': EPIC_E, 'EPIC_W': EPIC_W, 'KIND_WORD': KIND_WORD, 'KIND_OF': KIND_OF, 'SLOT_KIND': SLOT_KIND,
-        'NAMED': out, 'SET_NAMES': {k: v[0] for k, v in SET_NAMES.items()}, 'SET_PIECE': SET_PIECE, 'BANNED': BANNED, 'DARK': DARK,
+        'NAMED': out, 'SET_NAMES': {**{k: v[0] for k, v in SET_NAMES.items()}, **OLD_SET_NAMES}, 'SET_PIECE': SET_PIECE, 'BANNED': BANNED, 'DARK': DARK,
     }
     js = ('/* 自动生成：scripts/2d-naming/build_names.py（词库见 scripts/2d-naming/lexicon.py，规则见 docs/2D-NAMING.md）。 */\n'
           'export const NAMING=Object.freeze(' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ');\n')

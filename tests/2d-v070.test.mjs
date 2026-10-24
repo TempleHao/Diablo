@@ -100,7 +100,7 @@ test('class sets: 4 pieces, bonuses at 2/3/4, names follow set name',()=>{
   const p=freshSave();p.heroClass='mage';p.level=60;
   const pieces=SETS.set_mage.cids.map((cid,i)=>{const e=CATALOG_BY_ID.get(cid);return normalizeItem({id:'s'+i,slot:e.s,name:'x',rarity:4,setId:'set_mage',cid,ilvl:60,req:36,power:10,hp:0,mana:0,armor:0,affixes:[]});});
   assert.equal(pieces.length,4);
-  for(const it of pieces){assert.equal(it.setId,'set_mage');assert.ok(it.name.startsWith('河洛·'),it.name);}
+  for(const it of pieces){assert.equal(it.setId,'set_mage');assert.ok(it.name.startsWith('梅林·'),it.name);}
   p.inventory.push(...pieces);
   const base=stats(p).classSkill;
   equip(p,pieces[0].id);equip(p,pieces[1].id);assert.equal(stats(p).classSkill,base+1,'2-piece +1 skill');
