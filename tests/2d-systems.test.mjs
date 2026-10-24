@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes} from '../dist/2d/systems.js';
+import {SLOTS,SLOT_IDS,MAX_ITEMS,AFFIXES, RARITIES,SETS,SKILLS,REGION_DATA,makeLoot,normalizeItem,calculateStats,formatAffixes,catalogPool} from '../dist/2d/systems.js';
 import {mulberry32,makeDungeon,walkable,START,freshSave,sanitizeSave,equip,stats,upgradeSkill} from '../dist/2d/core.js';
 const i=(id,slot,affixes=[],setId=null)=>normalizeItem({id,slot,name:'测试装备',rarity:setId?4:2,ilvl:12,power:0,hp:0,mana:0,armor:0,affixes,setId});
 test('paper doll matches the equipment catalog: 11 slots, no legs or relic',()=>{
@@ -10,7 +10,7 @@ test('paper doll matches the equipment catalog: 11 slots, no legs or relic',()=>
   assert.ok(!SLOT_IDS.includes('pants')&&!SLOT_IDS.includes('charm'));
 });
 test('all eligible affix values affect genuine combat statistics',()=>{
-  const p=freshSave();const item=i('staff','weapon',[{key:'power',value:31},{key:'crit',value:8},{key:'haste',value:9},{key:'fire',value:18},{key:'skillFire',value:1}]);
+  const p=freshSave();const item=normalizeItem({id:'staff',slot:'weapon',name:'测试装备',rarity:2,ilvl:12,power:0,hp:0,mana:0,armor:0,cid:catalogPool(2,'weapon').find(c=>c.sub==='法杖').id,affixes:[{key:'power',value:31},{key:'crit',value:8},{key:'haste',value:9},{key:'fire',value:18},{key:'skillFire',value:1}]});   // v1.3：法师只能拿法师会用的武器
   p.inventory.push(item);assert.equal(equip(p,item.id),true);
   const b=stats(p);assert.equal(b.power,51);assert.equal(b.crit,13);assert.equal(b.haste,9);assert.equal(b.fire,18);assert.equal(b.skillFire,1);
 });

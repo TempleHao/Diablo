@@ -1034,3 +1034,9 @@ body.ghud-mobile .joystick{display:block!important}
 .hero-select.is-mobile .hs-thumbs{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px!important;overflow:visible!important}
 .hero-select.is-mobile .hs-thumbs .hs-plate{min-width:0!important;max-width:none!important;padding:5px 0!important}
 .hero-select.is-mobile .hs-thumbs .hs-plate b{font-size:clamp(9px,2.7vw,11px)!important;letter-spacing:0!important}
+/* v1.3 职业区隔：其他职业专属的装备在背包和仓库里压暗，本职业能穿的在仓库里加一道金边 */
+.item.is-alien{opacity:.55}
+.item.is-alien .item-thumbnail{filter:grayscale(.7)}
+.stash-item.is-alien{opacity:.5}
+.stash-item.is-mine{box-shadow:inset 0 0 0 1px #c9a46a!important}
+.item-cls{display:block}

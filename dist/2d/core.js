@@ -1,4 +1,4 @@
-import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient, sanitizeParagon, paragonPoints, PARAGON, itemPowers } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, emptyEquipment, normalizeItem, makeLoot, calculateStats, getSlotForItem, offhandAllowed, SKILLS, REGION_DATA, ACTIVE_LIMIT, DEFAULT_ACTIVE, DEFAULT_KEYS, bindableKey, CLASSES, CLASS_IDS, defaultActive, skillsOf, catalogEntry, proficient, sanitizeParagon, paragonPoints, PARAGON, itemPowers, canUseItem } from './systems.js';
 import {DIFFICULTIES,clampDifficulty,difficultyUnlocked,expRequired as expCurve,armorDR,monsterLevel as areaMonsterLevel} from './progression.js';
 import {buildById} from './builds.js';
 import {freshMaterials,sanitizeMaterials} from './crafting.js';
@@ -129,7 +129,7 @@ export function sanitizeSave(raw){
   for(const slot of SLOT_IDS){
     const id=raw.equipped?.[slot];
     const item=p.inventory.find(i=>i.id===id);
-    if(item&&getSlotForItem(item,slot)===slot&&!used.has(id)){p.equipped[slot]=id;used.add(id);}
+    if(item&&getSlotForItem(item,slot)===slot&&!used.has(id)&&canUseItem(item,p.heroClass)){p.equipped[slot]=id;used.add(id);}   // v1.3：其他职业专属的装备自动卸下，留在背包
   }
   if(!offhandAllowed(p.inventory.find(i=>i.id===p.equipped.weapon),p.inventory.find(i=>i.id===p.equipped.offhand)))p.equipped.offhand=null;
   return p;
@@ -202,7 +202,7 @@ export function buildScore(item,cls,build){
 /** 一键穿戴：每个部位穿上流派评分最高的装备；武器副手按组合比较（双手 / 弓 + 箭袋 / 单手 + 副手）。 */
 export function autoEquip(p,buildId){
   const cls=p.heroClass,build=buildById(cls,buildId||p.builds?.[cls]);
-  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level);
+  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level&&canUseItem(i,cls));
   const best=(slot)=>usable.filter(i=>getSlotForItem(i,slot)===slot||(slot.startsWith('ring')&&i.slot.startsWith('ring'))).sort((a,b)=>buildScore(b,cls,build)-buildScore(a,cls,build));
   const next=emptyEquipment();
   for(const slot of ['head','shoulders','robe','gloves','belt','boots','amulet']){const it=best(slot)[0];if(it)next[slot]=it.id;}
@@ -245,7 +245,7 @@ export function combatRating(p,buildId=null){
  *  返回 {before, after, changed:[部位]}；dry=true 时只计算不应用。 */
 export function smartEquip(p,buildId=null,{dry=false}={}){
   const original={...p.equipped},before=combatRating(p,buildId);
-  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level);
+  const usable=p.inventory.filter(i=>!i.legacy&&(i.req||1)<=p.level&&canUseItem(i,p.heroClass));
   const fits=(it,slot)=>slot.startsWith('ring')?it.slot.startsWith('ring'):getSlotForItem(it,slot)===slot;
   autoEquip(p,buildId||p.builds?.[p.heroClass]);
   let best=combatRating(p,buildId);
@@ -289,7 +289,7 @@ export function addParagon(p,key){
 export function resetParagon(p){const n=Object.values(p.paragon||{}).reduce((a,b)=>a+b,0);p.paragon={};return n;}
 export function createItem(rng,level,id){return makeLoot(rng,level,id);}
 export function equip(p,id,target=null){
-  const item=p.inventory.find(i=>i.id===id);if(!item||(item.req||1)>p.level)return false;
+  const item=p.inventory.find(i=>i.id===id);if(!item||(item.req||1)>p.level||!canUseItem(item,p.heroClass))return false;
   const slot=getSlotForItem(item,target);if(!slot)return false;
   for(const k of SLOT_IDS)if(p.equipped[k]===id)p.equipped[k]=null;
   p.equipped[slot]=id;

@@ -39,6 +39,24 @@ export const POOLS=Object.freeze({
 /** 兼容旧接口：品质 0-2 返回基底池，3 传奇池，4 暗金池。 */
 export const catalogPool=(rarity,slot)=>(rarity>=4?POOLS.unique:rarity===3?POOLS.legend:POOLS.base)[slotGroup(slot)]||[];
 export const catalogEntry=item=>CATALOG_BY_ID.get(item?.cid)||null;
+// ───── v1.3 职业区隔（参照 D2：武器按职业会用的类型、带职业的传奇 / 暗金 / 套装专属，普通防具首饰通用）─────
+// 某种武器 / 副手类型由哪些职业使用（来自 classes.js 各职业的武器表）；不在任何表里的类型（如圆盾）通用
+const TYPE_USERS=new Map();
+for(const c of CLASS_IDS)for(const sub of CLASSES[c].weapons||[]){if(!TYPE_USERS.has(sub))TYPE_USERS.set(sub,new Set());TYPE_USERS.get(sub).add(c);}
+const typeOk=(e,cls)=>!(e.s==='weapon'||e.s==='offhand')||!TYPE_USERS.has(e.sub)||TYPE_USERS.get(e.sub).has(cls);
+/** 能穿这件装备的职业：null 表示全职业通用，否则返回职业 id 数组。
+ *  1) 职业套装 → 只限该职业；2) 传奇 / 暗金带归属职业 → 只限该职业；3) 武器 / 副手 → 会用这种类型的职业；4) 其余（普通到史诗的防具、首饰）通用。 */
+export function itemClasses(item){
+  const e=catalogEntry(item);if(!e||item?.legacy)return null;
+  const set=item.setId&&SETS[item.setId];
+  if(set?.cls)return [set.cls];
+  if(item.rarity>=3&&!item.setId){const o=e.owner||CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
+  if((e.s==='weapon'||e.s==='offhand')&&TYPE_USERS.has(e.sub))return [...TYPE_USERS.get(e.sub)];
+  return null;
+}
+export const canUseItem=(item,cls)=>{const u=itemClasses(item);return !u||u.includes(cls||'mage');};
+/** 给界面用：「野蛮人 / 圣骑士 专属」或「通用」。 */
+export const itemClassLabel=item=>{const u=itemClasses(item);return u?u.map(c=>CLASSES[c].name).join(' / ')+' 专属':'全职业通用';};
 const BOWS=new Set(['长弓','短弓','骨弓','反曲弓','轻弩','重弩']);
 export const isBow=item=>BOWS.has(catalogEntry(item)?.sub);
 export const isQuiver=item=>catalogEntry(item)?.sub==='箭囊';
@@ -264,7 +282,9 @@ export const DROP_RULES=Object.freeze({
   // 难度倍率：hi 作用于传奇/套装/暗金，lo 作用于史诗/魔法
   difficulty:{hi:[1,1.7,2.8],lo:[1,1.15,1.3]},
   slotWeight:{weapon:3,offhand:1.5,head:1,shoulders:.6,robe:1,gloves:1,belt:1,boots:1,amulet:.7,ring1:1.2},
-  ownClass:.5,
+  // 职业区隔：武器 / 副手 90% 只出当前职业会用的类型；防具首饰 70% 偏本职业风格；传奇 / 暗金 / 套装 85% 出本职业或通用的
+  // （剩下的给共享仓库里的其他角色，和 D2 一样能捡到别的职业的好东西）
+  ownWeapon:.9,ownClass:.7,ownNamed:.85,
   // 厄运保护（按趟计）：连续 N 趟没见到传奇以上 / 暗金，下一个首领必掉
   pity:{legendary:20,unique:80},
   // 首领专属传奇：每次击杀的几率（普通 / 噩梦 / 地狱）；首杀不再必掉，改为首杀第一件至少史诗
@@ -295,23 +315,25 @@ export function rollQuality(rng,{ilvl=1,mf=0,source='normal',difficulty=0,min=0,
 const ownsEntry=(entry,cls)=>!!cls&&(entry.owner===cls||entry.cls===CLASSES[cls]?.catalog);
 function weightedPick(rng,list,w){let t=0;for(const x of list)t+=w(x);let r=rng()*t;for(const x of list){r-=w(x);if(r<=0)return x;}return list[list.length-1];}
 /** 选基底：品级 ≤ 物品等级；越接近物品等级的基底越常见；50% 偏向当前职业。 */
-export function pickBase(rng,slot,ilvl,cls=null){
+export function pickBase(rng,slot,ilvl,cls=null,strict=false){
   let pool=(POOLS.base[slotGroup(slot)]||[]).filter(c=>c.q<=Math.max(ilvl,1));
   if(!pool.length)pool=[...(POOLS.base[slotGroup(slot)]||[])].sort((a,b)=>a.q-b.q).slice(0,4);
-  if(cls&&rng()<DROP_RULES.ownClass){const mine=pool.filter(c=>ownsEntry(c,cls)||c.cls==='全职业');if(mine.length)pool=mine;}
+  const g=slotGroup(slot);
+  if(cls&&(g==='weapon'||g==='offhand')&&(strict||rng()<DROP_RULES.ownWeapon)){const ok=pool.filter(c=>typeOk(c,cls));if(ok.length)pool=ok;}
+  if(cls&&(strict||rng()<DROP_RULES.ownClass)){const mine=pool.filter(c=>ownsEntry(c,cls)||c.cls==='全职业');if(mine.length)pool=mine;}
   return weightedPick(rng,pool,c=>.06+3*(c.q/Math.max(ilvl,1))**3);
 }
-function pickNamed(rng,kind,slot,ilvl,cls){
+function pickNamed(rng,kind,slot,ilvl,cls,strict=false){
   const src=POOLS[kind];
   let pool=slot?(src[slotGroup(slot)]||[]):Object.values(src).flat();
   pool=pool.filter(c=>c.q<=ilvl);
-  if(cls&&kind==='legend'&&rng()<DROP_RULES.ownClass){const mine=pool.filter(c=>ownsEntry(c,cls));if(mine.length)pool=mine;}
+  if(cls&&(strict||rng()<DROP_RULES.ownNamed)){const mine=pool.filter(c=>(ownsEntry(c,cls)||c.cls==='全职业')&&typeOk(c,cls));if(mine.length)pool=mine;}
   // v0.7.3：越接近物品等级的传奇 / 暗金越常见（地狱多出高品级的，低品级的仍偶尔出现）
   return pool.length?weightedPick(rng,pool,c=>.12+2*(c.q/Math.max(ilvl,1))**3):null;
 }
 /** 掉落装备。opts：source normal/elite/boss，cls 当前职业，mf 寻宝几率，difficulty 难度，min 保底品质，force 强制品质。
  *  兼容旧调用：{boss:true} 等同 source:'boss'。 */
-export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null,slot:wantSlot=null,entry:forceEntry=null}={}){
+export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,difficulty=0,min=0,force=null,slot:wantSlot=null,entry:forceEntry=null,strict=false}={}){
   const n=Math.max(1,Math.min(MAX_LEVEL,Math.floor(level)||1));
   source=source||(boss?'boss':'normal');
   let {rarity,set}=rollQuality(rng,{ilvl:n,mf,source,difficulty,min,force});
@@ -319,22 +341,22 @@ export function makeLoot(rng,level,id,{boss=false,cls=null,mf=0,source=null,diff
   if(set&&!entry){
     const sets=Object.keys(SETS).filter(k=>SETS[k].q<=n&&(!wantSlot||(SETS[k].cids?SETS[k].cids.some(c=>CATALOG_BY_ID.get(c)?.s===slotGroup(wantSlot)):SETS[k].slots.includes(slotGroup(wantSlot)))));
     const mine=sets.filter(k=>SETS[k].cls===cls);
-    const usePool=mine.length&&rng()<DROP_RULES.ownClass?mine:sets;
+    const usePool=mine.length&&(strict||rng()<DROP_RULES.ownNamed)?mine:sets;
     setId=usePool.length?usePool[Math.floor(rng()*usePool.length)]:null;
     if(setId){
       const S=SETS[setId];
       const cids=S.cids&&wantSlot?S.cids.filter(c=>CATALOG_BY_ID.get(c)?.s===slotGroup(wantSlot)):S.cids;
       if(S.cids)entry=CATALOG_BY_ID.get(cids[Math.floor(rng()*cids.length)]);
-      else{const slot=wantSlot?slotGroup(wantSlot):S.slots[Math.floor(rng()*S.slots.length)];entry=pickBase(rng,slot,n,cls);}
+      else{const slot=wantSlot?slotGroup(wantSlot):S.slots[Math.floor(rng()*S.slots.length)];entry=pickBase(rng,slot,n,cls,strict);}
     }else rarity=3;
   }
   // 与 D2 相同：没有物品等级够得上的传奇/暗金时，降为史诗
-  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',wantSlot,n,cls);if(!entry)rarity=2;}
+  if(!entry&&rarity>=3){entry=pickNamed(rng,rarity===4?'unique':'legend',wantSlot,n,cls,strict);if(!entry)rarity=2;}
   if(!entry){
     // 只在有符合物品等级基底的部位里抽（比如护肩最低品级 5，1-4 级不出护肩）
     const slots=Object.keys(DROP_RULES.slotWeight).filter(s=>(POOLS.base[slotGroup(s)]||[]).some(c=>c.q<=n));
     const slot=wantSlot&&(POOLS.base[slotGroup(wantSlot)]||[]).length?slotGroup(wantSlot):weightedPick(rng,slots,s=>DROP_RULES.slotWeight[s]);
-    entry=pickBase(rng,slot,n,cls);
+    entry=pickBase(rng,slot,n,cls,strict);
   }
   const slot=entry.s;
   const owner=entry.owner||CLASS_BY_CATALOG[entry.cls];
@@ -407,7 +429,7 @@ export function gambleQuality(rng){
 export function gambleItem(rng,level,slot,id,cls=null){
   if(!GAMBLE_SLOTS.includes(slot))return null;
   const ilvl=Math.max(1,Math.min(MAX_LEVEL,(level|0)-5+Math.floor(rng()*10)));
-  return makeLoot(rng,ilvl,id,{cls,slot,force:gambleQuality(rng)});
+  return makeLoot(rng,ilvl,id,{cls,slot,force:gambleQuality(rng),strict:!!cls});   // 赌博买的一定是自己能用的
 }
 /** 新角色起始装备：本职业最低品级的武器（普通品质）+ 一件胸甲，开局不用空手。 */
 export function starterKit(cls,newId){

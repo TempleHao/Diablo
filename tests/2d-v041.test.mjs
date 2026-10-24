@@ -41,10 +41,10 @@ test('all weapon types drop; bows take a quiver, other two-handers block offhand
   for(let k=0;k<3000;k++){const it=makeLoot(r,30,'w'+k);if(it.slot==='weapon'||it.slot==='offhand')subs.add(catalogEntry(it).sub);}
   for(const s of ['长剑','双手斧','长弓','重弩','法杖','箭囊','塔盾','法典'])assert.ok(subs.has(s),s);
   const mk=(id,slot,f)=>normalizeItem({id,slot,name:'x',cid:catalogPool(1,slot).find(f).id,rarity:1,power:5,hp:0,mana:0,armor:0});
-  const bow=mk('bow','weapon',c=>c.sub==='长弓'),axe=mk('axe','weapon',c=>c.sub==='双手斧'),quiver=mk('qv','offhand',c=>c.sub==='箭囊'),shield=mk('sh','offhand',c=>c.sub==='塔盾');
+  const bow=mk('bow','weapon',c=>c.sub==='长弓'),axe=mk('axe','weapon',c=>c.h===2&&['长枪','三叉戟','钩镰枪'].includes(c.sub)),quiver=mk('qv','offhand',c=>c.sub==='箭囊'),shield=mk('sh','offhand',c=>c.sub==='鸢盾');
   assert.ok(isBow(bow)&&isQuiver(quiver));
   assert.equal(offhandAllowed(bow,quiver),true);assert.equal(offhandAllowed(bow,shield),false);assert.equal(offhandAllowed(axe,quiver),false);
-  const p=freshSave();p.inventory.push(bow,axe,quiver,shield);
+  const p=freshSave();p.heroClass='amazon';p.inventory.push(bow,axe,quiver,shield);   // v1.3：用亚马逊都会用的弓、长枪、箭袋、盾
   equip(p,'qv');equip(p,'bow');assert.equal(p.equipped.offhand,'qv');assert.equal(p.equipped.weapon,'bow');
   equip(p,'sh');assert.equal(p.equipped.weapon,null);assert.equal(p.equipped.offhand,'sh');
   equip(p,'axe');assert.equal(p.equipped.offhand,null);

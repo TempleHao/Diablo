@@ -4,14 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131a"><meta name="description" content="归墟 VORAGH：原创俯视角暗黑地牢动作 RPG。单机免费，刷怪、装备与成长。">
 <title>归墟 VORAGH</title><link rel="icon" href="./art/logo-voragh-icon.webp">
-<link rel="stylesheet" href="./style.css?v=121">
+<link rel="stylesheet" href="./style.css?v=130">
 </head>
 <body>
 <canvas id="game" aria-label="归墟游戏画面"></canvas><div class="grain" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="../" title="返回原版 3D 游戏"><img class="brand-logo" src="./art/logo-voragh-sm.webp?v=121" alt="归墟 VORAGH" draggable="false"></a>
   <div class="top-actions">
-    <span class="version">灰烬边境 · 第一幕 / v1.2.1</span>
+    <span class="version">灰烬边境 · 第一幕 / v1.3.0</span>
     <div class="top-more" id="top-more">
       <label class="region-picker"><span>难度</span><select id="difficulty-select" aria-label="选择难度"></select></label>
       <label class="region-picker"><span>区域</span><select id="region-select" aria-label="选择探索区域"></select></label>
@@ -87,7 +87,7 @@
       <small id="login-msg" class="login-msg" aria-live="polite"></small>
       <button id="login-guest" type="button" class="login-guest">以游客进入 · 只保存在本机</button>
     </form>
-    <p class="login-foot">原创俯视角暗黑 ARPG · v1.2.1</p>
+    <p class="login-foot">原创俯视角暗黑 ARPG · v1.3.0</p>
   </section>
 </div>
 <aside id="gm-panel" class="gm-panel" hidden aria-label="测试员工具">
@@ -161,6 +161,8 @@
           <label>类别
             <select id="inv-filter" aria-label="背包装备类别">
               <option value="all">全部</option>
+              <option value="mine">本职业能穿</option>
+              <option value="others">其他职业专属</option>
               <option value="weapon">武器 / 副手</option>
               <option value="armor">防具</option>
               <option value="accessory">饰品</option>

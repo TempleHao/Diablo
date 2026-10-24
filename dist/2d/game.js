@@ -10,7 +10,7 @@ import {heroRig} from './pixel-mage-demo.js';
 import {SKILL_BAL} from './balance.js';
 import {Lighting,drawGlow,drawEllipseGlow,shardSprite,addDecal,tickDecals,drawDecals,shakeOffset} from './fx.js';
 import {drawDungeonDetail} from './dungeon-detail.js';
-import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, DROP_RULES, GAMBLE_SLOTS, gambleCost, gambleItem, starterKit, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints } from './systems.js';
+import { SLOTS, SLOT_IDS, MAX_ITEMS, MAX_LEVEL, AFFIXES, RARITIES, RARITY_COLORS, SET_COLOR, LEGACY_SLOTS, SKILLS, SKILL_SCHOOLS, ACTIVE_LIMIT, keyLabel, CLASSES, CLASS_IDS, skillsOf, SETS, REGION_DATA, formatAffixes, makeLoot, rollDrops, DROP_RULES, GAMBLE_SLOTS, gambleCost, gambleItem, starterKit, itemScore, itemPowers, catalogEntry, isBow, normalizeItem, PARAGON, paragonPoints ,canUseItem,itemClassLabel} from './systems.js';
 import {describePower,skillLegend,PROC_FX} from './legendary.js';
 import {DIFFICULTIES,difficultyUnlocked,monsterLevel as areaMonsterLevel,xpFactor,monsterHpMult,monsterDmgMult,armorDR} from './progression.js';
 import {LocalStore,STASH_SIZE} from './storage.js';
@@ -566,10 +566,12 @@ function inspectItem(item){
   if(!item){panel.textContent='选择装备可查看详细属性、套装效果与实际穿戴增减。';$('compare-pair').replaceChildren();$('ring-choice').hidden=true;$('mobile-item-name').textContent='点选背包中的装备';$('mobile-equip').disabled=true;$('inv-quick-equip').disabled=true;$('inv-quick-equip').textContent='选择装备后点击穿戴';$('inv-temper').disabled=true;$('temper-cost').textContent='低品质物品分解后可在这里使用材料淬炼装备。';return;}
   const title=document.createElement('h3');title.className='rarity-'+item.rarity+(item.setId?' rarity-set':'');title.textContent=item.name;
   const meta=document.createElement('small');meta.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · 物品等级 '+item.ilvl+' · '+slotLabel(item);
-  const tooLow=(item.req||1)>profile.level;
+  const tooLow=(item.req||1)>profile.level,wrongCls=!canUseItem(item,profile.heroClass);
   const reqLine=document.createElement('small');reqLine.className='item-req'+(tooLow?' is-blocked':'');reqLine.textContent='需求等级 '+(item.req||1)+(tooLow?'（当前 '+profile.level+' 级，不能穿戴）':'');
+  const clsLine=document.createElement('small');clsLine.className='item-req item-cls'+(wrongCls?' is-blocked':'');
+  clsLine.textContent='职业：'+itemClassLabel(item)+(wrongCls?'（'+CLASSES[profile.heroClass].name+'不能穿戴，可存进共享仓库给对应角色）':'');
   const preview=document.createElement('canvas');preview.className='item-preview';preview.setAttribute('aria-label',item.name+' 装备图标');Art.drawItemIcon(preview,item);
-  panel.append(preview,title,meta,reqLine);
+  panel.append(preview,title,meta,reqLine,clsLine);
   if(item.tempered){const stamp=document.createElement('p');stamp.className='score-up';stamp.textContent='✦ 已淬炼强化';panel.append(stamp);}
   const list=document.createElement('ul');
   for(const line of formatAffixes(item)){const li=document.createElement('li');li.textContent=line;list.append(li);}
@@ -584,7 +586,7 @@ function inspectItem(item){
     if(info?.owner&&info.owner!==profile.heroClass){const n=document.createElement('small');n.textContent='这是'+CLASSES[info.owner].name+'的传奇：技能相关特效只对该职业生效，可以放进共享仓库转给对应角色。';fx.append(n);}
     panel.append(fx);
   }
-  if(info?.cls){const fit=document.createElement('small');fit.className='item-class';fit.textContent='偏好职业：'+info.cls+(info.h===2?' · 双手'+(isBow(item)?'（可配箭袋）':''):'');panel.append(fit);}
+  if(info?.cls){const fit=document.createElement('small');fit.className='item-class';fit.textContent='风格：'+info.cls+(info.h===2?' · 双手'+(isBow(item)?'（可配箭袋）':''):'');panel.append(fit);}
   if(info?.lore&&item.rarity===4){const lore=document.createElement('p');lore.className='item-lore';lore.textContent=loreFor(info,item.name);panel.append(lore);}
   if(item.legacy){const old=document.createElement('p');old.className='score-down';old.textContent='旧版装备槽已取消：不能穿戴，可以分解换材料。';panel.append(old);}
   if(item.setId){
@@ -610,10 +612,10 @@ function inspectItem(item){
   }
   // v0.7.3：用真实「战力」比较（试穿后整套重算，含套装、传奇特效、双手武器占副手）
   const crNow=combatRating(profile);let crTry=crNow;
-  if(!tooLow&&!(worn&&worn.id===item.id)){const trial={...profile,equipped:{...profile.equipped}};if(equip(trial,item.id,target))crTry=combatRating(trial);}
+  if(!tooLow&&!wrongCls&&!(worn&&worn.id===item.id)){const trial={...profile,equipped:{...profile.equipped}};if(equip(trial,item.id,target))crTry=combatRating(trial);}
   const delta=crTry-crNow;
   const compare=document.createElement('p');compare.className=delta>=0?'score-up':'score-down';
-  compare.textContent=tooLow?'需求等级不足，穿上不生效':worn&&worn.id===item.id?'正在穿着 · 战力 '+crNow:'相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 战力 '+(delta>0?'+':'')+delta+'（'+crNow+' → '+crTry+'）';
+  compare.textContent=wrongCls?'其他职业专属，当前角色不能穿戴':tooLow?'需求等级不足，穿上不生效':worn&&worn.id===item.id?'正在穿着 · 战力 '+crNow:'相对当前 '+SLOTS.find(x=>x[0]===target)?.[1]+' · 战力 '+(delta>0?'+':'')+delta+'（'+crNow+' → '+crTry+'）';
   panel.append(compare);
   if(worn&&worn.id!==item.id){
     const current=document.createElement('p');current.className='current-gear';
@@ -638,9 +640,9 @@ function inspectItem(item){
   }
   const quick=$('inv-quick-equip');
   const wornHere=profile.equipped[target]===item.id;
-  quick.disabled=!!item.legacy||tooLow&&!wornHere;
-  quick.textContent=item.legacy?'旧版装备 · 只能分解':wornHere?'卸下 '+item.name:tooLow?'需要 '+item.req+' 级':'直接穿戴 '+item.name;
-  if(item.legacy||tooLow&&!wornHere)$('mobile-equip').disabled=true;
+  quick.disabled=!!item.legacy||(tooLow||wrongCls)&&!wornHere;
+  quick.textContent=item.legacy?'旧版装备 · 只能分解':wornHere?'卸下 '+item.name:wrongCls?'其他职业专属 · 不能穿戴':tooLow?'需要 '+item.req+' 级':'直接穿戴 '+item.name;
+  if(item.legacy||(tooLow||wrongCls)&&!wornHere)$('mobile-equip').disabled=true;
   $('mobile-equip').textContent=wornHere?'卸下装备':'穿戴 / 替换';
   const cost=temperCost(item);
   $('inv-temper').disabled=!canTemper(profile,item.id);
@@ -676,7 +678,8 @@ function renderStash(){
   $('stash-count').textContent=stash.length+' / '+STASH_SIZE;
   if(!stash.length){const p=document.createElement('p');p.className='empty';p.textContent='仓库是空的。在背包里点「存仓」，其他角色就能取用。';box.append(p);return;}
   for(const item of stash){
-    const b=document.createElement('button');b.type='button';b.className='stash-item';b.title=item.name+' · 点击取回';
+    const mine=canUseItem(item,profile.heroClass);
+    const b=document.createElement('button');b.type='button';b.className='stash-item'+(mine?' is-mine':' is-alien');b.title=item.name+' · '+itemClassLabel(item)+' · 点击取回';
     const img=document.createElement('canvas');img.className='item-thumbnail';Art.drawItemIcon(img,item);
     const n=document.createElement('small');n.className='rarity-'+item.rarity+(item.setId?' rarity-set':'');n.textContent=item.name;
     b.append(img,n);b.onclick=()=>withdrawStash(item.id);box.append(b);
@@ -731,7 +734,9 @@ function renderInventory(){
     (category==='weapon'&&['weapon','offhand'].includes(item.slot))||
     (category==='armor'&&['head','shoulders','robe','gloves','belt','boots'].includes(item.slot))||
     (category==='accessory'&&['amulet','ring1','ring2'].includes(item.slot))||
-    (category==='legacy'&&item.legacy));
+    (category==='legacy'&&item.legacy)||
+    (category==='mine'&&!item.legacy&&canUseItem(item,profile.heroClass))||
+    (category==='others'&&!item.legacy&&!canUseItem(item,profile.heroClass)));
   visible.sort(sort==='score'?(a,b)=>itemScore(b)-itemScore(a):
     sort==='level'?(a,b)=>b.ilvl-a.ilvl:(a,b)=>0);
   if(sort==='rarity')visible.sort((a,b)=>b.rarity-a.rarity||b.ilvl-a.ilvl);
@@ -739,8 +744,9 @@ function renderInventory(){
     const node=document.createElement('div');node.className='item'+(selectedItemId===item.id?' is-selected':'');
     const detail=document.createElement('button');detail.type='button';detail.className='item-detail';
     const title=document.createElement('strong');title.className='rarity-'+item.rarity;title.textContent=item.name;
-    const desc=document.createElement('small');const low=(item.req||1)>profile.level;
-    desc.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · '+slotLabel(item)+' · '+(itemPowers(item).length?'传奇特效 · ':'')+(item.affixes?.length||0)+' 条词缀'+(low?' · 需 '+item.req+' 级':'');if(low)desc.classList.add('is-blocked');
+    const desc=document.createElement('small');const low=(item.req||1)>profile.level,alien=!canUseItem(item,profile.heroClass);
+    if(alien)node.classList.add('is-alien');
+    desc.textContent=(item.setId?'套装':RARITIES[item.rarity])+' · '+slotLabel(item)+' · '+(itemPowers(item).length?'传奇特效 · ':'')+(item.affixes?.length||0)+' 条词缀'+(low?' · 需 '+item.req+' 级':'')+(alien?' · '+itemClassLabel(item):'');if(low||alien)desc.classList.add('is-blocked');
     if(item.setId)title.classList.add('rarity-set');
     const img=document.createElement('canvas');img.className='item-thumbnail';img.setAttribute('aria-hidden','true');Art.drawItemIcon(img,item);
     const labels=document.createElement('span');labels.className='item-labels';labels.append(title,desc);
@@ -749,7 +755,7 @@ function renderInventory(){
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const actions=document.createElement('div');actions.className='item-actions';
     const worn=Object.values(profile.equipped).includes(item.id);
-    const use=document.createElement('button');use.textContent=worn?'已装备':item.legacy?'旧版':low?item.req+' 级':'装备';use.disabled=worn||!!item.legacy||low;
+    const use=document.createElement('button');use.textContent=worn?'已装备':item.legacy?'旧版':alien?'他职业':low?item.req+' 级':'装备';use.disabled=worn||!!item.legacy||low||alien;
     use.onclick=()=>{selectedItemId=item.id;applyEquipmentChange(()=>equip(profile,item.id,
       item.slot.startsWith('ring')?(!profile.equipped.ring1?'ring1':!profile.equipped.ring2?'ring2':item.slot):null));};
     const favorite=document.createElement('button');favorite.textContent=item.favorite?'★ 保留':'☆ 收藏';
@@ -2402,7 +2408,7 @@ function gmGear(){
   // 每个部位给一件 100 级的传奇 / 暗金 / 套装，再按战力一键换装
   const slots=['weapon','offhand','head','shoulders','robe','gloves','belt','boots','amulet','ring1','ring1'];let n=0;
   for(const slot of slots)for(const force of ['unique','legendary','set']){if(profile.inventory.length>=MAX_ITEMS)break;
-    profile.inventory.push(makeLoot(rng,MAX_LEVEL,'gm-'+Date.now()+'-'+(n++),{cls:profile.heroClass,slot,force}));}
+    profile.inventory.push(makeLoot(rng,MAX_LEVEL,'gm-'+Date.now()+'-'+(n++),{cls:profile.heroClass,slot,force,strict:true}));}
   applyEquipmentChange(()=>smartEquip(profile));return n;
 }
 const GM_ACTIONS=[

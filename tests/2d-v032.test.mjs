@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {REGION_DATA, BASES, makeLoot, catalogEntry} from '../dist/2d/systems.js';
+import {REGION_DATA, BASES, makeLoot, catalogEntry, catalogPool} from '../dist/2d/systems.js';
 import {BOSS_POOLS,rollBossRewards} from '../dist/2d/boss-loot.js';
 import {freshSave,sanitizeSave,makeDungeon,mulberry32} from '../dist/2d/core.js';
 import {pickRandomDestination,destinationOptions,validateDestination} from '../dist/2d/travel.js';
@@ -35,7 +35,8 @@ test('selection, next and random portal never emit invalid region',()=>{
 test('legacy save keeps owned items, boss victories and expands map slots',()=>{
  const old=freshSave();
  old.region=4;old.bossKills=[5,2,3,0,1];old.regionVisits=[2,2,1,1,4];
- old.inventory=[{id:'test',slot:'weapon',name:'测试法杖',rarity:3,power:36,hp:0,mana:0,armor:0,ilvl:10,affixes:[]}];
+ // v1.3：已穿的武器必须是本职业能用的，这里用一件法师的法杖传奇
+ old.inventory=[{id:'test',slot:'weapon',name:'测试法杖',rarity:3,power:36,hp:0,mana:0,armor:0,ilvl:10,affixes:[],cid:catalogPool(3,'weapon').find(c=>c.sub==='法杖'&&(c.owner==='mage'||c.cls==='法师')).id}];
  old.equipped.weapon='test';
  const restored=sanitizeSave(JSON.parse(JSON.stringify(old)));
  assert.equal(restored.bossKills[0].length,9);
