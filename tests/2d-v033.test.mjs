@@ -17,7 +17,7 @@ test('legacy save adds materials and default-disabled automatic salvage',()=>{
 });
 test('auto dismantling never removes equipped, favorites, legendary or set gear',()=>{
  const p=freshSave();p.autoSalvage=2;
- const plain=item('plain','head',0),magic=item('magic','head',1),rare=item('rare','weapon',2),
+ const plain=item('plain','head',0),magic=item('magic','head',1),rare=item('rare','weapon',2,{name:'试炼法杖'}),
   legendary=item('legend','weapon',3),favorite=item('fav','head',0,{favorite:true});
  const set=item('set','head',4,{setId:'dragonflame'});
  p.inventory.push(plain,magic,rare,legendary,favorite,set);

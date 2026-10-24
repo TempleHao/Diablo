@@ -5,10 +5,17 @@ import {makeLoot,gambleItem,itemClasses,canUseItem,normalizeItem,catalogPool,SET
 import {freshSave,sanitizeSave,equip,smartEquip,mulberry32} from '../dist/2d/core.js';
 const mk=(id,rarity,slot,f,extra={})=>normalizeItem({id,slot,name:'x',rarity,ilvl:40,power:10,hp:0,mana:0,armor:5,affixes:[],cid:catalogPool(rarity,slot).find(f).id,...extra});
 test('weapons are limited to classes that use the type; plain armor is shared',()=>{
-  const axe=mk('axe',1,'weapon',c=>c.sub==='双手斧'),staff=mk('st',1,'weapon',c=>c.sub==='法杖'),helm=mk('h',2,'head',()=>true);
+  const axe=mk('axe',1,'weapon',c=>c.sub==='双手斧'),staff=mk('st',1,'weapon',c=>c.sub==='法杖'),helm=mk('h',2,'head',c=>!String(c.a||'').startsWith('C-'));
   assert.ok(canUseItem(axe,'barbarian'));assert.ok(!canUseItem(axe,'mage'));
   assert.ok(canUseItem(staff,'mage'));assert.ok(!canUseItem(staff,'barbarian'));
   assert.equal(itemClasses(helm),null);for(const c of ['mage','barbarian','assassin'])assert.ok(canUseItem(helm,c));
+});
+test('every item on a class equipment sheet (C-*) belongs to that class, armor and jewelry included',()=>{
+  for(const [cls,name] of [['assassin','刺客'],['druid','德鲁伊'],['mage','法师']]){
+    const ring=mk('r-'+cls,1,'ring1',c=>c.a==='C-'+cls),robe=mk('b-'+cls,1,'robe',c=>c.a==='C-'+cls);
+    assert.deepEqual(itemClasses(ring),[cls]);assert.deepEqual(itemClasses(robe),[cls]);
+    assert.ok(!canUseItem(robe,cls==='mage'?'barbarian':'mage'));
+  }
 });
 test('class legendaries and class sets belong to that class only',()=>{
   const leg=mk('l',3,'head',c=>c.owner==='necro'||c.cls==='死灵法师');

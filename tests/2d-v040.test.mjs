@@ -31,8 +31,8 @@ test('every slot and rarity has a catalog pool',()=>{
 });
 test('two-hand weapon blocks the offhand both ways',()=>{
   const p=freshSave();
-  const staff=normalizeItem({id:'st',slot:'weapon',name:'x',cid:catalogPool(0,'weapon').find(c=>c.h===2&&c.sub==='法杖').id,rarity:0,power:40,hp:0,mana:0,armor:0});
-  const book=normalizeItem({id:'bk',slot:'offhand',name:'x',cid:catalogPool(0,'offhand').find(c=>c.sub==='法典').id,rarity:0,power:0,hp:0,mana:20,armor:5});
+  const staff=normalizeItem({id:'st',slot:'weapon',name:'x',cid:catalogPool(0,'weapon').find(c=>c.h===2&&c.sub==='法杖'&&!String(c.a||'').startsWith('C-')).id,rarity:0,power:40,hp:0,mana:0,armor:0});
+  const book=normalizeItem({id:'bk',slot:'offhand',name:'x',cid:catalogPool(0,'offhand').find(c=>c.sub==='法典'&&!String(c.a||'').startsWith('C-')).id,rarity:0,power:0,hp:0,mana:20,armor:5});
   assert.equal(staff.hands,2);
   p.inventory.push(staff,book);
   equip(p,'bk');equip(p,'st');
@@ -45,7 +45,7 @@ test('two-hand weapon blocks the offhand both ways',()=>{
   assert.equal(stats({...p,equipped:{...p.equipped,weapon:'st',offhand:'bk'}}).mana,100);
 });
 test('legacy saves: items get catalog names and icons, legs/relic stay in bag unequippable',()=>{
-  const save=sanitizeSave({version:2,level:20,heroClass:'necro',inventory:[
+  const save=sanitizeSave({version:2,level:20,heroClass:'paladin',inventory:[
     {id:'a',slot:'pants',name:'褐布护腿',rarity:1,power:0,hp:0,mana:0,armor:9,affixes:[{key:'hp',value:12}]},
     {id:'b',slot:'charm',name:'炉心遗物',rarity:2,power:0,hp:0,mana:0,armor:0},
     {id:'c',slot:'weapon',name:'白骨长剑',rarity:2,power:66,hp:0,mana:0},

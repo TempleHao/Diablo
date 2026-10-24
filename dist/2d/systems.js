@@ -51,6 +51,8 @@ export function itemClasses(item){
   const set=item.setId&&SETS[item.setId];
   if(set?.cls)return [set.cls];
   if(item.rarity>=3&&!item.setId){const o=e.owner||CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
+  // v1.5：用户给的七张职业装备图（art/equipment/C-<职业>）上的每一件，都只属于那个职业——防具、首饰也一样
+  if(typeof e.a==='string'&&e.a.startsWith('C-')){const o=CLASS_BY_CATALOG[e.cls];if(o&&CLASSES[o])return [o];}
   if((e.s==='weapon'||e.s==='offhand')&&TYPE_USERS.has(e.sub))return [...TYPE_USERS.get(e.sub)];
   return null;
 }
@@ -228,7 +230,8 @@ export function normalizeItem(item) {
     if(given&&given.s===slotGroup(item.slot))entry=given;
     else if(boss&&boss.s===slotGroup(item.slot))entry=boss;
     else{
-      const pool=catalogPool(rarity,item.slot);
+      // 旧存档补图鉴：只从通用的黑铁遗珍里挑，免得旧装备被分到别的职业名下穿不上
+      const all=catalogPool(rarity,item.slot),plain=all.filter(c=>!String(c.a||'').startsWith('C-')),named=plain.filter(c=>c.sub&&item.name.includes(c.sub)),pool=named.length?named:plain.length?plain:all;   // 名字里有武器类型（如「焦木法杖」）就挑同类型
       entry=pool[hashId(item.id)%pool.length];
       name=entry.n;
     }
@@ -284,7 +287,7 @@ export const DROP_RULES=Object.freeze({
   slotWeight:{weapon:3,offhand:1.5,head:1,shoulders:.6,robe:1,gloves:1,belt:1,boots:1,amulet:.7,ring1:1.2},
   // 职业区隔：武器 / 副手 90% 只出当前职业会用的类型；防具首饰 70% 偏本职业风格；传奇 / 暗金 / 套装 85% 出本职业或通用的
   // （剩下的给共享仓库里的其他角色，和 D2 一样能捡到别的职业的好东西）
-  ownWeapon:.9,ownClass:.7,ownNamed:.85,
+  ownWeapon:.9,ownClass:.85,ownNamed:.85,
   // 厄运保护（按趟计）：连续 N 趟没见到传奇以上 / 暗金，下一个首领必掉
   pity:{legendary:20,unique:80},
   // 首领专属传奇：每次击杀的几率（普通 / 噩梦 / 地狱）；首杀不再必掉，改为首杀第一件至少史诗
