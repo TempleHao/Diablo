@@ -45,10 +45,12 @@ export async function loadRig(base) {
   const parts = await Promise.all(def.files.map(f => loadOne(base + f)));
   const model = parts[0].scene;
   const clips = {};
-  parts.forEach((p, i) => p.clips.forEach((c, j) => {
+  const fixed = def.clips || {};
+  parts.forEach((p, i) => p.clips.forEach(c => {
     const label = !c.name || /mixamo\.com|^take ?\d*$/i.test(c.name) ? def.files[i].replace(/\.\w+$/, '') : c.name;
-    const role = Object.entries(def.clips || {}).find(([, v]) => v === label)?.[0] || roleOf(label);
-    if (role && !clips[role]) clips[role] = LOOP.has(role) ? pinHips(c) : c;
+    const mapped = Object.entries(fixed).find(([, v]) => v === label)?.[0];
+    const role = mapped || (fixed[roleOf(label)] ? null : roleOf(label));   // 指定过的角色不再按名字猜
+    if (role && (mapped || !clips[role])) clips[role] = LOOP.has(role) ? pinHips(c) : c;
   }));
 
   // 统一尺寸：按绑定姿态的包围盒把身高缩到 def.height，脚底放到地面
@@ -74,16 +76,27 @@ export function makeRigActor(proto, cloneFn) {
   const inst = cloneFn ? cloneFn(proto.model) : proto.model;
   root.add(inst);
   const bones = {};
-  inst.traverse(o => { if (o.isBone) bones[o.name.replace(/^mixamorig\d*:?/i, '').toLowerCase()] = o; });
+  inst.traverse(o => { if (o.isBone || o.userData.bone) bones[o.name.replace(/^mixamorig\d*:?/i, '').toLowerCase()] = o; });
+  // KayKit 骨架的名字对到 Mixamo 的叫法，程序化补位动作两边通用
+  for (const [mx, kk] of [['rightarm', 'upperarmr'], ['leftarm', 'upperarml'], ['rightforearm', 'lowerarmr'], ['leftforearm', 'lowerarml'], ['spine1', 'chest']]) if (!bones[mx] && bones[kk]) bones[mx] = bones[kk];
   const mixer = new THREE.AnimationMixer(inst);
-  const acts = {};
+  const acts = {}, upper = {};
+  const UP = /spine|chest|neck|head|arm|wrist|hand|shoulder/i;
   for (const [r, c] of Object.entries(proto.clips)) {
     const a = mixer.clipAction(c); acts[r] = a;
     if (!LOOP.has(r)) { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
+    // 只动上半身的版本：边跑边施法时腿继续跑
+    if (/cast|attack|hit/.test(r)) {
+      const u = mixer.clipAction(new THREE.AnimationClip(c.name + '_upper', c.duration, c.tracks.filter(t => UP.test(t.name.split('.')[0]) && !/ik/i.test(t.name))));
+      u.setLoop(THREE.LoopOnce, 1); u.clampWhenFinished = true; upper[r] = u;
+    }
   }
+  let lastSpeed = 0;
   const mats = [];
-  inst.traverse(o => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map(m => m.clone()) : o.material.clone(); (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => mats.push(m)); } });
-  let loop = null, once = null, onceT = 0, proc = null, dead = false;
+  const cl = m => { const c = m.clone(); c.onBeforeCompile = m.onBeforeCompile; c.customProgramCacheKey = m.customProgramCacheKey; return c; };
+  inst.traverse(o => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map(cl) : cl(o.material); (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => mats.push(m)); } });
+  let loop = null, once = null, onceT = 0, proc = null, dead = false, relax = 1;
+  const pose = proto.def.pose || [], armFix = proto.def.armFix;
   const runSpeed = proto.def.runSpeed || 4.6;
 
   function play(role, fade = .18) {
@@ -137,23 +150,34 @@ export function makeRigActor(proto, cloneFn) {
     has: r => !!acts[r],
     /* 每帧：speed 是当前水平速度（米/秒），用来对上跑步动作的步幅，脚不打滑 */
     update(dt, speed = 0) {
-      if (!dead) {
+      lastSpeed = speed;
+      if (!dead && !(once && once.full)) {
         if (speed > .3) { play('run'); if (loop === acts.run || loop === acts.walk) loop.timeScale = Math.max(.6, speed / runSpeed); }
         else play('idle');
       }
-      if (once && (onceT += dt) > once.getClip().duration * .92 && !dead) { once.fadeOut(.2); once = null; }
+      if (once && (onceT += dt) > once.getClip().duration / once.timeScale * .92 && !dead) { once.fadeOut(.2); once = null; }
       mixer.update(dt);
+      if (armFix) { bones.upperarml?.quaternion.premultiply(armFix.l); bones.upperarmr?.quaternion.premultiply(armFix.r); }
       inst.updateMatrixWorld(true);
+      // 体态：腐尸前伸的双臂、食尸鬼的驼背，叠加在动作之上（死亡时慢慢放松）
+      if (pose.length) {
+        relax = dead ? Math.max(0, relax - dt * 2) : 1;
+        const f = _v2.set(Math.sin(root.rotation.y), 0, Math.cos(root.rotation.y)), right = new THREE.Vector3(-f.z, 0, f.x);
+        for (const [b, ang, ax] of pose) turn(bones[b], ax === 'fwd' ? f : right, ang * relax * (speed > .3 || !/arm/.test(b) || ax ? 1 : .55));
+      }
       procPose(dt);
     },
     fire(role) {
       if (dead) return;
       if (role === 'die') dead = true;
-      const a = acts[role] || (role === 'attack' ? acts.cast : null);
+      const full = acts[role] || (role === 'attack' ? acts.cast : null);
+      const up = lastSpeed > .3 && !dead && (upper[role] || (role === 'attack' ? upper.cast : null));
+      const a = up || full;
       if (a) {
         if (once && once !== a) once.fadeOut(.08);
-        a.reset().setEffectiveWeight(1).fadeIn(.08).play(); once = a; onceT = 0;
-        if (dead && loop) loop.fadeOut(.2);
+        a.timeScale = role === 'cast' ? 1.7 : 1;
+        a.reset().setEffectiveWeight(up ? 3 : 1).fadeIn(.08).play(); once = a; onceT = 0; a.full = !up;
+        if (!up && loop) { loop.fadeOut(.12); loop = null; }
       } else proc = {kind: role === 'attack' ? 'cast' : role, t: 0};
     },
     revive() {

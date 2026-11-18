@@ -1,1 +1,1 @@
-{"hero": ["standin"], "note": "把 Mixamo 导出的主角放到 models/mage/ 并在这里把 \"mage\" 加到最前面"}
+{"hero": [], "note": "留空 = 用代码建模的主角（actors.js）。以后有 Mixamo 模型放到 models/<id>/，把 id 写进 hero 列表即可优先使用；models/standin 是灰色人偶。"}

@@ -24,6 +24,7 @@ jobs:
           node --check dist/proto/fx.js
           node --check dist/proto/main.js
           node --check dist/proto/char.js
+          node --check dist/proto/actors.js
           node --check dist/proto/pbr.js
           node --check dist/vendor/FBXLoader.js
           node --check dist/2d/core.js

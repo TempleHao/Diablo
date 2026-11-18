@@ -9,6 +9,7 @@ import {createFX} from './fx.js';
 import {spriteMaterial, tickMaterials, setDetail} from './materials.js';
 import {loadRig, makeRigActor} from './char.js';
 import {loadPBR} from './pbr.js';
+import {loadActors, skClone} from './actors.js';
 import {SPRITES} from '../2d/sprite-data.js';
 import {SKILL_ICON} from '../2d/skill-icons.js';
 import {NAMING} from '../2d/naming-data.js';
@@ -98,7 +99,7 @@ const art = {};
 
 /* ───────── 状态 ───────── */
 const P = {pos: new THREE.Vector3(0, 0, 3), vel: new THREE.Vector3(), yaw: Math.PI, yawT: Math.PI, holdYaw: 0, hp: 420, maxHp: 420, mp: 220, maxMp: 220, face: 1, cast: 0, castDir: 1, walk: 0, hurt: 0, alive: true, gold: 0, loot: 0, cd: {}};
-let player, hero = null, enemies = [], shots = [], drops = [], nums = [], kills = 0, bossOn = null, phase = 'intro', clock = 0, spawnT = 0, shake = 0, flash = 0;
+let player, hero = null, ACT = {}, enemies = [], shots = [], drops = [], nums = [], kills = 0, bossOn = null, phase = 'intro', clock = 0, spawnT = 0, shake = 0, flash = 0;
 const aim = new THREE.Vector3(0, 0, 0), keys = new Set();
 let mouseX = innerWidth / 2, mouseY = innerHeight / 2, mouseDown = false, mouseIn = false;
 const SK = {
@@ -129,13 +130,25 @@ const blocked = p => world.colliders.circles.some(c => Math.hypot(p.x - c.x, p.z
 /* ───────── 生成怪物 ───────── */
 function spawn(type, pos, {rise = false} = {}) {
   const T = TYPES[type], a = art[type];
-  const act = makeActor(a, T.h, a.foot);
-  const e = {type, T, ...act, pos: pos.clone(), hp: T.hp, maxHp: T.hp, face: 1, walk: Math.random() * 6, atk: 0, atkCd: 1 + Math.random(), state: rise ? 'rise' : 'chase', st: 0, frozen: 0, flash: 0, slam: 6, summoned: false, kb: new THREE.Vector3()};
+  let act;
+  if (ACT[type]) {
+    // 三维骨骼怪物：每只克隆一份骨架，几何体和材质程序共享
+    const rig = makeRigActor(ACT[type], skClone);
+    const blob = new THREE.Mesh(blobGeo, blobMat); blob.position.y = .02; blob.scale.setScalar(T.r * 1.3); blob.renderOrder = 1; rig.root.add(blob);
+    scene.add(rig.root);
+    act = {rig, root: rig.root, H: ACT[type].height, W: T.r * 2.4, blob};
+  } else act = makeActor(a, T.h, a.foot);
+  const e = {type, T, ...act, yaw: Math.atan2(P.pos.x - pos.x, P.pos.z - pos.z), pos: pos.clone(), hp: T.hp, maxHp: T.hp, face: 1, walk: Math.random() * 6, atk: 0, atkCd: 1 + Math.random(), state: rise ? 'rise' : 'chase', st: 0, frozen: 0, flash: 0, slam: 6, summoned: false, kb: new THREE.Vector3()};
   if (T.elite || T.boss) {
     e.aura = fx.ring(e.pos, T.boss ? 0x9a1030 : 0xff3a10, 1, T.r * 2.2, 1e9, {kind: 1, width: .1, follow: e.pos});
     e.aura.m.material.uniforms.uP.value = 0;
   }
   e.root.position.copy(e.pos);
+  if (e.rig) {
+    e.root.rotation.y = e.yaw;
+    e.riseDur = .9;
+    if (rise && e.rig.has('spawn')) { e.rig.fire('spawn'); e.riseDur = Math.min(2.2, ACT[type].clips.spawn.duration * .85); e.riseAnim = true; }
+  }
   enemies.push(e);
   if (rise) { fx.burst(new THREE.Vector3(pos.x, .2, pos.z), 'soul', 26, 3); fx.burst(new THREE.Vector3(pos.x, .2, pos.z), 'smoke', 8, 2); fx.decal('scorch', pos.x, pos.z, 1.8, 6); fx.light(new THREE.Vector3(pos.x, 1, pos.z), 0x9a50ff, 14, 7, .8); }
   return e;
@@ -169,11 +182,13 @@ function hurtEnemy(e, dmg, from, {freeze = 0, knock = 0} = {}) {
   addNum(e.pos.clone().setY(e.H * .9), crit ? dmg + '!' : '' + dmg, crit ? '#ffd27a' : freeze ? '#9fd8ff' : '#f2e6d0', crit);
   if (freeze) e.frozen = Math.max(e.frozen, freeze * (e.T.boss ? .35 : 1));
   if (knock && from && !e.T.boss) { const d = e.pos.clone().sub(from).setY(0).normalize(); e.kb.addScaledVector(d, knock * (e.T.elite ? .3 : 1)); }
-  fx.burst(e.pos.clone().setY(e.H * .55), 'blood', crit ? 10 : 5, 3);
+  fx.burst(e.pos.clone().setY(e.H * .55), e.type === 'skeleton' || e.type === 'lord' ? 'spark' : 'blood', crit ? 10 : 5, 3);
+  if (e.rig && e.hp > 0 && e.atk <= 0 && !e.frozen && (crit || Math.random() < .4) && !e.T.boss) e.rig.fire('hit');
   if (e.hp <= 0) kill(e);
 }
 function kill(e) {
-  e.state = 'dead'; e.st = 0; e.mat.transparent = true;
+  e.state = 'dead'; e.st = 0;
+  if (e.rig) e.rig.fire('die'); else e.mat.transparent = true;
   fx.burst(e.pos.clone().setY(e.H * .5), 'blood', 18, 4);
   fx.burst(e.pos.clone().setY(e.H * .6), 'soul', 8, 1.5);
   fx.decal('blood', e.pos.x + (Math.random() - .5), e.pos.z + (Math.random() - .5), e.W * .9 + .6, 50);
@@ -394,9 +409,31 @@ function update(dt) {
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i], T = e.T;
     e.flash = Math.max(0, e.flash - dt);
+    if (e.rig) for (const m of e.rig.mats) if (m.emissive) {
+      m.emissive.setRGB(e.flash > 0 ? .9 : e.frozen > 0 ? .03 : (e.atk > 0 && e.atk < .5 ? e.atk * .5 : 0), e.flash > 0 ? .8 : e.frozen > 0 ? .1 : 0, e.flash > 0 ? .75 : e.frozen > 0 ? .3 : 0);
+      m.color.setRGB(e.frozen > 0 ? .55 : 1, e.frozen > 0 ? .78 : 1, e.frozen > 0 ? 1.15 : 1);
+    }
+    if (e.rig) {
+      if (e.state === 'dead') {
+        e.st += dt; e.rig.update(dt, 0);
+        if (e.st > 2.2) e.root.position.y -= dt * .6;
+        e.blob.visible = e.st < 1.2;
+        if (e.st > 3.4) { scene.remove(e.root); enemies.splice(i, 1); }
+        continue;
+      }
+      if (e.state === 'rise') {
+        e.st += dt; const k = Math.min(1, e.st / e.riseDur);
+        e.root.position.set(e.pos.x, e.riseAnim ? 0 : -(1 - k) * e.H, e.pos.z);
+        e.rig.update(dt, 0);
+        if (Math.random() < .5) fx.burst(e.pos.clone().setY(.1), 'smoke', 1, 1);
+        if (k >= 1) { e.state = 'chase'; e.root.position.y = 0; }
+        continue;
+      }
+    } else {
     e.mat.emissive.setRGB(e.flash > 0 ? 1.4 : e.frozen > 0 ? .05 : 0, e.flash > 0 ? 1.3 : e.frozen > 0 ? .15 : 0, e.flash > 0 ? 1.2 : e.frozen > 0 ? .35 : 0);
     e.mat.color.setRGB(e.frozen > 0 ? .6 : 1, e.frozen > 0 ? .8 : 1, 1);
     e.body.quaternion.copy(camera.quaternion);
+    }
     if (e.state === 'dead') {
       e.st += dt;
       const k = Math.min(1, e.st * 3);
@@ -431,7 +468,8 @@ function update(dt) {
       const wind = T.ranged ? .6 : T.boss ? .7 : .42;
       const prev = e.atk; e.atk += dt;
       const t = e.atk;
-      if (t < wind) { e.u.uLean.value = -.16 * (t / wind) ** 2; e.mat.emissive.r += .4 * (t / wind); }
+      if (e.rig) { if (prev === .0001) e.rig.fire('attack'); }
+      else if (t < wind) { e.u.uLean.value = -.16 * (t / wind) ** 2; e.mat.emissive.r += .4 * (t / wind); }
       else { const q = Math.min(1, (t - wind) / .25); e.u.uLean.value = .3 * (q < .3 ? q / .3 : 1 - (q - .3) / .7); }
       if (prev < wind && t >= wind && P.alive) {
         if (T.ranged) {
@@ -442,10 +480,10 @@ function update(dt) {
           shots.push(s);
         } else if (d < T.range + .7) hurtPlayer(T.dmg, e.pos);
       }
-      if (t > wind + .45) { e.atk = 0; e.atkCd = T.ranged ? 2.4 : T.boss ? 1.4 : 1.1; e.u.uLean.value = 0; }
+      if (t > wind + .45) { e.atk = 0; e.atkCd = T.ranged ? 2.4 : T.boss ? 1.4 : 1.1; if (!e.rig) e.u.uLean.value = 0; }
     } else if (T.boss && (e.slam -= dt) <= 0 && d < 9) {
       // 首领：重踏，地面先出预警圈，1.2 秒后爆发
-      e.slam = 7; e.slamAt = e.pos.clone(); e.slamT = 1.2;
+      e.slam = 7; e.slamAt = e.pos.clone(); e.slamT = 1.2; if (e.rig) e.rig.fire('cast2');
       fx.ring(e.slamAt, 0xff2a20, 1, 5, 1.2, {kind: 1, width: .08});
       toast('<b style="color:#ff6a5a">躲开红圈！</b>', 1);
     } else if (d > T.range * (T.ranged ? .75 : .9)) {
@@ -472,6 +510,14 @@ function update(dt) {
     e.pos.addScaledVector(e.kb, dt * 8); e.kb.multiplyScalar(Math.exp(-dt * 8));
     collide(e.pos, T.r, ARENA + 6);
     if (Math.abs(to.x) > .15) e.face = to.x > 0 ? 1 : -1;
+    if (e.rig) {
+      // 转身：移动时朝前进方向，站定攻击时盯着玩家
+      const ty = moving2 && !(T.ranged && d < 7) ? Math.atan2(to.x, to.z) : Math.atan2(P.pos.x - e.pos.x, P.pos.z - e.pos.z);
+      let dy = ty - e.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy)); e.yaw += dy * (1 - Math.exp(-dt * 8));
+      e.root.position.set(e.pos.x, 0, e.pos.z); e.root.rotation.y = e.yaw;
+      e.rig.update(dt, moving2 ? T.speed * (e.hp < e.maxHp * .4 && T.elite ? 1.4 : 1) : 0);
+      continue;
+    }
     const b = animActor(e, dt, moving2, T.speed * .5);
     if (e.atk <= 0) e.u.uLean.value = moving2 ? .06 : 0;
     e.root.position.set(e.pos.x, b, e.pos.z);
@@ -699,14 +745,22 @@ $('help-keys').hidden = touch; $('help-touch').hidden = !touch;
     const mc = cropTex(mage, 0, 0, mage.width, mage.height); mc.tex.anisotropy = 8;
     player = makeActor(mc, 2.35, (mage.width * .646 + 4) / mc.w);
     player.walk = 0;
+    // 纯代码建模的骨骼角色（主角 + 怪物）；?actors=0 退回立绘
+    if (!/[?&]actors=0/.test(location.search)) {
+      try { ACT = await loadActors(['mage', 'skeleton', 'zombie', 'ghoul', 'cultist', 'butcher', 'lord'], quality); }
+      catch (err) { console.warn('代码建模角色加载失败，用立绘', err); ACT = {}; }
+    }
   } catch (e) { $('boot').innerHTML = '<p class="boot-err">素材加载失败，请刷新重试。</p>'; throw e; }
   // 三维骨骼主角：优先用 models/mage（混元3D + Mixamo 的正式模型），没有就用临时人偶；?hero=card 退回立绘
   if (!/[?&]hero=card/.test(location.search)) {
-    let ids = ['standin'];
+    let ids = [];
     try { ids = (await fetch('./models/index.json', {cache: 'no-cache'}).then(r => r.json())).hero || ids; } catch {}
+    const qh = location.search.match(/[?&]heroid=([\w-]+)/); if (qh && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) ids = [qh[1]];
+    if (ACT.mage) ids.push('proc');
     for (const id of ids) {
       try {
-        const proto = await loadRig(`./models/${id}/`);
+        const proto = id === 'proc' ? ACT.mage : await loadRig(`./models/${id}/`);
+        if (!proto) throw new Error('no proto');
         hero = makeRigActor(proto);
         if (proto.def.standin) hero.mats.forEach(m => { if (/joint/i.test(m.name)) { m.color.set(0x8a6a34); m.metalness = .8; m.roughness = .35; } else { m.color.set(0xd9d2c2); m.roughness = .7; m.metalness = 0; } });
         const blob = new THREE.Mesh(blobGeo, blobMat); blob.position.y = .02; blob.scale.setScalar(.55); blob.renderOrder = 1; hero.root.add(blob);
