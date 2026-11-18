@@ -4,9 +4,11 @@
  * 操作：电脑 WASD 移动、鼠标瞄准；左键 火球，右键 陨石，Q 冰霜新星，空格 闪现。手机：左手摇杆，右手技能（自动瞄准最近的敌人）。 */
 import * as THREE from '../vendor/three.module.js';
 import {buildWorld, ARENA} from './world.js';
-import {createPost} from './post.js';
+import {createPost, MAX_VL} from './post.js';
 import {createFX} from './fx.js';
 import {spriteMaterial, tickMaterials, setDetail} from './materials.js';
+import {loadRig, makeRigActor} from './char.js';
+import {loadPBR} from './pbr.js';
 import {SPRITES} from '../2d/sprite-data.js';
 import {SKILL_ICON} from '../2d/skill-icons.js';
 import {NAMING} from '../2d/naming-data.js';
@@ -32,9 +34,9 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = quality === 'low' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(32, 1, .5, 160);
-const world = buildWorld(scene, renderer, quality);
+let world;
 const fx = createFX(scene, quality);
-const post = createPost(renderer, {msaa: quality !== 'low', levels: quality === 'low' ? 4 : 6});
+const post = createPost(renderer, {msaa: quality !== 'low', levels: quality === 'low' ? 4 : 6, ao: quality !== 'low', vol: quality !== 'low', steps: quality === 'high' ? 12 : 7});
 const ov = $('ov'), og = ov.getContext('2d');
 
 let dpr = 1;
@@ -95,8 +97,8 @@ const KILL_GOAL = 40;
 const art = {};
 
 /* ───────── 状态 ───────── */
-const P = {pos: new THREE.Vector3(0, 0, 3), vel: new THREE.Vector3(), hp: 420, maxHp: 420, mp: 220, maxMp: 220, face: 1, cast: 0, castDir: 1, walk: 0, hurt: 0, alive: true, gold: 0, loot: 0, cd: {}};
-let player, enemies = [], shots = [], drops = [], nums = [], kills = 0, bossOn = null, phase = 'intro', clock = 0, spawnT = 0, shake = 0, flash = 0;
+const P = {pos: new THREE.Vector3(0, 0, 3), vel: new THREE.Vector3(), yaw: Math.PI, yawT: Math.PI, holdYaw: 0, hp: 420, maxHp: 420, mp: 220, maxMp: 220, face: 1, cast: 0, castDir: 1, walk: 0, hurt: 0, alive: true, gold: 0, loot: 0, cd: {}};
+let player, hero = null, enemies = [], shots = [], drops = [], nums = [], kills = 0, bossOn = null, phase = 'intro', clock = 0, spawnT = 0, shake = 0, flash = 0;
 const aim = new THREE.Vector3(0, 0, 0), keys = new Set();
 let mouseX = innerWidth / 2, mouseY = innerHeight / 2, mouseDown = false, mouseIn = false;
 const SK = {
@@ -261,6 +263,8 @@ function use(k) {
   if (!ready(k)) { if (P.alive && phase === 'play' && P.mp < SK[k].mp && (P.cd[k] || 0) <= 0) toast('法力不足', 1); return; }
   P.cd[k] = SK[k].cd; P.mp -= SK[k].mp; P.cast = .28;
   const A = aimDir(); P.castDir = A.dir.x >= 0 ? 1 : -1; P.face = P.castDir;
+  P.yawT = Math.atan2(A.dir.x, A.dir.z); P.holdYaw = .45;
+  if (hero) hero.fire(k === 'nova' || k === 'meteor' ? 'cast2' : 'cast');
   const hand = P.pos.clone().add(new THREE.Vector3(A.dir.x * .5, 1.45, A.dir.z * .5));
   if (k === 'fireball') {
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(.2, 12, 8), new THREE.MeshBasicMaterial({color: new THREE.Color(7, 3.2, .8)}));
@@ -311,10 +315,11 @@ function explode(at, r, dmg, kind) {
 function hurtPlayer(dmg, from) {
   if (!P.alive || phase !== 'play') return;
   P.hp -= dmg; P.hurt = 1;
+  if (hero && P.hp > 0 && dmg >= 10) hero.fire('hit');
   addNum(P.pos.clone().setY(2.2), '' + dmg, '#ff5a4a');
   fx.burst(P.pos.clone().setY(1.2), 'blood', 6, 2.5);
   shake = Math.max(shake, .12);
-  if (P.hp <= 0) { P.hp = 0; P.alive = false; defeat(); }
+  if (P.hp <= 0) { P.hp = 0; P.alive = false; if (hero) hero.fire('die'); defeat(); }
 }
 
 /* ───────── 每帧 ───────── */
@@ -370,6 +375,17 @@ function update(dt) {
   player.body.quaternion.copy(camera.quaternion);
   if (!P.alive) { player.body.rotateZ(-P.face * 1.3); player.root.position.y = -.2; }
   heroLight.position.set(P.pos.x, 3, P.pos.z + 2.2);
+  // 三维骨骼主角：朝移动方向转身，施法时转向目标；跑步动作的步幅按实际速度对齐
+  if (hero) {
+    P.holdYaw = Math.max(0, P.holdYaw - dt);
+    if (moving && P.holdYaw <= 0) P.yawT = Math.atan2(mv.x, mv.z);
+    else if (!moving && P.holdYaw <= 0 && !touch && mouseIn && P.alive) P.yawT = Math.atan2(aim.x - P.pos.x, aim.z - P.pos.z);
+    let dy = P.yawT - P.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+    if (P.alive) P.yaw += dy * (1 - Math.exp(-dt * 16));
+    hero.root.position.set(P.pos.x, 0, P.pos.z); hero.root.rotation.y = P.yaw;
+    hero.update(dt, moving ? 5.4 * Math.min(1, mv.length()) : 0);
+    player.root.visible = false;
+  }
 
   // —— 生成 ——
   if (phase === 'play' && !bossOn) { spawnT -= dt; if (spawnT <= 0) { spawnWave(); spawnT = Math.max(.55, 1.6 - kills * .025); } }
@@ -512,6 +528,23 @@ function update(dt) {
   post.final.uHurt.value = Math.max(P.hurt * .7, P.alive ? Math.max(0, .35 - P.hp / P.maxHp) * 1.6 : .9);
   post.final.uDesat.value = P.alive ? 0 : .7;
   post.final.uFlash.value = flash;
+  feedVolLights();
+}
+/* 体积雾里的点光：每帧挑离镜头焦点最近、正在亮的几盏 */
+let vLights = [];
+const _lc = new THREE.Color();
+function feedVolLights() {
+  if (quality === 'low') return;
+  const u = post.vol, cand = [];
+  for (const l of vLights) if (l.intensity > .05 && l.position.y > -10) cand.push([l.position.distanceToSquared(camTarget), l]);
+  cand.sort((a, b) => a[0] - b[0]);
+  const n = Math.min(MAX_VL, cand.length);
+  for (let i = 0; i < n; i++) {
+    const l = cand[i][1], k = (l === heroLight ? .12 : 1) * Math.min(1, 16 / l.intensity);   // 爆炸这种瞬间强光在雾里封顶，不然整屏发白
+    u.uLP.value[i].set(l.position.x, l.position.y, l.position.z, l.distance || 20);
+    _lc.copy(l.color).multiplyScalar(l.intensity * k); u.uLC.value[i].set(_lc.r, _lc.g, _lc.b);
+  }
+  u.uLN.value = n;
 }
 
 /* ───────── 画面上的血条、伤害数字、装备名 ───────── */
@@ -632,7 +665,8 @@ function reset() {
   for (const d of drops) scene.remove(d.g); drops = [];
   nums = []; kills = 0; bossOn = null; spawnT = 1.5;
   Object.assign(P, {hp: P.maxHp, mp: P.maxMp, alive: true, cd: {}, gold: 0, loot: 0, hurt: 0});
-  P.pos.set(0, 0, 3); camTarget.copy(P.pos);
+  P.pos.set(0, 0, 3); camTarget.copy(P.pos); P.yaw = P.yawT = Math.PI;
+  if (hero) hero.revive();
   $('boss').hidden = true; $('end').hidden = true;
   updateObjective();
 }
@@ -658,16 +692,34 @@ $('help-keys').hidden = touch; $('help-touch').hidden = !touch;
 /* ───────── 启动 ───────── */
 (async () => {
   try {
+    world = buildWorld(scene, renderer, quality, /[?&]tex=0/.test(location.search) ? {} : await loadPBR(quality, renderer));
+    if (quality !== 'low') scene.fog.density = .009;
     const [mons, mage] = await Promise.all([loadImg('../2d/art/monsters.webp'), loadImg('../2d/art/select/mage.webp')]);
     for (const [k, T] of Object.entries(TYPES)) { const f = SPRITES[T.sprite]; const c = cropTex(mons, f[0], f[1], f[2], f[3]); art[k] = {...c, foot: (f[4] + 4) / c.w}; }
     const mc = cropTex(mage, 0, 0, mage.width, mage.height); mc.tex.anisotropy = 8;
     player = makeActor(mc, 2.35, (mage.width * .646 + 4) / mc.w);
     player.walk = 0;
   } catch (e) { $('boot').innerHTML = '<p class="boot-err">素材加载失败，请刷新重试。</p>'; throw e; }
+  // 三维骨骼主角：优先用 models/mage（混元3D + Mixamo 的正式模型），没有就用临时人偶；?hero=card 退回立绘
+  if (!/[?&]hero=card/.test(location.search)) {
+    let ids = ['standin'];
+    try { ids = (await fetch('./models/index.json', {cache: 'no-cache'}).then(r => r.json())).hero || ids; } catch {}
+    for (const id of ids) {
+      try {
+        const proto = await loadRig(`./models/${id}/`);
+        hero = makeRigActor(proto);
+        if (proto.def.standin) hero.mats.forEach(m => { if (/joint/i.test(m.name)) { m.color.set(0x8a6a34); m.metalness = .8; m.roughness = .35; } else { m.color.set(0xd9d2c2); m.roughness = .7; m.metalness = 0; } });
+        const blob = new THREE.Mesh(blobGeo, blobMat); blob.position.y = .02; blob.scale.setScalar(.55); blob.renderOrder = 1; hero.root.add(blob);
+        scene.add(hero.root);
+        break;
+      } catch (err) { console.warn('3D 主角加载失败', id, err); }
+    }
+  }
   buildSkills(); resize(); updateObjective();
-  if (/[?&]qa=1/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__p3 = {scene, P, camera, renderer, get enemies() { return enemies; }, spawn, use, start, sim(n) { for (let i = 0; i < n; i++) update(1 / 30); }, fx, aim, keys, THREE, setPhase(x) { phase = x; }, kill(n) { kills += n; updateObjective(); if (kills >= KILL_GOAL && !bossOn) summonBoss(); }};
+  if (/[?&]qa=1/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__p3 = {scene, P, get hero() { return hero; }, post, setCam(v) { camDist = v; }, camera, renderer, get enemies() { return enemies; }, spawn, use, start, sim(n) { for (let i = 0; i < n; i++) update(1 / 30); }, fx, aim, keys, THREE, setPhase(x) { phase = x; }, kill(n) { kills += n; updateObjective(); if (kills >= KILL_GOAL && !bossOn) summonBoss(); }};
   addEventListener('resize', resize);
   // 先渲染一帧让着色器编译好，再撤掉加载画面
+  scene.traverse(o => { if (o.isPointLight) vLights.push(o); });
   renderer.compile(scene, camera);
   $('boot').classList.add('done');
   let last = performance.now();

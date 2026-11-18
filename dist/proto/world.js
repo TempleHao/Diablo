@@ -42,13 +42,27 @@ function ragged(geo, amount) {
   geo.computeVertexNormals();
   return geo;
 }
+/** 碎块：细分的方块，棱角按位置哈希随机削掉、表面起伏（同一位置的顶点移动一致，不会裂缝） */
+function chunkGeo(size, boxy = false) {
+  const g = boxy ? new THREE.BoxGeometry(1, 1, 1, 3, 3, 3) : new THREE.DodecahedronGeometry(1, 1);
+  const p = g.attributes.position;
+  const hv = (x, y, z, k) => { const s = Math.sin(Math.round(x * 97) * 12.9898 + Math.round(y * 89) * 78.233 + Math.round(z * 83) * 37.719 + k * 19.19) * 43758.5453; return s - Math.floor(s); };
+  for (let i = 0; i < p.count; i++) {
+    let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    if (boxy) { const c = Math.abs(x) + Math.abs(y) + Math.abs(z); if (c > 1.05) { const k = 1 - (c - 1.05) * .22 * (.6 + hv(x, y, z, 1)); x *= k; y *= k; z *= k; } }
+    const j = 1 + (hv(x, y, z, 2) - .5) * (boxy ? .1 : .3);
+    p.setXYZ(i, x * j * size, y * j * size, z * j * size);
+  }
+  g.computeVertexNormals();
+  return g;
+}
 const place = (g, x, y, z, ry = 0, rx = 0, rz = 0) => {
   g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rx, ry, rz)).setPosition(x, y, z)); return g;
 };
 
-export function buildWorld(scene, renderer, quality) {
+export function buildWorld(scene, renderer, quality, TX = {}) {
   const colliders = {circles: [], boxes: []}, occ = [];
-  const stoneG = [], darkStoneG = [], ironG = [], woodG = [];
+  const stoneG = [], pillarG = [], darkStoneG = [], ironG = [], woodG = [];
   scene.environment = envMap(renderer);
   scene.fog = new THREE.FogExp2(0x0a0d14, .02);
   scene.background = new THREE.Color(0x030406);
@@ -101,7 +115,7 @@ export function buildWorld(scene, renderer, quality) {
     const parts = [base, shaft];
     if (!broken) parts.push(new THREE.BoxGeometry(1.4, .45, 1.4).translate(0, .5 + h + .22, 0));
     const g = mergeGeometries(parts.map(q => q.toNonIndexed()));
-    stoneG.push(place(g, x, 0, z, rnd() * Math.PI));
+    pillarG.push(place(g, x, 0, z, rnd() * Math.PI));
     colliders.circles.push({x, z, r: .78});
     occ.push({x, z, r: 1.6, k: .55});
   };
@@ -114,7 +128,7 @@ export function buildWorld(scene, renderer, quality) {
   for (const [x, z, a] of [[-15, 5, .4], [16, -6, 2.1], [5, 18, 1.2], [-6, -17, 2.8]]) {
     const len = rr(2.4, 3.8), g = new THREE.CylinderGeometry(.5, .55, len, 12, 3);
     ragged(g, .3);
-    stoneG.push(place(g, x, .48, z, a, 0, Math.PI / 2));
+    pillarG.push(place(g, x, .48, z, a, 0, Math.PI / 2));
     const dx = Math.cos(a) * len / 2, dz = -Math.sin(a) * len / 2;
     for (let k = -1; k <= 1; k++) colliders.circles.push({x: x + dx * k * .8, z: z + dz * k * .8, r: .6});
     occ.push({x, z, r: len * .6, k: .4});
@@ -198,7 +212,7 @@ export function buildWorld(scene, renderer, quality) {
 
   // —— 碎石和骨头：散落在墙根、柱脚 ——
   const rubbleN = quality === 'low' ? 220 : 520;
-  const rubble = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(.18, 0), stoneMaterial({moss: .6, masonry: 0}), rubbleN);
+  const rubble = new THREE.InstancedMesh(chunkGeo(.18), stoneMaterial({moss: .6, masonry: 0, tex: TX.rubble, scale: 1}), rubbleN);
   rubble.castShadow = rubble.receiveShadow = true;
   const anchors = [...colliders.circles.map(c => [c.x, c.z, c.r + .6]), ...colliders.boxes.map(b => [(b.x0 + b.x1) / 2, (b.z0 + b.z1) / 2, Math.max(b.x1 - b.x0, b.z1 - b.z0) * .6])];
   for (let i = 0; i < rubbleN; i++) {
@@ -218,13 +232,31 @@ export function buildWorld(scene, renderer, quality) {
 
   // —— 合并几何体，每种材质一个绘制调用 ——
   const add = (list, mat) => { if (!list.length) return; const m = new THREE.Mesh(mergeGeometries(list.map(g => g.index ? g.toNonIndexed() : g)), mat); m.castShadow = m.receiveShadow = true; scene.add(m); return m; };
-  add(stoneG, stoneMaterial({moss: 1}));
-  add(darkStoneG, stoneMaterial({tint: 0x8a8580, moss: .5, scale: 1.3}));
+  add(stoneG, stoneMaterial({moss: 1, tex: TX.wall}));
+  add(pillarG, stoneMaterial({moss: .8, tex: TX.pillar}));
+  add(darkStoneG, stoneMaterial({tint: 0x8a8580, moss: .5, scale: 1.3, tex: TX.pillar}));
+
+  // —— 散落的砌块：墙根、柱脚、门洞边上的大块落石（真几何体，不是贴图）——
+  const blockN = quality === 'low' ? 70 : 180;
+  const blocks = new THREE.InstancedMesh(chunkGeo(.5, true), stoneMaterial({moss: .7, masonry: 0, tex: TX.wall || TX.rubble}), blockN);
+  blocks.castShadow = blocks.receiveShadow = true;
+  const wallAnch = colliders.boxes.filter(b => Math.max(Math.abs(b.x0 + b.x1), Math.abs(b.z0 + b.z1)) / 2 > ARENA - 3);
+  for (let i = 0; i < blockN; i++) {
+    const b = rnd() < .75 ? wallAnch[Math.floor(rnd() * wallAnch.length)] : null;
+    let x, z;
+    if (b) { const cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2, inward = -Math.sign(Math.abs(cx) > Math.abs(cz) ? cx : cz);
+      x = Math.abs(cx) > Math.abs(cz) ? cx + inward * rr(.9, 2.6) : rr(b.x0, b.x1); z = Math.abs(cx) > Math.abs(cz) ? rr(b.z0, b.z1) : cz + inward * rr(.9, 2.6); }
+    else { const c = colliders.circles[Math.floor(rnd() * colliders.circles.length)], a = rnd() * 6.28, d = c.r + rr(.3, 1.5); x = c.x + Math.cos(a) * d; z = c.z + Math.sin(a) * d; }
+    const sx = rr(.5, 1.1), sy = rr(.35, .6), sz = rr(.45, .8);
+    m4.compose(new THREE.Vector3(x, sy * .22, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(-.3, .3), rnd() * 6.28, rr(-.3, .3))), new THREE.Vector3(sx, sy, sz));
+    blocks.setMatrixAt(i, m4);
+  }
+  scene.add(blocks);
   add(ironG, ironMaterial());
   add(woodG, stoneMaterial({tint: 0x5a4636, moss: .3, scale: 3, wet: .3, masonry: 0}));
 
   // —— 地面 ——
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(140, 140, 1, 1).rotateX(-Math.PI / 2), groundMaterial(occ.slice(0, 96)));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(140, 140, 1, 1).rotateX(-Math.PI / 2), groundMaterial(occ.slice(0, 96), TX));
   ground.receiveShadow = true;
   scene.add(ground);
 
