@@ -17,6 +17,12 @@ jobs:
           node-version: 22
       - name: Static checks and pure game rules
         run: |
+          node --check dist/proto/glsl.js
+          node --check dist/proto/materials.js
+          node --check dist/proto/world.js
+          node --check dist/proto/post.js
+          node --check dist/proto/fx.js
+          node --check dist/proto/main.js
           node --check dist/2d/core.js
           node --check dist/2d/game.js
           node --check dist/2d/systems.js

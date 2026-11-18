@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#05060a">
+<title>归墟 VORAGH · 3D 画面小样</title>
+<link rel="icon" href="../2d/art/logo-voragh-icon.webp">
+<link rel="stylesheet" href="./proto.css?v=1">
+</head>
+<body>
+<canvas id="view"></canvas>
+<canvas id="ov"></canvas>
+<div id="ui">
+  <div class="tl">
+    <img class="brand" src="../2d/art/logo-voragh-sm.webp" alt="归墟 VORAGH">
+    <div class="tlx">
+      <div class="obj" id="obj"></div>
+      <div class="purse"><span>金币 <b id="gold">0</b></span><span>装备 <b id="loot">0</b></span></div>
+    </div>
+  </div>
+  <div class="tr">
+    <button id="btn-pause" class="ib" aria-label="暂停">❚❚</button>
+  </div>
+  <div id="boss" class="boss" hidden><span>冥河领主</span><i><u id="boss-fill"></u></i></div>
+  <div id="toast" class="toast"></div>
+  <div class="dock">
+    <div class="orb hp"><i id="hp-fill"></i><b id="hp-n">0</b></div>
+    <div id="skills" class="skills"></div>
+    <div class="orb mp"><i id="mp-fill"></i><b id="mp-n">0</b></div>
+  </div>
+  <div id="joyzone"></div>
+  <div id="joy" class="joy"><i></i></div>
+</div>
+
+<section id="start" class="panel">
+  <div class="card">
+    <img class="logo" src="../2d/art/logo-voragh.webp" alt="归墟 VORAGH">
+    <h1>三维画面小样</h1>
+    <p class="lead">月夜，废墟祭坛。清剿 40 个亡魂后，法阵会唤醒冥河领主。</p>
+    <p class="note">场景、材质、光影和特效全部由代码实时生成，没有使用任何模型或贴图文件；人物和怪物沿用游戏现有的立绘。</p>
+    <dl id="help-keys" class="keys"><dt>移动</dt><dd>WASD</dd><dt>火球</dt><dd>左键（按住连发）</dd><dt>陨石</dt><dd>右键</dd><dt>冰霜新星</dt><dd>Q</dd><dt>闪现</dt><dd>空格</dd><dt>拉近 / 拉远</dt><dd>滚轮</dd></dl>
+    <dl id="help-touch" class="keys"><dt>移动</dt><dd>左手在屏幕左半边拖动</dd><dt>技能</dt><dd>右下角按钮，自动瞄准最近的敌人</dd><dt>火球</dt><dd>按住连发</dd></dl>
+    <button id="btn-start" class="primary">进入祭坛</button>
+    <div class="qrow">画质 <button data-q="high">高</button><button data-q="medium">中</button><button data-q="low">低</button></div>
+    <a class="back" href="../2d/">返回 2D 正式版</a>
+  </div>
+</section>
+<section id="pause" class="panel" hidden>
+  <div class="card small"><h2>暂停</h2><button id="btn-resume" class="primary">继续</button>
+    <div class="qrow">画质 <button data-q="high">高</button><button data-q="medium">中</button><button data-q="low">低</button></div>
+    <a class="back" href="../2d/">返回 2D 正式版</a></div>
+</section>
+<section id="end" class="panel" hidden>
+  <div class="card small"><h2 id="end-title"></h2><p id="end-sub" class="lead"></p><button id="btn-again" class="primary">再来一次</button><a class="back" href="../2d/">返回 2D 正式版</a></div>
+</section>
+<div id="boot"><img src="../2d/art/logo-voragh.webp" alt=""><p>正在生成场景……</p></div>
+<script type="module" src="./main.js?v=1"></script>
+</body>
+</html>
